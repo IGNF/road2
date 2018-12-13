@@ -1,0 +1,13 @@
+{
+  "name": "Road2",
+  "version": "0.0.1",
+  "description": "Calcul d'itinéraire",
+  "author": "IDEV - IGN",
+  "main": "server.js",
+  "scripts": {
+    "start": "pm2-runtime start process.config.js"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
