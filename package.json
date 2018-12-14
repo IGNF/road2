@@ -8,6 +8,7 @@
     "start": "pm2-runtime start process.config.js"
   },
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "4.16.4",
+    "osrm": "5.20.0"
   }
 }

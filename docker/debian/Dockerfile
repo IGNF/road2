@@ -26,7 +26,7 @@ RUN apt-get -y update
 RUN apt-get -y upgrade
 
 ### Utilitaires
-RUN apt-get -y install wget vim
+RUN apt-get -y install wget vim unzip
 
 ### Installation des dépendances de NodeJS
 RUN apt-get install -y python g++ make
@@ -38,6 +38,20 @@ WORKDIR /home/docker/nodejs
 RUN wget -O node-v10.13.0.tar.gz "https://nodejs.org/dist/v10.13.0/node-v10.13.0.tar.gz"
 RUN tar -xzf /home/docker/nodejs/node-v10.13.0.tar.gz
 RUN cd node-v10.13.0  && ./configure && make -j4 && make install
+
+### Installation des dépendances de OSRM
+# https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM
+RUN apt-get install -y cmake libboost-dev libboost-filesystem-dev libboost-thread-dev libboost-system-dev libboost-regex-dev libstxxl-dev libxml2-dev libsparsehash-dev libbz2-dev zlib1g-dev libzip-dev libgomp1 liblua5.2-dev pkg-config libgdal-dev libboost-program-options-dev libboost-iostreams-dev libboost-test-dev libtbb-dev libexpat1-dev
+
+### Installation de OSRM pour utiliser la libosrm dans Road2
+# https://github.com/Project-OSRM/osrm-backend
+# https://github.com/Project-OSRM/osrm-backend/blob/master/docs/nodejs/api.md
+# https://github.com/door2door-io/osrm-express-server-demo
+# https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
+WORKDIR /home/docker/osrm
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.20.0.zip
+RUN unzip v5.20.0.zip -d ./osrm-backend
+RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/ && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && cmake --build . --target install
 
 ### Dossier de l'application
 WORKDIR /home/docker/app
