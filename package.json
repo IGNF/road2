@@ -5,7 +5,8 @@
   "author": "IDEV - IGN",
   "main": "server.js",
   "scripts": {
-    "start": "pm2-runtime start process.config.js"
+    "start": "pm2-runtime start process.config.js",
+    "test" : "mocha --recursive './test/mocha/*.js'"
   },
   "dependencies": {
     "express": "4.16.4",

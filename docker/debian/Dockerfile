@@ -60,6 +60,7 @@ WORKDIR /home/docker/app
 COPY package.json ./
 COPY process.config.js ./
 COPY src ./src/
+COPY /test ./test/
 
 ### Installation des dépandences de l'application NodeJS
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
@@ -72,6 +73,10 @@ RUN npm install
 # http://pm2.keymetrics.io/docs/usage/quick-start/
 # https://pm2.io/doc/en/runtime/integration/docker/
 RUN npm install pm2 -g
+
+### Installation de mocha pour les tests
+# https://mochajs.org/#installation
+RUN npm install mocha -g
 
 ### Commande de lancement de l'application
 CMD npm start
