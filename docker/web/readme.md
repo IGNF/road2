@@ -1,6 +1,8 @@
-# Dockerfile pour tester Road2 sur une page web cartographique
+# Dockerfile pour diffuser des données Web
 
-Cette image permet de tester Road2 sur une page web simple contenant une carte.
+Cette image permet de :
+- tester Road2 sur une page web simple contenant une carte.
+- visualiser la documentation de l'API et du code.
 
 
 # Construction de l'image
@@ -18,7 +20,7 @@ Les éléments suivants peuvent être spécifiés:
 docker build -t web-road2 --build-arg dnsIP=$dnsIP --build-arg dnsHost=$dnsHost --build-arg proxy=$proxy -f docker/web/Dockerfile .
 ```
 
-# Lancer l'application
+# Lancer le serveur web
 
 Pour lancer le serveur web qui rend la page accessible, il suffit d'utiliser la commande suivante:
 ```
@@ -39,3 +41,28 @@ docker run --name web-road2-page --rm -d -p 8080:80 -v $src:/home/docker/web/www
 ```
 docker run --name web-road2-page --rm -it -p 8080:80 -v $src:/home/docker/web/www web-road2 /bin/bash
 ```
+
+# Tester Road2
+
+On pourra tester Road2 sur le lien suivant: http://localhost:8080/road2/
+
+# Visualiser la documentation de l'API
+
+L'API est décrite via un fichier YAML qui est visualisable avec Swagger. Ce fichier est disponible via le lien http://localhost:8080/api/api.yaml.
+
+Pour le visualiser ou l'éditer, il est possible d'utiliser les dockers proposés par Swagger.
+```
+# Pour de l'édition
+docker run --rm -d -p 8081:8080 swaggerapi/swagger-editor
+# OU
+# Pour de la visualisation
+docker run --rm -d -p 8081:8080 swaggerapi/swagger-ui
+```
+
+Une fois le docker swagger et le docker web lancés, il suffit de se rendre sur l'URL suivante: http://localhost:8081/?url=http://localhost:8080/api/api.yaml.
+
+Il est donc possible de visualiser et d'éditer la documentation. Mais pour que les changements soient pris en compte, il faut modifier le vrai fichier manuellement dans de dépôt de code. Pour le moment, Swagger ne permet pas nativement de faire de la modification de fichier en local.
+
+# Visualiser la documentation du code
+
+On pourra tester Road2 sur le lien suivant: http://localhost:8080/road2/
