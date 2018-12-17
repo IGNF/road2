@@ -13,7 +13,9 @@ const app = express();
 app.get('/', (req, res) => {
   res.send('Hello world !! \n');
   osrm.route({coordinates: [[ 9.479455,42.546907], [9.435853,42.619204]]}, function(err, result) {
-    if(err) throw err;
+    if(err) {
+      throw err;
+    }
     console.log(result.waypoints); // array of Waypoint objects representing all waypoints in order
     console.log(result.routes); // array of Route objects ordered by descending recommendation rank
   });

@@ -68,6 +68,7 @@ WORKDIR /home/docker/app
 ### Récupération des sources de l'application
 COPY package.json ./
 COPY process.config.js ./
+COPY eslint.json ./
 COPY /src ./src/
 COPY /test ./test/
 
@@ -86,6 +87,10 @@ RUN npm install pm2 -g
 ### Installation de mocha pour les tests
 # https://mochajs.org/#installation
 RUN npm install mocha -g
+
+### Installation de eslint pour les le code
+# https://eslint.org/docs/user-guide/configuring
+RUN npm install eslint -g
 
 
 ### Commande de lancement de l'application

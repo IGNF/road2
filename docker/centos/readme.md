@@ -37,3 +37,16 @@ docker run --name centos-road2-server --rm -d -p 8080:8080 -v $src:/home/docker/
 ```
 docker run --name centos-road2-server --rm -it -p 8080:8080 -v $src:/home/docker/app/src centos-road2 /bin/bash
 ```
+# Lancer les tests
+
+Les tests ont été écrits avec Mocha. Pour les lancer, on utilisera la commande suivante:
+```
+docker run --name centos-road2-server --rm -v $src:/home/docker/app/src -v $test:/home/docker/app/test centos-road2 npm test
+```
+
+# Lancer eslint
+
+Pour linter le code, il suffit de lancer la commande suivante:
+```
+docker run --name centos-road2-server --rm -v $src:/home/docker/app/src centos-road2 npm run lint
+```

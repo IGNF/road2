@@ -1,0 +1,21 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "strict": 1,
+    "eqeqeq": 1,
+    "curly": 1,
+    "no-console": 1
+  }
+}

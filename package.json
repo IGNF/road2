@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "pm2-runtime start process.config.js",
-    "test" : "mocha --recursive './test/mocha/*.js'"
+    "test" : "mocha --recursive './test/mocha/*.js'",
+    "lint" : "eslint -c eslint.json ./src/"
   },
   "dependencies": {
     "express": "4.16.4",
