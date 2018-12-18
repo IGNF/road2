@@ -50,3 +50,14 @@ Pour linter le code, il suffit de lancer la commande suivante:
 ```
 docker run --name centos-road2-server --rm -v $src:/home/docker/app/src centos-road2 npm run lint
 ```
+
+# Créer la documentation du code via jsdoc
+
+Le code est documenté via des commentaires. Ces commentaires peuvent être plus ou moins structurés avec des tags. L'outil jsdoc permet de générer un site web à partir de ces commentaires et de ces tags.
+
+Pour créer la documentation, il suffit de lancer la commande suivante:
+```
+docker run --name centos-road2-server --rm -v $doc:/home/docker/app/documentation/code centos-road2 npm run jsdoc
+```
+
+La documentation sera alors accessible dans `$doc`.

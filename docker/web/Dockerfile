@@ -44,5 +44,9 @@ WORKDIR /home/docker/web/www/documentation/api
 COPY documentation/api/ /home/docker/web/www/documentation/api
 RUN ln -s /home/docker/web/www/documentation/api/ /var/www/html/api
 
+### Création d'un lien symbolique pour visualiser la documentation du code
+WORKDIR /home/docker/web/www/documentation/code
+RUN ln -s /home/docker/web/www/documentation/code/ /var/www/html/code
+
 ### Lancement du serveur Nginx
 CMD nginx -g "daemon off;"

@@ -69,6 +69,7 @@ WORKDIR /home/docker/app
 COPY package.json ./
 COPY process.config.js ./
 COPY eslint.json ./
+COPY jsdoc.json ./
 COPY /src ./src/
 COPY /test ./test/
 
@@ -88,9 +89,13 @@ RUN npm install pm2 -g
 # https://mochajs.org/#installation
 RUN npm install mocha -g
 
-### Installation de eslint pour les le code
+### Installation de eslint pour le code
 # https://eslint.org/docs/user-guide/configuring
 RUN npm install eslint -g
+
+### Installation de jsdoc pour la documentation du code
+# http://usejsdoc.org/about-configuring-jsdoc.html
+RUN npm install jsdoc -g
 
 
 ### Commande de lancement de l'application

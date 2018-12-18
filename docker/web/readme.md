@@ -65,4 +65,23 @@ Il est donc possible de visualiser et d'éditer la documentation. Mais pour que 
 
 # Visualiser la documentation du code
 
-On pourra tester Road2 sur le lien suivant: http://localhost:8080/road2/
+## Créer la documentation du code via jsdoc
+
+Le code est documenté via des commentaires. Ces commentaires peuvent être plus ou moins structurés avec des tags. L'outil jsdoc permet de générer un site web à partir de ces commentaires et de ces tags.
+
+Pour créer la documentation, il suffit de lancer la commande suivante:
+```
+docker run --rm -v $code:/home/docker/app/documentation/code debian-road2 npm run jsdoc
+# OU
+docker run --rm -v $code:/home/docker/app/documentation/code centos-road2 npm run jsdoc
+```
+
+La documentation sera alors accessible dans le dossier `$code`.
+
+## Visualiser la documentation créée
+
+Une fois que la documentation a été créée, il est possible de la visualiser avec l'image.
+```
+docker run --name web-road2-page --rm -d -p 8080:80 -v $code:/home/docker/web/www/documentation/code/ web-road2
+```
+La documentation est alors visible sur le lien suivant: http://localhost:8080/code.
