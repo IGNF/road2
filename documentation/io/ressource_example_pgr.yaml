@@ -1,0 +1,166 @@
+ressource:
+	id: "bduni_j+1"
+	type: "pgr"
+	description: "Données BDUNI v2 mise à jour quotidiennement."
+	topology:
+		description: "Données issues de la BDUNI de l'IGN."
+		projection: "EPSG:2154" 
+		base: 
+			table: "bduni-pgr"
+			startColumn: "start"
+			endColumn: "end"
+			idColumn: "id"
+			attributeColumns:
+				- key: "name"
+				  column: "ways_name"
+				  default: true
+				- key: "type"
+				  column: "ways_type"
+				  default: false
+				  #le coût, la durée et la distance dépendent de la requête
+				- key: "slope"
+				  column: "ways_slope"
+				  default: false
+	sources:
+		- id: "bduni-car-fastest"
+		  storage:
+		    costColumn: "car_fastest_cost"
+		    reverseCostColumn: "fcar_astest_reverse_cost"
+		  cost:
+		  	profile: "car"
+		  	optimisation: "fastest"
+		  	compute: 
+		  		storage:
+		  			file: "car-fastest.lua"
+		- id: "bduni-car-shortest"
+		  storage:
+		    costColumn: "car_shortest_cost"
+		    reverseCostColumn: "car_shortest_reverse_cost"
+		  cost:
+		  	profile: "car"
+		  	optimisation: "shortest"
+		  	compute: 
+		  		storage:
+		  			file: "car-shortest.lua"
+		- id: "bduni-bike-fastest"
+		  storage:
+		    costColumn: "bike_fastest_cost"
+		    reverseCostColumn: "bike_fastest_reverse_cost"
+		  cost:
+		  	profile: "bike"
+		  	optimisation: "fastest"
+		  	compute: 
+		  		storage:
+		  			file: "bike-fastest.lua"
+		- id: "bduni-bike-shortest"
+		  storage:
+		    costColumn: "bike_shortest_cost"
+		    reverseCostColumn: "bike_shortest_reverse_cost"
+		  cost:
+		  	profile: "bike"
+		  	optimisation: "shortest"
+		  	compute: 
+		  		storage:
+		  			file: "bike-shortest.lua"
+	defaultSourceId: "bduni-car-fastest"
+	availableOperations:
+		- type: "route"
+		  rate: 10
+		  maxIntermediatePoints: 5
+		  maxNumberOfConstraints: 2
+		  defaultParameters:
+		  	- id: "algorythme"
+		  	  default: "contraction-hierarchies"
+		  	- id: "format"
+		  	  default: "application/json"
+		  	- id: "getGeometry"
+		  	  default: true
+		  	- id: "getBbox"
+		  	  default: true
+		  	- id: "getInstructions"
+		  	  default: false
+		  	- id: "distanceUnit"
+		  	  default: "kilometer"
+		  	- id: "timeUnit"
+		  	  default: "h-m-s"
+		  constraints:
+			- id: "filter-1" 
+			  type: "constraint-pgr-enum" #c'est ce type qui est important et entraîne des actions spécifiques comme définir la liste des opérateurs disponibles.
+			  description: "Type d'arc emprunté."
+			  key: "road_type"
+			  values: "" #génération automatique à partir des données
+			  availableConstraintType: {"banned","preferred","unpreferred"}
+			  availableOperators: {"=","!=","like"}
+			  propertiesColumn: "type"
+			- id: "filter-2" 
+			  type: "constraint-pgr-number" 
+			  description: "Pente des arcs empruntés."
+			  key: "road_slope"
+			  values: "" #génération automatique à partir des données
+			  availableConstraintType: {"banned","preferred","unpreferred"}
+			  availableOperators: {"=","!=","<",">","<=",">="}
+			  propertiesColumn: "slope"
+			- id: "filter-3"
+			  type: "constraint-pgr-string" 
+			  description: "Nom des arcs empruntés."
+			  key: "road_name"
+			  values: "string"
+			  availableConstraintType: {"banned","preferred","unpreferred"}
+			  availableOperators: {"=","!=","like"}
+			  propertiesColumn: "name"
+	    - type: "nearest"
+		  rate: 20
+		  maxNumber: 100
+		  defaultParameters:
+  	  	  - id: "format"
+  	  	    default: "application/json"
+  	  	  - id: "getId"
+  	  	    default: false
+  	  	  - id: "number"
+  	  	    default: 1
+  	  	  - id: "type"
+  	  	    default: "all"
+		- id: "isochrone"
+		  rate: 10
+		  costs: #il faudra vérifier que les profils et les optimizations sont bien présentes dans les sources
+		  	- key: "temps"
+		  	  description: "Calculer des isochrones."
+		  	  sourceIds:
+		  	  	- "bduni-car-fastest" 
+		  	  	- "bduni-bike-fastest" 
+		  	  unit: "minute"
+		  	  min: 1.0
+		  	  max: 600.0
+		  	- key: "distance"
+		  	  description: "Calculer des iso-distances."
+		  	  sourceIds:
+		  	  	- "bduni-car-shortest" 
+		  	  	- "bduni-bike-shortest" 
+		  	  unit: "kilometer"
+		  	  min: 1.0
+		  	  max: 1000.0
+		  defaultParameters:
+	  	  	- id: "costType"
+	  	  	  default: "temps"
+	  	  	- id: "profile"
+	  	  	  default: "car"
+	  	  	- id: "direction"
+	  	  	  default: "départ"
+	  	  	- id: "format"
+	  	  	  default: "application/json"
+	  	  	- id: "distanceUnit"
+	  	  	  default: "kilometer"
+	  	  	- id: "timeUnit"
+	  	  	  default: "h-m-s"
+		  constraints:
+			- id: "filter-isochrone" 
+			  type: "constraint-pgr-isochrone" #c'est ce type qui est important et entraîne des actions spécifiques comme définir la liste des opérateurs disponibles.
+			  description: "Type d'arc emprunté."
+			  key: "road_type"
+			  values: "" #génération automatique à partir des données
+			  propertiesColumn: "type"
+			  availableConstraintType: {"banned"}
+			  availableOperators: {"="}
+	boundingBox: "0,6000000,1300000,7200000"
+	defaultProjection: "EPSG:2154"
+	availableProjection: {"EPSG:2154"}

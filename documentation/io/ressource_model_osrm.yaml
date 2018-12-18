@@ -1,0 +1,241 @@
+# Description d'un fichier de configuration de ressource OSRM
+
+# Une ressource est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.  
+"ressource":
+	type: object
+  required: true
+	properties:
+    # Id de la ressource. C'est l'id qui apparaîtra dans le getcap et sera utilisé pour les requêtes. 
+		"id":
+			type: string
+      required: true
+    # Type de la ressource: osmr ou pgr. Selon le type, différentes informations seront alors attendues. 
+		"type":
+			type: string
+      required: true
+			enum: ["osrm"]
+    # Description de la ressource qui apparaîtra dans le getcap. 
+		"description":
+			type: string
+      required: true
+    # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources). 
+		"topology":
+			type: object
+      required: true
+			properties:
+        # Description de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur. 
+				"description":
+					type: string
+          required: true
+        # Permet de savoir où est stocké la topologie utilisée. Cela est utile uniquement pour l'administrateur.  
+				"storage":
+					$ref: "#/components/schemas/storage"
+          required: true
+        # Projection d'origine des données 
+        "projection":
+          type: string
+          required: true
+    # Bbox dans laquelle les requêtes seront autorisées. Cette bbox doit être exprimée dans la projection d'origine des données. 
+		"boundingBox":
+			type: string
+      required: false
+    # Projection de diffusion par défaut
+		"defaultProjection":
+			type: string
+      required: false
+    # Liste des projections que l'on veut rendre disponible
+		"availableProjection":
+			type: array
+      required: false
+			minItems: 1
+			items:
+				type: string
+    # Id de la source qui va être utilisée pour initialiser le profile et l'optimisation par défaut. 
+		"defaultSourceId":
+			type: string
+      required: true
+    # Liste des sources permettants de construire la ressource. 
+		"sources":
+			type: array
+      required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+          # Id de la source
+					"id":
+						type: string
+            required: true
+          # Le storage indique ou se trouve le fichier .osrm (ce peut être un fichier ou un objet ceph)
+					"storage":
+						$ref: "#/components/schemas/storage"
+            required: true
+          # A chaque .osrm correspond un coût, soit un mode de déplacement et une optimisation combinée.
+					"cost":
+						type: object
+            required: true
+						properties:
+              # Mode de déplacement
+							"profile":
+								type: string
+                required: true
+              # Optimisation
+							"optimisation":
+								type: string
+                required: true
+              # Indique où se trouve le fichier .lua qui a permis de générer le .osrm
+							"compute":
+								type: object
+                required: true
+								properties:
+									"storage":
+										$ref: "#/components/schemas/storage"
+                    required: true
+    # Liste des opérations rendus disponibles 
+		"availableOperations":
+			type: array
+      required: true
+			minItems: 1
+      uniqueItems: true
+			items:
+				anyOf:
+					- $ref: "#/components/schemas/routeOperation"
+					- $ref: "#/components/schemas/nearestOperation"
+
+components:
+  schemas:
+    # storage d'un document: fichier ou ceph
+  	"storage":
+  		type: object
+  		properties:
+  			oneOf:
+          # Fichier 
+  				- "file":
+  						type: string
+              required: false
+          # storage objet ceph. Les informations de connexion sont dans la configuration principale de l'application. 
+  				- "ceph":
+  						type: object
+              required: false
+  						properties:
+                # Pool contenant l'objet.
+  							"pool":
+  								type: string
+                  required: true
+                # Id de l'objet.
+  							"objectId":
+  								type: string
+                  required: true
+    # Configuration des contraintes que l'on peut formuler dans les requêtes. 
+  	"constraint":
+  		type: object
+      properties: 
+        # Id de la contrainte
+      	"id":
+      		type: string
+          required: true
+        # type de la contrainte: parmi une liste prédéfinie. Le type va indiquer les opérations possibles. 
+      	"type":
+      		type: string
+          required: true
+      		enum: ["filter-osrm"]
+        # Description de la contrainte qui va apparaître dans le getcap.
+      	"description":
+      		type: string
+          required: true
+        # Mot clé permettant de formuler la contrainte. Indiqué dans le getcap. 
+        "key":
+          type: string
+          required: true
+        # Valeurs possibles pour la contrainte. Dans le cas d'OSRM, il n'y aura que des filtres précalculés lors de la génération des .osrm. Ce sont ces valeurs qui devront être indiquée ici. Elles seront alors visible dans le getcap. 
+        "values":
+        	type: array
+          required: true
+        	minItems: 1
+        	items:
+          	type: string
+        "availableConstraintType":
+          type: array
+          required: false
+          minItems: 1
+          items:
+            type: string
+            enum: {"banned"}
+        "availableOperators":
+          type: array
+          required: false
+          minItems: 1
+          items:
+            type: string
+            enum: {"="}
+    # Configuration des paramètres par défaut d'une opération
+    "defaultParameters":
+      type: array
+      required: false
+      minItems: 1
+      items:
+        type: object
+        properties:
+          # Id du paramètre concerné
+          "id":
+            type: string
+            required: true
+          # valeur par défaut du paramètre concerné
+          "default":
+            type: string
+            required: true
+    # Configuration nécessaire pour paramètrer l'opération route d'OSRM. 
+  	"routeOperation":
+  		type: object
+  		properties:
+        # Id de l'opération: route dans ce cas
+  			"type":
+  				type: string
+          required: true
+          enum: ["route"]
+        # Nombre de requête par seconde maximal
+  			"rate":
+  				type: number
+          required: false
+  				foramt: integer
+        # Nombre maximal de points intermédiaires par requête
+  			"maxIntermediatePoints":
+  				type: number
+          required: false
+  				foramt: integer
+        # Nombre maximal de contraintes formulables par requête
+  			"maxNumberOfConstraints":
+   				type: number
+          required: false
+  				foramt: integer
+        # Contraintes 
+  			"constraints":
+  				type: array
+          required: false
+  				minItems: 1
+  				items:
+  					$ref: "#/components/schemas/constraint"
+        # Paramètres par défaut
+        "defaultParameters":
+          $ref: "#/components/schemas/defaultParameters"
+  	"nearestOperation":
+  		type: object
+  		properties:
+        # Id de l'opération: nearest dans ce cas
+  			"type":
+  				type: string
+          required: true
+          enum: ["nearest"]
+        # Nombre de requête par seconde maximal
+  			"rate":
+  				type: number
+          required: false
+  				foramt: integer
+        # Nombre maximal d'entités que l'opération peut renvoyé.
+  			"maxNumber":
+  				type: number
+          required: false
+  				foramt: integer
+        # Paramètres par défaut
+        "defaultParameters":
+          $ref: "#/components/schemas/defaultParameters"

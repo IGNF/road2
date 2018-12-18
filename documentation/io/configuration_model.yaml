@@ -1,0 +1,72 @@
+# Description d'un fichier de configuration de l'application Road4
+
+# Une application est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
+"application":
+	type: object
+	required: true
+	properties:
+		# Nom de l'application qui va apparaître dans le getcap
+		"name":
+			type: string
+			required: true
+		# Titre qui va apparaître dans le getcap
+		"title":
+			type: string
+			required: true
+		# Description qui va apparaître dans le getcap
+		"description":
+			type: string
+			required: true
+		# Information sur le fournisseur du service
+		"provider":
+			type: object
+			required: false
+			properties:
+				# Nom du fournisseur
+				"name":
+					type: string
+					required: true
+				# Site web du fournisseur
+				"site":
+					type: string
+					required: false
+				# Adresse mail du fournisseur
+				"mail":
+					type: string
+					required: true
+		# Configuration des logs de l'application
+		"logs":
+			type: object
+			required: true
+			properties:
+				# Emplacement du fichier de configuration
+				"configuration":
+					type: string
+					required: true
+		# Configuration des ressources diffusées sur le service
+		"ressources":
+			type: object
+			required: true
+			properties:
+				# Dossier contenant l'ensemble des fichiers de configuration des ressources.
+				"directory":
+					type: string
+					required: true
+		# Configuration pour lire dans un stockage ceph
+		"ceph":
+			type: object
+			required: false
+			properties:
+				# Nom du cluster
+				"clusterName":
+					type: string
+					required: true
+				# Nom de l'utilisateur pouvant lire dans ceph
+				"userName":
+					type: string
+					required: true
+				# Fichier de configuration pour accéder à ceph
+				"configFile":
+					type: string
+					required: true
+

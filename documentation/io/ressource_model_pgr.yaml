@@ -1,0 +1,344 @@
+# Description d'un fichier de configuration de ressource PGR
+
+# Une ressource est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
+"ressource":
+	type: object
+  required: true
+	properties:
+    # Id de la ressource. C'est l'id qui apparaîtra dans le getcap et sera utilisé pour les requêtes. 
+		"id":
+			type: string
+      required: true
+    # Type de la ressource: osmr ou pgr. Selon le type, différentes informations seront alors attendues. 
+		"type":
+			type: string
+      required: true
+			enum: ["pgr"]
+    # Description de la ressource qui apparaîtra dans le getcap. 
+		"description":
+			type: string
+      required: true
+    # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources). 
+		"topology":
+			type: object
+      required: true
+			properties:
+        # Description de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
+				"description":
+					type: string
+          required: true
+        # Projection d'origine des données 
+        "projection":
+          type: string
+          required: true
+        # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
+				"base":
+					type: object
+          required: true
+					properties:
+            # Table contenant la topologie des tronçons navigables.
+						"table":
+							type: string
+              required: true
+            # Nom de la colonne des débuts de tronçons.
+						"startColumn":
+							type: string
+              required: true
+            # Nom de la colonne des fins de tronçons.
+						"endColumn":
+							type: string
+              required: true
+            # Nom de la colonne contenant les ids des tronçons.
+						"idColumn":
+							type: string
+              required: true
+            # Descriptif des colonnes contenant les attributs de chaque tronçon. 
+						"attributeColumns":
+							type: array
+              required: false
+							minItems: 1
+							items:
+                # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap. 
+								"key":
+									type: string
+                  required: true
+                # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table. 
+								"column":
+									type: string
+                  required: true
+                # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
+                "default":
+                  type: boolean
+                  required: true
+    # Bbox dans laquelle les requêtes seront autorisées. Cette bbox doit être exprimée dans la projection d'origine des données.
+		"boundingBox":
+			type: string
+      required: false
+    # Projection de diffusion par défaut
+		"defaultProjection":
+			type: string
+      required: false
+    # Liste des projections que l'on veut rendre disponible
+		"availableProjection":
+			type: array
+      required: false
+			minItems: 1
+			items:
+				type: string
+    # Id de la source qui va être utilisée pour initialiser le profile et l'optimisation par défaut. 
+		"defaultSourceId":
+			type: string
+      required: true
+    # Liste des sources permettants de construire la ressource. 
+		"sources":
+			type: array
+      required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+          # Id de la source
+					"id":
+						type: string
+            required: true
+          # Le storage indique ou se trouve le coût, comme c'est du PGR, il indique les colonnes de coût pour chaque tronçon. Ils doivent être dans la même table que la topologie.
+					"storage":
+						type: object
+            required: true
+						properties:
+              # Colonne de coût en sens direct
+							"costColumn":
+								type: string
+                required: true
+              # Colonne de coût en sens inverse
+							"reverseCostColumn":
+								type: string
+                required: true
+          # A chaque doublet de colonne de coût correspond un mode de déplacement et une optimisation combinée.
+					"cost":
+						type: object
+            required: true
+						properties:
+              # Mode de déplacement
+							"profile":
+								type: string
+                required: true
+              # Optimisation
+							"optimisation":
+								type: string
+                required: true
+              # Indique où se trouve le fichier .lua qui a permis de générer les colonnes de coût
+							"compute":
+								type: object
+                required: true
+								properties:
+									"storage":
+										$ref: "#/components/schemas/storage"
+                    required: true
+    # Liste des opérations rendus disponibles 
+		"availableOperations":
+			type: array
+      required: true
+			minItems: 1
+			items:
+				anyOf:
+					- $ref: "#/components/schemas/routeOperation"
+					- $ref: "#/components/schemas/nearestOperation"
+					- $ref: "#/components/schemas/isochroneOperation"
+
+components:
+  schemas:
+    # storage d'un document: fichier ou ceph
+  	"storage":
+  		type: object
+  		properties:
+  			oneOf:
+          # Fichier 
+  				- "file":
+  						type: string
+              required: false
+          # storage objet ceph. Les informations de connexion sont dans la configuration principale de l'application. 
+  				- "ceph":
+  						type: object
+              required: false
+  						properties:
+                # Pool contenant l'objet.
+  							"pool":
+  								type: string
+                  required: true
+                # Id de l'objet.
+  							"objectId":
+  								type: string
+                  required: true
+    # Configuration des contraintes que l'on peut formuler dans les requêtes. 
+  	"constraint":
+  		type: object
+      properties: 
+        # Id de la contrainte
+      	"id":
+      		type: string
+          required: true
+        # type de la contrainte: parmi une liste prédéfinie. Le type va indiquer les opérations possibles. 
+      	"type":
+      		type: string
+          required: true
+      		enum: ["constraint-pgr-enum","constraint-pgr-number","constraint-pgr-string","constraint-pgr-isochrone"]
+        # Description de la contrainte qui va apparaître dans le getcap.
+      	"description":
+      		type: string
+          required: true
+        # Mot clé permettant de formuler la contrainte. Indiqué dans le getcap.
+        "key":
+          type: string
+          required: true
+        # Valeurs possibles pour la contrainte. Dans le cas de PGR, les valeurs disponibles vont être calculées en fonction du type de contrainte et de la colonne contenant les valeurs. Elles seront alors visible dans le getcap. 
+        "values":
+        	type: string
+          required: true
+        # Colonne contenant les propriété permettant de définir des contraintes. Il faut reprendre la key indiquée dans la topologie de la ressource.
+        "propertiesColumn":
+        	type: string
+          required: true
+        "availableConstraintType":
+          type: array
+          required: false
+          minItems: 1
+          items:
+            type: string
+            enum: {"banned","prefered","unprefered"}
+        "availableOperators":
+          type: array
+          required: false
+          minItems: 1
+          items:
+            type: string
+            enum: {"=","!=","<",">","<=",">=","like"}
+    # Configuration des paramètres par défaut d'une opération
+    "defaultParameters":
+      type: array
+      required: false
+      minItems: 1
+      items:
+        type: object
+        properties:
+          # Id du paramètre concerné
+          "id":
+            type: string
+            required: true
+          # valeur par défaut du paramètre concerné
+          "default":
+            type: string
+            required: true
+    # Configuration nécessaire pour paramètrer l'opération route de PGR. 
+  	"routeOperation":
+  		type: object
+  		properties:
+        # Type de l'opération: route dans ce cas
+  			"type":
+  				type: string
+          required: true
+          enum: ["route"]
+        # Nombre de requête par seconde maximal
+  			"rate":
+  				type: number
+          required: false
+  				format: integer
+        # Nombre maximal de points intermédiaires par requête
+  			"maxIntermediatePoints":
+  				type: number
+          required: false
+  				format: integer
+        # Nombre maximal de contraintes formulables par requête
+  			"maxNumberOfConstraints":
+   				type: number
+          required: false
+  				format: integer
+        # Contraintes 
+  			"constraints":
+  				type: array
+          required: false
+  				minItems: 1
+  				items:
+  					$ref: "#/components/schemas/constraint"
+        # Paramètres par défaut
+        "defaultParameters":
+          $ref: "#/components/schemas/defaultParameters"
+    # Configuration nécessaire pour paramètrer l'opération nearest de PGR. 
+  	"nearestOperation":
+  		type: object
+  		properties:
+        # Type de l'opération: nearest dans ce cas
+  			"type":
+  				type: string
+          required: true
+          enum: ["nearest"]
+        # Nombre de requête par seconde maximal
+  			"rate":
+  				type: number
+          required: false
+  				format: integer
+        # Nombre maximal d'entités que l'opération peut renvoyé.
+  			"maxNumber":
+  				type: number
+          required: false
+  				format: integer
+        # Paramètres par défaut
+        "defaultParameters":
+          $ref: "#/components/schemas/defaultParameters"
+  	"isochroneOperation":
+  		type: object
+  		properties:
+        # Type de l'opération: isochrone dans ce cas
+  			"type":
+  				type: string
+          required: true
+          enum: ["isochrone"]
+        # Nombre de requête par seconde maximal
+        "rate":
+          type: number
+          required: false
+          format: integer
+        # Coûts disponibles pour faire des calculs d'iso-cost
+  			"cost":
+          type: array
+          required: true
+          minItems: 1
+          items:
+    				type: object
+    				properties:
+              # Clé pour définir le coût que l'on veut. C'est ce qui apparaîtra dans le getcap. 
+    					"key":
+    						type: string
+                required: true
+              # Description du coût
+              "description":
+                type: string
+                required: true
+              # Liens avec les sources pour savoir comment calculer les coûts selon chaque mode de déplacement. 
+              "sourceIds":
+                type: array
+                required: true
+                items: 
+                  type: string
+              # Unité du coût
+    					"unit":
+    						type: string
+                required: true
+              # Valeur min du coût
+    					"min":
+    						type: number
+                required: false
+              # Valeur max du coût
+    					"max":
+    						type: number
+                required: false
+        # Contraintes
+  			"constraints":
+  				type: array
+          required: false
+  				minItems: 1
+  				items:
+  					$ref: "#/components/schemas/constraint"
+        # Paramètres par défaut
+        "defaultParameters":
+          $ref: "#/components/schemas/defaultParameters"
