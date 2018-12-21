@@ -1,0 +1,7 @@
+{
+  "application": {
+    "logs": {
+      "configuration": "./config/log4js.json"
+    }
+  }
+}

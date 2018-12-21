@@ -3,6 +3,9 @@
 const express = require('express');
 // const OSRM = require("osrm");
 const log4js = require('log4js');
+const nconf = require('nconf');
+const path = require('path');
+const fs = require('fs');
 
 // Constants
 const PORT = 8080;
@@ -12,30 +15,29 @@ const HOST = '0.0.0.0';
 // App
 const app = express();
 
-// Configuration du logger
-log4js.configure({
- appenders: {
-   console: { type: 'console', layout: {type: 'pattern', pattern: '%[[%d] [%p] %c %z -%] %m'} },
-   file: { type: 'file', filename: 'road2.log', layout: {type: 'pattern', pattern: '[%d] [%p] %c %z - %m%n'} },
-   http: { type: 'file', filename: 'access.log'}
- },
- categories: {
-   default: { appenders: ['console','file'], level: 'info' },
-   request: { appenders: ['http'], level: 'info' }
- },
- //pour que les logs apparaissent dans tous les cas
- disableClustering: true
-});
+//Configuration
+// on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
+nconf.argv().env('ROAD2_CONF_FILE');
+if (nconf.get('ROAD2_CONF_FILE')) {
+  nconf.file({ file: path.resolve(__dirname,nconf.get('ROAD2_CONF_FILE')) });
+} else {
+  nconf.file({ file: path.resolve(__dirname,'./config/road2.json') });
+}
 
+//Lecture du fichier de configuration des logs
+var logsConf = JSON.parse(fs.readFileSync(path.resolve(__dirname,nconf.get("application:logs:configuration"))));
+
+// Configuration du logger
+log4js.configure(logsConf.mainConf);
+
+//Instanciation du logger
 var logger = log4js.getLogger('SERVER');
 
 // Pour le log des requêtes reçues sur le service avec la syntaxe
 app.use(log4js.connectLogger(log4js.getLogger('request'), {
-  level: 'info',
-  // include the Express request ID in the logs
-  format: (req, res, format) => format(`:remote-addr - ${req.id} - ":method :url HTTP/:http-version" :status :content-length ":referrer" ":user-agent"`)
+  level: logsConf.httpConf.level,
+  format: (req, res, format) => format(logsConf.httpConf.format)
 }));
-
 
 app.get('/', (req, res) => {
   res.send('Hello world !! \n');
