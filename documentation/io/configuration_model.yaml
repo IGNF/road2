@@ -44,7 +44,7 @@
 					type: string
 					required: true
 		# Configuration des ressources diffusées sur le service
-		"ressources":
+		"resources":
 			type: object
 			required: true
 			properties:
@@ -52,21 +52,16 @@
 				"directory":
 					type: string
 					required: true
-		# Configuration pour lire dans un stockage ceph
-		"ceph":
+		# Configuration du network
+		"network":
 			type: object
 			required: false
 			properties:
-				# Nom du cluster
-				"clusterName":
+				# Host
+				"host":
 					type: string
-					required: true
-				# Nom de l'utilisateur pouvant lire dans ceph
-				"userName":
+					required: false
+				# Port
+				"port":
 					type: string
-					required: true
-				# Fichier de configuration pour accéder à ceph
-				"configFile":
-					type: string
-					required: true
-
+					required: false

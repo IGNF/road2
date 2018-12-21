@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Calcul d'itinéraire",
   "author": "IDEV - IGN",
-  "main": "server.js",
+  "main": "src/js/server.js",
   "scripts": {
     "start": "pm2-runtime start process.config.js",
     "test" : "mocha --recursive './test/mocha/*.js'",

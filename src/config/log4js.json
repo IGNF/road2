@@ -2,8 +2,8 @@
   {
    "appenders": {
      "console": { "type": "console", "layout": {"type": "pattern", "pattern": "%[[%d] [%p] %c %z -%] %m"} },
-     "file": { "type": "file", "filename": "./road2Logs/road2.log", "layout": {"type": "pattern", "pattern": "[%d] [%p] %c %z - %m%n"} },
-     "http": { "type": "file", "filename": "./road2Logs/access.log"}
+     "file": { "type": "file", "filename": "/var/log/road2/road2.log", "layout": {"type": "pattern", "pattern": "[%d] [%p] %c %z - %m%n"} },
+     "http": { "type": "file", "filename": "/var/log/road2/access.log"}
    },
    "categories": {
      "default": { "appenders": ["console","file"], "level": "info" },

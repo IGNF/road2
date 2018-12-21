@@ -2,15 +2,14 @@ application:
 	name: "Road4"
 	title: "Service d'itinéraire du Géoportail"
 	description: "Ce service permet de calculer des itinéraires sur les données du Géoportail."
-	provider: 
+	provider:
 		name: "IGN"
 		site: "https://www.ign.fr"
 		mail: "idev@ign.fr"
 	logs:
 		configuration: "configuration_logs.yaml"
-	ressources:
+	resources:
 		directory: "/directory/"
-	ceph:
-		clusterName: "ceph_ign"
-		userName: "ign"
-		configFile: "configuration_ceph"
+  network:
+    host: "0.0.0.0"
+    port: "8080"
