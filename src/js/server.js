@@ -2,10 +2,12 @@
 
 const express = require('express');
 // const OSRM = require("osrm");
-const log4js = require('log4js');
-const nconf = require('nconf');
+global.log4js = require('log4js');
+global.nconf = require('nconf');
 const path = require('path');
 const fs = require('fs');
+var configuration = require('./configuration/configuration');
+var pm = require('./utils/processManager.js');
 
 var LOGGER;
 
@@ -28,7 +30,7 @@ function start() {
   initLogger();
 
   // Vérification de la configuration
-  checkGlobalConfiguration();
+  configuration.checkGlobalConfiguration();
 
   // App
   const app = express();
@@ -65,14 +67,32 @@ function start() {
 
 function loadGlobalConfiguration() {
 
+  var file;
+
   // on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
-  nconf.argv().env('ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT');
+  nconf.argv().env(['ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT']);
 
   if (nconf.get('ROAD2_CONF_FILE')) {
-    nconf.file({ file: path.resolve(__dirname,nconf.get('ROAD2_CONF_FILE')) });
+
+    // chemin absolu du fichier
+    file = path.resolve(__dirname,nconf.get('ROAD2_CONF_FILE'));
+
+    // vérification de l'exitence du fichier
+    if (fs.existsSync(file)) {
+      // chargement
+      nconf.file({ file: file });
+    } else {
+      console.log("Mauvaise configuration: fichier de configuration global inexistant:");
+      console.log(file);
+      console.log("Utilisez le paramètre ROAD2_CONF_FILE en ligne de commande ou en variable d'environnement pour le préciser.");
+      process.exit(1);
+    }
+
   } else {
     //si aucun fichier n'a été précisé on prend, par défaut, le fichier du projet
-    nconf.file({ file: path.resolve(__dirname,'../config/road2.json') });
+    file = path.resolve(__dirname,'../config/road2.json');
+    nconf.file({ file: file});
+    nconf.set('ROAD2_CONF_FILE',file);
   }
 
 }
@@ -91,10 +111,23 @@ function initLogger() {
   var logsConfFile = nconf.get("application:logs:configuration");
 
   if (logsConfFile) {
-    //Lecture du fichier de configuration des logs
-    logsConf = JSON.parse(fs.readFileSync(path.resolve(__dirname,logsConfFile)));
+    // chemin absolu du fichier
+    var file = path.resolve(__dirname,logsConfFile);
+
+    // vérification de l'exitence du fichier
+    if (fs.existsSync(file)) {
+      //Lecture du fichier de configuration des logs
+      logsConf = JSON.parse(fs.readFileSync(file));
+    } else {
+      console.log("Mauvaise configuration: fichier de configuration des logs inexistant:");
+      console.log(file);
+      process.exit(1);
+    }
+
   } else {
-    console.log("Mauvaise configuration: fichier de configuration des logs manquant !");
+    console.log("Mauvaise configuration: fichier de configuration des logs non precise dans la configuration globale:");
+    // FIXME: nconf.get retourne un undefined...
+    console.log(nconf.get('ROAD2_CONF_FILE'));
     process.exit(1);
   }
   // Configuration du logger
@@ -102,98 +135,6 @@ function initLogger() {
 
   //Instanciation du logger
   LOGGER = log4js.getLogger('SERVER');
-
-}
-
-/**
-*
-* @function
-* @name checkGlobalConfiguration
-* @description Vérification de la configuration globale du serveur
-*
-*/
-
-function checkGlobalConfiguration() {
-
-  // Configuration de l'application
-  if (!nconf.get("application")) {
-    LOGGER.fatal("Mauvaise configuration: Objet 'application' manquant !");
-    process.exit(1);
-  }
-  // Nom de l'application
-  if (!nconf.get("application:name")) {
-    LOGGER.fatal("Mauvaise configuration: Champ 'application:name' manquant !");
-    process.exit(1);
-  }
-  // Titre de l'application
-  if (!nconf.get("application:title")) {
-    LOGGER.fatal("Mauvaise configuration: Champ 'application:title' manquant !");
-    process.exit(1);
-  }
-  // Description de l'application
-  if (!nconf.get("application:description")) {
-    LOGGER.fatal("Mauvaise configuration: Champ 'application:description' manquant !");
-    process.exit(1);
-  }
-  // Information sur le fournisseur du service
-  if (nconf.get("application:provider")) {
-    // Nom
-    if (!nconf.get("application:provider:name")) {
-      LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:name' manquant !");
-      process.exit(1);
-    }
-    // Site
-    if (!nconf.get("application:provider:site")) {
-      LOGGER.info("Le champ 'application:provider:site' n'est pas renseigne.");
-    }
-    // Mail
-    if (!nconf.get("application:provider:mail")) {
-      LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:mail' manquant !");
-      process.exit(1);
-    }
-  } else {
-    LOGGER.warn("Configuration incomplete: Objet 'application:provider' manquant !");
-  }
-  // Information sur les ressources
-  if (nconf.get("application:resources")) {
-    // Dossier contenant les fichiers de ressources
-    if (!nconf.get("application:resources:directory")) {
-      LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directory' manquant !");
-      process.exit(1);
-    }
-  } else {
-    LOGGER.fatal("Mauvaise configuration: Objet 'application:resources' manquant !");
-    process.exit(1);
-  }
-  // Information sur le reseau
-  if (!nconf.get("ROAD2_HOST")) {
-    if (nconf.get("application:network")) {
-      // Host
-      if (!nconf.get("application:network:host")) {
-        LOGGER.info("Le champ 'application:network:host' n'est pas renseigne.");
-        nconf.set("ROAD2_HOST","0.0.0.0");
-      } else {
-        nconf.set("ROAD2_HOST",nconf.get("application:network:host"));
-      }
-    } else {
-      LOGGER.info("L'objet 'application:network:host' n'est pas renseigne.");
-      nconf.set("ROAD2_HOST","0.0.0.0");
-    }
-  }
-  if (!nconf.get("ROAD2_PORT")) {
-    if (nconf.get("application:network")) {
-      // Port
-      if (!nconf.get("application:network:port")) {
-        LOGGER.info("Le champ 'application:network:port' n'est pas renseigne.");
-        nconf.set("ROAD2_PORT","8080");
-      } else {
-        nconf.set("ROAD2_PORT",nconf.get("application:network:port"));
-      }
-    } else {
-      LOGGER.info("L'objet 'application:network:port' n'est pas renseigne.");
-      nconf.set("ROAD2_PORT","8080");
-    }
-  }
 
 }
 
