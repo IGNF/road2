@@ -17,6 +17,8 @@ module.exports = {
 
   checkGlobalConfiguration: function() {
 
+    LOGGER.info("Verification de la configuration globale de l'application...");
+
     // Configuration de l'application
     if (!global.nconf.get("application")) {
       LOGGER.fatal("Mauvaise configuration: Objet 'application' manquant !");
@@ -96,6 +98,8 @@ module.exports = {
         global.nconf.set("ROAD2_PORT","8080");
       }
     }
+
+    LOGGER.info("Verification terminee.");
 
   }
 

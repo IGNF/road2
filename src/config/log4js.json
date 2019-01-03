@@ -7,7 +7,7 @@
    },
    "categories": {
      "default": { "appenders": ["console","file"], "level": "info" },
-     "request": { "appenders": ["http"], "level": "info" }
+     "request": { "appenders": ["console","http"], "level": "info" }
    },
    "disableClustering": true
  },

@@ -6,8 +6,10 @@ global.nconf = require('nconf');
 const path = require('path');
 const fs = require('fs');
 var configuration = require('./configuration/configuration');
+var apisManager = require('./utils/apisManager');
 
 var LOGGER;
+
 
 /**
 *
@@ -19,6 +21,10 @@ var LOGGER;
 
 function start() {
 
+  console.log("===========================");
+  console.log("ROAD2 - Calcul d'itineraire");
+  console.log("===========================");
+
   // Chargement de la configuration
   loadGlobalConfiguration();
 
@@ -28,21 +34,7 @@ function start() {
   // Vérification de la configuration
   configuration.checkGlobalConfiguration();
 
-  // App
-  const app = express();
-
-  // Pour le log des requêtes reçues sur le service avec la syntaxe
-  app.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
-    level: global.nconf.get("httpConf").level,
-    format: (req, res, format) => format(global.nconf.get("httpConf").format)
-  }));
-
-  app.get('/', (req, res) => {
-    res.send('Hello world !! \n');
-  });
-
-  app.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
-  LOGGER.info(`Road2 is running on http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")}`);
+  createApp();
 
 }
 
@@ -55,6 +47,8 @@ function start() {
 */
 
 function loadGlobalConfiguration() {
+
+  console.log("Lecture de la configuration...");
 
   var file;
 
@@ -84,6 +78,8 @@ function loadGlobalConfiguration() {
     global.nconf.set('ROAD2_CONF_FILE',file);
   }
 
+  console.log("Configuration chargee.")
+
 }
 
 /**
@@ -95,6 +91,8 @@ function loadGlobalConfiguration() {
 */
 
 function initLogger() {
+
+  console.log("Instanciation du logger...");
 
   var logsConf;
   var logsConfFile = global.nconf.get("application:logs:configuration");
@@ -127,6 +125,43 @@ function initLogger() {
 
   //Instanciation du logger
   LOGGER = global.log4js.getLogger('SERVER');
+
+  LOGGER.info("Logger charge.")
+
+}
+
+/**
+*
+* @function
+* @name createApp
+* @description Création du serveur
+*
+*/
+
+function createApp() {
+
+  LOGGER.info("Creation de l'application web...");
+
+  // Application Express
+  var road2 = express();
+
+  // Pour le log des requêtes reçues sur le service avec la syntaxe
+  LOGGER.info("Instanciation du logger pour les requêtes...");
+  road2.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
+    level: global.nconf.get("httpConf").level,
+    format: (req, res, format) => format(global.nconf.get("httpConf").format)
+  }));
+
+  // Chargement des APIs
+  apisManager.loadAPIS(road2);
+
+  road2.all('/', (req, res) => {
+    res.send('Road2 is running !! \n');
+  });
+
+  // Prêt à écouter
+  road2.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
+  LOGGER.info(`Road2 est fonctionnel sur http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")}`);
 
 }
 
