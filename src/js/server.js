@@ -1,13 +1,11 @@
 'use strict';
 
 const express = require('express');
-// const OSRM = require("osrm");
 global.log4js = require('log4js');
 global.nconf = require('nconf');
 const path = require('path');
 const fs = require('fs');
 var configuration = require('./configuration/configuration');
-var pm = require('./utils/processManager.js');
 
 var LOGGER;
 
@@ -20,8 +18,6 @@ var LOGGER;
 */
 
 function start() {
-
-  // const osrm = new OSRM("/home/docker/data/corse-latest.osrm");
 
   // Chargement de la configuration
   loadGlobalConfiguration();
@@ -36,24 +32,17 @@ function start() {
   const app = express();
 
   // Pour le log des requêtes reçues sur le service avec la syntaxe
-  // app.use(log4js.connectLogger(log4js.getLogger('request'), {
-  //   level: logsConf.httpConf.level,
-  //   format: (req, res, format) => format(logsConf.httpConf.format)
-  // }));
+  app.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
+    level: global.nconf.get("httpConf").level,
+    format: (req, res, format) => format(global.nconf.get("httpConf").format)
+  }));
 
   app.get('/', (req, res) => {
     res.send('Hello world !! \n');
-    // osrm.route({coordinates: [[ 9.479455,42.546907], [9.435853,42.619204]]}, function(err, result) {
-    //   if(err) {
-    //     throw err;
-    //   }
-    //   console.log(result.waypoints); // array of Waypoint objects representing all waypoints in order
-    //   console.log(result.routes); // array of Route objects ordered by descending recommendation rank
-    // });
   });
 
-  app.listen(nconf.get("ROAD2_PORT"), nconf.get("ROAD2_HOST"));
-  LOGGER.info(`Road2 is running on http://${nconf.get("ROAD2_HOST")}:${nconf.get("ROAD2_PORT")}`);
+  app.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
+  LOGGER.info(`Road2 is running on http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")}`);
 
 }
 
@@ -70,17 +59,17 @@ function loadGlobalConfiguration() {
   var file;
 
   // on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
-  nconf.argv().env(['ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT']);
+  global.nconf.argv().env(['ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT']);
 
-  if (nconf.get('ROAD2_CONF_FILE')) {
+  if (global.nconf.get('ROAD2_CONF_FILE')) {
 
     // chemin absolu du fichier
-    file = path.resolve(__dirname,nconf.get('ROAD2_CONF_FILE'));
+    file = path.resolve(__dirname,global.nconf.get('ROAD2_CONF_FILE'));
 
     // vérification de l'exitence du fichier
     if (fs.existsSync(file)) {
       // chargement
-      nconf.file({ file: file });
+      global.nconf.file({ file: file });
     } else {
       console.log("Mauvaise configuration: fichier de configuration global inexistant:");
       console.log(file);
@@ -91,8 +80,8 @@ function loadGlobalConfiguration() {
   } else {
     //si aucun fichier n'a été précisé on prend, par défaut, le fichier du projet
     file = path.resolve(__dirname,'../config/road2.json');
-    nconf.file({ file: file});
-    nconf.set('ROAD2_CONF_FILE',file);
+    global.nconf.file({ file: file});
+    global.nconf.set('ROAD2_CONF_FILE',file);
   }
 
 }
@@ -108,7 +97,7 @@ function loadGlobalConfiguration() {
 function initLogger() {
 
   var logsConf;
-  var logsConfFile = nconf.get("application:logs:configuration");
+  var logsConfFile = global.nconf.get("application:logs:configuration");
 
   if (logsConfFile) {
     // chemin absolu du fichier
@@ -126,15 +115,18 @@ function initLogger() {
 
   } else {
     console.log("Mauvaise configuration: fichier de configuration des logs non precise dans la configuration globale:");
-    // FIXME: nconf.get retourne un undefined...
-    console.log(nconf.get('ROAD2_CONF_FILE'));
+    // FIXME: global.nconf.get retourne un undefined...
+    console.log(global.nconf.get('ROAD2_CONF_FILE'));
     process.exit(1);
   }
   // Configuration du logger
-  log4js.configure(logsConf.mainConf);
+  global.log4js.configure(logsConf.mainConf);
+
+  //Récupération des informations pour les logs des requêtes
+  global.nconf.set("httpConf",logsConf.httpConf);
 
   //Instanciation du logger
-  LOGGER = log4js.getLogger('SERVER');
+  LOGGER = global.log4js.getLogger('SERVER');
 
 }
 
