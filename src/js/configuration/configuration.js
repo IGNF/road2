@@ -1,6 +1,8 @@
 'use strict';
 
-var pm = require('../utils/processManager.js')
+var pm = require('../utils/processManager.js');
+const fs = require('fs');
+const path = require('path');
 
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("CONFIGURATION");
@@ -64,6 +66,23 @@ module.exports = {
       if (!global.nconf.get("application:resources:directory")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directory' manquant !");
         pm.shutdown(1);
+      } else {
+        // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
+        var directory =  path.resolve(__dirname,global.nconf.get("application:resources:directory"));
+        if (fs.existsSync(directory)) {
+          // On vérifie que l'application peut lire les fichiers du dossier
+          fs.readdirSync(directory).forEach(resource => {
+            try {
+              var file = directory + "/" + resource;
+              fs.accessSync(file, fs.constants.R_OK);
+            } catch (err) {
+              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+            }
+          });
+        } else {
+          LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+          pm.shutdown(1);
+        }
       }
     } else {
       LOGGER.fatal("Mauvaise configuration: Objet 'application:resources' manquant !");
