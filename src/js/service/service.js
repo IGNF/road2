@@ -1,13 +1,35 @@
 'use strict';
 
-var pm = require('../utils/processManager.js');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+var apisManager = require('../utils/apisManager');
+var pm = require('../utils/processManager.js');
+var resourceManager = require('../resources/resourceManager');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("CONFIGURATION");
+var LOGGER = global.log4js.getLogger("SERVICE");
 
-module.exports = {
+/**
+*
+* @class
+* @name Service
+* @description Il n'y a qu'un service par instance. Un service regroupe l'ensemble des informations utiles pour répondre aux requêtes.
+*
+*/
+
+module.exports = class Service {
+
+
+  /**
+  *
+  * @function
+  * @name constructor
+  * @description Constructeur de la classe Service
+  *
+  */
+    constructor() {
+    }
 
   /**
   *
@@ -17,7 +39,7 @@ module.exports = {
   *
   */
 
-  checkGlobalConfiguration: function() {
+  checkGlobalConfiguration() {
 
     LOGGER.info("Verification de la configuration globale de l'application...");
 
@@ -121,5 +143,75 @@ module.exports = {
     LOGGER.info("Verification terminee.");
 
   }
+
+  /**
+  *
+  * @function
+  * @name loadResources
+  * @description Chargement des ressources
+  *
+  */
+
+  loadResources() {
+
+    LOGGER.info("Chargement des ressources...");
+
+    var resourceDirectory =  path.resolve(__dirname,global.nconf.get("application:resources:directory"));
+
+    // Pour chaque fichier du dossier des ressources, on crée une ressource
+    fs.readdirSync(resourceDirectory).forEach(fileName => {
+      var resourceFile = resourceDirectory + "/" + fileName;
+      LOGGER.info("Chargement de: " + resourceFile);
+
+      // Récupération du contenu en objet pour vérification puis création de la ressource
+      var resourceContent = JSON.parse(fs.readFileSync(resourceFile));
+      LOGGER.debug(resourceContent);
+
+      // Vérification du contenu
+      if (!resourceManager.checkResource(resourceContent)) {
+        LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+      }
+
+      // Création de la ressource
+
+    });
+
+  }
+
+  /**
+  *
+  * @function
+  * @name createServer
+  * @description Création du serveur
+  *
+  */
+
+  createServer() {
+
+    LOGGER.info("Creation de l'application web...");
+
+    // Application Express
+    var road2 = express();
+
+    // Pour le log des requêtes reçues sur le service avec la syntaxe
+    LOGGER.info("Instanciation du logger pour les requêtes...");
+    road2.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
+      level: global.nconf.get("httpConf").level,
+      format: (req, res, format) => format(global.nconf.get("httpConf").format)
+    }));
+
+    // Chargement des APIs
+    apisManager.loadAPIS(road2);
+
+    road2.all('/', (req, res) => {
+      res.send('Road2 is running !! \n');
+    });
+
+    // Prêt à écouter
+    road2.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
+    LOGGER.info(`Road2 est fonctionnel (http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")})`);
+
+  }
+
 
 }

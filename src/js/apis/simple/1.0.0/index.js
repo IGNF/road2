@@ -29,16 +29,19 @@ router.route("/route")
     LOGGER.debug("Gestion de la requête GET sur /route");
 
     // Vérification des paramètres de la requête
-    checkRouteParameters(req,res);
+    if (checkRouteParameters(req,res)) {
 
-    // Transformation de la requête en objet pour le proxy
+      // Transformation de la requête en objet pour le proxy
 
-    // Envoie au proxy et récupération de l'objet réponse du proxy
+      // Envoie au proxy et récupération de l'objet réponse du proxy
 
-    // Formattage de la réponse
+      // Formattage de la réponse
 
-    // Envoie de la réponse
-    res.send("/route en GET");
+      // Envoie de la réponse
+      res.send("/route en GET");
+
+    }
+
 
 })
   .post(function(req, res) {
@@ -61,6 +64,7 @@ function checkRouteParameters(req,res) {
   if (!req.query.resource) {
       LOGGER.debug("Parametre 'resource' absent.");
       res.status(400).json({ error: { errorType: "Bad Request", message: " Parameter 'resource' not found "}});
+      return false;
   } else {
     // Vérification de la disponibilité de la ressource
   }
@@ -69,6 +73,7 @@ function checkRouteParameters(req,res) {
   if (!req.query.start) {
       LOGGER.debug("Parametre 'start' absent.");
       res.status(400).json({ error: { errorType: "Bad Request", message: " Parameter 'start' not found "}});
+      return false;
   } else {
     // Vérification de la validité des coordonnées fournies
   }
@@ -77,9 +82,12 @@ function checkRouteParameters(req,res) {
   if (!req.query.end) {
       LOGGER.debug("Parametre 'end' absent.");
       res.status(400).json({ error: { errorType: "Bad Request", message: " Parameter 'end' not found "}});
+      return false;
   } else {
     // Vérification de la validité des coordonnées fournies
   }
+
+  return true;
 
 }
 

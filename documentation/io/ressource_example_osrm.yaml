@@ -1,4 +1,4 @@
-ressource:
+resource:
 	id: "bduni"
 	type: "osrm"
 	description: "Données BDUNI v2."
@@ -6,15 +6,15 @@ ressource:
 		description: "Données issues de la BDUNI de l'IGN."
 		storage: #utile pour les administrateurs
 			file: "bduni.osm"
-		projection: "EPSG:4326" 
+		projection: "EPSG:4326"
 	sources: #différentes sources pour une même topologie (même .osm pour générer les .osrm)
 		- id: "bduni-car-fastest"
 		  storage:
 		    file: "bduni-car-fastest.osrm"
 		  cost:
 		  	profile: "car"
-		  	optimisation: "fastest"
-		  	compute: 
+		  	optimization: "fastest"
+		  	compute:
 		  		storage:
 		  			file: "car-fastest.lua"
 		- id: "bduni-car-shortest"
@@ -24,8 +24,8 @@ ressource:
 		  	  objectId: "bduni-car-shortest.osrm"
 		  cost:
 		  	profile: "car"
-		  	optimisation: "shortest"
-		  	compute: 
+		  	optimization: "shortest"
+		  	compute:
 		  		storage:
 		  			file: "car-shortest.lua"
 	defaultSourceId: "bduni-car-fastest"

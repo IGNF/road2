@@ -1,12 +1,10 @@
 'use strict';
 
-const express = require('express');
 global.log4js = require('log4js');
 global.nconf = require('nconf');
+const Service = require('./service/service');
 const path = require('path');
 const fs = require('fs');
-var configuration = require('./configuration/configuration');
-var apisManager = require('./utils/apisManager');
 
 var LOGGER;
 
@@ -25,16 +23,23 @@ function start() {
   console.log("ROAD2 - Calcul d'itineraire");
   console.log("===========================");
 
-  // Chargement de la configuration
+  // Chargement de la configuration pour pouvoir charger le logger
   loadGlobalConfiguration();
 
   // Chargement du logger
   initLogger();
 
-  // Vérification de la configuration
-  configuration.checkGlobalConfiguration();
+  // Création du service
+  global.service = new Service();
 
-  createApp();
+  // Vérification de la configuration globale du service
+  global.service.checkGlobalConfiguration();
+
+  // Chargement des ressources
+  global.service.loadResources();
+
+  // Création du serveur web
+  global.service.createServer();
 
 }
 
@@ -65,8 +70,7 @@ function loadGlobalConfiguration() {
       // chargement
       global.nconf.file({ file: file });
     } else {
-      console.log("Mauvaise configuration: fichier de configuration global inexistant:");
-      console.log(file);
+      console.log("Mauvaise configuration: fichier de configuration global inexistant: " + file);
       console.log("Utilisez le paramètre ROAD2_CONF_FILE en ligne de commande ou en variable d'environnement pour le préciser.");
       process.exit(1);
     }
@@ -74,6 +78,7 @@ function loadGlobalConfiguration() {
   } else {
     //si aucun fichier n'a été précisé on prend, par défaut, le fichier du projet
     file = path.resolve(__dirname,'../config/road2.json');
+    console.log("Fichier de configuration: " + file);
     global.nconf.file({ file: file});
     global.nconf.set('ROAD2_CONF_FILE',file);
   }
@@ -130,40 +135,6 @@ function initLogger() {
 
 }
 
-/**
-*
-* @function
-* @name createApp
-* @description Création du serveur
-*
-*/
-
-function createApp() {
-
-  LOGGER.info("Creation de l'application web...");
-
-  // Application Express
-  var road2 = express();
-
-  // Pour le log des requêtes reçues sur le service avec la syntaxe
-  LOGGER.info("Instanciation du logger pour les requêtes...");
-  road2.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
-    level: global.nconf.get("httpConf").level,
-    format: (req, res, format) => format(global.nconf.get("httpConf").format)
-  }));
-
-  // Chargement des APIs
-  apisManager.loadAPIS(road2);
-
-  road2.all('/', (req, res) => {
-    res.send('Road2 is running !! \n');
-  });
-
-  // Prêt à écouter
-  road2.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
-  LOGGER.info(`Road2 est fonctionnel sur http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")}`);
-
-}
 
 // Lancement de l'application
 start();

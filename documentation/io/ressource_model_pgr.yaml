@@ -1,24 +1,24 @@
 # Description d'un fichier de configuration de ressource PGR
 
 # Une ressource est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
-"ressource":
+"resource":
 	type: object
   required: true
 	properties:
-    # Id de la ressource. C'est l'id qui apparaîtra dans le getcap et sera utilisé pour les requêtes. 
+    # Id de la ressource. C'est l'id qui apparaîtra dans le getcap et sera utilisé pour les requêtes.
 		"id":
 			type: string
       required: true
-    # Type de la ressource: osmr ou pgr. Selon le type, différentes informations seront alors attendues. 
+    # Type de la ressource: osmr ou pgr. Selon le type, différentes informations seront alors attendues.
 		"type":
 			type: string
       required: true
 			enum: ["pgr"]
-    # Description de la ressource qui apparaîtra dans le getcap. 
+    # Description de la ressource qui apparaîtra dans le getcap.
 		"description":
 			type: string
       required: true
-    # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources). 
+    # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources).
 		"topology":
 			type: object
       required: true
@@ -27,7 +27,7 @@
 				"description":
 					type: string
           required: true
-        # Projection d'origine des données 
+        # Projection d'origine des données
         "projection":
           type: string
           required: true
@@ -52,17 +52,17 @@
 						"idColumn":
 							type: string
               required: true
-            # Descriptif des colonnes contenant les attributs de chaque tronçon. 
+            # Descriptif des colonnes contenant les attributs de chaque tronçon.
 						"attributeColumns":
 							type: array
               required: false
 							minItems: 1
 							items:
-                # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap. 
+                # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
 								"key":
 									type: string
                   required: true
-                # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table. 
+                # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
 								"column":
 									type: string
                   required: true
@@ -85,11 +85,11 @@
 			minItems: 1
 			items:
 				type: string
-    # Id de la source qui va être utilisée pour initialiser le profile et l'optimisation par défaut. 
+    # Id de la source qui va être utilisée pour initialiser le profile et l'optimisation par défaut.
 		"defaultSourceId":
 			type: string
       required: true
-    # Liste des sources permettants de construire la ressource. 
+    # Liste des sources permettants de construire la ressource.
 		"sources":
 			type: array
       required: true
@@ -124,7 +124,7 @@
 								type: string
                 required: true
               # Optimisation
-							"optimisation":
+							"optimization":
 								type: string
                 required: true
               # Indique où se trouve le fichier .lua qui a permis de générer les colonnes de coût
@@ -135,7 +135,7 @@
 									"storage":
 										$ref: "#/components/schemas/storage"
                     required: true
-    # Liste des opérations rendus disponibles 
+    # Liste des opérations rendus disponibles
 		"availableOperations":
 			type: array
       required: true
@@ -153,11 +153,11 @@ components:
   		type: object
   		properties:
   			oneOf:
-          # Fichier 
+          # Fichier
   				- "file":
   						type: string
               required: false
-          # storage objet ceph. Les informations de connexion sont dans la configuration principale de l'application. 
+          # storage objet ceph. Les informations de connexion sont dans la configuration principale de l'application.
   				- "ceph":
   						type: object
               required: false
@@ -170,15 +170,15 @@ components:
   							"objectId":
   								type: string
                   required: true
-    # Configuration des contraintes que l'on peut formuler dans les requêtes. 
+    # Configuration des contraintes que l'on peut formuler dans les requêtes.
   	"constraint":
   		type: object
-      properties: 
+      properties:
         # Id de la contrainte
       	"id":
       		type: string
           required: true
-        # type de la contrainte: parmi une liste prédéfinie. Le type va indiquer les opérations possibles. 
+        # type de la contrainte: parmi une liste prédéfinie. Le type va indiquer les opérations possibles.
       	"type":
       		type: string
           required: true
@@ -191,7 +191,7 @@ components:
         "key":
           type: string
           required: true
-        # Valeurs possibles pour la contrainte. Dans le cas de PGR, les valeurs disponibles vont être calculées en fonction du type de contrainte et de la colonne contenant les valeurs. Elles seront alors visible dans le getcap. 
+        # Valeurs possibles pour la contrainte. Dans le cas de PGR, les valeurs disponibles vont être calculées en fonction du type de contrainte et de la colonne contenant les valeurs. Elles seront alors visible dans le getcap.
         "values":
         	type: string
           required: true
@@ -229,7 +229,7 @@ components:
           "default":
             type: string
             required: true
-    # Configuration nécessaire pour paramètrer l'opération route de PGR. 
+    # Configuration nécessaire pour paramètrer l'opération route de PGR.
   	"routeOperation":
   		type: object
   		properties:
@@ -253,7 +253,7 @@ components:
    				type: number
           required: false
   				format: integer
-        # Contraintes 
+        # Contraintes
   			"constraints":
   				type: array
           required: false
@@ -263,7 +263,7 @@ components:
         # Paramètres par défaut
         "defaultParameters":
           $ref: "#/components/schemas/defaultParameters"
-    # Configuration nécessaire pour paramètrer l'opération nearest de PGR. 
+    # Configuration nécessaire pour paramètrer l'opération nearest de PGR.
   	"nearestOperation":
   		type: object
   		properties:
@@ -306,7 +306,7 @@ components:
           items:
     				type: object
     				properties:
-              # Clé pour définir le coût que l'on veut. C'est ce qui apparaîtra dans le getcap. 
+              # Clé pour définir le coût que l'on veut. C'est ce qui apparaîtra dans le getcap.
     					"key":
     						type: string
                 required: true
@@ -314,11 +314,11 @@ components:
               "description":
                 type: string
                 required: true
-              # Liens avec les sources pour savoir comment calculer les coûts selon chaque mode de déplacement. 
+              # Liens avec les sources pour savoir comment calculer les coûts selon chaque mode de déplacement.
               "sourceIds":
                 type: array
                 required: true
-                items: 
+                items:
                   type: string
               # Unité du coût
     					"unit":

@@ -1,11 +1,11 @@
-ressource:
+resource:
 	id: "bduni_j+1"
 	type: "pgr"
 	description: "Données BDUNI v2 mise à jour quotidiennement."
 	topology:
 		description: "Données issues de la BDUNI de l'IGN."
-		projection: "EPSG:2154" 
-		base: 
+		projection: "EPSG:2154"
+		base:
 			table: "bduni-pgr"
 			startColumn: "start"
 			endColumn: "end"
@@ -28,8 +28,8 @@ ressource:
 		    reverseCostColumn: "fcar_astest_reverse_cost"
 		  cost:
 		  	profile: "car"
-		  	optimisation: "fastest"
-		  	compute: 
+		  	optimization: "fastest"
+		  	compute:
 		  		storage:
 		  			file: "car-fastest.lua"
 		- id: "bduni-car-shortest"
@@ -38,8 +38,8 @@ ressource:
 		    reverseCostColumn: "car_shortest_reverse_cost"
 		  cost:
 		  	profile: "car"
-		  	optimisation: "shortest"
-		  	compute: 
+		  	optimization: "shortest"
+		  	compute:
 		  		storage:
 		  			file: "car-shortest.lua"
 		- id: "bduni-bike-fastest"
@@ -48,8 +48,8 @@ ressource:
 		    reverseCostColumn: "bike_fastest_reverse_cost"
 		  cost:
 		  	profile: "bike"
-		  	optimisation: "fastest"
-		  	compute: 
+		  	optimization: "fastest"
+		  	compute:
 		  		storage:
 		  			file: "bike-fastest.lua"
 		- id: "bduni-bike-shortest"
@@ -58,8 +58,8 @@ ressource:
 		    reverseCostColumn: "bike_shortest_reverse_cost"
 		  cost:
 		  	profile: "bike"
-		  	optimisation: "shortest"
-		  	compute: 
+		  	optimization: "shortest"
+		  	compute:
 		  		storage:
 		  			file: "bike-shortest.lua"
 	defaultSourceId: "bduni-car-fastest"
@@ -84,7 +84,7 @@ ressource:
 		  	- id: "timeUnit"
 		  	  default: "h-m-s"
 		  constraints:
-			- id: "filter-1" 
+			- id: "filter-1"
 			  type: "constraint-pgr-enum" #c'est ce type qui est important et entraîne des actions spécifiques comme définir la liste des opérateurs disponibles.
 			  description: "Type d'arc emprunté."
 			  key: "road_type"
@@ -92,8 +92,8 @@ ressource:
 			  availableConstraintType: {"banned","preferred","unpreferred"}
 			  availableOperators: {"=","!=","like"}
 			  propertiesColumn: "type"
-			- id: "filter-2" 
-			  type: "constraint-pgr-number" 
+			- id: "filter-2"
+			  type: "constraint-pgr-number"
 			  description: "Pente des arcs empruntés."
 			  key: "road_slope"
 			  values: "" #génération automatique à partir des données
@@ -101,7 +101,7 @@ ressource:
 			  availableOperators: {"=","!=","<",">","<=",">="}
 			  propertiesColumn: "slope"
 			- id: "filter-3"
-			  type: "constraint-pgr-string" 
+			  type: "constraint-pgr-string"
 			  description: "Nom des arcs empruntés."
 			  key: "road_name"
 			  values: "string"
@@ -126,16 +126,16 @@ ressource:
 		  	- key: "temps"
 		  	  description: "Calculer des isochrones."
 		  	  sourceIds:
-		  	  	- "bduni-car-fastest" 
-		  	  	- "bduni-bike-fastest" 
+		  	  	- "bduni-car-fastest"
+		  	  	- "bduni-bike-fastest"
 		  	  unit: "minute"
 		  	  min: 1.0
 		  	  max: 600.0
 		  	- key: "distance"
 		  	  description: "Calculer des iso-distances."
 		  	  sourceIds:
-		  	  	- "bduni-car-shortest" 
-		  	  	- "bduni-bike-shortest" 
+		  	  	- "bduni-car-shortest"
+		  	  	- "bduni-bike-shortest"
 		  	  unit: "kilometer"
 		  	  min: 1.0
 		  	  max: 1000.0
@@ -153,7 +153,7 @@ ressource:
 	  	  	- id: "timeUnit"
 	  	  	  default: "h-m-s"
 		  constraints:
-			- id: "filter-isochrone" 
+			- id: "filter-isochrone"
 			  type: "constraint-pgr-isochrone" #c'est ce type qui est important et entraîne des actions spécifiques comme définir la liste des opérateurs disponibles.
 			  description: "Type d'arc emprunté."
 			  key: "road_type"
