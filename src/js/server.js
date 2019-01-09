@@ -38,6 +38,8 @@ function start() {
   // Chargement des ressources
   global.service.loadResources();
 
+  // Chargement des sources uniques
+
   // Création du serveur web
   global.service.createServer();
 

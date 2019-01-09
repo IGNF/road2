@@ -163,4 +163,4 @@ resource:
 			  availableOperators: {"="}
 	boundingBox: "0,6000000,1300000,7200000"
 	defaultProjection: "EPSG:2154"
-	availableProjection: {"EPSG:2154"}
+	availableProjections: {"EPSG:2154"}

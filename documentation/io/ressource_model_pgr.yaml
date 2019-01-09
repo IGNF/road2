@@ -79,7 +79,7 @@
 			type: string
       required: false
     # Liste des projections que l'on veut rendre disponible
-		"availableProjection":
+		"availableProjections":
 			type: array
       required: false
 			minItems: 1

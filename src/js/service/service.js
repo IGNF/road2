@@ -170,9 +170,9 @@ module.exports = class Service {
       // Vérification du contenu
       if (!resourceManager.checkResource(resourceContent)) {
         LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+      } else {
+        // Création de la ressource
       }
-
-      // Création de la ressource
 
     });
 
