@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 var apisManager = require('../utils/apisManager');
 var pm = require('../utils/processManager.js');
-var resourceManager = require('../resources/resourceManager');
+var ResourceManager = require('../resources/resourceManager');
 
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("SERVICE");
@@ -28,8 +28,52 @@ module.exports = class Service {
   * @description Constructeur de la classe Service
   *
   */
-    constructor() {
+  constructor() {
+
+    // Manager des ressources du service.
+    this.resourceManager = new ResourceManager();
+
+    // catalogue des ressources du service.
+    this.resourceCatalog = {};
+    
+  }
+
+  /**
+  *
+  * @function
+  * @name getResources
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
+  getResources() {
+    return this.resourceCatalog;
+  }
+
+  /**
+  *
+  * @function
+  * @name getResources
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
+  getResourceById(id) {
+    return this.resourceCatalog[id];
+  }
+
+  /**
+  *
+  * @function
+  * @name verifyResourceExistenceById
+  * @description Savoir si une ressource existe à partir de son id
+  *
+  */
+  verifyResourceExistenceById(id) {
+    if (this.resourceCatalog[id]) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
   /**
   *
@@ -168,10 +212,11 @@ module.exports = class Service {
       LOGGER.debug(resourceContent);
 
       // Vérification du contenu
-      if (!resourceManager.checkResource(resourceContent)) {
+      if (!this.resourceManager.checkResource(resourceContent)) {
         LOGGER.error("Erreur lors du chargement de: " + resourceFile);
       } else {
         // Création de la ressource
+        this.resourceCatalog[resourceContent.resource.id] = this.resourceManager.createResource(resourceContent);
       }
 
     });

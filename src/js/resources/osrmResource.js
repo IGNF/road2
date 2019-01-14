@@ -1,5 +1,7 @@
 'use strict';
 
+var Resource = require('./resource');
+
 /**
 *
 * @class
@@ -8,7 +10,7 @@
 *
 */
 
-module.exports = class osrmResource {
+module.exports = class osrmResource extends Resource {
 
 
   /**
@@ -18,7 +20,25 @@ module.exports = class osrmResource {
   * @description Constructeur de la classe osrmResource
   *
   */
-    constructor() {
+  constructor(resourceJsonObject) {
+
+    // Constructeur parent
+    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type);
+
+    // Stockage de la configuration
+    this.configuration = resourceJsonObject.resource;
+
+  }
+
+    /**
+    *
+    * @function
+    * @name getConfiguration
+    * @description Récupérer la configuration de la resource
+    *
+    */
+    getConfiguration() {
+      return this.configuration;
     }
 
 

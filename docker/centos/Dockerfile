@@ -61,6 +61,13 @@ RUN unzip v5.20.0.zip -d ./osrm-backend
 WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/build
 RUN scl enable devtoolset-6 bash && export CC=/opt/rh/devtoolset-6/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-6/root/usr/bin/g++ && make && make install
 
+### PARTIE TEMPORAIRE
+# Téléchargement de données OSM pour tester OSRM
+# Puis conversion des données avec les binaires d'OSRM
+WORKDIR /home/docker/data
+RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua
+RUN osrm-contract corse-latest.osrm
 
 ### Dossier de l'application
 WORKDIR /home/docker/app

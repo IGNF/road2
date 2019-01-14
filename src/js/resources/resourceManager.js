@@ -3,11 +3,23 @@
 const fs = require('fs');
 const path = require('path');
 var storageManager = require('../utils/storageManager');
+var osrmResource = require('../resources/osrmResource');
 
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("RESOURCEMANAGER");
 
-module.exports = {
+module.exports = class resourceManager {
+
+  /**
+  *
+  * @function
+  * @name constructor
+  * @description Constructeur de la classe resourceManager
+  *
+  */
+    constructor() {
+      this.listOfResourceIds = [];
+    }
 
   /**
   *
@@ -17,7 +29,7 @@ module.exports = {
   *
   */
 
-  checkResource: function(resourceJsonObject) {
+  checkResource(resourceJsonObject) {
 
     LOGGER.info("Verification de la ressource...");
 
@@ -26,7 +38,19 @@ module.exports = {
       LOGGER.error("La ressource ne contient pas d'id.");
       return false;
     } else {
-      // TODO: On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource
+      // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource.
+      if (this.listOfResourceIds.length != 0) {
+        for (var i = 0; i < this.listOfResourceIds.length; i++ ) {
+          if (this.listOfResourceIds[i] == resourceJsonObject.resource.id) {
+            LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre ajoutee.");
+            return false;
+          }
+        }
+        this.listOfResourceIds.push(resourceJsonObject.resource.id);
+      } else {
+        // C'est la première ressource.
+        this.listOfResourceIds.push(resourceJsonObject.resource.id);
+      }
     }
 
     // Type
@@ -63,7 +87,7 @@ module.exports = {
     LOGGER.info("Fin de la verification de la ressource.");
     return true;
 
-  },
+  }
 
 
   /**
@@ -74,7 +98,7 @@ module.exports = {
   *
   */
 
-  checkResourceOsrm: function(resourceJsonObject) {
+  checkResourceOsrm(resourceJsonObject) {
 
     LOGGER.info("Verification de la ressource osrm...");
 
@@ -245,6 +269,29 @@ module.exports = {
     LOGGER.info("Fin de la verification de la ressource osrm.");
     return true;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name createResource
+  * @description Fonction utilisée pour créer une ressource.
+  *
+  */
+
+  createResource(resourceJsonObject) {
+
+    LOGGER.info("Creation de la ressource: " + resourceJsonObject.resource.id);
+
+    var resource;
+
+    if (resourceJsonObject.resource.type == "osrm") {
+      resource = new osrmResource(resourceJsonObject);
+    } else {
+      // On va voir si c'est un autre type.
+    }
+
+    return resource;
   }
 
 
