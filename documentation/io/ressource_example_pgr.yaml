@@ -23,6 +23,7 @@ resource:
 				  default: false
 	sources:
 		- id: "bduni-car-fastest"
+      type: "pgr"
 		  storage:
 		    costColumn: "car_fastest_cost"
 		    reverseCostColumn: "fcar_astest_reverse_cost"
@@ -33,6 +34,7 @@ resource:
 		  		storage:
 		  			file: "car-fastest.lua"
 		- id: "bduni-car-shortest"
+      type: "pgr"
 		  storage:
 		    costColumn: "car_shortest_cost"
 		    reverseCostColumn: "car_shortest_reverse_cost"
@@ -43,6 +45,7 @@ resource:
 		  		storage:
 		  			file: "car-shortest.lua"
 		- id: "bduni-bike-fastest"
+      type: "pgr"
 		  storage:
 		    costColumn: "bike_fastest_cost"
 		    reverseCostColumn: "bike_fastest_reverse_cost"
@@ -53,6 +56,7 @@ resource:
 		  		storage:
 		  			file: "bike-fastest.lua"
 		- id: "bduni-bike-shortest"
+      type: "pgr"
 		  storage:
 		    costColumn: "bike_shortest_cost"
 		    reverseCostColumn: "bike_shortest_reverse_cost"

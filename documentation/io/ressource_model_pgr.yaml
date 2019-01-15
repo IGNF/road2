@@ -101,6 +101,10 @@
 					"id":
 						type: string
             required: true
+          # Type de la source
+					"type":
+						type: string
+            required: true
           # Le storage indique ou se trouve le coût, comme c'est du PGR, il indique les colonnes de coût pour chaque tronçon. Ils doivent être dans la même table que la topologie.
 					"storage":
 						type: object

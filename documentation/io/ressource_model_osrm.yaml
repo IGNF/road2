@@ -66,6 +66,10 @@
 					"id":
 						type: string
             required: true
+          # Type de la source
+					"type":
+						type: string
+            required: true
           # Le storage indique ou se trouve le fichier .osrm (ce peut être un fichier ou un objet ceph)
 					"storage":
 						$ref: "#/components/schemas/storage"

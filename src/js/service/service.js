@@ -6,6 +6,7 @@ const express = require('express');
 var apisManager = require('../utils/apisManager');
 var pm = require('../utils/processManager.js');
 var ResourceManager = require('../resources/resourceManager');
+var SourceManager = require('../sources/sourceManager');
 
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("SERVICE");
@@ -35,7 +36,13 @@ module.exports = class Service {
 
     // catalogue des ressources du service.
     this.resourceCatalog = {};
-    
+
+    // Manager des sources du service.
+    this.sourceManager = new SourceManager();
+
+    // catalogue des sources du service.
+    this.sourceCatalog = {};
+
   }
 
   /**
@@ -52,8 +59,8 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name getResources
-  * @description Récupérer l'ensemble des ressources
+  * @name getResourceById
+  * @description Récupérer une ressource par son id
   *
   */
   getResourceById(id) {
@@ -69,6 +76,43 @@ module.exports = class Service {
   */
   verifyResourceExistenceById(id) {
     if (this.resourceCatalog[id]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+  *
+  * @function
+  * @name getSources
+  * @description Récupérer l'ensemble des sources
+  *
+  */
+  getSources() {
+    return this.sourceCatalog;
+  }
+
+  /**
+  *
+  * @function
+  * @name getSourceById
+  * @description Récupérer une source par son id
+  *
+  */
+  getSourceById(id) {
+    return this.sourceCatalog[id];
+  }
+
+  /**
+  *
+  * @function
+  * @name verifySourceExistenceById
+  * @description Savoir si une ressource existe à partir de son id
+  *
+  */
+  verifySourceExistenceById(id) {
+    if (this.sourceCatalog[id]) {
       return true;
     } else {
       return false;
@@ -212,7 +256,7 @@ module.exports = class Service {
       LOGGER.debug(resourceContent);
 
       // Vérification du contenu
-      if (!this.resourceManager.checkResource(resourceContent)) {
+      if (!this.resourceManager.checkResource(resourceContent,this.sourceManager)) {
         LOGGER.error("Erreur lors du chargement de: " + resourceFile);
       } else {
         // Création de la ressource
@@ -220,6 +264,54 @@ module.exports = class Service {
       }
 
     });
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadSources
+  * @description Chargement des sources
+  *
+  */
+
+  loadSources() {
+
+    LOGGER.info("Chargement des sources...");
+
+    // On récupère les informations du resourceManager pour les intégrer au sourceManager du service
+    var listOfSourceIds = this.sourceManager.getListOfSourceIds();
+    var sourceDescriptions = this.sourceManager.getSourceDescriptions();
+
+    // On va créer chaque source
+    if (listOfSourceIds.length != 0) {
+      // On va charger chaque source identifiée
+      for (var i = 0; i < listOfSourceIds.length; i++) {
+
+        var sourceId = listOfSourceIds[i];
+        LOGGER.info("Chargement de la source: " + sourceId);
+        LOGGER.debug(sourceDescriptions[sourceId]);
+
+        // On crée la source
+        var currentSource = this.sourceManager.createSource(sourceDescriptions[sourceId]);
+
+        // On vérifie que le source peut bien être chargée ou connectée
+        if (this.sourceManager.connectSource(sourceId)) {
+          // On la stocke
+          this.sourceCatalog[sourceId] = currentSource;
+
+        } else {
+          // on n'a pas pu se connecter à la source
+          LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
+          pm.shutdown(1);
+        }
+
+      }
+
+    } else {
+      LOGGER.fatal("Il n'y a aucune source a charger.");
+      pm.shutdown(1);
+    }
 
   }
 

@@ -9,6 +9,7 @@ resource:
 		projection: "EPSG:4326"
 	sources: #différentes sources pour une même topologie (même .osm pour générer les .osrm)
 		- id: "bduni-car-fastest"
+      type: "osrm"
 		  storage:
 		    file: "bduni-car-fastest.osrm"
 		  cost:
@@ -18,6 +19,7 @@ resource:
 		  		storage:
 		  			file: "car-fastest.lua"
 		- id: "bduni-car-shortest"
+      type: "osrm"
 		  storage:
 		    ceph:
 		      pool: "itineraire"

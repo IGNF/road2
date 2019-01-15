@@ -13,6 +13,7 @@
   "sources": [
     {
       "id": "corse-car-fastest",
+      "type": "osrm",
       "storage": {
         "file": "/home/docker/data/corse-latest.osrm"
       },
