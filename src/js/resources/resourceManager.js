@@ -21,19 +21,19 @@ module.exports = class resourceManager {
   constructor() {
 
     // Liste des ids des ressources gérées par le manager
-    this.listOfResourceIds = [];
+    this._listOfResourceIds = [];
 
   }
 
   /**
   *
   * @function
-  * @name getListOfResourceIds
+  * @name get listOfResourceIds
   * @description Récupérer l'ensemble des ids de ressources
   *
   */
-  getListOfResourceIds() {
-    return this.listOfResourceIds;
+  get listOfResourceIds() {
+    return this._listOfResourceIds;
   }
 
   /**
@@ -55,17 +55,17 @@ module.exports = class resourceManager {
     } else {
       LOGGER.info("Ressource id: " + resourceJsonObject.resource.id);
       // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource.
-      if (this.listOfResourceIds.length != 0) {
-        for (var i = 0; i < this.listOfResourceIds.length; i++ ) {
-          if (this.listOfResourceIds[i] == resourceJsonObject.resource.id) {
+      if (this._listOfResourceIds.length != 0) {
+        for (var i = 0; i < this._listOfResourceIds.length; i++ ) {
+          if (this._listOfResourceIds[i] == resourceJsonObject.resource.id) {
             LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre ajoutee.");
             return false;
           }
         }
-        this.listOfResourceIds.push(resourceJsonObject.resource.id);
+        this._listOfResourceIds.push(resourceJsonObject.resource.id);
       } else {
         // C'est la première ressource.
-        this.listOfResourceIds.push(resourceJsonObject.resource.id);
+        this._listOfResourceIds.push(resourceJsonObject.resource.id);
       }
     }
 

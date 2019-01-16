@@ -26,19 +26,19 @@ module.exports = class osrmResource extends Resource {
     super(resourceJsonObject.resource.id,resourceJsonObject.resource.type);
 
     // Stockage de la configuration
-    this.configuration = resourceJsonObject.resource;
+    this._configuration = resourceJsonObject.resource;
 
   }
 
     /**
     *
     * @function
-    * @name getConfiguration
+    * @name get configuration
     * @description Récupérer la configuration de la resource
     *
     */
-    getConfiguration() {
-      return this.configuration;
+    get configuration () {
+      return this._configuration;
     }
 
 

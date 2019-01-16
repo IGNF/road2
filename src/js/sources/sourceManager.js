@@ -21,55 +21,55 @@ module.exports = class sourceManager {
   constructor() {
 
     // Liste des ids des sources gérées par le manager
-    this.listOfSourceIds = [];
+    this._listOfSourceIds = [];
 
-    // Description des sources conservées de manière unique dans listOfSourceIds
-    this.sourceDescriptions = {};
+    // Description des sources conservées de manière unique dans _listOfSourceIds
+    this._sourceDescriptions = {};
 
   }
 
   /**
   *
   * @function
-  * @name getListOfSourceIds
+  * @name get listOfSourceIds
   * @description Récupérer l'ensemble des ids de sources
   *
   */
-  getListOfSourceIds() {
-    return this.listOfSourceIds;
+  get listOfSourceIds() {
+    return this._listOfSourceIds;
   }
 
   /**
   *
   * @function
-  * @name getSourceDescriptions
+  * @name get sourceDescriptions
   * @description Récupérer l'ensemble des descriptions des sources conservées
   *
   */
-  getSourceDescriptions() {
-    return this.sourceDescriptions;
+  get sourceDescriptions() {
+    return this._sourceDescriptions;
   }
 
   /**
   *
   * @function
-  * @name setListOfSourceIds
+  * @name set listOfSourceIds
   * @description Attribuer l'ensemble des ids de sources
   *
   */
-  setListOfSourceIds(list) {
-    this.listOfSourceIds = list;
+  set listOfSourceIds(list) {
+    this._listOfSourceIds = list;
   }
 
   /**
   *
   * @function
-  * @name setSourceDescriptions
+  * @name set sourceDescriptions
   * @description Attribuer l'ensemble des descriptions des sources conservées
   *
   */
-  setSourceDescriptions(descriptions) {
-    this.sourceDescriptions = descriptions;
+  set sourceDescriptions(descriptions) {
+    this._sourceDescriptions = descriptions;
   }
 
   /**
@@ -80,8 +80,8 @@ module.exports = class sourceManager {
   *
   */
   getSourceDescriptionById(id) {
-    if (this.sourceDescriptions[id]) {
-      return this.sourceDescriptions[id];
+    if (this._sourceDescriptions[id]) {
+      return this._sourceDescriptions[id];
     } else {
       return {};
     }
@@ -106,12 +106,12 @@ module.exports = class sourceManager {
       return false;
     } else {
       // On vérifie que l'id n'est pas déjà pris.
-      if (this.listOfSourceIds.length != 0) {
+      if (this._listOfSourceIds.length != 0) {
 
         var present = false;
 
-        for (var i = 0; i < this.listOfSourceIds.length; i++ ) {
-          if (this.listOfSourceIds[i] == sourceJsonObject.id) {
+        for (var i = 0; i < this._listOfSourceIds.length; i++ ) {
+          if (this._listOfSourceIds[i] == sourceJsonObject.id) {
             LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja referencee.");
             // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
             if (this.checkDuplicationSource(sourceJsonObject)) {
@@ -128,14 +128,14 @@ module.exports = class sourceManager {
         }
 
         if (!present) {
-          this.listOfSourceIds.push(sourceJsonObject.id);
-          this.sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
+          this._listOfSourceIds.push(sourceJsonObject.id);
+          this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
         }
 
       } else {
         // C'est la première source.
-        this.listOfSourceIds.push(sourceJsonObject.id);
-        this.sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
+        this._listOfSourceIds.push(sourceJsonObject.id);
+        this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
       }
     }
 
@@ -257,7 +257,7 @@ module.exports = class sourceManager {
     LOGGER.info("Comparaison des deux sources identifiees et devant etre identiques...");
 
     // On récupère la description de la source faisant office de référence car lue la première.
-    var referenceSource = this.sourceDescriptions[sourceJsonObject.id];
+    var referenceSource = this._sourceDescriptions[sourceJsonObject.id];
 
     // On compare les deux objets
     try {
@@ -300,15 +300,24 @@ module.exports = class sourceManager {
   *
   * @function
   * @name connectSource
-  * @description Fonction utilisée pour connecter une source à partir de son id.
+  * @description Fonction utilisée pour connecter une source.
   *
   */
 
-  connectSource(sourceId) {
+  connectSource(source) {
 
-    LOGGER.info("Connexion a la source: " + sourceId);
+    LOGGER.info("Connexion a la source: " + source.id);
 
-    return true;
+    if (source.connect()) {
+      LOGGER.info("Source connectee.");
+      return true;
+    } else {
+      LOGGER.error("Impossible de connecter la source.");
+      return false;
+    }
+
+    return false;
+
   }
 
 

@@ -20,33 +20,33 @@ module.exports = class Resource {
   */
     constructor(id,type) {
       // Id d'une ressource. Il doit être unique.
-      this.id = id;
+      this._id = id;
 
       // Type de la ressource
-      this.type = type;
+      this._type = type;
 
     }
 
     /**
     *
     * @function
-    * @name getId
+    * @name get id
     * @description Récupérer l'id de la resource
     *
     */
-      getId() {
-        return this.id;
+      get id () {
+        return this._id;
       }
 
       /**
       *
       * @function
-      * @name getType
+      * @name get type
       * @description Récupérer le type de la resource
       *
       */
-        getType() {
-          return this.type;
+        get type () {
+          return this._type;
         }
 
 

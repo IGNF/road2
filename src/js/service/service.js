@@ -32,28 +32,28 @@ module.exports = class Service {
   constructor() {
 
     // Manager des ressources du service.
-    this.resourceManager = new ResourceManager();
+    this._resourceManager = new ResourceManager();
 
     // catalogue des ressources du service.
-    this.resourceCatalog = {};
+    this._resourceCatalog = {};
 
     // Manager des sources du service.
-    this.sourceManager = new SourceManager();
+    this._sourceManager = new SourceManager();
 
     // catalogue des sources du service.
-    this.sourceCatalog = {};
+    this._sourceCatalog = {};
 
   }
 
   /**
   *
   * @function
-  * @name getResources
+  * @name get resourceCatalog
   * @description Récupérer l'ensemble des ressources
   *
   */
-  getResources() {
-    return this.resourceCatalog;
+  get resourceCatalog() {
+    return this._resourceCatalog;
   }
 
   /**
@@ -64,7 +64,7 @@ module.exports = class Service {
   *
   */
   getResourceById(id) {
-    return this.resourceCatalog[id];
+    return this._resourceCatalog[id];
   }
 
   /**
@@ -75,7 +75,7 @@ module.exports = class Service {
   *
   */
   verifyResourceExistenceById(id) {
-    if (this.resourceCatalog[id]) {
+    if (this._resourceCatalog[id]) {
       return true;
     } else {
       return false;
@@ -85,12 +85,12 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name getSources
+  * @name get sourceCatalog
   * @description Récupérer l'ensemble des sources
   *
   */
-  getSources() {
-    return this.sourceCatalog;
+  get sourceCatalog() {
+    return this._sourceCatalog;
   }
 
   /**
@@ -101,7 +101,7 @@ module.exports = class Service {
   *
   */
   getSourceById(id) {
-    return this.sourceCatalog[id];
+    return this._sourceCatalog[id];
   }
 
   /**
@@ -112,7 +112,7 @@ module.exports = class Service {
   *
   */
   verifySourceExistenceById(id) {
-    if (this.sourceCatalog[id]) {
+    if (this._sourceCatalog[id]) {
       return true;
     } else {
       return false;
@@ -256,11 +256,11 @@ module.exports = class Service {
       LOGGER.debug(resourceContent);
 
       // Vérification du contenu
-      if (!this.resourceManager.checkResource(resourceContent,this.sourceManager)) {
+      if (!this._resourceManager.checkResource(resourceContent,this._sourceManager)) {
         LOGGER.error("Erreur lors du chargement de: " + resourceFile);
       } else {
         // Création de la ressource
-        this.resourceCatalog[resourceContent.resource.id] = this.resourceManager.createResource(resourceContent);
+        this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent);
       }
 
     });
@@ -280,8 +280,8 @@ module.exports = class Service {
     LOGGER.info("Chargement des sources...");
 
     // On récupère les informations du resourceManager pour les intégrer au sourceManager du service
-    var listOfSourceIds = this.sourceManager.getListOfSourceIds();
-    var sourceDescriptions = this.sourceManager.getSourceDescriptions();
+    var listOfSourceIds = this._sourceManager.listOfSourceIds;
+    var sourceDescriptions = this._sourceManager.sourceDescriptions;
 
     // On va créer chaque source
     if (listOfSourceIds.length != 0) {
@@ -293,12 +293,12 @@ module.exports = class Service {
         LOGGER.debug(sourceDescriptions[sourceId]);
 
         // On crée la source
-        var currentSource = this.sourceManager.createSource(sourceDescriptions[sourceId]);
+        var currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
 
         // On vérifie que le source peut bien être chargée ou connectée
-        if (this.sourceManager.connectSource(sourceId)) {
+        if (this._sourceManager.connectSource(currentSource)) {
           // On la stocke
-          this.sourceCatalog[sourceId] = currentSource;
+          this._sourceCatalog[sourceId] = currentSource;
 
         } else {
           // on n'a pas pu se connecter à la source
