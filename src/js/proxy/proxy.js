@@ -1,5 +1,7 @@
 'use strict';
 
+const errorManager = require('../utils/errorManager');
+
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("PROXY");
 
@@ -16,7 +18,7 @@ module.exports = {
   *
   */
 
-  computeRoute: function(routeRequest, callbackSuccess, callbackError) {
+  computeRoute: function(routeRequest, callback) {
 
     var typeFound = false;
 
@@ -38,8 +40,8 @@ module.exports = {
       typeFound = true;
       // Envoie de la requête
       var routeResponse = {response: true};
-      // FIXME: faut-il utiliser return avec les callback ?
-      callbackSuccess(routeResponse);
+      callback(null,routeResponse);
+      return;
 
     } else {
       // On va regarder si c'est un autre type
@@ -48,8 +50,7 @@ module.exports = {
 
     // Cette erreur  n'est pas censé arrivé si on a bien vérifié la validité et la disponibilité de la ressource requêtée.
     if (!typeFound) {
-      // FIXME: faut-il utiliser return avec les callback ?
-      callbackError("Invalid resource type.");
+      callback(errorManager.createError("Invalid resource type."));
     }
 
   }

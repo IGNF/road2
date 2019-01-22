@@ -11,6 +11,7 @@
     "jsdoc": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
+    "async": "2.6.1",
     "express": "4.16.4",
     "log4js": "3.0.6",
     "nconf": "0.10.0",

@@ -4,8 +4,10 @@
 var express = require('express');
 var router = express.Router();
 const RouteRequest = require('../../../requests/routeRequest');
+var errorManager = require('../../../utils/errorManager');
 var LOGGER = global.log4js.getLogger("SIMPLE");
 var PROXY = require('../../../proxy/proxy');
+var async = require('async');
 
 // Accueil de l'API
 router.all("/", function(req, res) {
@@ -28,34 +30,24 @@ router.all("/getcapabilities", function(req, res) {
 router.route("/route")
   .get(function(req, res, next) {
 
-    // Vérification des paramètres de la requête de manière synchrone
-    if (checkRouteParameters(req, res, next)) {
-
-      // Transformation de la requête en objet pour le proxy
-      var routeRequest = new RouteRequest(req.query.resource, req.query.start, req.query.end);
-
-      // Envoie au proxy en asynchrone et récupération de l'objet réponse du proxy
-      PROXY.computeRoute(routeRequest,
-
-        // Callback de succes
-        (routeResponse) => {
-        // Formattage de la réponse de manière synchrone
-        var userResponse = writeRouteResponse(routeResponse);
-        // Envoie de la réponse
-        res.status(200).json(userResponse);
-
-        },
-        // Callback d'erreur
-        (err) => {
-          return next(createError(500,err));
+    async.waterfall(
+      [
+        // Vérification des paramètres de la requête
+        async.apply(checkRouteParameters, req),
+        // Envoie au proxy et récupération de l'objet réponse du proxy
+        PROXY.computeRoute,
+        // Formattage de la réponse
+        writeRouteResponse
+      ],
+      function (error, result) {
+        if (error) {
+          return next(error);
+        } else {
+          res.status(200).json(result);
         }
-      );
+      }
 
-    } else {
-      // FIXME: Normalement, si il y a eu problème, le programme ne doit pas passer ici
-      // next(error(500," Bad request "));
-    }
-
+    );
 
 })
   .post(function(req, res) {
@@ -67,9 +59,7 @@ router.route("/route")
 // ---
 router.use(logError);
 router.use(sendError);
-// our custom JSON 404 middleware. Since it's placed last
-// it will be the last middleware called, if all others
-// invoke next() and do not respond.
+// Celui-ci doit être le dernier pour renvoyer un 404 si toutes les autres routes font appel à next
 router.use(notFoundError);
 // ---
 
@@ -82,30 +72,36 @@ router.use(notFoundError);
 *
 */
 
-function checkRouteParameters(req, res, next) {
+function checkRouteParameters(req, callback) {
 
   // Resource
   if (!req.query.resource) {
-      return next(createError(400," Parameter 'resource' not found "));
+      callback(errorManager.createError(" Parameter 'resource' not found ", 400));
+      return;
   } else {
     // Vérification de la disponibilité de la ressource
   }
 
   // Start
   if (!req.query.start) {
-      return next(createError(400," Parameter 'start' not found "));
+      callback(errorManager.createError(" Parameter 'start' not found ", 400));
+      return;
   } else {
     // Vérification de la validité des coordonnées fournies
   }
 
   // End
   if (!req.query.end) {
-      return next(createError(400," Parameter 'end' not found "));
+      callback(errorManager.createError(" Parameter 'end' not found ", 400));
+      return;
   } else {
     // Vérification de la validité des coordonnées fournies
   }
 
-  return true;
+  var routeRequest = new RouteRequest(req.query.resource, req.query.start, req.query.end);
+
+  callback(null, routeRequest);
+  return;
 
 }
 
@@ -114,32 +110,15 @@ function checkRouteParameters(req, res, next) {
 /**
 *
 * @function
-* @name checkRouteParameters
-* @description Vérification des paramètres d'une requête sur /route
+* @name writeRouteResponse
+* @description Ré-écriture de la réponse d'un moteur pour une requête sur /route
 *
 */
 
-function writeRouteResponse(routeResponse) {
+function writeRouteResponse(routeResponse, callback) {
 
-  return {response: true, write: "ok"};
+  callback(null, {response: true, write: "ok"});
 
-}
-
-/**
-*
-* @function
-* @name createError
-* @description Création d'une erreur
-* create an error with .status. we
-* can then use the property in our
-* custom error handler (Connect repects this prop as well)
-*
-*/
-
-function createError(status, msg) {
-  var err = new Error(msg);
-  err.status = status;
-  return err;
 }
 
 /**
