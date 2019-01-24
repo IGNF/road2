@@ -2,6 +2,7 @@
 
 var Source = require('./source');
 const OSRM = require("osrm");
+var RouteResponse = require('../responses/routeResponse');
 
 // Création du LOGGER
 var LOGGER = global.log4js.getLogger("OSRMSOURCE");
@@ -126,11 +127,11 @@ module.exports = class osrmSource extends Source {
 
     if (request.operation == "route") {
 
-      this.osrm.route({coordinates: [[8.732901, 41.928821], [8.76385, 41.953932]]}, (err, result) => {
+      this.osrm.route({coordinates: [[request.start.lon, request.start.lat], [request.end.lon, request.end.lat]]}, (err, result) => {
         if (err) {
           callback(err);
         } else {
-          callback(null, result);
+          this.writeRouteResponse(request, result, callback);
         }
       });
 
@@ -138,8 +139,44 @@ module.exports = class osrmSource extends Source {
       // on va voir si c'est une autre opération
     }
 
-    // var response = {result: true};
-    // return response;
+  }
+
+  /**
+  *
+  * @function
+  * @name writeRouteResponse
+  * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
+  * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
+  * TODO: c'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
+  * au proxy, on considère qu'elle est correcte.  
+  *
+  */
+  writeRouteResponse (routeRequest, osrmResponse, callback) {
+
+    var resource;
+    var start;
+    var end;
+    var profile;
+    var optimization;
+
+    // resource
+    resource = routeRequest.resource;
+
+    // profile
+    profile = routeRequest.profile;
+
+    // optimization
+    optimization = routeRequest.optimization;
+
+    // start
+    start = osrmResponse.waypoints[0].location[0] +","+ osrmResponse.waypoints[0].location[1];
+
+    // end
+    end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
+
+    var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
+
+    callback(null, routeResponse);
 
   }
 

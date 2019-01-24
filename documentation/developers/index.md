@@ -6,14 +6,6 @@ D'un point de vue développeur, *Road2 est un service web écrit en NodeJS*. Ce 
 
 Road2 a été codé pour qu'il soit facile d'ajouter des nouvelles APIs d'accès ou des nouveaux moteurs de calcul.
 
-## Principes d'organisation du code
-
-Road2 est un serveur web. Son point d'entrée est donc `src/js/server.js`.
-
-Ce serveur propose un service. Le service est l'objet qui permet de gérer les ressources proposées par l'instance en cours. Il contient donc un catalogue de ressources et un manager de ressources.
-
-Chaque ressource contient plusieurs sources. Étant donné que plusieurs ressources peuvent pointer vers des sources communes, le service contient un catalogue de sources uniques et un manager de sources.
-
 ## Modularité de l'application
 
 ### Indépendance entre les APIs et les moteurs
@@ -46,7 +38,7 @@ Une instance doit pouvoir gérer plusieurs ressources. Road2 est codé pour qu'i
 
 Ce qui fait le lien entre un moteur de calcul et le reste de l'application est la *source*. Une source définit un moyen de calculer un itinéraire. Ce peut être un fichier .osrm qui permet donc d'utiliser le moteur OSRM pour faire des calculs. Mais une source pourrait en théorie faire appel à plusieurs moteurs pour rendre un résultat. L'essentiel est de comprendre qu'une source ne renvoie qu'un résultat pour une seule requête.
 
-Pour ajouter un moteur, il faut donc ajouter une source. Cette source peut ensuite être utilisée dans plusieurs ressources. Et cela, conjointement à d'autres types de sources. 
+Pour ajouter un moteur, il faut donc ajouter une source. Cette source peut ensuite être utilisée dans plusieurs ressources. Et cela, conjointement à d'autres types de sources.
 
 ## Modification du code
 
@@ -74,7 +66,7 @@ Le dossier `src/js/resources` contient un manager de ressource qui permet à l'a
 
 Chaque ressource est une classe qui dérive de la classe mère `resource.js`. Cette classe définit une ressource comme l'ensemble d'un id unique à l'instance et un type.
 
-Chaque ressource peut alors contenir autant d'information supplémentaire qu'on le souhaite.
+Chaque ressource peut alors contenir autant d'information supplémentaire qu'on le souhaite. Mais elle permet surtout de faire le lien avec une source, ou plusieurs, lors d'une requête. Chaque ressource doit implémenter la fonction `getSourceIdFromRequest()`.
 
 #### Ajouter une ressource
 
@@ -87,3 +79,37 @@ Pour que cette ressource soit prise en compte dans l'application, il suffit de m
 Pour supprimer une ressource, il suffit de supprimer le fichier qui contient sa définition et les parties du code qui la concerne dans le manager de ressources.
 
 ### Source
+
+Le dossier `src/js/sources` contient un manager de source qui permet à l'application de gérer l'ensemble de ces sources, et la définition des sources utilisables.
+
+Chaque source est une classe qui dérive de la classe mère `source.js`. Cette classe définit une source comme l'ensemble d'un id unique à l'instance, d'un type et d'un état de connexion.
+
+Chaque source peut alors contenir autant d'information supplémentaire qu'on le souhaite. Mais elle permet surtout de faire le lien avec un moteur, ou plusieurs, lors d'une requête. Chaque ressource doit implémenter la fonction `computeRequest()`.
+
+#### Ajouter une source
+
+Pour ajouter une source, il suffit donc d'ajouter un fichier dans le dossier `src/js/sources`. Ce fichier sera la définition d'une classe fille de `source.js`.
+
+Pour que cette source soit prise en compte dans l'application, il suffit de modifier le manager de sources `src/js/sources/sourceManager.js`. Ce fichier permet à l'application de savoir que cette nouvelle source est disponible. Il suffira de copier et coller certaines parties du code et de les adapter.
+
+Ensuite, il faut créer ou modifier une ressource pour qu'elle utilise cette nouvelle source.
+
+#### Supprimer une source
+
+Pour supprimer une source, il suffit de supprimer le fichier qui contient sa définition et les parties du code qui la concerne dans le manager de sources et les ressources qui l'utilisent.
+
+## Fonctionnement du code
+
+### Au lancement de l'application
+
+Road2 est un serveur web. Son point d'entrée est donc `src/js/server.js`.
+
+Ce serveur propose un service. Le service est l'objet qui permet de gérer les ressources proposées par l'instance en cours. Il contient donc un catalogue de ressources et un manager de ressources.
+
+Chaque ressource contient plusieurs sources. Étant donné que plusieurs ressources peuvent pointer vers des sources communes, le service contient un catalogue de sources uniques et un manager de sources.
+
+Lorsque l'application est lancée, on commence par charger la configuration de l'application pour être capable d'instancier le logger. Une fois que le logger est chargé, on vérifie complètement la configuration.
+
+Après cela, on charge les ressources et les sources du service indiquées dans la configuration. On finit par charger les APIs exposées par le service.
+
+### A la réception d'une requête

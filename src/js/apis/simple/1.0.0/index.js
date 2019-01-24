@@ -75,6 +75,10 @@ router.use(notFoundError);
 function checkRouteParameters(req, callback) {
 
   var resource;
+  var start = {};
+  var end = {};
+  var profile;
+  var optimization;
 
   // Resource
   if (!req.query.resource) {
@@ -97,6 +101,16 @@ function checkRouteParameters(req, callback) {
       return;
   } else {
     // Vérification de la validité des coordonnées fournies
+    var tmpStringCoordinates = req.query.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    if (!tmpStringCoordinates) {
+      callback(errorManager.createError(" Parameter 'start' is invalid ", 400));
+      return;
+    } else {
+      tmpStringCoordinates = tmpStringCoordinates[0].split(",");
+      start.lon = Number(tmpStringCoordinates[0]);
+      start.lat = Number(tmpStringCoordinates[1]);
+      // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+    }
   }
 
   // End
@@ -105,12 +119,20 @@ function checkRouteParameters(req, callback) {
       return;
   } else {
     // Vérification de la validité des coordonnées fournies
+    var tmpStringCoordinates = req.query.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    if (!tmpStringCoordinates) {
+      callback(errorManager.createError(" Parameter 'end' is invalid ", 400));
+      return;
+    } else {
+      tmpStringCoordinates = tmpStringCoordinates[0].split(",");
+      end.lon = Number(tmpStringCoordinates[0]);
+      end.lat = Number(tmpStringCoordinates[1]);
+      // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+    }
   }
 
   // Profile and Optimization
   // ---
-  var profile;
-  var optimization;
 
   if (!req.query.profile) {
     // Récupération du paramètre par défaut
@@ -134,7 +156,7 @@ function checkRouteParameters(req, callback) {
   // ---
 
   // On définit la routeRequest avec les paramètres obligatoires
-  var routeRequest = new RouteRequest(req.query.resource, req.query.start, req.query.end, profile, optimization);
+  var routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
 
   callback(null, routeRequest);
   return;
@@ -153,7 +175,24 @@ function checkRouteParameters(req, callback) {
 
 function writeRouteResponse(routeResponse, callback) {
 
-  callback(null, routeResponse);
+  var userResponse = {};
+
+  // resource
+  userResponse.resource = routeResponse.resource;
+
+  // start
+  userResponse.start = routeResponse.start;
+
+  // end
+  userResponse.end = routeResponse.end;
+
+  // profile
+  userResponse.profile = routeResponse.profile;
+
+  // optimiszation
+  userResponse.optimization = routeResponse.optimization;
+
+  callback(null, userResponse);
 
 }
 
