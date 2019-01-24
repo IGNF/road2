@@ -42,6 +42,12 @@ Une ressource sera définie par un fichier. Le serveur lira l’ensemble des fic
 
 Une instance doit pouvoir gérer plusieurs ressources. Road2 est codé pour qu'il soit facile d'ajouter de nouveaux types de ressources et de sources indépendamment. Il devrait être possible de créer différents types de source et de les associer, ou pas, dans divers types de ressources.
 
+### Lien entre la source et un moteur
+
+Ce qui fait le lien entre un moteur de calcul et le reste de l'application est la *source*. Une source définit un moyen de calculer un itinéraire. Ce peut être un fichier .osrm qui permet donc d'utiliser le moteur OSRM pour faire des calculs. Mais une source pourrait en théorie faire appel à plusieurs moteurs pour rendre un résultat. L'essentiel est de comprendre qu'une source ne renvoie qu'un résultat pour une seule requête.
+
+Pour ajouter un moteur, il faut donc ajouter une source. Cette source peut ensuite être utilisée dans plusieurs ressources. Et cela, conjointement à d'autres types de sources. 
+
 ## Modification du code
 
 ### API
@@ -81,5 +87,3 @@ Pour que cette ressource soit prise en compte dans l'application, il suffit de m
 Pour supprimer une ressource, il suffit de supprimer le fichier qui contient sa définition et les parties du code qui la concerne dans le manager de ressources.
 
 ### Source
-
-### Moteur

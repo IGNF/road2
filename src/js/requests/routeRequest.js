@@ -1,5 +1,7 @@
 'use strict';
 
+var Request = require('./request');
+
 /**
 *
 * @class
@@ -9,7 +11,7 @@
 * pour le proxy
 */
 
-module.exports = class routeRequest {
+module.exports = class routeRequest extends Request {
 
 
   /**
@@ -19,10 +21,10 @@ module.exports = class routeRequest {
   * @description Constructeur de la classe routeRequest
   *
   */
-  constructor(resource, start, end) {
+  constructor(resource, start, end, profile, optimization) {
 
-    // Ressource concernée
-    this._resource = resource;
+    // Constructeur parent
+    super("route",resource);
 
     // Point de départ
     this._start = start;
@@ -30,28 +32,12 @@ module.exports = class routeRequest {
     // Point d'arrivée
     this._end = end;
 
-  }
+    // Profile
+    this._profile = profile;
 
-  /**
-  *
-  * @function
-  * @name get resource
-  * @description Récupérer la ressource de la requête
-  *
-  */
-  get resource () {
-    return this._resource;
-  }
+    // Optimisation
+    this._optimization = optimization;
 
-  /**
-  *
-  * @function
-  * @name set resource
-  * @description Attribuer la ressource de la requête
-  *
-  */
-  set resource (res) {
-    this._resource = res;
   }
 
   /**
@@ -80,7 +66,7 @@ module.exports = class routeRequest {
   *
   * @function
   * @name get end
-  * @description Récupérer le poitn d'arrivée de la requête
+  * @description Récupérer le point d'arrivée de la requête
   *
   */
   get end () {
@@ -91,11 +77,55 @@ module.exports = class routeRequest {
   *
   * @function
   * @name set end
-  * @description Attribuer le poitn d'arrivée de la requête
+  * @description Attribuer le point d'arrivée de la requête
   *
   */
   set end (en) {
-    this._end = end;
+    this._end = en;
+  }
+
+  /**
+  *
+  * @function
+  * @name get profile
+  * @description Récupérer le profile de la requête
+  *
+  */
+  get profile () {
+    return this._profile;
+  }
+
+  /**
+  *
+  * @function
+  * @name set profile
+  * @description Attribuer le profile de la requête
+  *
+  */
+  set profile (pr) {
+    this._profile = pr;
+  }
+
+  /**
+  *
+  * @function
+  * @name get optmization
+  * @description Récupérer l'optmisation de la requête
+  *
+  */
+  get optimization () {
+    return this._optimization;
+  }
+
+  /**
+  *
+  * @function
+  * @name set optmization
+  * @description Attribuer l'optmisation de la requête
+  *
+  */
+  set optimization (op) {
+    this._optimization = op;
   }
 
 

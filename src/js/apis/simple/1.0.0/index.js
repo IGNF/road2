@@ -35,7 +35,7 @@ router.route("/route")
         // Vérification des paramètres de la requête
         async.apply(checkRouteParameters, req),
         // Envoie au proxy et récupération de l'objet réponse du proxy
-        PROXY.computeRoute,
+        PROXY.computeRequest,
         // Formattage de la réponse
         writeRouteResponse
       ],
@@ -74,12 +74,21 @@ router.use(notFoundError);
 
 function checkRouteParameters(req, callback) {
 
+  var resource;
+
   // Resource
   if (!req.query.resource) {
       callback(errorManager.createError(" Parameter 'resource' not found ", 400));
       return;
   } else {
-    // Vérification de la disponibilité de la ressource
+    // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
+    if (!global.service.verifyResourceExistenceById(req.query.resource)) {
+      callback(errorManager.createError(" Parameter 'resource' is invalid ", 400));
+      return;
+    } else {
+      resource = global.service.getResourceById(req.query.resource);
+      // TODO: vérification de la compatibilité de son type avec la requête
+    }
   }
 
   // Start
@@ -98,7 +107,34 @@ function checkRouteParameters(req, callback) {
     // Vérification de la validité des coordonnées fournies
   }
 
-  var routeRequest = new RouteRequest(req.query.resource, req.query.start, req.query.end);
+  // Profile and Optimization
+  // ---
+  var profile;
+  var optimization;
+
+  if (!req.query.profile) {
+    // Récupération du paramètre par défaut
+    profile = resource.defaultProfile;
+  } else {
+    // TODO: vérification de la validité du paramètre
+    profile = req.query.profile;
+  }
+  if (!req.query.optimization) {
+    // Récupération du paramètre par défaut
+    optimization = resource.defaultOptimization;
+  } else {
+    // TODO: vérification de la validité du paramètre
+    optimization = req.query.optimization;
+  }
+  // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
+  if (!resource.linkedSource[profile+optimization]) {
+    callback(errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400));
+    return;
+  }
+  // ---
+
+  // On définit la routeRequest avec les paramètres obligatoires
+  var routeRequest = new RouteRequest(req.query.resource, req.query.start, req.query.end, profile, optimization);
 
   callback(null, routeRequest);
   return;
@@ -117,7 +153,7 @@ function checkRouteParameters(req, callback) {
 
 function writeRouteResponse(routeResponse, callback) {
 
-  callback(null, {response: true, write: "ok"});
+  callback(null, routeResponse);
 
 }
 
@@ -130,7 +166,7 @@ function writeRouteResponse(routeResponse, callback) {
 */
 
 function logError(err, req, res, next) {
-  LOGGER.debug({
+  LOGGER.info({
     request: req.originalUrl,
     error: {
       errorType: err.code,

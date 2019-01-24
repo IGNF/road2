@@ -99,4 +99,18 @@ module.exports = class Source {
     return true;
   }
 
+  /**
+  *
+  * @function
+  * @name computeRequest
+  * @description Traiter une requête.
+  * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
+  * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
+  * dans chacune des classes filles.
+  *
+  */
+  computeRequest (request, callback) {
+
+  }
+
 }

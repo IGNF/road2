@@ -114,5 +114,34 @@ module.exports = class osrmSource extends Source {
     return true;
   }
 
+  /**
+  *
+  * @function
+  * @name computeRequest
+  * @description Traiter une requête.
+  * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
+  *
+  */
+  computeRequest (request, callback) {
+
+    if (request.operation == "route") {
+
+      this.osrm.route({coordinates: [[8.732901, 41.928821], [8.76385, 41.953932]]}, (err, result) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, result);
+        }
+      });
+
+    } else {
+      // on va voir si c'est une autre opération
+    }
+
+    // var response = {result: true};
+    // return response;
+
+  }
+
 
 }

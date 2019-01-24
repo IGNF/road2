@@ -10,48 +10,37 @@ module.exports = {
   /**
   *
   * @function
-  * @name computeRoute
-  * @description Fonction utilisée pour rediriger une requête de calcul d'itinéraire vers le bon moteur.
+  * @name computeRequest
+  * @description Fonction utilisée pour rediriger une requête vers le bon moteur.
   * Une requête se fait nécessairement sur une ressource. Cette ressource est indiquée dans la requête.
   * En fonction de la ressource, et potentiellement de plusieurs autres paramètres, cette fonction permettra
   * de renvoyer la requête vers le bon moteur.
   *
   */
 
-  computeRoute: function(routeRequest, callback) {
+  computeRequest: function(request, callback) {
 
-    var typeFound = false;
-
-    // Récupération de la ressource et de son type
-
+    // Récupération de la ressource
+    // ---
     // L'id est dans la requête
-    var resourceId = routeRequest.resource;
+    var resourceId = request.resource;
     // La ressource est dans le catalogue du service
     var resource = global.service.getResourceById(resourceId);
-    var resourceType = resource.type;
-
-    // On renvoie la requête vers le moteur
-
-    // Cas de la ressource OSRM
-    // Partie à copier pour ajouter la gestion d'un nouveau type de ressource
-    // ---
-    if (resourceType == "osrm") {
-
-      typeFound = true;
-      // Envoie de la requête
-      var routeResponse = {response: true};
-      callback(null,routeResponse);
-      return;
-
-    } else {
-      // On va regarder si c'est un autre type
-    }
     // ---
 
-    // Cette erreur  n'est pas censé arrivé si on a bien vérifié la validité et la disponibilité de la ressource requêtée.
-    if (!typeFound) {
-      callback(errorManager.createError("Invalid resource type."));
-    }
+    // Récupération de la source concernée par la requête
+    // ---
+    // L'id est donné par le ressource
+    var sourceId = resource.getSourceIdFromRequest(request);
+    // La source est dans le catalogue du service
+    var source = global.service.getSourceById(sourceId);
+    // ---
+
+    //On renvoie la requête vers le moteur
+    // ---
+    // C'est la source qui fait le lien avec un moteur
+    source.computeRequest(request,callback);
+    // ---
 
   }
 
