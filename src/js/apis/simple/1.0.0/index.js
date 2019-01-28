@@ -176,6 +176,7 @@ function checkRouteParameters(req, callback) {
 function writeRouteResponse(routeResponse, callback) {
 
   var userResponse = {};
+  var route = routeResponse.routes[0];
 
   // resource
   userResponse.resource = routeResponse.resource;
@@ -191,6 +192,36 @@ function writeRouteResponse(routeResponse, callback) {
 
   // optimiszation
   userResponse.optimization = routeResponse.optimization;
+
+  // On ne considère que le premier itinéraire renvoyé par routeResponse
+  // Portions
+  userResponse.portions = new Array();
+
+  for (var i = 0; i < route.portions.length; i++) {
+
+    var currentPortion = {};
+
+    // start
+    currentPortion.start = route.portions[i].start;
+    // end
+    currentPortion.end = route.portions[i].end;
+
+    // step
+    currentPortion.steps = new Array();
+
+    for (var j = 0; j < route.portions[i].steps.length; j++) {
+
+      var currentStep = {};
+
+      currentStep.geometry = route.portions[i].steps[j].geometry;
+
+      currentPortion.steps.push(currentStep);
+
+    }
+
+    userResponse.portions.push(currentPortion);
+
+  }
 
   callback(null, userResponse);
 

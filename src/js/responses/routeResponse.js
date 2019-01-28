@@ -37,13 +37,17 @@ module.exports = class routeResponse extends Response {
     // optmization
     this._optimization = optimization;
 
+    // Itinéraires
+    //Tableau contenant l'ensemble des itinéraires calculés par le moteur
+    this._routes = [];
+
   }
 
   /**
   *
   * @function
   * @name get start
-  * @description Récupérer le point de départ de l'itinéraire de la réponse
+  * @description Récupérer le point de départ des itinéraires
   *
   */
   get start () {
@@ -54,7 +58,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name set start
-  * @description Attribuer le point de départ de l'itinéraire de la réponse
+  * @description Attribuer le point de départ des itinéraires
   *
   */
   set start (st) {
@@ -65,7 +69,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name get end
-  * @description Récupérer le point d'arrivée de l'itinéraire de la réponse
+  * @description Récupérer le point d'arrivée des itinéraires
   *
   */
   get end () {
@@ -76,7 +80,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name set end
-  * @description Attribuer le point d'arrivée de l'itinéraire de la réponse
+  * @description Attribuer le point d'arrivée des itinéraires
   *
   */
   set end (st) {
@@ -87,7 +91,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name get profile
-  * @description Récupérer le profile de l'itinéraire
+  * @description Récupérer le profile des itinéraires
   *
   */
   get profile () {
@@ -98,7 +102,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name set profile
-  * @description Attribuer le profile de l'itinéraire
+  * @description Attribuer le profile des itinéraires
   *
   */
   set profile (st) {
@@ -109,7 +113,7 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name get optimization
-  * @description Récupérer l'optimisation de l'itinéraire
+  * @description Récupérer l'optimisation des itinéraires
   *
   */
   get optimization () {
@@ -120,11 +124,33 @@ module.exports = class routeResponse extends Response {
   *
   * @function
   * @name set optimization
-  * @description Attribuer l'optimisation de l'itinéraire
+  * @description Attribuer l'optimisation des itinéraires
   *
   */
   set optimization (st) {
     this._optimization = st;
+  }
+
+  /**
+  *
+  * @function
+  * @name get routes
+  * @description Récupérer les itinéraires
+  *
+  */
+  get routes () {
+    return this._routes;
+  }
+
+  /**
+  *
+  * @function
+  * @name set routes
+  * @description Attribuer les itinéraires
+  *
+  */
+  set routes (st) {
+    this._routes = st;
   }
 
 
