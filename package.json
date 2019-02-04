@@ -6,12 +6,13 @@
   "main": "src/js/server.js",
   "scripts": {
     "start": "pm2-runtime start process.config.js",
-    "test" : "mocha --recursive './test/mocha/*.js'",
+    "test" : "mocha --recursive './test/mocha/**/*.js'",
     "lint" : "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
     "async": "2.6.1",
+    "cors": "2.8.5",
     "express": "4.16.4",
     "log4js": "3.0.6",
     "nconf": "0.10.0",

@@ -8,6 +8,13 @@ var errorManager = require('../../../utils/errorManager');
 var LOGGER = global.log4js.getLogger("SIMPLE");
 var PROXY = require('../../../proxy/proxy');
 var async = require('async');
+var cors = require('cors');
+
+// CORS
+// ---
+// Pour cette API, on va applicer les CORS sur l'ensemble du router
+router.use(cors());
+// ---
 
 // Accueil de l'API
 router.all("/", function(req, res) {
@@ -192,6 +199,9 @@ function writeRouteResponse(routeResponse, callback) {
 
   // optimiszation
   userResponse.optimization = routeResponse.optimization;
+
+  // geometry
+  userResponse.geometry = route.geometry;
 
   // On ne considère que le premier itinéraire renvoyé par routeResponse
   // Portions

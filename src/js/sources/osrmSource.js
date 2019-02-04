@@ -92,6 +92,7 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name connect
   * @description Chargement de la source OSRM, donc du fichier osrm
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   connect() {
@@ -112,6 +113,7 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name disconnect
   * @description Déchargement de la source OSRM, donc du fichier osrm
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   disconnect() {
@@ -125,6 +127,8 @@ module.exports = class osrmSource extends Source {
   * @name computeRequest
   * @description Traiter une requête.
   * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
+  * @param {Request} request - Objet Request ou dérivant de la classe Request
+  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
   computeRequest (request, callback) {
@@ -153,6 +157,9 @@ module.exports = class osrmSource extends Source {
   * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
   * TODO: c'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
+  * @param {Request} request - Objet Request ou dérivant de la classe Request
+  * @param {osrmResponse} osrmResponse - Objet osrmResponse
+  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
   writeRouteResponse (routeRequest, osrmResponse, callback) {

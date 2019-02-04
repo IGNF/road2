@@ -57,6 +57,8 @@ module.exports = class Resource {
   * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
   * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
   * dans chacune des classes filles.
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
+  * @return {string} Id de la source concernée par la requête 
   *
   */
   getSourceIdFromRequest (request) {

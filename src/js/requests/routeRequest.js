@@ -19,6 +19,11 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name constructor
   * @description Constructeur de la classe routeRequest
+  * @param {string} resource - Ressource concernée
+  * @param {object} start - Point de départ concerné (ex. {lon: 8.732901, lat: 41.928821})
+  * @param {object} end - Point d'arrivée concerné (ex. {lon: 8.732901, lat: 41.953932})
+  * @param {string} profile - Profile concerné
+  * @param {string} optimization - Optimisation concernée
   *
   */
   constructor(resource, start, end, profile, optimization) {

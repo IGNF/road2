@@ -15,6 +15,8 @@ module.exports = {
   * Une requête se fait nécessairement sur une ressource. Cette ressource est indiquée dans la requête.
   * En fonction de la ressource, et potentiellement de plusieurs autres paramètres, cette fonction permettra
   * de renvoyer la requête vers le bon moteur.
+  * @param {Request} request - Requête
+  * @param {function} callback - Callback de succès et d'erreur qui sera transmise au moteur pour la fin de son calcul
   *
   */
 

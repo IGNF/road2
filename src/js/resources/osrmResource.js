@@ -18,6 +18,7 @@ module.exports = class osrmResource extends Resource {
   * @function
   * @name constructor
   * @description Constructeur de la classe osrmResource
+  * @param {json} resourceJsonObject - Description JSON de la ressource
   *
   */
   constructor(resourceJsonObject) {
@@ -159,6 +160,8 @@ module.exports = class osrmResource extends Resource {
   * @name getSourceIdFromRequest
   * @description Récupérer l'id de la source concernée par la requête.
   * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
+  * @return {string} Id de la source concernée par la requête
   *
   */
   getSourceIdFromRequest (request) {

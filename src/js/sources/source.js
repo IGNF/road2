@@ -80,6 +80,7 @@ module.exports = class Source {
   * @function
   * @name connect
   * @description Fonction pour utiliser pour connecter une source. Elle doit être ré-écrite dans chaque classe fille.
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   connect() {
@@ -92,6 +93,7 @@ module.exports = class Source {
   * @function
   * @name disconnect
   * @description Fonction pour utiliser pour déconnecter une source. Elle doit être ré-écrite dans chaque classe fille.
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   disconnect() {
@@ -107,6 +109,8 @@ module.exports = class Source {
   * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
   * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
   * dans chacune des classes filles.
+  * @param {Request} request - Objet Request ou dérivant de la classe Request
+  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
   computeRequest (request, callback) {

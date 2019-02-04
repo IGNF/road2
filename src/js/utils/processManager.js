@@ -10,6 +10,7 @@ module.exports = {
   * @function
   * @name shutdown
   * @description Fonction utilisée pour éteindre le serveur. Elle permet aux logs d'être écrits avant d'arrêter le processus.
+  * @param {integer} error - Signal de retour du process
   *
   */
 

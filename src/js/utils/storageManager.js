@@ -2,9 +2,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("STORAGEMANAGER");
+var LOGGER = log4js.getLogger("STORAGEMANAGER");
 
 module.exports = {
 
@@ -13,6 +14,8 @@ module.exports = {
   * @function
   * @name checkJsonStorage
   * @description Fonction utilisée pour vérifier l'écriture d'un json au niveau du stockage.
+  * @param {json} jsonStorage - Json décrivant le stockage
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 

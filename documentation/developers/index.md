@@ -12,7 +12,7 @@ Road2 a été codé pour qu'il soit facile d'ajouter des nouvelles APIs d'accès
 
 Comme précisé plus haut, Road2 a été codé pour faciliter la gestion des APIs et des moteurs. Pour atteindre cet objectif, la partie API et la partie moteur sont séparées et aucune ne voit ce que fait l'autre.
 
-Une API va donc devoir créer un objet requête générique qui sera envoyé à un proxy. Ce proxy saura vers quel moteur rediriger la requête. Le moteur va donc recevoir cet objet, effectuer un calcul, et créer un objet réponse générique qui sera alors retourner à l'API. Cette dernière pourra alors la formater si nécessaire pour l'utilisateur.
+Une API va donc devoir créer un objet requête générique qui sera envoyé à un proxy. Ce proxy renverra la requête vers le moteur concerné. Le moteur va donc recevoir cet objet, effectuer un calcul, et créer un objet réponse générique qui sera alors retourner à l'API. Cette dernière pourra alors la formater si nécessaire pour l'utilisateur.
 
 Cela permet d'ajouter ou supprimer une API sans qu'une telle modification impacte les moteurs. Et inversement.
 
@@ -60,6 +60,10 @@ Il suffit de créer l'arborescence `${apiName}/${apiVersion}/index.js` dans le d
 
 Pour supprimer une API, il suffit de supprimer le dossier qui contient sa définition.
 
+#### Fichiers de configuration pour une API
+
+Si on souhaite ajouter une configuration, on veillera à les ajouter dans un fichier de configuration indépendant du reste de la configuration de l'application. Par exemple, on pourra créer un fichier `src/config/apis/${apiName}/${apiVersion}/config.json` contenant la configuration nécessaire.
+
 ### Resource
 
 Le dossier `src/js/resources` contient un manager de ressource qui permet à l'application de gérer l'ensemble de ces ressources, et la définition des ressources utilisables.
@@ -84,7 +88,7 @@ Le dossier `src/js/sources` contient un manager de source qui permet à l'applic
 
 Chaque source est une classe qui dérive de la classe mère `source.js`. Cette classe définit une source comme l'ensemble d'un id unique à l'instance, d'un type et d'un état de connexion.
 
-Chaque source peut alors contenir autant d'information supplémentaire qu'on le souhaite. Mais elle permet surtout de faire le lien avec un moteur, ou plusieurs, lors d'une requête. Chaque ressource doit implémenter la fonction `computeRequest()`.
+Chaque source peut alors contenir autant d'information supplémentaire qu'on le souhaite. Mais elle permet surtout de faire le lien avec un moteur, ou plusieurs, lors d'une requête. Chaque ressource doit implémenter les fonctions `connect()`, `disconnect()` et `computeRequest()`.
 
 #### Ajouter une source
 
@@ -113,3 +117,19 @@ Lorsque l'application est lancée, on commence par charger la configuration de l
 Après cela, on charge les ressources et les sources du service indiquées dans la configuration. On finit par charger les APIs exposées par le service.
 
 ### A la réception d'une requête
+
+Lorsqu'une requête arrive, elle est traitée par le router expressJS de l'API appelée. Il est possible de faire les traitements que l'on veut au sein de ce router. Ces traitements peuvent n'avoir aucun rapport avec le reste de l'application. C'est un router express au sens basique du framework.
+
+On peut supposer que l'objectif sera de faire un calcul d'itinéraire. Road2 intègre donc plusieurs classes et plusieurs fonctions qui permettent d'atteindre cet objectif sans toucher aux moteurs.
+
+S'il y a des pré-traitements à effectuer avant de lancer un calcul, il sera préférable de les définir dans le fichier `index.js` qui contient la définition du router ou dans d'autres fichiers mais qui seront dans le dossier de l'API `${apiName}/${apiVersion}`. On préférera le même fonctionnement pour les post-traitements. Cela permettra de garder un code modulaire. Par exemple, la suppression d'une API n'entraînera pas la mort de certaines parties du code.
+
+Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au proxy de l'application via la fonction `PROXY.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
+
+#### Gestion des CORS
+
+Par défaut, une API ne va pas gérer les CORS. Chaque développeur doit préciser s'il souhaite utiliser les CORS au sein de l'API qu'il développe. Ainsi, il est possible de déterminer sur quelle route on souhaite utiliser quels CORS. Par exemple, on pourra autoriser toutes les origines sur certaines routes de calculs et les restreindre sur des routes d'administration.
+
+Pour appliquer des CORS, on utilise le module `cors` qui s'intègre bien à expressJS.
+
+Par défaut, il y a des options qui sont utilisées mais elles peuvent être remplacées. Si on souhaite surchargée les options, on veillera à les ajouter dans un fichier de configuration indépendant du reste de la configuration de l'application, comme cela est précisé dans le paragraphe traitant de l'ajout d'une API.  

@@ -41,6 +41,8 @@ module.exports = class resourceManager {
   * @function
   * @name checkResource
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource.
+  * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
@@ -111,6 +113,8 @@ module.exports = class resourceManager {
   * @function
   * @name checkResourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource osrm.
+  * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
@@ -242,6 +246,8 @@ module.exports = class resourceManager {
   * @function
   * @name createResource
   * @description Fonction utilisée pour créer une ressource.
+  * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @return {Resource} Ressource créée
   *
   */
 

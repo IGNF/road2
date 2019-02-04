@@ -93,6 +93,8 @@ module.exports = class sourceManager {
   * @function
   * @name checkSource
   * @description Fonction utilisée pour vérifier la partie source d'un fichier de description d'une ressource.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
@@ -180,6 +182,8 @@ module.exports = class sourceManager {
   * @function
   * @name checkSourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source osrm.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
@@ -249,6 +253,8 @@ module.exports = class sourceManager {
   * @function
   * @name checkDuplicationSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
@@ -278,6 +284,8 @@ module.exports = class sourceManager {
   * @function
   * @name createSource
   * @description Fonction utilisée pour créer une source.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {Source} Source créée
   *
   */
 
@@ -301,6 +309,8 @@ module.exports = class sourceManager {
   * @function
   * @name connectSource
   * @description Fonction utilisée pour connecter une source.
+  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
