@@ -1,7 +1,9 @@
 'use strict';
 
+const log4js = require('log4js');
+
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("PROCMANAGER");
+var LOGGER = log4js.getLogger("PROCMANAGER");
 
 module.exports = {
 

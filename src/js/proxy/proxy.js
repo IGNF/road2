@@ -1,9 +1,10 @@
 'use strict';
 
 const errorManager = require('../utils/errorManager');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("PROXY");
+var LOGGER = log4js.getLogger("PROXY");
 
 module.exports = {
 

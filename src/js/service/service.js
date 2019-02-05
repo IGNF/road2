@@ -7,9 +7,11 @@ var apisManager = require('../utils/apisManager');
 var pm = require('../utils/processManager.js');
 var ResourceManager = require('../resources/resourceManager');
 var SourceManager = require('../sources/sourceManager');
+const log4js = require('log4js');
+const nconf = require('nconf');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("SERVICE");
+var LOGGER = log4js.getLogger("SERVICE");
 
 /**
 *
@@ -132,38 +134,38 @@ module.exports = class Service {
     LOGGER.info("Verification de la configuration globale de l'application...");
 
     // Configuration de l'application
-    if (!global.nconf.get("application")) {
+    if (!nconf.get("application")) {
       LOGGER.fatal("Mauvaise configuration: Objet 'application' manquant !");
       pm.shutdown(1);
     }
     // Nom de l'application
-    if (!global.nconf.get("application:name")) {
+    if (!nconf.get("application:name")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:name' manquant !");
       pm.shutdown(1);
     }
     // Titre de l'application
-    if (!global.nconf.get("application:title")) {
+    if (!nconf.get("application:title")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:title' manquant !");
       pm.shutdown(1);
     }
     // Description de l'application
-    if (!global.nconf.get("application:description")) {
+    if (!nconf.get("application:description")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:description' manquant !");
       pm.shutdown(1);
     }
     // Information sur le fournisseur du service
-    if (global.nconf.get("application:provider")) {
+    if (nconf.get("application:provider")) {
       // Nom
-      if (!global.nconf.get("application:provider:name")) {
+      if (!nconf.get("application:provider:name")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:name' manquant !");
         pm.shutdown(1);
       }
       // Site
-      if (!global.nconf.get("application:provider:site")) {
+      if (!nconf.get("application:provider:site")) {
         LOGGER.info("Le champ 'application:provider:site' n'est pas renseigne.");
       }
       // Mail
-      if (!global.nconf.get("application:provider:mail")) {
+      if (!nconf.get("application:provider:mail")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:mail' manquant !");
         pm.shutdown(1);
       }
@@ -171,14 +173,14 @@ module.exports = class Service {
       LOGGER.warn("Configuration incomplete: Objet 'application:provider' manquant !");
     }
     // Information sur les ressources
-    if (global.nconf.get("application:resources")) {
+    if (nconf.get("application:resources")) {
       // Dossier contenant les fichiers de ressources
-      if (!global.nconf.get("application:resources:directory")) {
+      if (!nconf.get("application:resources:directory")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directory' manquant !");
         pm.shutdown(1);
       } else {
         // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
-        var directory =  path.resolve(__dirname,global.nconf.get("application:resources:directory"));
+        var directory =  path.resolve(__dirname,nconf.get("application:resources:directory"));
         if (fs.existsSync(directory)) {
           // On vérifie que l'application peut lire les fichiers du dossier
           fs.readdirSync(directory).forEach(resource => {
@@ -199,32 +201,32 @@ module.exports = class Service {
       pm.shutdown(1);
     }
     // Information sur le reseau
-    if (!global.nconf.get("ROAD2_HOST")) {
-      if (global.nconf.get("application:network")) {
+    if (!nconf.get("ROAD2_HOST")) {
+      if (nconf.get("application:network")) {
         // Host
-        if (!global.nconf.get("application:network:host")) {
+        if (!nconf.get("application:network:host")) {
           LOGGER.info("Le champ 'application:network:host' n'est pas renseigne.");
-          global.nconf.set("ROAD2_HOST","0.0.0.0");
+          nconf.set("ROAD2_HOST","0.0.0.0");
         } else {
-          global.nconf.set("ROAD2_HOST",global.nconf.get("application:network:host"));
+          nconf.set("ROAD2_HOST",nconf.get("application:network:host"));
         }
       } else {
         LOGGER.info("L'objet 'application:network:host' n'est pas renseigne.");
-        global.nconf.set("ROAD2_HOST","0.0.0.0");
+        nconf.set("ROAD2_HOST","0.0.0.0");
       }
     }
-    if (!global.nconf.get("ROAD2_PORT")) {
-      if (global.nconf.get("application:network")) {
+    if (!nconf.get("ROAD2_PORT")) {
+      if (nconf.get("application:network")) {
         // Port
-        if (!global.nconf.get("application:network:port")) {
+        if (!nconf.get("application:network:port")) {
           LOGGER.info("Le champ 'application:network:port' n'est pas renseigne.");
-          global.nconf.set("ROAD2_PORT","8080");
+          nconf.set("ROAD2_PORT","8080");
         } else {
-          global.nconf.set("ROAD2_PORT",global.nconf.get("application:network:port"));
+          nconf.set("ROAD2_PORT",nconf.get("application:network:port"));
         }
       } else {
         LOGGER.info("L'objet 'application:network:port' n'est pas renseigne.");
-        global.nconf.set("ROAD2_PORT","8080");
+        nconf.set("ROAD2_PORT","8080");
       }
     }
 
@@ -244,7 +246,7 @@ module.exports = class Service {
 
     LOGGER.info("Chargement des ressources...");
 
-    var resourceDirectory =  path.resolve(__dirname,global.nconf.get("application:resources:directory"));
+    var resourceDirectory =  path.resolve(__dirname,nconf.get("application:resources:directory"));
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
     fs.readdirSync(resourceDirectory).forEach(fileName => {
@@ -332,9 +334,9 @@ module.exports = class Service {
 
     // Pour le log des requêtes reçues sur le service avec la syntaxe
     LOGGER.info("Instanciation du logger pour les requêtes...");
-    road2.use(global.log4js.connectLogger(global.log4js.getLogger('request'), {
-      level: global.nconf.get("httpConf").level,
-      format: (req, res, format) => format(global.nconf.get("httpConf").format)
+    road2.use(log4js.connectLogger(log4js.getLogger('request'), {
+      level: nconf.get("httpConf").level,
+      format: (req, res, format) => format(nconf.get("httpConf").format)
     }));
 
     // Chargement des APIs
@@ -345,8 +347,8 @@ module.exports = class Service {
     });
 
     // Prêt à écouter
-    road2.listen(global.nconf.get("ROAD2_PORT"), global.nconf.get("ROAD2_HOST"));
-    LOGGER.info(`Road2 est fonctionnel (http://${global.nconf.get("ROAD2_HOST")}:${global.nconf.get("ROAD2_PORT")})`);
+    road2.listen(nconf.get("ROAD2_PORT"), nconf.get("ROAD2_HOST"));
+    LOGGER.info(`Road2 est fonctionnel (http://${nconf.get("ROAD2_HOST")}:${nconf.get("ROAD2_PORT")})`);
 
   }
 

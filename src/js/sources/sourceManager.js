@@ -5,9 +5,10 @@ const path = require('path');
 const assert = require('assert').strict;
 var storageManager = require('../utils/storageManager');
 var osrmSource = require('../sources/osrmSource');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("SOURCEMANAGER");
+var LOGGER = log4js.getLogger("SOURCEMANAGER");
 
 module.exports = class sourceManager {
 

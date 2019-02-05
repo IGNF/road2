@@ -7,9 +7,10 @@ var Route = require('../responses/route');
 var Portion = require('../responses/portion');
 var Step = require('../responses/step');
 var errorManager = require('../utils/errorManager');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("OSRMSOURCE");
+var LOGGER = log4js.getLogger("OSRMSOURCE");
 
 
 /**

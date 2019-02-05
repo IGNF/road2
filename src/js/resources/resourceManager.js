@@ -5,9 +5,10 @@ const path = require('path');
 var storageManager = require('../utils/storageManager');
 var SourceManager = require('../sources/sourceManager');
 var osrmResource = require('../resources/osrmResource');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("RESOURCEMANAGER");
+var LOGGER = log4js.getLogger("RESOURCEMANAGER");
 
 module.exports = class resourceManager {
 

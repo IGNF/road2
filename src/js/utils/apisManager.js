@@ -2,9 +2,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = global.log4js.getLogger("APISMANAGER");
+var LOGGER = log4js.getLogger("APISMANAGER");
 
 module.exports = {
 
@@ -13,7 +14,7 @@ module.exports = {
   * @function
   * @name loadAPIS
   * @description Fonction utilisée pour charger l'ensemble des APIs disponibles dans le projet.
-  * @param {express} app - Objet créé par ExpressJS représentant l'application 
+  * @param {express} app - Objet créé par ExpressJS représentant l'application
   *
   */
 
