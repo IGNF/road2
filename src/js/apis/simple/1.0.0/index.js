@@ -87,6 +87,7 @@ function checkRouteParameters(req, callback) {
   var end = {};
   var profile;
   var optimization;
+  var tmpStringCoordinates;
 
   // Resource
   if (!req.query.resource) {
@@ -109,7 +110,7 @@ function checkRouteParameters(req, callback) {
       return;
   } else {
     // Vérification de la validité des coordonnées fournies
-    var tmpStringCoordinates = req.query.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = req.query.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
       callback(errorManager.createError(" Parameter 'start' is invalid ", 400));
       return;
@@ -127,7 +128,7 @@ function checkRouteParameters(req, callback) {
       return;
   } else {
     // Vérification de la validité des coordonnées fournies
-    var tmpStringCoordinates = req.query.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = req.query.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
       callback(errorManager.createError(" Parameter 'end' is invalid ", 400));
       return;

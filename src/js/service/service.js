@@ -286,7 +286,7 @@ module.exports = class Service {
     var sourceDescriptions = this._sourceManager.sourceDescriptions;
 
     // On va créer chaque source
-    if (listOfSourceIds.length != 0) {
+    if (listOfSourceIds.length !== 0) {
       // On va charger chaque source identifiée
       for (var i = 0; i < listOfSourceIds.length; i++) {
 

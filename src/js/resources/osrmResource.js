@@ -42,7 +42,7 @@ module.exports = class osrmResource extends Resource {
       var linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
 
-      if (this._configuration.sources[i].id == this._defaultSourceId) {
+      if (this._configuration.sources[i].id === this._defaultSourceId) {
 
         // Profile par défaut
         this._defaultProfile = this._configuration.sources[i].cost.profile;

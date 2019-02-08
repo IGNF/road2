@@ -134,7 +134,7 @@ module.exports = class osrmSource extends Source {
   */
   computeRequest (request, callback) {
 
-    if (request.operation == "route") {
+    if (request.operation === "route") {
 
       this.osrm.route({coordinates: [[request.start.lon, request.start.lat], [request.end.lon, request.end.lat]], steps: true}, (err, result) => {
         if (err) {

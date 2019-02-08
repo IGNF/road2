@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const assert = require('assert').strict;
 var storageManager = require('../utils/storageManager');
 var osrmSource = require('../sources/osrmSource');
@@ -109,12 +107,12 @@ module.exports = class sourceManager {
       return false;
     } else {
       // On vérifie que l'id n'est pas déjà pris.
-      if (this._listOfSourceIds.length != 0) {
+      if (this._listOfSourceIds.length !== 0) {
 
         var present = false;
 
         for (var i = 0; i < this._listOfSourceIds.length; i++ ) {
-          if (this._listOfSourceIds[i] == sourceJsonObject.id) {
+          if (this._listOfSourceIds[i] === sourceJsonObject.id) {
             LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja referencee.");
             // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
             if (this.checkDuplicationSource(sourceJsonObject)) {
@@ -152,7 +150,7 @@ module.exports = class sourceManager {
       // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
       // Il ne reste plus qu'à créer la fonction de vérification correspondante.
       //------ OSRM
-      if (sourceJsonObject.type == "osrm") {
+      if (sourceJsonObject.type === "osrm") {
         available = true;
         LOGGER.info("Source osrm.");
         if (!this.checkSourceOsrm(sourceJsonObject)) {
@@ -296,7 +294,7 @@ module.exports = class sourceManager {
 
     var source;
 
-    if (sourceJsonObject.type == "osrm") {
+    if (sourceJsonObject.type === "osrm") {
       source = new osrmSource(sourceJsonObject);
     } else {
       // On va voir si c'est un autre type.

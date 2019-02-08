@@ -38,7 +38,7 @@ describe('Test de la classe osrmSource', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua"
+          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car-2.lua"
         }
       }
     }
@@ -70,7 +70,7 @@ describe('Test de la classe osrmSource', function() {
 
     it('Set Source configuration', function() {
       source.configuration = otherSourceDescription;
-      assert.equal(source.configuration, otherSourceDescription);
+      assert.deepEqual(source.configuration, otherSourceDescription);
     });
 
   });

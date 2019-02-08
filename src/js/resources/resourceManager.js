@@ -1,9 +1,6 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 var storageManager = require('../utils/storageManager');
-var SourceManager = require('../sources/sourceManager');
 var osrmResource = require('../resources/osrmResource');
 const log4js = require('log4js');
 
@@ -58,9 +55,9 @@ module.exports = class resourceManager {
     } else {
       LOGGER.info("Ressource id: " + resourceJsonObject.resource.id);
       // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource.
-      if (this._listOfResourceIds.length != 0) {
+      if (this._listOfResourceIds.length !== 0) {
         for (var i = 0; i < this._listOfResourceIds.length; i++ ) {
-          if (this._listOfResourceIds[i] == resourceJsonObject.resource.id) {
+          if (this._listOfResourceIds[i] === resourceJsonObject.resource.id) {
             LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre ajoutee.");
             return false;
           }
@@ -82,7 +79,7 @@ module.exports = class resourceManager {
       // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
       // Il ne reste plus qu'à créer la fonction de vérification correspondante.
       //------ OSRM
-      if (resourceJsonObject.resource.type == "osrm") {
+      if (resourceJsonObject.resource.type === "osrm") {
         available = true;
         LOGGER.info("Ressource osrm.");
         if (!this.checkResourceOsrm(resourceJsonObject.resource, sourceManager)) {
@@ -204,7 +201,7 @@ module.exports = class resourceManager {
       for (var i = 0; i < resourceJsonObject.sources.length; i++ ) {
         var sourceJsonObject = resourceJsonObject.sources[i];
 
-        if (sourceJsonObject.id == resourceJsonObject.defaultSourceId) {
+        if (sourceJsonObject.id === resourceJsonObject.defaultSourceId) {
           foundId = true;
           break;
         }
@@ -258,7 +255,7 @@ module.exports = class resourceManager {
 
     var resource;
 
-    if (resourceJsonObject.resource.type == "osrm") {
+    if (resourceJsonObject.resource.type === "osrm") {
       resource = new osrmResource(resourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
