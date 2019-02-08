@@ -12,15 +12,17 @@ module.exports = {
   /**
   *
   * @function
-  * @name loadAPIS
+  * @name loadAPISDirectory
   * @description Fonction utilisée pour charger l'ensemble des APIs disponibles dans le projet.
   * @param {express} app - Objet créé par ExpressJS représentant l'application
+  * @param {string} dir - Dossier contenant les routers à charger dans app
+  * @param {string} prefix - Préfixe utilisé pour chaque router ajouté
   *
   */
 
-  loadAPIS: function(app) {
+  loadAPISDirectory: function(app, dir, prefix) {
 
-    var APIsDirectory = path.resolve(__dirname,"../apis/");
+    var APIsDirectory = path.resolve(__dirname, dir);
 
     LOGGER.info("Chargement des APIS...");
 
@@ -43,7 +45,11 @@ module.exports = {
                 // on peut charger l'API
                 var api = require("../apis/" + apiName + "/" + apiVersion + "/index");
 
-                app.use("/"+ apiName + "/" + apiVersion, api);
+                if (prefix !== "") {
+                  app.use("/" + prefix + "/" + apiName + "/" + apiVersion, api);
+                } else {
+                  app.use("/"+ apiName + "/" + apiVersion, api);
+                }
 
               } else {
                 // le fichier index.js n'existe pas donc on ne fait rien
@@ -62,6 +68,7 @@ module.exports = {
     });
 
     LOGGER.info("APIS chargees.")
+    return true;
 
   }
 

@@ -1,7 +1,13 @@
 var assert = require('assert');
 var storageManager = require('../../../src/js/utils/storageManager');
+var logManager = require('../logManager');
 
 describe('Test du storageManager', function() {
+
+  before(function() {
+    // runs before all tests in this block
+    logManager.manageLogs();
+  });
 
   describe('Test de la fonction checkJsonStorage()', function() {
 

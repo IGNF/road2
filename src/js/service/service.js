@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-var apisManager = require('../utils/apisManager');
+var apisManager = require('../apis/apisManager');
 var pm = require('../utils/processManager.js');
 var ResourceManager = require('../resources/resourceManager');
 var SourceManager = require('../sources/sourceManager');
@@ -340,7 +340,7 @@ module.exports = class Service {
     }));
 
     // Chargement des APIs
-    apisManager.loadAPIS(road2);
+    apisManager.loadAPISDirectory(road2,"../apis/","");
 
     road2.all('/', (req, res) => {
       res.send('Road2 is running !! \n');

@@ -1,0 +1,8 @@
+{
+ "appenders": {
+   "console": { "type": "console", "layout": {"type": "pattern", "pattern": "%[[%d] [%p] %c %z -%] %m"} }
+ },
+ "categories": {
+   "default": { "appenders": ["console"], "level": "info" }
+ }
+}

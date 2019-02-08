@@ -1,6 +1,6 @@
 //Variables Globales
 
-var road2Url = 'http://localhost:8080/simple/1.0.0/route?resource=corse-osm'
+var road2Url = 'http://lambiek.ign.fr:8080/simple/1.0.0/route?resource=corse-osm'
 
 
 //Carte
@@ -49,8 +49,8 @@ function createMap() {
             vectorLayer
         ],
         view: new ol.View({
-            center: [260447.42, 6249628.41],
-            zoom: 15,
+            center: [1046575, 5267122],
+            zoom: 10,
             projection: "EPSG:3857"
         })
     });
@@ -107,9 +107,6 @@ function createMap() {
         return r.json();
       })
       .then(function(json) {
-        if(json.code !== 'Ok') {
-          return;
-        }
         utils.createRoute(json.geometry);
       });
 
@@ -133,7 +130,6 @@ var utils = {
     vectorSource.addFeature(feature);
   },
   createRoute: function(polyline) {
-    // route is ol.geom.LineString
     var route = new ol.format.Polyline({
       factor: 1e5
     }).readGeometry(polyline, {
