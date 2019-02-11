@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 var apisManager = require('../apis/apisManager');
-var pm = require('../utils/processManager.js');
 var ResourceManager = require('../resources/resourceManager');
 var SourceManager = require('../sources/sourceManager');
 const log4js = require('log4js');
@@ -44,6 +43,9 @@ module.exports = class Service {
 
     // catalogue des sources du service.
     this._sourceCatalog = {};
+
+    // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
+    this._server = {};
 
   }
 
@@ -136,29 +138,29 @@ module.exports = class Service {
     // Configuration de l'application
     if (!nconf.get("application")) {
       LOGGER.fatal("Mauvaise configuration: Objet 'application' manquant !");
-      pm.shutdown(1);
+      return false;
     }
     // Nom de l'application
     if (!nconf.get("application:name")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:name' manquant !");
-      pm.shutdown(1);
+      return false;
     }
     // Titre de l'application
     if (!nconf.get("application:title")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:title' manquant !");
-      pm.shutdown(1);
+      return false;
     }
     // Description de l'application
     if (!nconf.get("application:description")) {
       LOGGER.fatal("Mauvaise configuration: Champ 'application:description' manquant !");
-      pm.shutdown(1);
+      return false;
     }
     // Information sur le fournisseur du service
     if (nconf.get("application:provider")) {
       // Nom
       if (!nconf.get("application:provider:name")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:name' manquant !");
-        pm.shutdown(1);
+        return false;
       }
       // Site
       if (!nconf.get("application:provider:site")) {
@@ -167,7 +169,7 @@ module.exports = class Service {
       // Mail
       if (!nconf.get("application:provider:mail")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:provider:mail' manquant !");
-        pm.shutdown(1);
+        return false;
       }
     } else {
       LOGGER.warn("Configuration incomplete: Objet 'application:provider' manquant !");
@@ -177,7 +179,7 @@ module.exports = class Service {
       // Dossier contenant les fichiers de ressources
       if (!nconf.get("application:resources:directory")) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directory' manquant !");
-        pm.shutdown(1);
+        return false;
       } else {
         // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
         var directory =  path.resolve(__dirname,nconf.get("application:resources:directory"));
@@ -193,12 +195,12 @@ module.exports = class Service {
           });
         } else {
           LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
-          pm.shutdown(1);
+          return false;
         }
       }
     } else {
       LOGGER.fatal("Mauvaise configuration: Objet 'application:resources' manquant !");
-      pm.shutdown(1);
+      return false;
     }
     // Information sur le reseau
     if (!nconf.get("ROAD2_HOST")) {
@@ -231,6 +233,7 @@ module.exports = class Service {
     }
 
     LOGGER.info("Verification terminee.");
+    return true;
 
   }
 
@@ -239,14 +242,15 @@ module.exports = class Service {
   * @function
   * @name loadResources
   * @description Chargement des ressources
+  * @param {string} userResourceDirectory - Dossier contenant les ressources à charger
   *
   */
 
-  loadResources() {
+  loadResources(userResourceDirectory) {
 
     LOGGER.info("Chargement des ressources...");
 
-    var resourceDirectory =  path.resolve(__dirname,nconf.get("application:resources:directory"));
+    var resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
     fs.readdirSync(resourceDirectory).forEach(fileName => {
@@ -266,6 +270,8 @@ module.exports = class Service {
       }
 
     });
+
+    return true;
 
   }
 
@@ -305,15 +311,17 @@ module.exports = class Service {
         } else {
           // on n'a pas pu se connecter à la source
           LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
-          pm.shutdown(1);
+          return false;
         }
 
       }
 
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
-      pm.shutdown(1);
+      return false;
     }
+
+    return true;
 
   }
 
@@ -322,10 +330,14 @@ module.exports = class Service {
   * @function
   * @name createServer
   * @description Création du serveur
+  * @param {string} port - Port d'écoute du serveur
+  * @param {string} host - Host pour le serveur
+  * @param {string} userApiDirectory - Dossier contenant les apis à charger sur ce serveur
+  * @param {string} userServerPrefix - Prefixe à utiliser sur le serveur créer
   *
   */
 
-  createServer() {
+  createServer(port, host, userApiDirectory, userServerPrefix) {
 
     LOGGER.info("Creation de l'application web...");
 
@@ -340,15 +352,32 @@ module.exports = class Service {
     }));
 
     // Chargement des APIs
-    apisManager.loadAPISDirectory(road2,"../apis/","");
+    apisManager.loadAPISDirectory(road2, userApiDirectory, userServerPrefix);
 
     road2.all('/', (req, res) => {
       res.send('Road2 is running !! \n');
     });
 
     // Prêt à écouter
-    road2.listen(nconf.get("ROAD2_PORT"), nconf.get("ROAD2_HOST"));
-    LOGGER.info(`Road2 est fonctionnel (http://${nconf.get("ROAD2_HOST")}:${nconf.get("ROAD2_PORT")})`);
+    this._server = road2.listen(port, host);
+    LOGGER.info(`Road2 est fonctionnel (http://${host}:${port})`);
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name stopServer
+  * @description Arrêt du serveur
+  *
+  */
+
+  stopServer(callback) {
+
+    this._server.close(callback);
+    return true;
 
   }
 

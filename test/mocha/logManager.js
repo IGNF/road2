@@ -3,6 +3,7 @@
 var path = require('path');
 var fs = require('fs');
 var log4js = require('log4js');
+var nconf = require('nconf');
 var LOGGER;
 
 module.exports = {
@@ -20,7 +21,7 @@ module.exports = {
 
     if (process.env.DEBUG) {
 
-      var userFile = "log4js.json";
+      var userFile = "./config/log4js.json";
       if (file) {
         userFile = file;
       }
@@ -29,12 +30,36 @@ module.exports = {
 
       var logsConf = JSON.parse(fs.readFileSync(fileName));
 
-      log4js.configure(logsConf);
+      log4js.configure(logsConf.mainConf);
       LOGGER = log4js.getLogger();
-      
+
     } else {
 
     }
+
+  },
+
+  /**
+  *
+  * @function
+  * @name getHttpConf
+  * @description Gestion des logs http pour les tests
+  * @param {string} file - Fichier de configuration des logs
+  *
+  */
+
+  getHttpConf: function(file) {
+
+    var userFile = "./config/log4js.json";
+    if (file) {
+      userFile = file;
+    }
+
+    var fileName = path.resolve(__dirname, userFile);
+
+    var logsConf = JSON.parse(fs.readFileSync(fileName));
+
+    return logsConf.httpConf;
 
   }
 

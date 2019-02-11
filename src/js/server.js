@@ -5,6 +5,7 @@ const nconf = require('nconf');
 const Service = require('./service/service');
 const path = require('path');
 const fs = require('fs');
+var pm = require('./utils/processManager.js');
 
 var LOGGER;
 
@@ -33,16 +34,20 @@ function start() {
   global.service = new Service();
 
   // Vérification de la configuration globale du service
-  global.service.checkGlobalConfiguration();
+  if (!global.service.checkGlobalConfiguration()) {
+    pm.shutdown(1);
+  }
 
   // Chargement des ressources
-  global.service.loadResources();
+  global.service.loadResources(nconf.get("application:resources:directory"));
 
   // Chargement des sources uniques
-  global.service.loadSources();
+  if (!global.service.loadSources()) {
+    pm.shutdown(1);
+  }
 
   // Création du serveur web
-  global.service.createServer();
+  global.service.createServer(nconf.get("ROAD2_PORT"), nconf.get("ROAD2_HOST"), "../apis/", "");
 
 }
 

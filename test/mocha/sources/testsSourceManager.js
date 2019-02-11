@@ -136,4 +136,22 @@ describe('Test de la classe SourceManager', function() {
 
   });
 
+  describe('Test de la fonction createSource()', function() {
+
+    it('createSource() avec une description correcte', function() {
+      var source = sourceManager.createSource(description);
+      assert.equal(source.type, "osrm");
+    });
+
+  });
+
+  describe('Test de la fonction connectSource()', function() {
+
+    it('connectSource() avec une description correcte', function() {
+      var source = sourceManager.createSource(description);
+      assert.equal(sourceManager.connectSource(source), true);
+    });
+
+  });
+
 });
