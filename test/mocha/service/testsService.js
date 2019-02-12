@@ -1,12 +1,14 @@
 var assert = require('assert');
 var Service = require('../../../src/js/service/service');
 var logManager = require('../logManager');
-const nconf = require('nconf');
 const path = require('path');
+const fs = require('fs');
 
 describe('Test de la classe Service', function() {
 
   var service = new Service();
+  var httpConf;
+  var configuration;
 
   before(function() {
 
@@ -15,18 +17,18 @@ describe('Test de la classe Service', function() {
 
     // Chargement de la configuration pour les tests
     var file = path.resolve(__dirname,'../config/road2.json');
-    nconf.file({ file: file });
+    configuration = JSON.parse(fs.readFileSync(file));
 
     // Chargement de la configuration pour les requêtes http
-    var httpConf = logManager.getHttpConf();
-    nconf.set("httpConf",httpConf);
+    logsConf = logManager.getLogsConf();
+    service.logConfiguration = logsConf;
 
   });
 
-  describe('Test de checkGlobalConfiguration()', function() {
+  describe('Test de checkAndSaveGlobalConfiguration()', function() {
 
-    it('checkGlobalConfiguration() return true avec une configuration correcte', function() {
-      assert.equal(service.checkGlobalConfiguration(), true);
+    it('checkAndSaveGlobalConfiguration() return true avec une configuration correcte', function() {
+      assert.equal(service.checkAndSaveGlobalConfiguration(configuration), true);
     });
 
   });
@@ -34,7 +36,7 @@ describe('Test de la classe Service', function() {
   describe('Test de loadResources()', function() {
 
     it('loadResources() return true avec une configuration correcte', function() {
-      assert.equal(service.loadResources(nconf.get("application:resources:directory")), true);
+      assert.equal(service.loadResources(), true);
     });
 
   });
@@ -50,7 +52,7 @@ describe('Test de la classe Service', function() {
   describe('Test de createServer() et stopServer()', function() {
 
     it('createServer() return true avec une configuration correcte', function() {
-      assert.equal(service.createServer(nconf.get("ROAD2_PORT"), nconf.get("ROAD2_HOST"), "../apis/", ""), true);
+      assert.equal(service.createServer("../apis/", ""), true);
     });
 
     after(function(done) {

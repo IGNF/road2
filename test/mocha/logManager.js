@@ -61,6 +61,30 @@ module.exports = {
 
     return logsConf.httpConf;
 
+  },
+
+  /**
+  *
+  * @function
+  * @name getLogsConf
+  * @description Récupération de la configuration des logs
+  * @param {string} file - Fichier de configuration des logs
+  *
+  */
+
+  getLogsConf: function(file) {
+
+    var userFile = "./config/log4js.json";
+    if (file) {
+      userFile = file;
+    }
+
+    var fileName = path.resolve(__dirname, userFile);
+
+    var logsConf = JSON.parse(fs.readFileSync(fileName));
+
+    return logsConf;
+
   }
 
 }
