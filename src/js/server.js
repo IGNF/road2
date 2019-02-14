@@ -29,7 +29,8 @@ function start() {
   var configuration = loadGlobalConfiguration();
 
   // Instanciation du logger et sauvegarde de sa configuration
-  var logConfiguration = initLogger(configuration.application.logs.configuration);
+  var logConfiguration = getLoggerConfiguration(configuration);
+  initLogger(logConfiguration);
 
   // Création du service
   global.service = new Service();
@@ -51,7 +52,9 @@ function start() {
   }
 
   // Création du serveur web
-  global.service.createServer("../apis/", "");
+  if (!global.service.createServer("../apis/", "")) {
+    pm.shutdown(1);
+  }
 
 }
 
@@ -111,44 +114,97 @@ function loadGlobalConfiguration() {
 * @function
 * @name initLogger
 * @description Initialiser le logger
-* @param {string} userLogConfigurationFile - Nom du fichier de configuration des logs
-* @return {json} Configuration des logs du serveur
+* @param {json} userLogConfigurationFile - Configuration des logs de l'application
 *
 */
 
-function initLogger(userLogConfigurationFile) {
+function initLogger(userLogConfiguration) {
 
   console.log("Instanciation du logger...");
 
-  var logsConf;
+  if (userLogConfiguration) {
 
-  if (userLogConfigurationFile) {
-    // chemin absolu du fichier
-    var file = path.resolve(__dirname,userLogConfigurationFile);
+    if (userLogConfiguration.mainConf) {
 
-    // vérification de l'exitence du fichier
-    if (fs.existsSync(file)) {
-      //Lecture du fichier de configuration des logs
-      logsConf = JSON.parse(fs.readFileSync(file));
+      // Configuration du logger
+      log4js.configure(userLogConfiguration.mainConf);
+
+      //Instanciation du logger
+      LOGGER = log4js.getLogger('SERVER');
+
+      LOGGER.info("Logger charge.");
+
     } else {
-      console.log("Mauvaise configuration: fichier de configuration des logs inexistant:");
-      console.log(file);
+      console.log("Mausvaise configuration pour les logs: 'mainConf' absent.");
       process.exit(1);
     }
 
   } else {
-    console.log("Mauvaise configuration: fichier de configuration des logs non precise dans la configuration globale:");
-    // FIXME: nconf.get retourne un undefined...
-    console.log(nconf.get('ROAD2_CONF_FILE'));
+    console.log("Aucune configuration pour les logs.");
     process.exit(1);
   }
-  // Configuration du logger
-  log4js.configure(logsConf.mainConf);
 
-  //Instanciation du logger
-  LOGGER = log4js.getLogger('SERVER');
+}
 
-  LOGGER.info("Logger charge.");
+/**
+*
+* @function
+* @name getLoggerConfiguration
+* @description Récupérer la configuration des logs du serveur
+* @param {json} userConfiguration - Configuration de l'application
+* @return {json} Configuration des logs du serveur
+*
+*/
+
+function getLoggerConfiguration(userConfiguration) {
+
+  console.log("Recuperation de la configuration du logger...");
+
+  var logsConf;
+  var userLogConfigurationFile;
+
+  if (userConfiguration) {
+
+    if (userConfiguration.application) {
+
+      if (userConfiguration.application.logs) {
+
+        if (userConfiguration.application.logs.configuration) {
+
+          userLogConfigurationFile = userConfiguration.application.logs.configuration;
+
+          // chemin absolu du fichier
+          var file = path.resolve(__dirname,userLogConfigurationFile);
+
+          // vérification de l'exitence du fichier
+          if (fs.existsSync(file)) {
+            //Lecture du fichier de configuration des logs
+            logsConf = JSON.parse(fs.readFileSync(file));
+          } else {
+            console.log("Mauvaise configuration: fichier de configuration des logs inexistant:");
+            console.log(file);
+            process.exit(1);
+          }
+
+        } else {
+          console.log("Mauvais configuration: 'application.logs.configuration' absent.");
+          process.exit(1);
+        }
+
+      } else {
+        console.log("Mauvais configuration: 'application.logs' absent.");
+        process.exit(1);
+      }
+
+    } else {
+      console.log("Mauvais configuration: 'application' absent.");
+      process.exit(1);
+    }
+
+  } else {
+    console.log("Absence de configuration pour l'application.");
+    process.exit(1);
+  }
 
   return logsConf;
 

@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-var apisManager = require('../apis/apisManager');
+var ApisManager = require('../apis/apisManager');
 var ResourceManager = require('../resources/resourceManager');
 var SourceManager = require('../sources/sourceManager');
 const log4js = require('log4js');
@@ -42,6 +42,9 @@ module.exports = class Service {
 
     // catalogue des sources du service.
     this._sourceCatalog = {};
+
+    // Manager des apis du service 
+    this._apisManager = new ApisManager();
 
     // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
     this._server = {};
@@ -403,7 +406,10 @@ module.exports = class Service {
     }
 
     // Chargement des APIs
-    apisManager.loadAPISDirectory(road2, userApiDirectory, userServerPrefix);
+    if (!this._apisManager.loadAPISDirectory(road2, userApiDirectory, userServerPrefix)) {
+      LOGGER.error("Erreur lors du chargement des apis.");
+      return false;
+    }
 
     road2.all('/', (req, res) => {
       res.send('Road2 is running !! \n');
