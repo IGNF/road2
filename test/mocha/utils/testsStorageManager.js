@@ -23,7 +23,7 @@ describe('Test du storageManager', function() {
       assert.equal(storageManager.checkJsonStorage(json), true);
     });
 
-    it('checkJsonStorage() should return false when the json is correct', function() {
+    it('checkJsonStorage() should return false when the json is incorrect', function() {
       assert.equal(storageManager.checkJsonStorage(wrongJson), false);
     });
 

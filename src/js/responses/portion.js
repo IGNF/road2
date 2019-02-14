@@ -18,6 +18,8 @@ module.exports = class Portion {
   * @function
   * @name constructor
   * @description Constructeur de la classe Portion
+  * @param {string} start - Point de départ
+  * @param {string} end - Point d'arrivée
   *
   */
   constructor(start, end) {
@@ -50,6 +52,7 @@ module.exports = class Portion {
   * @function
   * @name set start
   * @description Attribuer le point de départ de la portion
+  * @param {string} start - Point de départ
   *
   */
   set start (st) {
@@ -72,10 +75,11 @@ module.exports = class Portion {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée de la portion
+  * @param {string} end - Point d'arrivée
   *
   */
-  set end (st) {
-    this._end = st;
+  set end (en) {
+    this._end = en;
   }
 
   /**
@@ -94,6 +98,7 @@ module.exports = class Portion {
   * @function
   * @name set steps
   * @description Attribuer les étapes de la portion
+  * @param {table} st - Ensemble des étapes (tableau d'objets Step)
   *
   */
   set steps (st) {

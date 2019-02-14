@@ -17,6 +17,7 @@ module.exports = class Route {
   * @function
   * @name constructor
   * @description Constructeur de la classe Route
+  * @param {string} geometry - Géométrie de l'étape
   *
   */
   constructor(geometry) {
@@ -46,6 +47,7 @@ module.exports = class Route {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'itinéraire
+  * @param {string} geometry - Géométrie de l'étape
   *
   */
   set geometry (st) {
@@ -68,6 +70,7 @@ module.exports = class Route {
   * @function
   * @name set portions
   * @description Attribuer les portions de l'itinéraire
+  * @param {table} st - Ensemble des portions (tableau d'objets Portion)
   *
   */
   set portions (st) {

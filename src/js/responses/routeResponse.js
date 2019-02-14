@@ -18,6 +18,11 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name constructor
   * @description Constructeur de la classe routeResponse
+  * @param {string} resource - Nom de la ressource
+  * @param {string} start - Point de départ
+  * @param {string} end - Point d'arrivée
+  * @param {string} profile - Profile
+  * @param {string} optimization - Optimisation
   *
   */
   constructor(resource, start, end, profile, optimization) {
@@ -59,6 +64,7 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set start
   * @description Attribuer le point de départ des itinéraires
+  * @param {string} st - Point de départ
   *
   */
   set start (st) {
@@ -81,10 +87,11 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée des itinéraires
+  * @param {string} end - Point d'arrivée
   *
   */
-  set end (st) {
-    this._end = st;
+  set end (en) {
+    this._end = en;
   }
 
   /**
@@ -103,10 +110,11 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set profile
   * @description Attribuer le profile des itinéraires
+  * @param {string} pr - Profile
   *
   */
-  set profile (st) {
-    this._profile = st;
+  set profile (pr) {
+    this._profile = pr;
   }
 
   /**
@@ -125,10 +133,11 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set optimization
   * @description Attribuer l'optimisation des itinéraires
+  * @param {string} op - Optimisation
   *
   */
-  set optimization (st) {
-    this._optimization = st;
+  set optimization (op) {
+    this._optimization = op;
   }
 
   /**
@@ -147,6 +156,7 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set routes
   * @description Attribuer les itinéraires
+  * @param {table} st - Ensemble des itinéraires (tableau d'objets Route)
   *
   */
   set routes (st) {

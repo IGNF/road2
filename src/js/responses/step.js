@@ -17,6 +17,7 @@ module.exports = class Step {
   * @function
   * @name constructor
   * @description Constructeur de la classe Step
+  * @param {string} geometry - Géométrie de l'étape
   *
   */
   constructor(geometry) {
@@ -42,6 +43,7 @@ module.exports = class Step {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'étape
+  * @param {string} geometry - Géométrie de l'étape 
   *
   */
   set geometry (st) {

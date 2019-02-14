@@ -16,11 +16,12 @@ module.exports = class Response {
   * @function
   * @name constructor
   * @description Constructeur de la classe Response
+  * @param {string} resource - Nom de la ressource
   *
   */
   constructor(resource) {
 
-    // Ressource concernée
+    // Nom de la ressource concernée par la réponse 
     this._resource = resource;
 
   }
@@ -41,6 +42,7 @@ module.exports = class Response {
   * @function
   * @name set resource
   * @description Attribuer la ressource de la requête
+  * @param {string} res - Nom de la ressource
   *
   */
   set resource (res) {
