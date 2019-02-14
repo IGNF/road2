@@ -33,26 +33,26 @@ function start() {
   initLogger(logConfiguration);
 
   // Création du service
-  global.service = new Service();
+  var service = new Service();
 
   // Vérification de la configuration globale du service et sauvegarde
-  if (!global.service.checkAndSaveGlobalConfiguration(configuration)) {
+  if (!service.checkAndSaveGlobalConfiguration(configuration)) {
     pm.shutdown(1);
   }
 
   // Sauvegarde de la configuration des logs
-  global.service.logConfiguration = logConfiguration;
+  service.logConfiguration = logConfiguration;
 
   // Chargement des ressources
-  global.service.loadResources();
+  service.loadResources();
 
   // Chargement des sources uniques
-  if (!global.service.loadSources()) {
+  if (!service.loadSources()) {
     pm.shutdown(1);
   }
 
   // Création du serveur web
-  if (!global.service.createServer("../apis/", "")) {
+  if (!service.createServer("../apis/", "")) {
     pm.shutdown(1);
   }
 

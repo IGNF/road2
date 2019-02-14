@@ -43,7 +43,7 @@ module.exports = class Service {
     // catalogue des sources du service.
     this._sourceCatalog = {};
 
-    // Manager des apis du service 
+    // Manager des apis du service
     this._apisManager = new ApisManager();
 
     // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
@@ -393,6 +393,9 @@ module.exports = class Service {
 
     // Application Express
     var road2 = express();
+
+    // Stockage de l'instance Service dans l'app expressJS afin que les informations soient accessibles par les requêtes
+    road2.set("service", this);
 
     if (this._logConfiguration !== {}) {
 

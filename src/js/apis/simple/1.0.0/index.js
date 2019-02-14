@@ -89,17 +89,20 @@ function checkRouteParameters(req, callback) {
   var optimization;
   var tmpStringCoordinates;
 
+  // On récupère l'instance de Service pour des vérifications
+  var service = req.app.get("service");
+
   // Resource
   if (!req.query.resource) {
       callback(errorManager.createError(" Parameter 'resource' not found ", 400));
       return;
   } else {
     // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
-    if (!global.service.verifyResourceExistenceById(req.query.resource)) {
+    if (!service.verifyResourceExistenceById(req.query.resource)) {
       callback(errorManager.createError(" Parameter 'resource' is invalid ", 400));
       return;
     } else {
-      resource = global.service.getResourceById(req.query.resource);
+      resource = service.getResourceById(req.query.resource);
       // TODO: vérification de la compatibilité de son type avec la requête
     }
   }
@@ -167,7 +170,7 @@ function checkRouteParameters(req, callback) {
   // On définit la routeRequest avec les paramètres obligatoires
   var routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
 
-  callback(null, routeRequest);
+  callback(null, service, routeRequest);
   return;
 
 }

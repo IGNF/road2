@@ -126,6 +126,8 @@ S'il y a des pré-traitements à effectuer avant de lancer un calcul, il sera pr
 
 Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au proxy de l'application via la fonction `PROXY.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
 
+Lors du traitement d'une requête `req` issue d'ExpressJS, il sera possible d'accéder à l'instance de la classe `Service` qui contient de nombreuses informations utiles. Cela sera possible par la méthode `req.app.get("service")` qui retourne l'instance du service. 
+
 #### Gestion des CORS
 
 Par défaut, une API ne va pas gérer les CORS. Chaque développeur doit préciser s'il souhaite utiliser les CORS au sein de l'API qu'il développe. Ainsi, il est possible de déterminer sur quelle route on souhaite utiliser quels CORS. Par exemple, on pourra autoriser toutes les origines sur certaines routes de calculs et les restreindre sur des routes d'administration.
