@@ -32,9 +32,11 @@ module.exports = class routeRequest extends Request {
     super("route",resource);
 
     // Point de départ
+    // (ex. {lon: 8.732901, lat: 41.928821})
     this._start = start;
 
     // Point d'arrivée
+    // (ex. {lon: 8.732901, lat: 41.953932})
     this._end = end;
 
     // Profile
@@ -42,6 +44,10 @@ module.exports = class routeRequest extends Request {
 
     // Optimisation
     this._optimization = optimization;
+
+    // Intermediates
+    // (ex. [{lon: 8.732901, lat: 41.953932}, {lon: 8.732901, lat: 41.928821}])
+    this._intermediates = [];
 
   }
 
@@ -131,6 +137,28 @@ module.exports = class routeRequest extends Request {
   */
   set optimization (op) {
     this._optimization = op;
+  }
+
+  /**
+  *
+  * @function
+  * @name get intermediates
+  * @description Récupérer les points intermédiaires de la requête
+  *
+  */
+  get intermediates () {
+    return this._intermediates;
+  }
+
+  /**
+  *
+  * @function
+  * @name set intermediates
+  * @description Attribuer les points intermédiaires de la requête
+  *
+  */
+  set intermediates (i) {
+    this._intermediates = i;
   }
 
 

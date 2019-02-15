@@ -136,7 +136,30 @@ module.exports = class osrmSource extends Source {
 
     if (request.operation === "route") {
 
-      this.osrm.route({coordinates: [[request.start.lon, request.start.lat], [request.end.lon, request.end.lat]], steps: true}, (err, result) => {
+      // Construction de l'objet pour la requête OSRM
+      // ---
+      var osrmRequest = {};
+
+      // Coordonnées
+      var coordinatesTable = [];
+      // start
+      coordinatesTable.push([request.start.lon, request.start.lat]);
+      // intermediates
+      if (request.intermediates.length !== 0) {
+        for (var i = 0; i < request.intermediates.length; i++) {
+          coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+        }
+      }
+      // end
+      coordinatesTable.push([request.end.lon, request.end.lat]);
+
+      osrmRequest.coordinates = coordinatesTable;
+
+      // steps
+      osrmRequest.steps = true;
+      // ---
+
+      this.osrm.route(osrmRequest, (err, result) => {
         if (err) {
           callback(err);
         } else {

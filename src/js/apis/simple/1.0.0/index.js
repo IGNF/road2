@@ -2,14 +2,15 @@
 
 
 var express = require('express');
-var router = express.Router();
 const RouteRequest = require('../../../requests/routeRequest');
 var errorManager = require('../../../utils/errorManager');
 const log4js = require('log4js');
-var LOGGER = log4js.getLogger("SIMPLE");
 var PROXY = require('../../../proxy/proxy');
 var async = require('async');
 var cors = require('cors');
+
+var LOGGER = log4js.getLogger("SIMPLE");
+var router = express.Router();
 
 // CORS
 // ---
@@ -87,6 +88,7 @@ function checkRouteParameters(req, callback) {
   var end = {};
   var profile;
   var optimization;
+  var intermediatesPoints = [];
   var tmpStringCoordinates;
 
   // On récupère l'instance de Service pour des vérifications
@@ -169,6 +171,41 @@ function checkRouteParameters(req, callback) {
 
   // On définit la routeRequest avec les paramètres obligatoires
   var routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
+
+  // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet RouteRequest
+
+  // Points intermédiaires
+  // ---
+  if (req.query.intermediates) {
+
+    // Vérification de la validité des coordonnées fournies
+    var intermediatesTable = req.query.intermediates.split("|");
+
+    // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration 
+
+    for (var i = 0; i < intermediatesTable.length; i++) {
+
+      tmpStringCoordinates = intermediatesTable[i].match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+
+      if (!tmpStringCoordinates) {
+        callback(errorManager.createError(" Parameter 'intermediates' is invalid ", 400));
+        return;
+      } else {
+        tmpStringCoordinates = tmpStringCoordinates[0].split(",");
+        intermediatesPoints[i] = {};
+        intermediatesPoints[i].lon = Number(tmpStringCoordinates[0]);
+        intermediatesPoints[i].lat = Number(tmpStringCoordinates[1]);
+        // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+      }
+
+    }
+
+    routeRequest.intermediates = intermediatesPoints;
+
+  } else {
+    // il n'y a rien à faire
+  }
+  // ---
 
   callback(null, service, routeRequest);
   return;
