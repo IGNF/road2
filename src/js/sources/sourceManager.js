@@ -20,7 +20,7 @@ module.exports = class sourceManager {
   constructor() {
 
     // Liste des ids des sources gérées par le manager
-    this._listOfSourceIds = [];
+    this._listOfSourceIds = new Array();
 
     // Description des sources conservées de manière unique dans _listOfSourceIds
     this._sourceDescriptions = {};

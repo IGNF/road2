@@ -10,7 +10,7 @@ describe('Test de la classe SourceManager', function() {
   });
 
   var sourceManager = new SourceManager();
-  var sourcesIds = [];
+  var sourcesIds = new Array();
   var sourcesDescriptions = {};
 
   var description = {
@@ -53,7 +53,7 @@ describe('Test de la classe SourceManager', function() {
   describe('Test du constructeur et des getters/setters', function() {
 
     it('Get SourceManager listOfSourceIds', function() {
-      assert.deepEqual(sourceManager.listOfSourceIds, []);
+      assert.deepEqual(sourceManager.listOfSourceIds, new Array());
     });
 
     it('Get SourceManager sourceDescriptions', function() {

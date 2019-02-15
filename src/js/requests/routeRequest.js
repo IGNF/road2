@@ -47,7 +47,10 @@ module.exports = class routeRequest extends Request {
 
     // Intermediates
     // (ex. [{lon: 8.732901, lat: 41.953932}, {lon: 8.732901, lat: 41.928821}])
-    this._intermediates = [];
+    this._intermediates = new Array();
+
+    // computeGeometry
+    this._computeGeometry = true;
 
   }
 
@@ -159,6 +162,28 @@ module.exports = class routeRequest extends Request {
   */
   set intermediates (i) {
     this._intermediates = i;
+  }
+
+  /**
+  *
+  * @function
+  * @name get computeGeometry
+  * @description Récupérer le choix de l'affichage de la géoémtrie
+  *
+  */
+  get computeGeometry () {
+    return this._computeGeometry;
+  }
+
+  /**
+  *
+  * @function
+  * @name set computeGeometry
+  * @description Attribuer le choix de l'affichage de la géoémtrie
+  *
+  */
+  set computeGeometry (i) {
+    this._computeGeometry = i;
   }
 
 

@@ -19,7 +19,7 @@ module.exports = class apisManager {
   constructor() {
 
     // Liste des routes chargées par app
-    this._listOfRoutes = [];
+    this._listOfRoutes = new Array();
 
   }
 

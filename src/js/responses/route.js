@@ -27,7 +27,7 @@ module.exports = class Route {
 
     // portions
     // s'il y a des points intermédiaires, il y a des portions pour les relier
-    this._portions = [];
+    this._portions = new Array();
 
   }
 

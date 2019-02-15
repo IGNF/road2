@@ -141,7 +141,7 @@ module.exports = class osrmSource extends Source {
       var osrmRequest = {};
 
       // Coordonnées
-      var coordinatesTable = [];
+      var coordinatesTable = new Array();
       // start
       coordinatesTable.push([request.start.lon, request.start.lat]);
       // intermediates
@@ -156,7 +156,12 @@ module.exports = class osrmSource extends Source {
       osrmRequest.coordinates = coordinatesTable;
 
       // steps
-      osrmRequest.steps = true;
+      if (request.computeGeometry) {
+        osrmRequest.steps = true;
+      } else {
+        osrmRequest.steps = false;
+      }
+
       // ---
 
       this.osrm.route(osrmRequest, (err, result) => {
@@ -193,7 +198,7 @@ module.exports = class osrmSource extends Source {
     var end;
     var profile;
     var optimization;
-    var routes = [];
+    var routes = new Array();
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
     // ---
@@ -222,7 +227,7 @@ module.exports = class osrmSource extends Source {
     // Il peut y avoir plusieurs itinéraires
     for (var i = 0; i < osrmResponse.routes.length; i++) {
 
-      var portions = [];
+      var portions = new Array();
       var currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
@@ -240,18 +245,24 @@ module.exports = class osrmSource extends Source {
         var currentOsrmRouteLeg = currentOsrmRoute.legs[j];
         var legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
         var legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
-        var steps = [];
 
         portions[j] = new Portion(legStart, legEnd);
 
-        // On va associer les étapes à la portion concernée
-        for (var k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+        if (routeRequest.computeGeometry) {
+          var steps = new Array();
 
-          var currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step(currentOsrmRouteStep.geometry);
+          // On va associer les étapes à la portion concernée
+          for (var k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+
+            var currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
+            steps[k] = new Step(currentOsrmRouteStep.geometry);
+          }
+
+          portions[j].steps = steps;
+
+        } else {
+          // Comme la géométrie des steps n'est pas demandée, on ne l'a donne pas
         }
-
-        portions[j].steps = steps;
 
       }
 

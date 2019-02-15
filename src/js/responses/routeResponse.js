@@ -44,7 +44,7 @@ module.exports = class routeResponse extends Response {
 
     // Itinéraires
     //Tableau contenant l'ensemble des itinéraires calculés par le moteur
-    this._routes = [];
+    this._routes = new Array();
 
   }
 

@@ -5,7 +5,7 @@ var road2Url = 'http://lambiek.ign.fr:8080/simple/1.0.0/route?resource=corse-osm
 
 //Carte
 var map;
-var clickedPoints = [];
+var clickedPoints = new Array();
 var vectorSource = new ol.source.Vector(),
     vectorLayer = new ol.layer.Vector({
       source: vectorSource

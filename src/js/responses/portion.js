@@ -32,7 +32,7 @@ module.exports = class Portion {
 
     // steps
     // C'est l'ensemble des étapes de la portion de l'itinéraire
-    this._steps = [];
+    this._steps = new Array();
 
   }
 

@@ -88,7 +88,7 @@ function checkRouteParameters(req, callback) {
   var end = {};
   var profile;
   var optimization;
-  var intermediatesPoints = [];
+  var intermediatesPoints = new Array();
   var tmpStringCoordinates;
 
   // On récupère l'instance de Service pour des vérifications
@@ -181,7 +181,7 @@ function checkRouteParameters(req, callback) {
     // Vérification de la validité des coordonnées fournies
     var intermediatesTable = req.query.intermediates.split("|");
 
-    // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration 
+    // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration
 
     for (var i = 0; i < intermediatesTable.length; i++) {
 
@@ -204,6 +204,25 @@ function checkRouteParameters(req, callback) {
 
   } else {
     // il n'y a rien à faire
+  }
+  // ---
+
+  // getGeometry
+  // ---
+  if (req.query.getGeometry) {
+    if (req.query.getGeometry === "true") {
+      routeRequest.computeGeometry = true;
+    } else {
+      if (req.query.getGeometry === "false") {
+        routeRequest.computeGeometry = false;
+      } else {
+        callback(errorManager.createError(" Parameter 'getGeometry' is invalid ", 400));
+        return;
+      }
+    }
+
+  } else {
+    // TODO: on met la valeur par défaut issue de la configuration
   }
   // ---
 
@@ -261,14 +280,18 @@ function writeRouteResponse(routeResponse, callback) {
     // step
     currentPortion.steps = new Array();
 
-    for (var j = 0; j < route.portions[i].steps.length; j++) {
+    if (route.portions[i].steps.length !== 0) {
+      for (var j = 0; j < route.portions[i].steps.length; j++) {
 
-      var currentStep = {};
+        var currentStep = {};
 
-      currentStep.geometry = route.portions[i].steps[j].geometry;
+        currentStep.geometry = route.portions[i].steps[j].geometry;
 
-      currentPortion.steps.push(currentStep);
+        currentPortion.steps.push(currentStep);
 
+      }
+    } else {
+      // il n'y a rien à ajouter
     }
 
     userResponse.portions.push(currentPortion);

@@ -19,7 +19,7 @@ module.exports = class resourceManager {
   constructor() {
 
     // Liste des ids des ressources gérées par le manager
-    this._listOfResourceIds = [];
+    this._listOfResourceIds = new Array();
 
   }
 
