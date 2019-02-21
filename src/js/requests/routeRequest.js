@@ -29,7 +29,7 @@ module.exports = class routeRequest extends Request {
   constructor(resource, start, end, profile, optimization) {
 
     // Constructeur parent
-    super("route",resource);
+    super("route", resource, "routeRequest");
 
     // Point de départ
     // (ex. {lon: 8.732901, lat: 41.928821})

@@ -137,29 +137,35 @@ module.exports = class osrmSource extends Source {
     if (request.operation === "route") {
 
       // Construction de l'objet pour la requête OSRM
+      // Cette construction dépend du type de la requête fournie
       // ---
       var osrmRequest = {};
 
-      // Coordonnées
-      var coordinatesTable = new Array();
-      // start
-      coordinatesTable.push([request.start.lon, request.start.lat]);
-      // intermediates
-      if (request.intermediates.length !== 0) {
-        for (var i = 0; i < request.intermediates.length; i++) {
-          coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+      if (request.type === "routeRequest") {
+        // Coordonnées
+        var coordinatesTable = new Array();
+        // start
+        coordinatesTable.push([request.start.lon, request.start.lat]);
+        // intermediates
+        if (request.intermediates.length !== 0) {
+          for (var i = 0; i < request.intermediates.length; i++) {
+            coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+          }
         }
-      }
-      // end
-      coordinatesTable.push([request.end.lon, request.end.lat]);
+        // end
+        coordinatesTable.push([request.end.lon, request.end.lat]);
 
-      osrmRequest.coordinates = coordinatesTable;
+        osrmRequest.coordinates = coordinatesTable;
 
-      // steps
-      if (request.computeGeometry) {
-        osrmRequest.steps = true;
+        // steps
+        if (request.computeGeometry) {
+          osrmRequest.steps = true;
+        } else {
+          osrmRequest.steps = false;
+        }
+
       } else {
-        osrmRequest.steps = false;
+        // on va voir si c'est un autre type de requête
       }
 
       // ---
@@ -184,7 +190,7 @@ module.exports = class osrmSource extends Source {
   * @name writeRouteResponse
   * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
   * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
-  * TODO: c'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
+  * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
   * @param {osrmResponse} osrmResponse - Objet osrmResponse
@@ -215,6 +221,11 @@ module.exports = class osrmSource extends Source {
     // Lecture de la réponse OSRM
     // ---
 
+    if (osrmResponse.waypoints.length < 2) {
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
+      callback(errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. "));
+    }
+
     // start
     start = osrmResponse.waypoints[0].location[0] +","+ osrmResponse.waypoints[0].location[1];
 
@@ -222,6 +233,11 @@ module.exports = class osrmSource extends Source {
     end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
 
     var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
+
+    if (osrmResponse.routes.length === 0) {
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
+      callback(errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. "));
+    }
 
     // routes
     // Il peut y avoir plusieurs itinéraires

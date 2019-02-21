@@ -249,8 +249,14 @@ module.exports = class Service {
           LOGGER.info("Le champ 'application:network:host' n'est pas renseigne.");
           this._host = "0.0.0.0";
         } else {
-          // TODO: vérification du paramètre
-          this._host = userConfiguration.application.network.host;
+          // Vérification du paramètre
+          var tmpHost = userConfiguration.application.network.host.match(/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/g);
+          if (!tmpHost) {
+            LOGGER.fatal("L'objet 'application:network:host' est mal renseigne.");
+            return false;
+          } else {
+            this._host = userConfiguration.application.network.host;
+          }
         }
       } else {
         LOGGER.info("L'objet 'application:network:host' n'est pas renseigne.");
@@ -267,8 +273,21 @@ module.exports = class Service {
           LOGGER.info("Le champ 'application:network:port' n'est pas renseigne.");
           this._port = "8080";
         } else {
-          // TODO: vérification du paramètre
-          this._port = userConfiguration.application.network.port;
+          // Vérification du paramètre
+          var tmpPort = userConfiguration.application.network.port.match(/^\d{1,5}$/g);
+          if (!tmpPort) {
+            LOGGER.fatal("L'objet 'application:network:port' est mal renseigne.");
+            return false;
+          } else {
+
+            if (tmpPort > 65536) {
+              LOGGER.fatal("L'objet 'application:network:port' est mal renseigne: Numero de port invalide");
+              return false;
+            } else {
+              this._port = userConfiguration.application.network.port;
+            }
+
+          }
         }
       } else {
         LOGGER.info("L'objet 'application:network:port' n'est pas renseigne.");

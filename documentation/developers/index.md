@@ -102,6 +102,24 @@ Ensuite, il faut créer ou modifier une ressource pour qu'elle utilise cette nou
 
 Pour supprimer une source, il suffit de supprimer le fichier qui contient sa définition et les parties du code qui la concerne dans le manager de sources et les ressources qui l'utilisent.
 
+### Request
+
+Le dossier `src/js/requests` contient la définition des classes `Request` et toutes celles qui en dérivent. Lorsqu'une requête arrive, une API doit utiliser l'une de ces classes filles pour interroger un moteur via le PROXY. Par exemple, il existe déjà une classe fille pour calculer des itinéraires: `routeRequest`.
+
+Chaque classe fille contient des informations utiles pour que les moteurs puissent traiter la requête. Ces informations sont nécessaires pour certaines et facultatives pour d'autres. Néanmoins, pour une raison quelconque, on souhaitera parfois ajouter une nouvelle classe fille. Par exemple, pour traiter une nouvelle opération ou pour traiter autrement une opération déjà existante. Cela évitera de modifier une classe existante et tous les impacts que cela peut avoir sur la gestion des moteurs.
+
+#### Modifier une Request
+
+Une `Request` est un élément central dans Road2 car il fait le lien entre une API et un moteur. Pour cette raison, modifier une telle classe aura des impacts sur les APIs et les sources qui l'utilisent. 
+
+#### Supprimer une Request
+
+Il suffit de supprimer la classe concernée et ses usages dans les APIs et les sources concernés.
+
+#### Ajouter une Request
+
+Il suffit de créer une classe fille de `Request` et d'implémenter son usage dans une ou plusieurs APIs et sources.
+
 ## Fonctionnement du code
 
 ### Au lancement de l'application
@@ -126,7 +144,7 @@ S'il y a des pré-traitements à effectuer avant de lancer un calcul, il sera pr
 
 Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au proxy de l'application via la fonction `PROXY.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
 
-Lors du traitement d'une requête `req` issue d'ExpressJS, il sera possible d'accéder à l'instance de la classe `Service` qui contient de nombreuses informations utiles. Cela sera possible par la méthode `req.app.get("service")` qui retourne l'instance du service. 
+Lors du traitement d'une requête `req` issue d'ExpressJS, il sera possible d'accéder à l'instance de la classe `Service` qui contient de nombreuses informations utiles. Cela sera possible par la méthode `req.app.get("service")` qui retourne l'instance du service.
 
 #### Gestion des CORS
 

@@ -20,7 +20,7 @@ module.exports = {
 
     LOGGER.info("Extinction du serveur.")
 
-    global.log4js.shutdown(function(){
+    log4js.shutdown(function(){
       process.exit(error);
     });
 

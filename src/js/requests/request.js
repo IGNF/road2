@@ -18,17 +18,19 @@ module.exports = class Request {
   * @name constructor
   * @description Constructeur de la classe routeRequest
   * @param {string} operation - Type d'opération concernée
-  * @param {string} resource - Ressource concernée 
+  * @param {string} resource - Ressource concernée
   *
   */
-  constructor(operation, resource) {
+  constructor(operation, resource, type) {
 
-    // Ressource concernée
+    // Opération concernée
     this._operation = operation;
 
     // Ressource concernée
     this._resource = resource;
 
+    // Type de la requête
+    this._type = type;
 
   }
 
@@ -74,6 +76,28 @@ module.exports = class Request {
   */
   set operation (op) {
     this._operation = op;
+  }
+
+  /**
+  *
+  * @function
+  * @name get type
+  * @description Récupérer le type de la requête
+  *
+  */
+  get type () {
+    return this._type;
+  }
+
+  /**
+  *
+  * @function
+  * @name set type
+  * @description Attribuer le type de la requête
+  *
+  */
+  set type (ty) {
+    this._type = ty;
   }
 
 

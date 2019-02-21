@@ -199,7 +199,7 @@ module.exports = class sourceManager {
         LOGGER.error("Stockage de la source incorrect.");
         return false;
       } else {
-        // TODO: vérifier que ce stockage n'est pas déjà utilisé
+        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée 
       }
     }
 
