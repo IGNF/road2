@@ -1,7 +1,7 @@
 'use strict';
 
 var Source = require('./source');
-const OSRM = require("osrm");
+const { Client } = require('pg');
 var RouteResponse = require('../responses/routeResponse');
 var Route = require('../responses/route');
 var Portion = require('../responses/portion');
@@ -10,25 +10,25 @@ var errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = log4js.getLogger("OSRMSOURCE");
+var LOGGER = log4js.getLogger("PGRSOURCE");
 
 
 /**
 *
 * @class
-* @name osrmSource
-* @description Classe modélisant une source OSRM.
+* @name pgrSource
+* @description Classe modélisant une source pgRouting.
 *
 */
 
-module.exports = class osrmSource extends Source {
+module.exports = class pgrSource extends Source {
 
 
   /**
   *
   * @function
   * @name constructor
-  * @description Constructeur de la classe osrmSource
+  * @description Constructeur de la classe pgrSource
   *
   */
   constructor(sourceJsonObject) {
@@ -39,8 +39,8 @@ module.exports = class osrmSource extends Source {
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
-    // Objet OSRM qui permet de faire les calculs
-    this._osrm = {};
+    // Connection à la base de données
+    this._client = {};
 
   }
 
@@ -69,41 +69,25 @@ module.exports = class osrmSource extends Source {
   /**
   *
   * @function
-  * @name get osrm
-  * @description Récupérer l'objet osrm de la source
-  *
-  */
-  get osrm () {
-    return this._osrm;
-  }
-
-  /**
-  *
-  * @function
-  * @name set osrm
-  * @description Attribuer l'objet osrm de la source
-  *
-  */
-  set osrm (o) {
-    this._osrm = o;
-  }
-
-  /**
-  *
-  * @function
   * @name connect
-  * @description Chargement de la source OSRM, donc du fichier osrm
+  * @description Connection à la base pgRouting
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   connect() {
 
-    // Récupération de l'emplacement du fichier OSRM
-    var osrmFile = this._configuration.storage.file;
-    LOGGER.info("Chargement du fichier OSRM: " + osrmFile);
+    // Connection à la base de données
+    let db_config = this._configuration.storage.file; // objet similaire à config de https://node-postgres.com/api/client
 
-    // Chargement du fichier OSRM
-    this._osrm = new OSRM(osrmFile);
+    LOGGER.info("Connection à la base : " + db_config.database);
+    this._client = new Client(db_config);
+    this._client.connect((err) => {
+      if (err) {
+        LOGGER.error('erreur de connection : ', err.stack)
+      } else {
+        LOGGER.info('connection réussie')
+      }
+    });
     super.connected = true;
     return true;
 
@@ -113,11 +97,17 @@ module.exports = class osrmSource extends Source {
   *
   * @function
   * @name disconnect
-  * @description Déchargement de la source OSRM, donc du fichier osrm
+  * @description Déconnection à la base pgRouting
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   disconnect() {
+    await this._client.end((err) => {
+      LOGGER.info('client déconecté')
+      if (err) {
+        LOGGER.error('error pendant la deconnection : ', err.stack)
+      }
+    });
     super.connected = false;
     return true;
   }
@@ -139,7 +129,7 @@ module.exports = class osrmSource extends Source {
       // Construction de l'objet pour la requête OSRM
       // Cette construction dépend du type de la requête fournie
       // ---
-      var osrmRequest = {};
+      var pgrRequest = {};
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -155,13 +145,13 @@ module.exports = class osrmSource extends Source {
         // end
         coordinatesTable.push([request.end.lon, request.end.lat]);
 
-        osrmRequest.coordinates = coordinatesTable;
+        pgrRequest.coordinates = coordinatesTable;
 
         // steps
         if (request.computeGeometry) {
-          osrmRequest.steps = true;
+          pgrRequest.steps = true;
         } else {
-          osrmRequest.steps = false;
+          pgrRequest.steps = false;
         }
 
       } else {
@@ -169,8 +159,13 @@ module.exports = class osrmSource extends Source {
       }
 
       // ---
+      let query_string = "SELECT coord_dijkstra($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
+        this._configuration.storage.costColumn +
+        "','" +
+        this._configuration.storage.reverseCostColumn +
+        "')";
 
-      this._osrm.route(osrmRequest, (err, result) => {
+      this._client.query(query_string, pgrRequest, (err, result) => {
         if (err) {
           callback(err);
         } else {
@@ -197,7 +192,7 @@ module.exports = class osrmSource extends Source {
   * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
-  writeRouteResponse (routeRequest, osrmResponse, callback) {
+  writeRouteResponse (routeRequest, pgrResponse, callback) {
 
     var resource;
     var start;
