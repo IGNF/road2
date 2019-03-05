@@ -147,11 +147,12 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
+        let sql_function;
         // steps
         if (request.computeGeometry) {
-          pgrRequest.steps = true;
+          sql_function = "coord_dijkstra";
         } else {
-          pgrRequest.steps = false;
+          sql_function = "coord_dijkstra_no_geom";
         }
 
       } else {
@@ -159,7 +160,7 @@ module.exports = class pgrSource extends Source {
       }
 
       // ---
-      let query_string = "SELECT coord_dijkstra($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
+      let query_string = "SELECT " + sql_function + "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
         this._configuration.storage.costColumn +
         "','" +
         this._configuration.storage.reverseCostColumn +
@@ -216,23 +217,25 @@ module.exports = class pgrSource extends Source {
     // Lecture de la réponse OSRM
     // ---
 
-    if (osrmResponse.waypoints.length < 2) {
+    if (pgrResponse.length < 1) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      callback(errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. "));
+      callback(errorManager.createError(" pgr response is invalid: the number of steps is lower than 1. "));
     }
+
+    let vertex_table = "ways_vertices_pgr";
+    let start_id = pgrResponse[0].node;
+    let end_id = pgrResponse[pgrResponse.length - 1].node;
+    let start_request_result = await this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + start_id);
 
     // start
-    start = osrmResponse.waypoints[0].location[0] +","+ osrmResponse.waypoints[0].location[1];
+    start = start_request_result.lon +","+ start_request_result.lat;
+
+    let end_request_result = await this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + end_id);
 
     // end
-    end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
+    end = end_request_result.lon +","+ end_request_result.lat;
 
     var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
-
-    if (osrmResponse.routes.length === 0) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      callback(errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. "));
-    }
 
     // routes
     // Il peut y avoir plusieurs itinéraires
