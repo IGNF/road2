@@ -79,13 +79,14 @@ describe('Test de la classe SourceManager', function() {
     });
 
     it('checkSource() avec un mauvais id', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSource() avec un mauvais type', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-2";
       wrongDescription.type = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
@@ -99,25 +100,29 @@ describe('Test de la classe SourceManager', function() {
     });
 
     it('checkSourceOsrm() avec un mauvais cost', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-3";
       wrongDescription.cost = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.profile', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-4";
       wrongDescription.cost.profile = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.optimization', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-5";
       wrongDescription.cost.optimization = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.compute', function() {
-      var wrongDescription = Object.assign({}, description);
+      var wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-6";
       wrongDescription.cost.compute = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });

@@ -18,6 +18,9 @@ module.exports = class resourceManager {
   */
   constructor() {
 
+    // Liste des ids des ressources vérifiées par le manager
+    this._listOfVerifiedResourceIds = new Array();
+
     // Liste des ids des ressources gérées par le manager
     this._listOfResourceIds = new Array();
 
@@ -55,17 +58,15 @@ module.exports = class resourceManager {
     } else {
       LOGGER.info("Ressource id: " + resourceJsonObject.resource.id);
       // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource.
-      if (this._listOfResourceIds.length !== 0) {
-        for (var i = 0; i < this._listOfResourceIds.length; i++ ) {
-          if (this._listOfResourceIds[i] === resourceJsonObject.resource.id) {
-            LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre ajoutee.");
+      if (this._listOfVerifiedResourceIds.length !== 0) {
+        for (var i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
+          if (this._listOfVerifiedResourceIds[i] === resourceJsonObject.resource.id) {
+            LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " a deja ete verifiee. Cette ressource ne peut donc etre ajoutee.");
             return false;
           }
         }
-        this._listOfResourceIds.push(resourceJsonObject.resource.id);
       } else {
         // C'est la première ressource.
-        this._listOfResourceIds.push(resourceJsonObject.resource.id);
       }
     }
 
@@ -99,6 +100,9 @@ module.exports = class resourceManager {
         return false;
       }
     }
+
+    // on sauvegarde l'id de la ressource pour savoir qu'elle a déjà été vérifiée et que sa description est valide
+    this._listOfVerifiedResourceIds.push(resourceJsonObject.resource.id);
 
     LOGGER.info("Fin de la verification de la ressource.");
     return true;
@@ -251,15 +255,48 @@ module.exports = class resourceManager {
 
   createResource(resourceJsonObject) {
 
+    var resource;
+
+    if (!resourceJsonObject.resource.id) {
+      LOGGER.error("La ressource ne contient pas d'id.");
+      return null;
+    }
+
     LOGGER.info("Creation de la ressource: " + resourceJsonObject.resource.id);
 
-    var resource;
+    // On vérifie que la ressource a bien été vérifiée et validée
+    if (this._listOfVerifiedResourceIds.length !== 0) {
+      for (var i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
+        if (this._listOfVerifiedResourceIds[i] === resourceJsonObject.resource.id) {
+          LOGGER.info("La ressource contenant l'id " + resourceJsonObject.resource.id + " a deja ete verifiee.");
+          break;
+        }
+      }
+    } else {
+      LOGGER.error("Tentative de creation d'une ressource sans verification prealable. Cette ressource ne peut donc etre creee.");
+      return null;
+    }
+
+    // On vérifie que la ressource n'a pas déjà été créée
+    if (this._listOfResourceIds.length !== 0) {
+      for (var i = 0; i < this._listOfResourceIds.length; i++ ) {
+        if (this._listOfResourceIds[i] === resourceJsonObject.resource.id) {
+          LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre creee.");
+          return null;
+        }
+      }
+    } else {
+      // C'est la première ressource.
+    }
 
     if (resourceJsonObject.resource.type === "osrm") {
       resource = new osrmResource(resourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
     }
+
+    // on sauvegarde l'id de la ressource pour savoir qu'elle a déjà été créée
+    this._listOfResourceIds.push(resourceJsonObject.resource.id);
 
     return resource;
   }

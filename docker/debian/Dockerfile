@@ -66,7 +66,6 @@ WORKDIR /home/docker/app
 
 ### Récupération des sources de l'application
 COPY package.json ./
-COPY process.config.js ./
 COPY eslint.json ./
 COPY jsdoc.json ./
 COPY src ./src/
@@ -77,12 +76,6 @@ COPY /test ./test/
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 # https://expressjs.com/fr/starter/installing.html
 RUN npm install
-
-### Installation de PM2 pour gérer l'application
-# Ce n'est pas une dépendance nécessaire à l'exécution de l'application
-# http://pm2.keymetrics.io/docs/usage/quick-start/
-# https://pm2.io/doc/en/runtime/integration/docker/
-RUN npm install pm2 -g
 
 ### Installation de mocha pour les tests
 # https://mochajs.org/#installation
