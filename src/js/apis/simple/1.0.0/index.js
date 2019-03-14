@@ -5,7 +5,6 @@ var express = require('express');
 const RouteRequest = require('../../../requests/routeRequest');
 var errorManager = require('../../../utils/errorManager');
 const log4js = require('log4js');
-var PROXY = require('../../../proxy/proxy');
 var async = require('async');
 var cors = require('cors');
 
@@ -39,12 +38,18 @@ router.all("/getcapabilities", function(req, res) {
 router.route("/route")
   .get(function(req, res, next) {
 
+    // On récupère l'instance de Service pour faire les calculs
+    var service = req.app.get("service");
+
+    // Async.waterfall permet d'executer des fonctions les unes après les autres
+    // Le contexte est changé par la fonction, donc il est parfois nécessaire de le repréciser avec bind
     async.waterfall(
       [
         // Vérification des paramètres de la requête
         async.apply(checkRouteParameters, req),
-        // Envoie au proxy et récupération de l'objet réponse du proxy
-        PROXY.computeRequest,
+        // Envoie au service et récupération de l'objet réponse
+
+        service.computeRequest.bind(service),
         // Formattage de la réponse
         writeRouteResponse
       ],
@@ -226,7 +231,7 @@ function checkRouteParameters(req, callback) {
   }
   // ---
 
-  callback(null, service, routeRequest);
+  callback(null, routeRequest);
   return;
 
 }

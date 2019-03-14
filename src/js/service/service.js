@@ -460,5 +460,44 @@ module.exports = class Service {
 
   }
 
+  /**
+  *
+  * @function
+  * @name computeRequest
+  * @description Fonction utilisée pour rediriger une requête vers le bon moteur.
+  * Une requête se fait nécessairement sur une ressource. Cette ressource est indiquée dans la requête.
+  * La ressource sait comment déterminer la source concernée par la requête.
+  * Et la source interrogera le moteur.
+  * @param {Request} request - Requête
+  * @param {function} callback - Callback de succès et d'erreur qui sera transmise au moteur pour la fin de son calcul
+  *
+  */
+
+  computeRequest(request, callback) {
+    console.log(request);
+    // Récupération de la ressource
+    // ---
+    // L'id est dans la requête
+    var resourceId = request.resource;
+    // La ressource est dans le catalogue du service
+    var resource = this._resourceCatalog[resourceId];
+    // ---
+
+    // Récupération de la source concernée par la requête
+    // ---
+    // L'id est donné par le ressource
+    var sourceId = resource.getSourceIdFromRequest(request);
+    // La source est dans le catalogue du service
+    var source = this._sourceCatalog[sourceId];
+    // ---
+
+    //On renvoie la requête vers le moteur
+    // ---
+    // C'est la source qui fait le lien avec un moteur
+    source.computeRequest(request,callback);
+    // ---
+
+  }
+
 
 }
