@@ -1,7 +1,7 @@
-var assert = require('assert');
-var osrmSource = require('../../../src/js/sources/osrmSource');
-var RouteRequest = require('../../../src/js/requests/routeRequest');
-var logManager = require('../logManager');
+const assert = require('assert');
+const osrmSource = require('../../../src/js/sources/osrmSource');
+const RouteRequest = require('../../../src/js/requests/routeRequest');
+const logManager = require('../logManager');
 
 describe('Test de la classe osrmSource', function() {
 
@@ -10,7 +10,7 @@ describe('Test de la classe osrmSource', function() {
     logManager.manageLogs();
   });
 
-  var sourceDescription = {
+  let sourceDescription = {
     "id": "corse-car-fastest",
     "type": "osrm",
     "storage": {
@@ -27,7 +27,7 @@ describe('Test de la classe osrmSource', function() {
     }
   };
 
-  var otherSourceDescription = {
+  let otherSourceDescription = {
     "id": "corse-car-fastest-2",
     "type": "osrm",
     "storage": {
@@ -44,7 +44,7 @@ describe('Test de la classe osrmSource', function() {
     }
   };
 
-  var source = new osrmSource(sourceDescription);
+  let source = new osrmSource(sourceDescription);
 
   describe('Test du constructeur et des getters', function() {
 
@@ -93,12 +93,12 @@ describe('Test de la classe osrmSource', function() {
 
   describe('Test de computeRequest() et writeRouteResponse()', function() {
 
-    var resource = "resource-test";
-    var start = {lon: 8.732901, lat: 41.928821};
-    var end = {lon: 8.76385, lat: 41.953932};
-    var profile = "car-test";
-    var optimization = "fastest-test";
-    var routeRequest = new RouteRequest(resource, start, end, profile, optimization);
+    let resource = "resource-test";
+    let start = {lon: 8.732901, lat: 41.928821};
+    let end = {lon: 8.76385, lat: 41.953932};
+    let profile = "car-test";
+    let optimization = "fastest-test";
+    let routeRequest = new RouteRequest(resource, start, end, profile, optimization);
 
     it('computeRequest() should return a routeResponse', async function() {
       source.connect();

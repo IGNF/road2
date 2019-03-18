@@ -1,11 +1,11 @@
 'use strict';
 
 
-var express = require('express');
+const express = require('express');
 const RouteRequest = require('../../../requests/routeRequest');
-var errorManager = require('../../../utils/errorManager');
+const errorManager = require('../../../utils/errorManager');
 const log4js = require('log4js');
-var cors = require('cors');
+const cors = require('cors');
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -24,7 +24,7 @@ router.all("/", function(req, res) {
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
   //création du getCapabilities
-  var getCapabilities = {
+  let getCapabilities = {
     info: {
       name: "Calcul d'itinéraire"
     }
@@ -38,7 +38,7 @@ router.route("/route")
   .get(async function(req, res, next) {
 
     // On récupère l'instance de Service pour faire les calculs
-    var service = req.app.get("service");
+    let service = req.app.get("service");
 
     try {
 
@@ -80,16 +80,16 @@ router.use(notFoundError);
 
 function checkRouteParameters(req) {
 
-  var resource;
-  var start = {};
-  var end = {};
-  var profile;
-  var optimization;
-  var intermediatesPoints = new Array();
-  var tmpStringCoordinates;
+  let resource;
+  let start = {};
+  let end = {};
+  let profile;
+  let optimization;
+  let intermediatesPoints = new Array();
+  let tmpStringCoordinates;
 
   // On récupère l'instance de Service pour des vérifications
-  var service = req.app.get("service");
+  let service = req.app.get("service");
 
   // Resource
   if (!req.query.resource) {
@@ -160,7 +160,7 @@ function checkRouteParameters(req) {
   // ---
 
   // On définit la routeRequest avec les paramètres obligatoires
-  var routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
+  let routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
 
   // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet RouteRequest
 
@@ -169,11 +169,11 @@ function checkRouteParameters(req) {
   if (req.query.intermediates) {
 
     // Vérification de la validité des coordonnées fournies
-    var intermediatesTable = req.query.intermediates.split("|");
+    let intermediatesTable = req.query.intermediates.split("|");
 
     // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration
 
-    for (var i = 0; i < intermediatesTable.length; i++) {
+    for (let i = 0; i < intermediatesTable.length; i++) {
 
       tmpStringCoordinates = intermediatesTable[i].match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
 
@@ -230,8 +230,8 @@ function checkRouteParameters(req) {
 
 function writeRouteResponse(routeResponse) {
 
-  var userResponse = {};
-  var route = routeResponse.routes[0];
+  let userResponse = {};
+  let route = routeResponse.routes[0];
 
   // resource
   userResponse.resource = routeResponse.resource;
@@ -255,9 +255,9 @@ function writeRouteResponse(routeResponse) {
   // Portions
   userResponse.portions = new Array();
 
-  for (var i = 0; i < route.portions.length; i++) {
+  for (let i = 0; i < route.portions.length; i++) {
 
-    var currentPortion = {};
+    let currentPortion = {};
 
     // start
     currentPortion.start = route.portions[i].start;
@@ -268,9 +268,9 @@ function writeRouteResponse(routeResponse) {
     currentPortion.steps = new Array();
 
     if (route.portions[i].steps.length !== 0) {
-      for (var j = 0; j < route.portions[i].steps.length; j++) {
+      for (let j = 0; j < route.portions[i].steps.length; j++) {
 
-        var currentStep = {};
+        let currentStep = {};
 
         currentStep.geometry = route.portions[i].steps[j].geometry;
 

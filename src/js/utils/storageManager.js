@@ -20,7 +20,7 @@ module.exports = {
 
   checkJsonStorage: function(jsonStorage) {
 
-    var storageFound = false;
+    let storageFound = false;
 
     // On regarde si c'est du stokage fichier
     if (jsonStorage.file) {

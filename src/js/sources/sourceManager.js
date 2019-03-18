@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert').strict;
-var storageManager = require('../utils/storageManager');
-var osrmSource = require('../sources/osrmSource');
+const storageManager = require('../utils/storageManager');
+const osrmSource = require('../sources/osrmSource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -109,9 +109,9 @@ module.exports = class sourceManager {
       // On vérifie que l'id n'est pas déjà pris.
       if (this._listOfSourceIds.length !== 0) {
 
-        var present = false;
+        let present = false;
 
-        for (var i = 0; i < this._listOfSourceIds.length; i++ ) {
+        for (let i = 0; i < this._listOfSourceIds.length; i++ ) {
           if (this._listOfSourceIds[i] === sourceJsonObject.id) {
             LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja referencee.");
             // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
@@ -146,7 +146,7 @@ module.exports = class sourceManager {
       return false;
     } else {
       // Vérification que le type est valide puis vérification spécifique à chaque type
-      var available = false;
+      let available = false;
       // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
       // Il ne reste plus qu'à créer la fonction de vérification correspondante.
       //------ OSRM
@@ -199,7 +199,7 @@ module.exports = class sourceManager {
         LOGGER.error("Stockage de la source incorrect.");
         return false;
       } else {
-        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée 
+        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
       }
     }
 
@@ -262,7 +262,7 @@ module.exports = class sourceManager {
     LOGGER.info("Comparaison des deux sources identifiees et devant etre identiques...");
 
     // On récupère la description de la source faisant office de référence car lue la première.
-    var referenceSource = this._sourceDescriptions[sourceJsonObject.id];
+    let referenceSource = this._sourceDescriptions[sourceJsonObject.id];
 
     // On compare les deux objets
     try {
@@ -292,7 +292,7 @@ module.exports = class sourceManager {
 
     LOGGER.info("Creation de la source: " + sourceJsonObject.id);
 
-    var source;
+    let source;
 
     if (sourceJsonObject.type === "osrm") {
       source = new osrmSource(sourceJsonObject);

@@ -1,12 +1,12 @@
 'use strict';
 
-var Source = require('./source');
+const Source = require('./source');
 const OSRM = require("osrm");
-var RouteResponse = require('../responses/routeResponse');
-var Route = require('../responses/route');
-var Portion = require('../responses/portion');
-var Step = require('../responses/step');
-var errorManager = require('../utils/errorManager');
+const RouteResponse = require('../responses/routeResponse');
+const Route = require('../responses/route');
+const Portion = require('../responses/portion');
+const Step = require('../responses/step');
+const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -99,7 +99,7 @@ module.exports = class osrmSource extends Source {
   connect() {
 
     // Récupération de l'emplacement du fichier OSRM
-    var osrmFile = this._configuration.storage.file;
+    let osrmFile = this._configuration.storage.file;
     LOGGER.info("Chargement du fichier OSRM: " + osrmFile);
 
     // Chargement du fichier OSRM
@@ -139,16 +139,16 @@ module.exports = class osrmSource extends Source {
       // Construction de l'objet pour la requête OSRM
       // Cette construction dépend du type de la requête fournie
       // ---
-      var osrmRequest = {};
+      let osrmRequest = {};
 
       if (request.type === "routeRequest") {
         // Coordonnées
-        var coordinatesTable = new Array();
+        let coordinatesTable = new Array();
         // start
         coordinatesTable.push([request.start.lon, request.start.lat]);
         // intermediates
         if (request.intermediates.length !== 0) {
-          for (var i = 0; i < request.intermediates.length; i++) {
+          for (let i = 0; i < request.intermediates.length; i++) {
             coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
           }
         }
@@ -201,12 +201,12 @@ module.exports = class osrmSource extends Source {
   */
   writeRouteResponse (routeRequest, osrmResponse) {
 
-    var resource;
-    var start;
-    var end;
-    var profile;
-    var optimization;
-    var routes = new Array();
+    let resource;
+    let start;
+    let end;
+    let profile;
+    let optimization;
+    let routes = new Array();
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
     // ---
@@ -234,7 +234,7 @@ module.exports = class osrmSource extends Source {
     // end
     end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
 
-    var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
+    let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (osrmResponse.routes.length === 0) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
@@ -243,10 +243,10 @@ module.exports = class osrmSource extends Source {
 
     // routes
     // Il peut y avoir plusieurs itinéraires
-    for (var i = 0; i < osrmResponse.routes.length; i++) {
+    for (let i = 0; i < osrmResponse.routes.length; i++) {
 
-      var portions = new Array();
-      var currentOsrmRoute = osrmResponse.routes[i];
+      let portions = new Array();
+      let currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route(currentOsrmRoute.geometry);
@@ -258,21 +258,21 @@ module.exports = class osrmSource extends Source {
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
-      for (var j = 0; j < currentOsrmRoute.legs.length; j++) {
+      for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
 
-        var currentOsrmRouteLeg = currentOsrmRoute.legs[j];
-        var legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
-        var legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
+        let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
+        let legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
+        let legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
 
         portions[j] = new Portion(legStart, legEnd);
 
         if (routeRequest.computeGeometry) {
-          var steps = new Array();
+          let steps = new Array();
 
           // On va associer les étapes à la portion concernée
-          for (var k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+          for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
-            var currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
+            let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
             steps[k] = new Step(currentOsrmRouteStep.geometry);
           }
 

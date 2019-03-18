@@ -1,15 +1,15 @@
-var assert = require('assert');
-var Service = require('../../../src/js/service/service');
-var RouteRequest = require('../../../src/js/requests/routeRequest');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Service = require('../../../src/js/service/service');
+const RouteRequest = require('../../../src/js/requests/routeRequest');
+const logManager = require('../logManager');
 const path = require('path');
 const fs = require('fs');
 
 describe('Test de la classe Service', function() {
 
-  var service = new Service();
-  var httpConf;
-  var configuration;
+  let service = new Service();
+  let httpConf;
+  let configuration;
 
   before(function() {
 
@@ -17,7 +17,7 @@ describe('Test de la classe Service', function() {
     logManager.manageLogs();
 
     // Chargement de la configuration pour les tests
-    var file = path.resolve(__dirname,'../config/road2.json');
+    let file = path.resolve(__dirname,'../config/road2.json');
     configuration = JSON.parse(fs.readFileSync(file));
 
     // Chargement de la configuration pour les requêtes http
@@ -69,7 +69,7 @@ describe('Test de la classe Service', function() {
     });
 
     it('computeRequest() avec une requete correcte', async function() {
-      var request = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
+      const request = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
       const response = await service.computeRequest(request);
       assert.equal(response.resource, "corse-osm");
     });

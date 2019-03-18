@@ -1,6 +1,6 @@
-var assert = require('assert');
-var SourceManager = require('../../../src/js/sources/sourceManager');
-var logManager = require('../logManager');
+const assert = require('assert');
+const SourceManager = require('../../../src/js/sources/sourceManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe SourceManager', function() {
 
@@ -9,11 +9,11 @@ describe('Test de la classe SourceManager', function() {
     logManager.manageLogs();
   });
 
-  var sourceManager = new SourceManager();
-  var sourcesIds = new Array();
-  var sourcesDescriptions = {};
+  let sourceManager = new SourceManager();
+  let sourcesIds = new Array();
+  let sourcesDescriptions = {};
 
-  var description = {
+  let description = {
     "id": "corse-car-fastest",
     "type": "osrm",
     "storage": {
@@ -30,7 +30,7 @@ describe('Test de la classe SourceManager', function() {
     }
   };
 
-  var wrongDuplicateDescription = {
+  let wrongDuplicateDescription = {
     "id": "corse-car-fastest",
     "type": "osrm",
     "storage": {
@@ -79,13 +79,13 @@ describe('Test de la classe SourceManager', function() {
     });
 
     it('checkSource() avec un mauvais id', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSource() avec un mauvais type', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-2";
       wrongDescription.type = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
@@ -100,28 +100,28 @@ describe('Test de la classe SourceManager', function() {
     });
 
     it('checkSourceOsrm() avec un mauvais cost', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-3";
       wrongDescription.cost = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.profile', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-4";
       wrongDescription.cost.profile = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.optimization', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-5";
       wrongDescription.cost.optimization = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.compute', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(description));
+      let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-6";
       wrongDescription.cost.compute = "";
       assert.equal(sourceManager.checkSource(wrongDescription), false);
@@ -144,7 +144,7 @@ describe('Test de la classe SourceManager', function() {
   describe('Test de la fonction createSource()', function() {
 
     it('createSource() avec une description correcte', function() {
-      var source = sourceManager.createSource(description);
+      let source = sourceManager.createSource(description);
       assert.equal(source.type, "osrm");
     });
 
@@ -153,7 +153,7 @@ describe('Test de la classe SourceManager', function() {
   describe('Test de la fonction connectSource()', function() {
 
     it('connectSource() avec une description correcte', function() {
-      var source = sourceManager.createSource(description);
+      let source = sourceManager.createSource(description);
       assert.equal(sourceManager.connectSource(source), true);
     });
 

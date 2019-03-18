@@ -1,6 +1,6 @@
-var assert = require('assert');
-var Response = require('../../../src/js/responses/response');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Response = require('../../../src/js/responses/response');
+const logManager = require('../logManager');
 
 describe('Test de la classe Response', function() {
 
@@ -11,7 +11,7 @@ describe('Test de la classe Response', function() {
 
   describe('Test du constructeur et des getters/setters', function() {
 
-    var response = new Response("mon-id");
+    let response = new Response("mon-id");
 
     it('Get Resource', function() {
       assert.equal(response.resource, "mon-id");

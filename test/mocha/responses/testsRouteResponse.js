@@ -1,9 +1,9 @@
-var assert = require('assert');
-var RouteResponse = require('../../../src/js/responses/routeResponse');
-var Route = require('../../../src/js/responses/route');
-var Portion = require('../../../src/js/responses/portion');
-var Step = require('../../../src/js/responses/step');
-var logManager = require('../logManager');
+const assert = require('assert');
+const RouteResponse = require('../../../src/js/responses/routeResponse');
+const Route = require('../../../src/js/responses/route');
+const Portion = require('../../../src/js/responses/portion');
+const Step = require('../../../src/js/responses/step');
+const logManager = require('../logManager');
 
 describe('Test de la classe RouteResponse', function() {
 
@@ -14,24 +14,24 @@ describe('Test de la classe RouteResponse', function() {
 
   describe('Test du constructeur et des getters/setters', function() {
 
-    var start = "8.732901,41.928821";
-    var end = "8.763831,41.953897";
-    var portion = new Portion(start, end);
+    let start = "8.732901,41.928821";
+    let end = "8.763831,41.953897";
+    let portion = new Portion(start, end);
 
-    var step1 = new Step("{ba_G}tnt@");
-    var step2 = new Step("kba_G{ont@QIQIGQA]DUH[Lk@");
-    var stepsTable = [step1, step2];
+    let step1 = new Step("{ba_G}tnt@");
+    let step2 = new Step("kba_G{ont@QIQIGQA]DUH[Lk@");
+    let stepsTable = [step1, step2];
     portion.steps = stepsTable;
 
-    var portionsTable = [portion];
-    var route = new Route("cf|~Fssht@tAgLFiNqJTaEuFiEpEgIxCsLdDwDw@oIac@mAg@cKkTBiBeAaByCqSkHc[mGaQHiGgB_@wL{[_FvBsDmEuEeB{RjGk@e@Z{B");
+    let portionsTable = [portion];
+    let route = new Route("cf|~Fssht@tAgLFiNqJTaEuFiEpEgIxCsLdDwDw@oIac@mAg@cKkTBiBeAaByCqSkHc[mGaQHiGgB_@wL{[_FvBsDmEuEeB{RjGk@e@Z{B");
     route.portions = portionsTable;
-    var routesTable = [route];
+    let routesTable = [route];
 
-    var resource = "mon-id";
-    var profile = "car";
-    var optimization = "fastest";
-    var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
+    let resource = "mon-id";
+    let profile = "car";
+    let optimization = "fastest";
+    let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
 
     it('Get start', function() {

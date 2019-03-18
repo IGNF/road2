@@ -1,6 +1,6 @@
 'use strict';
 
-var Response = require('./response');
+const Response = require('./response');
 
 /**
 *

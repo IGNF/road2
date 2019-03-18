@@ -1,6 +1,6 @@
-var assert = require('assert');
-var errorManager = require('../../../src/js/utils/errorManager');
-var logManager = require('../logManager');
+const assert = require('assert');
+const errorManager = require('../../../src/js/utils/errorManager');
+const logManager = require('../logManager');
 
 describe('Test du errorManager', function() {
 
@@ -11,11 +11,11 @@ describe('Test du errorManager', function() {
 
   describe('Test de la fonction createError()', function() {
 
-    var msg = "Un message d'erreur";
+    let msg = "Un message d'erreur";
 
-    var status = 500;
+    let status = 500;
 
-    var goodResult = new Error(msg);
+    let goodResult = new Error(msg);
     goodResult.status = status;
 
     it('createError() should return an error', function() {

@@ -1,7 +1,7 @@
 'use strict';
 
-var storageManager = require('../utils/storageManager');
-var osrmResource = require('../resources/osrmResource');
+const storageManager = require('../utils/storageManager');
+const osrmResource = require('../resources/osrmResource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -59,7 +59,7 @@ module.exports = class resourceManager {
       LOGGER.info("Ressource id: " + resourceJsonObject.resource.id);
       // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource.
       if (this._listOfVerifiedResourceIds.length !== 0) {
-        for (var i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
+        for (let i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
           if (this._listOfVerifiedResourceIds[i] === resourceJsonObject.resource.id) {
             LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " a deja ete verifiee. Cette ressource ne peut donc etre ajoutee.");
             return false;
@@ -76,7 +76,7 @@ module.exports = class resourceManager {
       return false;
     } else {
       // Vérification que le type est valide puis vérification spécifique à chaque type
-      var available = false;
+      let available = false;
       // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
       // Il ne reste plus qu'à créer la fonction de vérification correspondante.
       //------ OSRM
@@ -173,9 +173,9 @@ module.exports = class resourceManager {
 
       LOGGER.info("Verification des sources...")
 
-      for (var i = 0; i < resourceJsonObject.sources.length; i++ ) {
+      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
 
-        var sourceJsonObject = resourceJsonObject.sources[i];
+        let sourceJsonObject = resourceJsonObject.sources[i];
         if (!sourceManager.checkSource(sourceJsonObject)) {
           LOGGER.error("La ressource contient une source invalide.");
           return false;
@@ -200,10 +200,10 @@ module.exports = class resourceManager {
       return false;
     } else {
 
-      var foundId = false;
+      let foundId = false;
 
-      for (var i = 0; i < resourceJsonObject.sources.length; i++ ) {
-        var sourceJsonObject = resourceJsonObject.sources[i];
+      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
+        let sourceJsonObject = resourceJsonObject.sources[i];
 
         if (sourceJsonObject.id === resourceJsonObject.defaultSourceId) {
           foundId = true;
@@ -255,7 +255,7 @@ module.exports = class resourceManager {
 
   createResource(resourceJsonObject) {
 
-    var resource;
+    let resource;
 
     if (!resourceJsonObject.resource.id) {
       LOGGER.error("La ressource ne contient pas d'id.");
@@ -266,7 +266,7 @@ module.exports = class resourceManager {
 
     // On vérifie que la ressource a bien été vérifiée et validée
     if (this._listOfVerifiedResourceIds.length !== 0) {
-      for (var i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
+      for (let i = 0; i < this._listOfVerifiedResourceIds.length; i++ ) {
         if (this._listOfVerifiedResourceIds[i] === resourceJsonObject.resource.id) {
           LOGGER.info("La ressource contenant l'id " + resourceJsonObject.resource.id + " a deja ete verifiee.");
           break;
@@ -279,7 +279,7 @@ module.exports = class resourceManager {
 
     // On vérifie que la ressource n'a pas déjà été créée
     if (this._listOfResourceIds.length !== 0) {
-      for (var i = 0; i < this._listOfResourceIds.length; i++ ) {
+      for (let i = 0; i < this._listOfResourceIds.length; i++ ) {
         if (this._listOfResourceIds[i] === resourceJsonObject.resource.id) {
           LOGGER.error("Une ressource contenant l'id " + resourceJsonObject.resource.id + " existe deja. Cette ressource ne peut donc etre creee.");
           return null;

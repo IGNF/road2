@@ -1,6 +1,6 @@
-var assert = require('assert');
-var RouteRequest = require('../../../src/js/requests/routeRequest');
-var logManager = require('../logManager');
+const assert = require('assert');
+const RouteRequest = require('../../../src/js/requests/routeRequest');
+const logManager = require('../logManager');
 
 describe('Test de la classe RouteRequest', function() {
 
@@ -9,7 +9,7 @@ describe('Test de la classe RouteRequest', function() {
     logManager.manageLogs();
   });
 
-  var request = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
+  let request = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
 
   describe('Test du constructeur et des getters', function() {
 

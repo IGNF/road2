@@ -1,8 +1,8 @@
-var assert = require('assert');
-var ResourceManager = require('../../../src/js/resources/resourceManager');
-var SourceManager = require('../../../src/js/sources/sourceManager');
-var OsrmResource = require('../../../src/js/resources/osrmResource');
-var logManager = require('../logManager');
+const assert = require('assert');
+const ResourceManager = require('../../../src/js/resources/resourceManager');
+const SourceManager = require('../../../src/js/sources/sourceManager');
+const OsrmResource = require('../../../src/js/resources/osrmResource');
+const logManager = require('../logManager');
 
 describe('Test de la classe ResourceManager', function() {
 
@@ -11,7 +11,7 @@ describe('Test de la classe ResourceManager', function() {
     logManager.manageLogs();
   });
 
-  var resourceConfiguration = {
+  let resourceConfiguration = {
     "resource": {
     "id": "corse-osm",
     "type": "osrm",
@@ -51,8 +51,8 @@ describe('Test de la classe ResourceManager', function() {
     }
   };
 
-  var resourceManager = new ResourceManager();
-  var sourceManager = new SourceManager();
+  let resourceManager = new ResourceManager();
+  let sourceManager = new SourceManager();
 
   describe('Test du constructeur et des getters', function() {
 
@@ -69,20 +69,20 @@ describe('Test de la classe ResourceManager', function() {
     });
 
     it('checkResource() avec un mauvais id', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
+      let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       wrongDescription.resource.id = "";
       assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
     });
 
     it('checkResource() avec un mauvais type', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
+      let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       wrongDescription.resource.id = "test-2";
       wrongDescription.resource.type = "test";
       assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
     });
 
     it('checkResource() avec un mauvais id deja pris', function() {
-      var wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
+      let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
     });
 
@@ -91,7 +91,7 @@ describe('Test de la classe ResourceManager', function() {
   describe('Test de createResource()', function() {
 
     it('createResource()', function() {
-      var reference = new OsrmResource(resourceConfiguration);
+      let reference = new OsrmResource(resourceConfiguration);
       assert.deepEqual(resourceManager.createResource(resourceConfiguration), reference);
     });
 

@@ -1,6 +1,6 @@
-var assert = require('assert');
-var storageManager = require('../../../src/js/utils/storageManager');
-var logManager = require('../logManager');
+const assert = require('assert');
+const storageManager = require('../../../src/js/utils/storageManager');
+const logManager = require('../logManager');
 
 describe('Test du storageManager', function() {
 
@@ -11,11 +11,11 @@ describe('Test du storageManager', function() {
 
   describe('Test de la fonction checkJsonStorage()', function() {
 
-    var json = {
+    let json = {
       "file": "/home/docker/data/corse-latest.osrm"
     };
 
-    var wrongJson = {
+    let wrongJson = {
       "fil": "/home/docker/data/corse-latest.osrm"
     };
 

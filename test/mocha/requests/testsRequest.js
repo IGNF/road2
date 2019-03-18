@@ -1,6 +1,6 @@
-var assert = require('assert');
-var Request = require('../../../src/js/requests/request');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Request = require('../../../src/js/requests/request');
+const logManager = require('../logManager');
 
 describe('Test de la classe Request', function() {
 
@@ -9,7 +9,7 @@ describe('Test de la classe Request', function() {
     logManager.manageLogs();
   });
 
-  var request = new Request("route", "corse-osm", "routeRequest");
+  let request = new Request("route", "corse-osm", "routeRequest");
 
   describe('Test du constructeur et des getters', function() {
 

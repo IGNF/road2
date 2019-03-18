@@ -1,7 +1,7 @@
-var assert = require('assert');
-var OsrmResource = require('../../../src/js/resources/osrmResource');
-var RouteRequest = require('../../../src/js/requests/routeRequest');
-var logManager = require('../logManager');
+const assert = require('assert');
+const OsrmResource = require('../../../src/js/resources/osrmResource');
+const RouteRequest = require('../../../src/js/requests/routeRequest');
+const logManager = require('../logManager');
 
 describe('Test de la classe OsrmResource', function() {
 
@@ -10,7 +10,7 @@ describe('Test de la classe OsrmResource', function() {
     logManager.manageLogs();
   });
 
-  var resourceConfiguration = {
+  let resourceConfiguration = {
     "resource": {
     "id": "corse-osm",
     "type": "osrm",
@@ -50,7 +50,7 @@ describe('Test de la classe OsrmResource', function() {
     }
   };
 
-  var resource = new OsrmResource(resourceConfiguration);
+  let resource = new OsrmResource(resourceConfiguration);
 
   describe('Test du constructeur et des getters', function() {
 
@@ -79,7 +79,7 @@ describe('Test de la classe OsrmResource', function() {
     });
 
     it('Get LinkedSource', function() {
-      var reference = {};
+      let reference = {};
       reference["carfastest"] = "corse-car-fastest";
       assert.deepEqual(resource.linkedSource, reference);
     });
@@ -88,7 +88,7 @@ describe('Test de la classe OsrmResource', function() {
 
   describe('Test du constructeur et des getters', function() {
 
-    var request = new RouteRequest("resource-id", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
+    let request = new RouteRequest("resource-id", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
 
     it('getSourceIdFromRequest()', function() {
       assert.equal(resource.getSourceIdFromRequest(request), "corse-car-fastest");

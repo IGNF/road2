@@ -1,6 +1,6 @@
 'use strict';
 
-var Resource = require('./resource');
+const Resource = require('./resource');
 
 /**
 *
@@ -37,9 +37,9 @@ module.exports = class osrmResource extends Resource {
 
     // Instanciation de la correspondance entre profile/optimization et sourceId
     // et instanciation du profile et de l'optimisation par défaut
-    for (var i=0; i < this._configuration.sources.length; i++) {
+    for (let i=0; i < this._configuration.sources.length; i++) {
 
-      var linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
+      let linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
 
       if (this._configuration.sources[i].id === this._defaultSourceId) {

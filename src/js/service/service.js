@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-var ApisManager = require('../apis/apisManager');
-var ResourceManager = require('../resources/resourceManager');
-var SourceManager = require('../sources/sourceManager');
+const ApisManager = require('../apis/apisManager');
+const ResourceManager = require('../resources/resourceManager');
+const SourceManager = require('../sources/sourceManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -221,7 +221,7 @@ module.exports = class Service {
         return false;
       } else {
         // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
-        var directory =  path.resolve(__dirname,userConfiguration.application.resources.directory);
+        let directory =  path.resolve(__dirname,userConfiguration.application.resources.directory);
         if (fs.existsSync(directory)) {
           // On vérifie que l'application peut lire les fichiers du dossier
           fs.readdirSync(directory).forEach(resource => {
@@ -250,7 +250,7 @@ module.exports = class Service {
           this._host = "0.0.0.0";
         } else {
           // Vérification du paramètre
-          var tmpHost = userConfiguration.application.network.host.match(/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/g);
+          let tmpHost = userConfiguration.application.network.host.match(/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/g);
           if (!tmpHost) {
             LOGGER.fatal("L'objet 'application:network:host' est mal renseigne.");
             return false;
@@ -274,7 +274,7 @@ module.exports = class Service {
           this._port = "8080";
         } else {
           // Vérification du paramètre
-          var tmpPort = userConfiguration.application.network.port.match(/^\d{1,5}$/g);
+          let tmpPort = userConfiguration.application.network.port.match(/^\d{1,5}$/g);
           if (!tmpPort) {
             LOGGER.fatal("L'objet 'application:network:port' est mal renseigne.");
             return false;
@@ -321,15 +321,15 @@ module.exports = class Service {
       userResourceDirectory = this._configuration.application.resources.directory;
     }
 
-    var resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
+    let resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
     fs.readdirSync(resourceDirectory).forEach(fileName => {
-      var resourceFile = resourceDirectory + "/" + fileName;
+      let resourceFile = resourceDirectory + "/" + fileName;
       LOGGER.info("Chargement de: " + resourceFile);
 
       // Récupération du contenu en objet pour vérification puis création de la ressource
-      var resourceContent = JSON.parse(fs.readFileSync(resourceFile));
+      let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
       LOGGER.debug(resourceContent);
 
       // Vérification du contenu
@@ -359,20 +359,20 @@ module.exports = class Service {
     LOGGER.info("Chargement des sources...");
 
     // On récupère les informations du resourceManager pour les intégrer au sourceManager du service
-    var listOfSourceIds = this._sourceManager.listOfSourceIds;
-    var sourceDescriptions = this._sourceManager.sourceDescriptions;
+    let listOfSourceIds = this._sourceManager.listOfSourceIds;
+    let sourceDescriptions = this._sourceManager.sourceDescriptions;
 
     // On va créer chaque source
     if (listOfSourceIds.length !== 0) {
       // On va charger chaque source identifiée
-      for (var i = 0; i < listOfSourceIds.length; i++) {
+      for (let i = 0; i < listOfSourceIds.length; i++) {
 
-        var sourceId = listOfSourceIds[i];
+        let sourceId = listOfSourceIds[i];
         LOGGER.info("Chargement de la source: " + sourceId);
         LOGGER.debug(sourceDescriptions[sourceId]);
 
         // On crée la source
-        var currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
+        let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
 
         // On vérifie que le source peut bien être chargée ou connectée
         if (this._sourceManager.connectSource(currentSource)) {
@@ -411,7 +411,7 @@ module.exports = class Service {
     LOGGER.info("Creation de l'application web...");
 
     // Application Express
-    var road2 = express();
+    let road2 = express();
 
     // Stockage de l'instance Service dans l'app expressJS afin que les informations soient accessibles par les requêtes
     road2.set("service", this);
@@ -478,17 +478,17 @@ module.exports = class Service {
     // Récupération de la ressource
     // ---
     // L'id est dans la requête
-    var resourceId = request.resource;
+    let resourceId = request.resource;
     // La ressource est dans le catalogue du service
-    var resource = this._resourceCatalog[resourceId];
+    let resource = this._resourceCatalog[resourceId];
     // ---
 
     // Récupération de la source concernée par la requête
     // ---
     // L'id est donné par le ressource
-    var sourceId = resource.getSourceIdFromRequest(request);
+    let sourceId = resource.getSourceIdFromRequest(request);
     // La source est dans le catalogue du service
-    var source = this._sourceCatalog[sourceId];
+    let source = this._sourceCatalog[sourceId];
     // ---
 
     //On renvoie la requête vers le moteur

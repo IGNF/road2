@@ -1,6 +1,6 @@
-var assert = require('assert');
-var Resource = require('../../../src/js/resources/resource');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Resource = require('../../../src/js/resources/resource');
+const logManager = require('../logManager');
 
 describe('Test de la classe Resource', function() {
 
@@ -9,7 +9,7 @@ describe('Test de la classe Resource', function() {
     logManager.manageLogs();
   });
 
-  var resource = new Resource("mon-id", "osrm");
+  let resource = new Resource("mon-id", "osrm");
 
   describe('Test du constructeur et des getters', function() {
 
