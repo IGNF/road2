@@ -129,10 +129,10 @@ module.exports = class osrmSource extends Source {
   * @description Traiter une requête.
   * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
+  * @return {Promise}
   *
   */
-  computeRequest (request, callback) {
+  computeRequest (request) {
 
     if (request.operation === "route") {
 
@@ -170,13 +170,16 @@ module.exports = class osrmSource extends Source {
 
       // ---
 
+    return new Promise ( (resolve, reject) => {
       this.osrm.route(osrmRequest, (err, result) => {
         if (err) {
-          callback(err);
+          console.log(err);
+          reject(err);
         } else {
-          this.writeRouteResponse(request, result, callback);
+          resolve(this.writeRouteResponse(request, result));
         }
       });
+    });
 
     } else {
       // on va voir si c'est une autre opération
@@ -194,10 +197,9 @@ module.exports = class osrmSource extends Source {
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
   * @param {osrmResponse} osrmResponse - Objet osrmResponse
-  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
-  writeRouteResponse (routeRequest, osrmResponse, callback) {
+  writeRouteResponse (routeRequest, osrmResponse) {
 
     var resource;
     var start;
@@ -223,7 +225,7 @@ module.exports = class osrmSource extends Source {
 
     if (osrmResponse.waypoints.length < 2) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      callback(errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. "));
+      throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
     }
 
     // start
@@ -236,7 +238,7 @@ module.exports = class osrmSource extends Source {
 
     if (osrmResponse.routes.length === 0) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      callback(errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. "));
+      throw errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. ");
     }
 
     // routes
@@ -252,7 +254,7 @@ module.exports = class osrmSource extends Source {
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
       if (currentOsrmRoute.legs.length !== osrmResponse.waypoints.length-1) {
-        callback(errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. "));
+        throw errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
@@ -290,7 +292,7 @@ module.exports = class osrmSource extends Source {
 
     // ---
 
-    callback(null, routeResponse);
+    return routeResponse;
 
   }
 

@@ -68,9 +68,10 @@ describe('Test de la classe Service', function() {
       service.createServer("../apis/", "");
     });
 
-    it('computeRequest() avec une requete correcte', function(done) {
+    it('computeRequest() avec une requete correcte', async function() {
       var request = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
-      service.computeRequest(request, done);
+      const response = await service.computeRequest(request);
+      assert.equal(response.resource, "corse-osm");
     });
 
     after(function(done) {

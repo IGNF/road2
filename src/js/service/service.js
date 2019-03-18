@@ -469,12 +469,12 @@ module.exports = class Service {
   * La ressource sait comment déterminer la source concernée par la requête.
   * Et la source interrogera le moteur.
   * @param {Request} request - Requête
-  * @param {function} callback - Callback de succès et d'erreur qui sera transmise au moteur pour la fin de son calcul
+  * @param {Promise} Promesse qui sera transmise au moteur pour la fin de son calcul
   *
   */
 
-  computeRequest(request, callback) {
-    console.log(request);
+  computeRequest(request) {
+
     // Récupération de la ressource
     // ---
     // L'id est dans la requête
@@ -494,7 +494,7 @@ module.exports = class Service {
     //On renvoie la requête vers le moteur
     // ---
     // C'est la source qui fait le lien avec un moteur
-    source.computeRequest(request,callback);
+    return source.computeRequest(request);
     // ---
 
   }

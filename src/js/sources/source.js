@@ -110,10 +110,10 @@ module.exports = class Source {
   * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
   * dans chacune des classes filles.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
+  * @return {Promise}
   *
   */
-  computeRequest (request, callback) {
+  computeRequest (request) {
 
   }
 

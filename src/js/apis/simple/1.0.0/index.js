@@ -5,7 +5,6 @@ var express = require('express');
 const RouteRequest = require('../../../requests/routeRequest');
 var errorManager = require('../../../utils/errorManager');
 const log4js = require('log4js');
-var async = require('async');
 var cors = require('cors');
 
 var LOGGER = log4js.getLogger("SIMPLE");
@@ -36,32 +35,25 @@ router.all("/getcapabilities", function(req, res) {
 // Route
 // Pour effectuer un calcul d'itinéraire
 router.route("/route")
-  .get(function(req, res, next) {
+  .get(async function(req, res, next) {
 
     // On récupère l'instance de Service pour faire les calculs
     var service = req.app.get("service");
 
-    // Async.waterfall permet d'executer des fonctions les unes après les autres
-    // Le contexte est changé par la fonction, donc il est parfois nécessaire de le repréciser avec bind
-    async.waterfall(
-      [
-        // Vérification des paramètres de la requête
-        async.apply(checkRouteParameters, req),
-        // Envoie au service et récupération de l'objet réponse
+    try {
 
-        service.computeRequest.bind(service),
-        // Formattage de la réponse
-        writeRouteResponse
-      ],
-      function (error, result) {
-        if (error) {
-          return next(error);
-        } else {
-          res.status(200).json(result);
-        }
-      }
+      // Vérification des paramètres de la requête
+      const routeRequest = checkRouteParameters(req);
+      // Envoie au service et récupération de l'objet réponse
+      const routeResponse = await service.computeRequest(routeRequest);
+      // Formattage de la réponse
+      const userResponse = writeRouteResponse(routeResponse);
 
-    );
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
 
 })
   .post(function(req, res) {
@@ -86,7 +78,7 @@ router.use(notFoundError);
 *
 */
 
-function checkRouteParameters(req, callback) {
+function checkRouteParameters(req) {
 
   var resource;
   var start = {};
@@ -101,13 +93,11 @@ function checkRouteParameters(req, callback) {
 
   // Resource
   if (!req.query.resource) {
-      callback(errorManager.createError(" Parameter 'resource' not found ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'resource' not found ", 400);
   } else {
     // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
     if (!service.verifyResourceExistenceById(req.query.resource)) {
-      callback(errorManager.createError(" Parameter 'resource' is invalid ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'resource' is invalid ", 400);
     } else {
       resource = service.getResourceById(req.query.resource);
       // TODO: vérification de la compatibilité de son type avec la requête
@@ -116,14 +106,12 @@ function checkRouteParameters(req, callback) {
 
   // Start
   if (!req.query.start) {
-      callback(errorManager.createError(" Parameter 'start' not found ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'start' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
     tmpStringCoordinates = req.query.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
-      callback(errorManager.createError(" Parameter 'start' is invalid ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'start' is invalid ", 400);
     } else {
       tmpStringCoordinates = tmpStringCoordinates[0].split(",");
       start.lon = Number(tmpStringCoordinates[0]);
@@ -134,14 +122,12 @@ function checkRouteParameters(req, callback) {
 
   // End
   if (!req.query.end) {
-      callback(errorManager.createError(" Parameter 'end' not found ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'end' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
     tmpStringCoordinates = req.query.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
-      callback(errorManager.createError(" Parameter 'end' is invalid ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'end' is invalid ", 400);
     } else {
       tmpStringCoordinates = tmpStringCoordinates[0].split(",");
       end.lon = Number(tmpStringCoordinates[0]);
@@ -169,8 +155,7 @@ function checkRouteParameters(req, callback) {
   }
   // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
   if (!resource.linkedSource[profile+optimization]) {
-    callback(errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400));
-    return;
+    throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
   }
   // ---
 
@@ -193,8 +178,7 @@ function checkRouteParameters(req, callback) {
       tmpStringCoordinates = intermediatesTable[i].match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
 
       if (!tmpStringCoordinates) {
-        callback(errorManager.createError(" Parameter 'intermediates' is invalid ", 400));
-        return;
+        throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
         tmpStringCoordinates = tmpStringCoordinates[0].split(",");
         intermediatesPoints[i] = {};
@@ -221,8 +205,7 @@ function checkRouteParameters(req, callback) {
       if (req.query.getGeometry === "false") {
         routeRequest.computeGeometry = false;
       } else {
-        callback(errorManager.createError(" Parameter 'getGeometry' is invalid ", 400));
-        return;
+        throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
       }
     }
 
@@ -231,8 +214,7 @@ function checkRouteParameters(req, callback) {
   }
   // ---
 
-  callback(null, routeRequest);
-  return;
+  return routeRequest;
 
 }
 
@@ -246,7 +228,7 @@ function checkRouteParameters(req, callback) {
 *
 */
 
-function writeRouteResponse(routeResponse, callback) {
+function writeRouteResponse(routeResponse) {
 
   var userResponse = {};
   var route = routeResponse.routes[0];
@@ -303,7 +285,7 @@ function writeRouteResponse(routeResponse, callback) {
 
   }
 
-  callback(null, userResponse);
+  return userResponse;
 
 }
 
