@@ -26,6 +26,17 @@ module.exports = class apisManager {
   /**
   *
   * @function
+  * @name get listOfRoutes
+  * @description Récupérer la liste des routes disponibles via ce manager
+  *
+  */
+  get listOfRoutes () {
+    return this._listOfRoutes;
+  }
+
+  /**
+  *
+  * @function
   * @name loadAPISDirectory
   * @description Fonction utilisée pour charger l'ensemble des APIs disponibles dans un dossier.
   * @param {express} app - Objet créé par ExpressJS représentant l'application
