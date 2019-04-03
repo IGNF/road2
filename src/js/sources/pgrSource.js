@@ -239,10 +239,9 @@ module.exports = class pgrSource extends Source {
 
     // routes
     // Il peut y avoir plusieurs itinéraires
-    for (var i = 0; i < osrmResponse.routes.length; i++) {
+    for (var i = 0; i < 1; i++) {
 
       var portions = new Array();
-      var currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route(currentOsrmRoute.geometry);
