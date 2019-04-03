@@ -44,7 +44,9 @@ function start() {
   service.logConfiguration = logConfiguration;
 
   // Chargement des ressources
-  service.loadResources();
+  if (!service.loadResources()) {
+    pm.shutdown(1);
+  }
 
   // Chargement des sources uniques
   if (!service.loadSources()) {

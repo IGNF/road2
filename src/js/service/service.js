@@ -162,6 +162,17 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name get apisManager
+  * @description Récupérer le manager d'apis 
+  *
+  */
+  get apisManager() {
+    return this._apisManager;
+  }
+
+  /**
+  *
+  * @function
   * @name checkAndSaveGlobalConfiguration
   * @description Vérification de la configuration globale du serveur
   * @param {json} userConfiguration - JSON décrivant la configuration du service
@@ -381,6 +392,8 @@ module.exports = class Service {
 
         } else {
           // on n'a pas pu se connecter à la source
+          // TODO: remplacer ce comportement par une gestion plus fine des ressources
+          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
           LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
           return false;
         }
