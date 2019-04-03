@@ -12,7 +12,7 @@ Road2 a été codé pour qu'il soit facile d'ajouter des nouvelles APIs d'accès
 
 Comme précisé plus haut, Road2 a été codé pour faciliter la gestion des APIs et des moteurs. Pour atteindre cet objectif, la partie API et la partie moteur sont séparées et aucune ne voit ce que fait l'autre.
 
-Une API va donc devoir créer un objet requête générique qui sera envoyé à un proxy. Ce proxy renverra la requête vers le moteur concerné. Le moteur va donc recevoir cet objet, effectuer un calcul, et créer un objet réponse générique qui sera alors retourner à l'API. Cette dernière pourra alors la formater si nécessaire pour l'utilisateur.
+Une API va donc devoir créer un objet requête générique qui sera envoyé à un service. Ce service renverra la requête vers le moteur concerné. Le moteur va donc recevoir cet objet, effectuer un calcul, et créer un objet réponse générique qui sera alors retourner à l'API. Cette dernière pourra alors la formater si nécessaire pour l'utilisateur.
 
 Cela permet d'ajouter ou supprimer une API sans qu'une telle modification impacte les moteurs. Et inversement.
 
@@ -104,13 +104,13 @@ Pour supprimer une source, il suffit de supprimer le fichier qui contient sa dé
 
 ### Request
 
-Le dossier `src/js/requests` contient la définition des classes `Request` et toutes celles qui en dérivent. Lorsqu'une requête arrive, une API doit utiliser l'une de ces classes filles pour interroger un moteur via le PROXY. Par exemple, il existe déjà une classe fille pour calculer des itinéraires: `routeRequest`.
+Le dossier `src/js/requests` contient la définition des classes `Request` et toutes celles qui en dérivent. Lorsqu'une requête arrive, une API doit utiliser l'une de ces classes filles pour interroger un moteur via le service. Par exemple, il existe déjà une classe fille pour calculer des itinéraires: `routeRequest`.
 
 Chaque classe fille contient des informations utiles pour que les moteurs puissent traiter la requête. Ces informations sont nécessaires pour certaines et facultatives pour d'autres. Néanmoins, pour une raison quelconque, on souhaitera parfois ajouter une nouvelle classe fille. Par exemple, pour traiter une nouvelle opération ou pour traiter autrement une opération déjà existante. Cela évitera de modifier une classe existante et tous les impacts que cela peut avoir sur la gestion des moteurs.
 
 #### Modifier une Request
 
-Une `Request` est un élément central dans Road2 car il fait le lien entre une API et un moteur. Pour cette raison, modifier une telle classe aura des impacts sur les APIs et les sources qui l'utilisent. 
+Une `Request` est un élément central dans Road2 car il fait le lien entre une API et un moteur. Pour cette raison, modifier une telle classe aura des impacts sur les APIs et les sources qui l'utilisent.
 
 #### Supprimer une Request
 
@@ -142,7 +142,7 @@ On peut supposer que l'objectif sera de faire un calcul d'itinéraire. Road2 int
 
 S'il y a des pré-traitements à effectuer avant de lancer un calcul, il sera préférable de les définir dans le fichier `index.js` qui contient la définition du router ou dans d'autres fichiers mais qui seront dans le dossier de l'API `${apiName}/${apiVersion}`. On préférera le même fonctionnement pour les post-traitements. Cela permettra de garder un code modulaire. Par exemple, la suppression d'une API n'entraînera pas la mort de certaines parties du code.
 
-Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au proxy de l'application via la fonction `PROXY.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
+Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au service de l'application via la fonction `service.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
 
 Lors du traitement d'une requête `req` issue d'ExpressJS, il sera possible d'accéder à l'instance de la classe `Service` qui contient de nombreuses informations utiles. Cela sera possible par la méthode `req.app.get("service")` qui retourne l'instance du service.
 

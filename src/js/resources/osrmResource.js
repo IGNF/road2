@@ -1,6 +1,6 @@
 'use strict';
 
-var Resource = require('./resource');
+const Resource = require('./resource');
 
 /**
 *
@@ -37,9 +37,9 @@ module.exports = class osrmResource extends Resource {
 
     // Instanciation de la correspondance entre profile/optimization et sourceId
     // et instanciation du profile et de l'optimisation par défaut
-    for (var i=0; i < this._configuration.sources.length; i++) {
+    for (let i=0; i < this._configuration.sources.length; i++) {
 
-      var linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
+      let linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
 
       if (this._configuration.sources[i].id === this._defaultSourceId) {
@@ -80,34 +80,12 @@ module.exports = class osrmResource extends Resource {
   /**
   *
   * @function
-  * @name set defaultProfile
-  * @description Attribuer le profile par défaut de la ressource
-  *
-  */
-  set defaultProfile (pr) {
-    this._defaultProfile = pr;
-  }
-
-  /**
-  *
-  * @function
   * @name get defaultOptimization
   * @description Récupérer l'optmisation par défaut de la ressource
   *
   */
   get defaultOptimization () {
     return this._defaultOptimization;
-  }
-
-  /**
-  *
-  * @function
-  * @name set defaultOptimization
-  * @description Attribuer l'optmisation par défaut de la ressource
-  *
-  */
-  set defaultOptimization (op) {
-    this._defaultOptimization = op;
   }
 
   /**
@@ -124,34 +102,12 @@ module.exports = class osrmResource extends Resource {
   /**
   *
   * @function
-  * @name set defaultSourceId
-  * @description Attribuer la source par défaut de la ressource
-  *
-  */
-  set defaultSourceId (id) {
-    this._defaultSourceId = id;
-  }
-
-  /**
-  *
-  * @function
   * @name get linkedSource
   * @description Récupérer la correspondance entre profile/optimization et sourceId de la ressource
   *
   */
   get linkedSource () {
     return this._linkedSource;
-  }
-
-  /**
-  *
-  * @function
-  * @name set linkedSource
-  * @description Attribuer la correspondance entre profile/optimization et sourceId de la ressource
-  *
-  */
-  set linkedSource (ls) {
-    this._linkedSource = ls;
   }
 
   /**

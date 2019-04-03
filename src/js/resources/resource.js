@@ -58,11 +58,11 @@ module.exports = class Resource {
   * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
   * dans chacune des classes filles.
   * @param {Request} request - Objet Request ou ou dérivant de la classe Request
-  * @return {string} Id de la source concernée par la requête 
+  * @return {string} Id de la source concernée par la requête
   *
   */
   getSourceIdFromRequest (request) {
-    var sourceId = "";
+    let sourceId = "";
     return sourceId;
   }
 

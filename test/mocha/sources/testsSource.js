@@ -1,6 +1,6 @@
-var assert = require('assert');
-var Source = require('../../../src/js/sources/source');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Source = require('../../../src/js/sources/source');
+const logManager = require('../logManager');
 
 describe('Test de la classe Source', function() {
 
@@ -11,7 +11,7 @@ describe('Test de la classe Source', function() {
 
   describe('Test du constructeur et des getters', function() {
 
-    var source = new Source("mon-id", "osrm");
+    let source = new Source("mon-id", "osrm");
 
     it('Get Source id', function() {
       assert.equal(source.id, "mon-id");
@@ -29,7 +29,7 @@ describe('Test de la classe Source', function() {
 
   describe('Test des setters', function() {
 
-    var source = new Source("mon-id", "osrm");
+    let source = new Source("mon-id", "osrm");
 
     it('Set Source connected', function() {
       source.connected = true;
@@ -40,7 +40,7 @@ describe('Test de la classe Source', function() {
 
   describe('Test de la fonction connect()', function() {
 
-    var source = new Source("mon-id", "osrm");
+    let source = new Source("mon-id", "osrm");
 
     it('Connect()', function() {
       assert.equal(source.connect(), true);
@@ -50,7 +50,7 @@ describe('Test de la classe Source', function() {
 
   describe('Test de la fonction disconnect()', function() {
 
-    var source = new Source("mon-id", "osrm");
+    let source = new Source("mon-id", "osrm");
 
     it('Disconnect()', function() {
       assert.equal(source.disconnect(), true);

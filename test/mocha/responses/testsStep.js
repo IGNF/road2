@@ -1,6 +1,6 @@
-var assert = require('assert');
-var Step = require('../../../src/js/responses/step');
-var logManager = require('../logManager');
+const assert = require('assert');
+const Step = require('../../../src/js/responses/step');
+const logManager = require('../logManager');
 
 describe('Test de la classe Step', function() {
 
@@ -11,7 +11,7 @@ describe('Test de la classe Step', function() {
 
   describe('Test du constructeur et des getters/setters', function() {
 
-    var step = new Step("{ba_G}tnt@");
+    let step = new Step("{ba_G}tnt@");
 
     it('Get Geometry', function() {
       assert.equal(step.geometry, "{ba_G}tnt@");

@@ -5,7 +5,7 @@ const nconf = require('nconf');
 const Service = require('./service/service');
 const path = require('path');
 const fs = require('fs');
-var pm = require('./utils/processManager.js');
+const pm = require('./utils/processManager.js');
 
 var LOGGER;
 
@@ -26,14 +26,14 @@ function start() {
 
   // Chargement de la configuration
   // Notamment pour pouvoir charger le logger
-  var configuration = loadGlobalConfiguration();
+  let configuration = loadGlobalConfiguration();
 
   // Instanciation du logger et sauvegarde de sa configuration
-  var logConfiguration = getLoggerConfiguration(configuration);
+  let logConfiguration = getLoggerConfiguration(configuration);
   initLogger(logConfiguration);
 
   // Création du service
-  var service = new Service();
+  let service = new Service();
 
   // Vérification de la configuration globale du service et sauvegarde
   if (!service.checkAndSaveGlobalConfiguration(configuration)) {
@@ -71,8 +71,8 @@ function loadGlobalConfiguration() {
 
   console.log("Lecture de la configuration...");
 
-  var file;
-  var globalConfiguration;
+  let file;
+  let globalConfiguration;
 
   // on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
   nconf.argv().env(['ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT']);
@@ -160,8 +160,8 @@ function getLoggerConfiguration(userConfiguration) {
 
   console.log("Recuperation de la configuration du logger...");
 
-  var logsConf;
-  var userLogConfigurationFile;
+  let logsConf;
+  let userLogConfigurationFile;
 
   if (userConfiguration) {
 
@@ -174,7 +174,7 @@ function getLoggerConfiguration(userConfiguration) {
           userLogConfigurationFile = userConfiguration.application.logs.configuration;
 
           // chemin absolu du fichier
-          var file = path.resolve(__dirname,userLogConfigurationFile);
+          let file = path.resolve(__dirname,userLogConfigurationFile);
 
           // vérification de l'exitence du fichier
           if (fs.existsSync(file)) {

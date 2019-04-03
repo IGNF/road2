@@ -12,13 +12,13 @@ module.exports = {
   * custom error handler (Connect repects this prop as well)
   * @param {string} msg - Message d'erreur
   * @param {integer} status - Code http d'erreur
-  * @return {Error} err - Erreur 
+  * @return {Error} err - Erreur
   *
   */
 
   createError: function(msg, status) {
 
-    var err = new Error(msg);
+    let err = new Error(msg);
     if (status) {
       err.status = status;
     } else {

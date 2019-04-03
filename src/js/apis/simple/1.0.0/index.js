@@ -1,13 +1,11 @@
 'use strict';
 
 
-var express = require('express');
+const express = require('express');
 const RouteRequest = require('../../../requests/routeRequest');
-var errorManager = require('../../../utils/errorManager');
+const errorManager = require('../../../utils/errorManager');
 const log4js = require('log4js');
-var PROXY = require('../../../proxy/proxy');
-var async = require('async');
-var cors = require('cors');
+const cors = require('cors');
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -26,7 +24,7 @@ router.all("/", function(req, res) {
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
   //création du getCapabilities
-  var getCapabilities = {
+  let getCapabilities = {
     info: {
       name: "Calcul d'itinéraire"
     }
@@ -37,26 +35,27 @@ router.all("/getcapabilities", function(req, res) {
 // Route
 // Pour effectuer un calcul d'itinéraire
 router.route("/route")
-  .get(function(req, res, next) {
+  .get(async function(req, res, next) {
 
-    async.waterfall(
-      [
-        // Vérification des paramètres de la requête
-        async.apply(checkRouteParameters, req),
-        // Envoie au proxy et récupération de l'objet réponse du proxy
-        PROXY.computeRequest,
-        // Formattage de la réponse
-        writeRouteResponse
-      ],
-      function (error, result) {
-        if (error) {
-          return next(error);
-        } else {
-          res.status(200).json(result);
-        }
-      }
+    // On récupère l'instance de Service pour faire les calculs
+    let service = req.app.get("service");
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.query;
 
-    );
+    try {
+
+      // Vérification des paramètres de la requête
+      const routeRequest = checkRouteParameters(parameters, service);
+      // Envoie au service et récupération de l'objet réponse
+      const routeResponse = await service.computeRequest(routeRequest);
+      // Formattage de la réponse
+      const userResponse = writeRouteResponse(routeResponse);
+
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
 
 })
   .post(function(req, res) {
@@ -81,44 +80,37 @@ router.use(notFoundError);
 *
 */
 
-function checkRouteParameters(req, callback) {
+function checkRouteParameters(parameters, service) {
 
-  var resource;
-  var start = {};
-  var end = {};
-  var profile;
-  var optimization;
-  var intermediatesPoints = new Array();
-  var tmpStringCoordinates;
-
-  // On récupère l'instance de Service pour des vérifications
-  var service = req.app.get("service");
+  let resource;
+  let start = {};
+  let end = {};
+  let profile;
+  let optimization;
+  let intermediatesPoints = new Array();
+  let tmpStringCoordinates;
 
   // Resource
-  if (!req.query.resource) {
-      callback(errorManager.createError(" Parameter 'resource' not found ", 400));
-      return;
+  if (!parameters.resource) {
+      throw errorManager.createError(" Parameter 'resource' not found ", 400);
   } else {
     // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
-    if (!service.verifyResourceExistenceById(req.query.resource)) {
-      callback(errorManager.createError(" Parameter 'resource' is invalid ", 400));
-      return;
+    if (!service.verifyResourceExistenceById(parameters.resource)) {
+      throw errorManager.createError(" Parameter 'resource' is invalid ", 400);
     } else {
-      resource = service.getResourceById(req.query.resource);
+      resource = service.getResourceById(parameters.resource);
       // TODO: vérification de la compatibilité de son type avec la requête
     }
   }
 
   // Start
-  if (!req.query.start) {
-      callback(errorManager.createError(" Parameter 'start' not found ", 400));
-      return;
+  if (!parameters.start) {
+      throw errorManager.createError(" Parameter 'start' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
-    tmpStringCoordinates = req.query.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = parameters.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
-      callback(errorManager.createError(" Parameter 'start' is invalid ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'start' is invalid ", 400);
     } else {
       tmpStringCoordinates = tmpStringCoordinates[0].split(",");
       start.lon = Number(tmpStringCoordinates[0]);
@@ -128,15 +120,13 @@ function checkRouteParameters(req, callback) {
   }
 
   // End
-  if (!req.query.end) {
-      callback(errorManager.createError(" Parameter 'end' not found ", 400));
-      return;
+  if (!parameters.end) {
+      throw errorManager.createError(" Parameter 'end' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
-    tmpStringCoordinates = req.query.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = parameters.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
-      callback(errorManager.createError(" Parameter 'end' is invalid ", 400));
-      return;
+      throw errorManager.createError(" Parameter 'end' is invalid ", 400);
     } else {
       tmpStringCoordinates = tmpStringCoordinates[0].split(",");
       end.lon = Number(tmpStringCoordinates[0]);
@@ -148,48 +138,46 @@ function checkRouteParameters(req, callback) {
   // Profile and Optimization
   // ---
 
-  if (!req.query.profile) {
+  if (!parameters.profile) {
     // Récupération du paramètre par défaut
     profile = resource.defaultProfile;
   } else {
     // TODO: vérification de la validité du paramètre
-    profile = req.query.profile;
+    profile = parameters.profile;
   }
-  if (!req.query.optimization) {
+  if (!parameters.optimization) {
     // Récupération du paramètre par défaut
     optimization = resource.defaultOptimization;
   } else {
     // TODO: vérification de la validité du paramètre
-    optimization = req.query.optimization;
+    optimization = parameters.optimization;
   }
   // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
   if (!resource.linkedSource[profile+optimization]) {
-    callback(errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400));
-    return;
+    throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
   }
   // ---
 
   // On définit la routeRequest avec les paramètres obligatoires
-  var routeRequest = new RouteRequest(req.query.resource, start, end, profile, optimization);
+  let routeRequest = new RouteRequest(parameters.resource, start, end, profile, optimization);
 
   // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet RouteRequest
 
   // Points intermédiaires
   // ---
-  if (req.query.intermediates) {
+  if (parameters.intermediates) {
 
     // Vérification de la validité des coordonnées fournies
-    var intermediatesTable = req.query.intermediates.split("|");
+    let intermediatesTable = parameters.intermediates.split("|");
 
     // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration
 
-    for (var i = 0; i < intermediatesTable.length; i++) {
+    for (let i = 0; i < intermediatesTable.length; i++) {
 
       tmpStringCoordinates = intermediatesTable[i].match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
 
       if (!tmpStringCoordinates) {
-        callback(errorManager.createError(" Parameter 'intermediates' is invalid ", 400));
-        return;
+        throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
         tmpStringCoordinates = tmpStringCoordinates[0].split(",");
         intermediatesPoints[i] = {};
@@ -209,15 +197,14 @@ function checkRouteParameters(req, callback) {
 
   // getGeometry
   // ---
-  if (req.query.getGeometry) {
-    if (req.query.getGeometry === "true") {
+  if (parameters.getGeometry) {
+    if (parameters.getGeometry === "true") {
       routeRequest.computeGeometry = true;
     } else {
-      if (req.query.getGeometry === "false") {
+      if (parameters.getGeometry === "false") {
         routeRequest.computeGeometry = false;
       } else {
-        callback(errorManager.createError(" Parameter 'getGeometry' is invalid ", 400));
-        return;
+        throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
       }
     }
 
@@ -226,8 +213,7 @@ function checkRouteParameters(req, callback) {
   }
   // ---
 
-  callback(null, service, routeRequest);
-  return;
+  return routeRequest;
 
 }
 
@@ -241,10 +227,10 @@ function checkRouteParameters(req, callback) {
 *
 */
 
-function writeRouteResponse(routeResponse, callback) {
+function writeRouteResponse(routeResponse) {
 
-  var userResponse = {};
-  var route = routeResponse.routes[0];
+  let userResponse = {};
+  let route = routeResponse.routes[0];
 
   // resource
   userResponse.resource = routeResponse.resource;
@@ -268,9 +254,9 @@ function writeRouteResponse(routeResponse, callback) {
   // Portions
   userResponse.portions = new Array();
 
-  for (var i = 0; i < route.portions.length; i++) {
+  for (let i = 0; i < route.portions.length; i++) {
 
-    var currentPortion = {};
+    let currentPortion = {};
 
     // start
     currentPortion.start = route.portions[i].start;
@@ -281,9 +267,9 @@ function writeRouteResponse(routeResponse, callback) {
     currentPortion.steps = new Array();
 
     if (route.portions[i].steps.length !== 0) {
-      for (var j = 0; j < route.portions[i].steps.length; j++) {
+      for (let j = 0; j < route.portions[i].steps.length; j++) {
 
-        var currentStep = {};
+        let currentStep = {};
 
         currentStep.geometry = route.portions[i].steps[j].geometry;
 
@@ -298,7 +284,7 @@ function writeRouteResponse(routeResponse, callback) {
 
   }
 
-  callback(null, userResponse);
+  return userResponse;
 
 }
 

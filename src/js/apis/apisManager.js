@@ -26,6 +26,17 @@ module.exports = class apisManager {
   /**
   *
   * @function
+  * @name get listOfRoutes
+  * @description Récupérer la liste des routes disponibles via ce manager
+  *
+  */
+  get listOfRoutes () {
+    return this._listOfRoutes;
+  }
+
+  /**
+  *
+  * @function
   * @name loadAPISDirectory
   * @description Fonction utilisée pour charger l'ensemble des APIs disponibles dans un dossier.
   * @param {express} app - Objet créé par ExpressJS représentant l'application
@@ -36,28 +47,28 @@ module.exports = class apisManager {
 
   loadAPISDirectory (app, dir, prefix) {
 
-    var APIsDirectory = path.resolve(__dirname, dir);
+    let APIsDirectory = path.resolve(__dirname, dir);
 
     LOGGER.info("Chargement des APIS...");
 
     fs.readdirSync(APIsDirectory).forEach(apiName => {
-      var APIDirectory = APIsDirectory + "/" + apiName;
+      let APIDirectory = APIsDirectory + "/" + apiName;
       if (fs.statSync(APIDirectory).isDirectory()) {
         // c'est un dossier qui contient potentiellement une API
 
         LOGGER.info("Nouvelle API: " + apiName);
 
         fs.readdirSync(APIDirectory).forEach(apiVersion => {
-          var APIDirectoryVersion = APIDirectory + "/" + apiVersion;
+          let APIDirectoryVersion = APIDirectory + "/" + apiVersion;
           if (fs.statSync(APIDirectoryVersion).isDirectory()) {
               // c'est un dossier qui contient potentiellement une version de l'API
 
               LOGGER.info("Nouvelle version: " + apiVersion);
-              var APIFile = APIDirectoryVersion + "/index.js";
+              let APIFile = APIDirectoryVersion + "/index.js";
               //on cherche le fichier index.js qui contient la description de l'API
               if (fs.statSync(APIFile).isFile()) {
 
-                var route;
+                let route;
 
                 if (prefix !== "") {
                   route = "/" + prefix + "/" + apiName + "/" + apiVersion;
@@ -73,7 +84,7 @@ module.exports = class apisManager {
                 }
 
                 // on peut charger l'API
-                var api = require("../apis/" + apiName + "/" + apiVersion + "/index");
+                let api = require("../apis/" + apiName + "/" + apiVersion + "/index");
 
                 app.use(route, api);
                 this._listOfRoutes.push(route);
@@ -111,7 +122,7 @@ module.exports = class apisManager {
 
   verifyRouteExistanceById (route) {
 
-    for (var i = 0; i < this._listOfRoutes.length; i++) {
+    for (let i = 0; i < this._listOfRoutes.length; i++) {
       if (this._listOfRoutes[i] === route) {
         return true;
       }

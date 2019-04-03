@@ -1,9 +1,9 @@
 'use strict';
 
-var path = require('path');
-var fs = require('fs');
-var log4js = require('log4js');
-var nconf = require('nconf');
+const path = require('path');
+const fs = require('fs');
+const log4js = require('log4js');
+const nconf = require('nconf');
 var LOGGER;
 
 module.exports = {
@@ -21,14 +21,14 @@ module.exports = {
 
     if (process.env.DEBUG) {
 
-      var userFile = "./config/log4js.json";
+      let userFile = "./config/log4js.json";
       if (file) {
         userFile = file;
       }
 
-      var fileName = path.resolve(__dirname, userFile);
+      let fileName = path.resolve(__dirname, userFile);
 
-      var logsConf = JSON.parse(fs.readFileSync(fileName));
+      let logsConf = JSON.parse(fs.readFileSync(fileName));
 
       log4js.configure(logsConf.mainConf);
       LOGGER = log4js.getLogger();
@@ -50,14 +50,14 @@ module.exports = {
 
   getHttpConf: function(file) {
 
-    var userFile = "./config/log4js.json";
+    let userFile = "./config/log4js.json";
     if (file) {
       userFile = file;
     }
 
-    var fileName = path.resolve(__dirname, userFile);
+    let fileName = path.resolve(__dirname, userFile);
 
-    var logsConf = JSON.parse(fs.readFileSync(fileName));
+    let logsConf = JSON.parse(fs.readFileSync(fileName));
 
     return logsConf.httpConf;
 
@@ -74,14 +74,14 @@ module.exports = {
 
   getLogsConf: function(file) {
 
-    var userFile = "./config/log4js.json";
+    let userFile = "./config/log4js.json";
     if (file) {
       userFile = file;
     }
 
-    var fileName = path.resolve(__dirname, userFile);
+    let fileName = path.resolve(__dirname, userFile);
 
-    var logsConf = JSON.parse(fs.readFileSync(fileName));
+    let logsConf = JSON.parse(fs.readFileSync(fileName));
 
     return logsConf;
 

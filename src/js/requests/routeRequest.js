@@ -1,6 +1,6 @@
 'use strict';
 
-var Request = require('./request');
+const Request = require('./request');
 
 /**
 *
