@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  road2-debian:
+    build:
+      context: ..
+      dockerfile: ./docker/debian/Dockerfile
+      args:
+        - dnsIP=172.21.2.14
+        - dnsHost=ign.fr
+        - proxy=http://proxy.ign.fr:3128
+    image: road2-debian
+    container_name: road2-debian-server
+    ports:
+      - 8080:8080
+    volumes:
+      - iti-data-volume:/home/docker/data-volume
+  road2-centos:
+    build:
+      context: ..
+      dockerfile: ./docker/centos/Dockerfile
+      args:
+        - dnsIP=172.21.2.14
+        - dnsHost=ign.fr
+        - proxy=http://proxy.ign.fr:3128
+    image: road2-centos
+    container_name: road2-centos-server
+    ports:
+      - 8080:8080
+    volumes:
+      - iti-data-volume:/home/docker/data-volume
+
+volumes:
+  iti-data-volume:
+    name: iti-data-volume
