@@ -70,6 +70,17 @@ module.exports = class Service {
   * @description Récupérer l'ensemble des ressources
   *
   */
+  get configuration() {
+    return this._configuration;
+  }
+
+  /**
+  *
+  * @function
+  * @name get resourceCatalog
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
   get resourceCatalog() {
     return this._resourceCatalog;
   }
@@ -163,7 +174,7 @@ module.exports = class Service {
   *
   * @function
   * @name get apisManager
-  * @description Récupérer le manager d'apis 
+  * @description Récupérer le manager d'apis
   *
   */
   get apisManager() {

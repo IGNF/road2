@@ -17,6 +17,10 @@
 		"description":
 			type: string
 			required: true
+    # Url du service qui va apparaître dans le getcap
+    "url":
+      type: string
+      required: true
 		# Information sur le fournisseur du service
 		"provider":
 			type: object

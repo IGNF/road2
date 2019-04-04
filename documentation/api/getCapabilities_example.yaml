@@ -1,7 +1,7 @@
-getCapabilities: 
+getCapabilities:
 	info:
 		name: "Calcul d'itinéraire"
-		url: "https://wxs.ign.fr/itineraire"
+		url: "https://wxs.ign.fr/#KEY/geoportail/itineraire"
 		description: "Service permettant plusieurs opérations liées au calcul d'itinéraire."
 	api:
 		name: "rest"
@@ -10,7 +10,7 @@ getCapabilities:
 		- id: "route"
 		  description: "Calculer un itinéraire."
 		  url: "/route?"
-		  methods: 
+		  methods:
 		  	- "GET"
 		  	- "POST"
 		  parameters:
@@ -152,7 +152,7 @@ getCapabilities:
 		- id: "nearest"
 		  description: "Trouver le noeud du graphe le plus proche d'un point donné."
 		  url: "/nearest?"
-		  methods: 
+		  methods:
 		  	- "GET"
 		  	- "POST"
 		  parameters:
@@ -208,7 +208,7 @@ getCapabilities:
 	    - id: "isochrone"
 		  description: "Calculer une isochrone ou une isodistance."
 		  url: "/isochrone?"
-		  methods: 
+		  methods:
 		  	- "GET"
 		  	- "POST"
 		  parameters:
@@ -303,7 +303,7 @@ getCapabilities:
 	        schema:
 	          type: "enumeration"
 	        example: "EPSG:4326"
-	ressources:
+	resources:
 		- id: "bduni"
 		  description: "Données BDUNI v2."
 		  availableOperations:
@@ -312,15 +312,15 @@ getCapabilities:
 		  	  	- id: "ressource"
 		  	  	  values: {"bduni"}
 		  	  	- id: "start"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "-90,-180,90,180"
 		  	  	  	projection: "EPSG:4326"
 		  	  	- id: "end"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "-90,-180,90,180"
 		  	  	  	projection: "EPSG:4326"
 		  	  	- id: "intermediates"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "-90,-180,90,180"
 		  	  	  	projection: "EPSG:4326"
 		  	  	  maxItems: 10
@@ -346,13 +346,13 @@ getCapabilities:
 		  	  	  	  - key: "delta_time"
 		  	  	  	    description: "Delta entre le temps (en min) avec les contraintes et sans ces dernières."
 		  	  	  	    availableOperators: {"<",">","<=",">="}
-		  	  	  	  	values: 
+		  	  	  	  	values:
 		  	  	  	  		min: 1
 		  	  	  	  		max: 600
 		  	  	  	  - key: "delta_distance"
 		  	  	  	    description: "Delta entre la distance (en km) avec les contraintes et sans ces dernières."
 		  	  	  	    availableOperators: {"<",">","<=",">="}
-		  	  	  	  	values: 
+		  	  	  	  	values:
 		  	  	  	  		min: 1
 		  	  	  	  		max: 1000
 		  	  	- id: "format"
@@ -411,15 +411,15 @@ getCapabilities:
 		  	    - id: "ressource"
 		  	  	  values: {"bduni_j+1"}
 		  	  	- id: "start"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "0,6000000,1300000,7200000"
 		  	  	  	projection: "EPSG:2154"
 		  	  	- id: "end"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "0,6000000,1300000,7200000"
 		  	  	  	projection: "EPSG:2154"
 		  	  	- id: "intermediates"
-		  	  	  values: 
+		  	  	  values:
 		  	  	    bbox: "0,6000000,1300000,7200000"
 		  	  	    projection: "EPSG:2154"
 		  	  	  maxItems: 5
@@ -461,7 +461,7 @@ getCapabilities:
 		  	  	  	    description: "Pente des arcs empruntés."
 		  	  	  	    availableConstraintType: {"banned","preferred","unpreferred"}
 		  	  	  	  	availableOperators: {"=","!=","<",">","<=",">="}
-		  	  	  	  	values: 
+		  	  	  	  	values:
 		  	  	  	  		min: 0
 		  	  	  	  		max: 45
 		  	  	  	  - key: "road_name" #dans la configuration de la ressource
@@ -473,13 +473,13 @@ getCapabilities:
 		  	  	  	  - key: "delta_time"
 		  	  	  	    description: "Delta entre le temps (en min) avec les contraintes et sans ces dernières."
 		  	  	  	    availableOperators: {"<",">","<=",">="}
-		  	  	  	  	values: 
+		  	  	  	  	values:
 		  	  	  	  		min: 1
 		  	  	  	  		max: 600
 		  	  	  	  - key: "delta_distance"
 		  	  	  	    description: "Delta entre la distance (en km) avec les contraintes et sans ces dernières."
 		  	  	  	    availableOperators: {"<",">","<=",">="}
-		  	  	  	  	values: 
+		  	  	  	  	values:
 		  	  	  	  		min: 1
 		  	  	  	  		max: 1000
 		  	  	- id: "getGeometry"
@@ -531,7 +531,7 @@ getCapabilities:
 		  	  	- id: "ressource"
 		  	  	  values: {"bduni_j+1"}
 		  	  	- id: "point"
-		  	  	  values: 
+		  	  	  values:
 		  	  	  	bbox: "0,6000000,1300000,7200000"
 		  	  	  	projection: "EPSG:2154"
 		  	  	- id: "costType"
@@ -575,4 +575,3 @@ getCapabilities:
 		  	  	- id: "crs"
 		  	  	  default: "EPSG:2154"
 		  	  	  values: {"EPSG:2154"}
-

@@ -19,14 +19,60 @@ module.exports = {
 
   createGetCapabilities: function(app, uid) {
 
+    // récupération du service
     let service = app.get("service");
 
+    // récupération de la configuration de l'application
+    let globalConfiguration = service.configuration;
+
     //création du getCapabilities
-    let getCapabilities = {
-      info: {
-        name: "Calcul d'itinéraire"
-      }
-    };
+    let getCapabilities = {};
+
+    // info
+    // info.name
+    getCapabilities.info = {};
+    getCapabilities.info.name = globalConfiguration.application.name;
+    // info.description
+    getCapabilities.info.description = globalConfiguration.application.description;
+    // info.url
+    getCapabilities.info.url = globalConfiguration.application.url;
+
+    // api
+    getCapabilities.api = {};
+    // api.name
+    getCapabilities.api.name = "simple";
+    // api.version
+    getCapabilities.api.version = "1.0.0";
+
+    // --- operations
+    getCapabilities.operations = new Array();
+
+    // route
+    let routeDescription = {};
+    // route.id
+    routeDescription.id = "route";
+    // route.description
+    routeDescription.description = "Calculer un itinéraire.";
+    // route.url
+    routeDescription.url = "/route?";
+    // route.methods
+    routeDescription.methods = new Array();
+    routeDescription.methods.push("GET");
+
+    getCapabilities.operations.push(routeDescription);
+    // --- operations
+
+    // --- resources
+    // getCapabilities.resources = new Array();
+    //
+    // for(let i = 0; i < ; i++) {
+    //   let resourceDescription = {};
+    //
+    //
+    //   getCapabilities.resources.push(resourceDescription);
+    // }
+
+    // --- resources
 
     // sauvegarde du getCapabilities
     app.set(uid + "-getcap", getCapabilities);
