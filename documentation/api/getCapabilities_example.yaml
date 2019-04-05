@@ -14,7 +14,7 @@ getCapabilities:
 		  	- "GET"
 		  	- "POST"
 		  parameters:
-	      - name: "ressource"
+	      - name: "resource"
 	        in: "query"
 	        description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans la partie ressources du GetCapabilities."
 	        required: true
@@ -94,7 +94,7 @@ getCapabilities:
 	        example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','thresholds':{'key':'delta_time','operator':'<','value':'10'}}"
 	      - name: "getGeometry"
 	        in: "query"
-	        description: "Présence de la géométrie dans la réponse."
+	        description: "Présence de la géométrie détaillée dans la réponse."
 	        required: false
 	        default: true
 	        schema:

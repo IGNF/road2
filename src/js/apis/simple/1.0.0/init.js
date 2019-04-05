@@ -59,20 +59,136 @@ module.exports = {
     routeDescription.methods = new Array();
     routeDescription.methods.push("GET");
 
+    // -- route.parameters
+    routeDescription.parameters = new Array();
+
+    // route.parameters.resource
+    let resourceParameterDescription = {};
+    resourceParameterDescription.name = "resource";
+    resourceParameterDescription.in = "query";
+    resourceParameterDescription.description = "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans la partie ressources du GetCapabilities.";
+    resourceParameterDescription.required = "true";
+    resourceParameterDescription.default = "false";
+    resourceParameterDescription.schema = {};
+    resourceParameterDescription.schema.type = "string";
+    resourceParameterDescription.example = "bduni";
+    routeDescription.parameters.push(resourceParameterDescription);
+
+    // route.parameters.start
+    let startParameterDescription = {};
+    startParameterDescription.name = "start";
+    startParameterDescription.in = "query";
+    startParameterDescription.description = "Point de départ.";
+    startParameterDescription.required = "true";
+    startParameterDescription.default = "false";
+    startParameterDescription.schema = {};
+    startParameterDescription.schema.type = "string";
+    startParameterDescription.example = "48.849319,2.337306";
+    routeDescription.parameters.push(startParameterDescription);
+
+    // route.parameters.end
+    let endParameterDescription = {};
+    endParameterDescription.name = "end";
+    endParameterDescription.in = "query";
+    endParameterDescription.description = "Point d'arrivée.";
+    endParameterDescription.required = "true";
+    endParameterDescription.default = "false";
+    endParameterDescription.schema = {};
+    endParameterDescription.schema.type = "string";
+    endParameterDescription.example = "48.852891,2.367776";
+    routeDescription.parameters.push(endParameterDescription);
+
+    // route.parameters.intermediates
+    let intermediatesParameterDescription = {};
+    intermediatesParameterDescription.name = "intermediates";
+    intermediatesParameterDescription.in = "query";
+    intermediatesParameterDescription.description = "Point(s) intermédiaires.";
+    intermediatesParameterDescription.required = "true";
+    intermediatesParameterDescription.default = "false";
+    intermediatesParameterDescription.schema = {};
+    intermediatesParameterDescription.schema.type = "array";
+    intermediatesParameterDescription.schema.items = {};
+    intermediatesParameterDescription.schema.items.type = "string";
+    intermediatesParameterDescription.explode = "false";
+    intermediatesParameterDescription.style = "pipeDelimited";
+    intermediatesParameterDescription.example = "48.852890,2.368776|48.842891,2.367976";
+    routeDescription.parameters.push(intermediatesParameterDescription);
+
+    // route.parameters.profile
+    let profileParameterDescription = {};
+    profileParameterDescription.name = "profile";
+    profileParameterDescription.in = "query";
+    profileParameterDescription.description = "Mode de déplacement utilisé pour le calcul.";
+    profileParameterDescription.required = "false";
+    profileParameterDescription.default = "true";
+    profileParameterDescription.schema = {};
+    profileParameterDescription.schema.type = "enumeration";
+    profileParameterDescription.example = "car";
+    routeDescription.parameters.push(profileParameterDescription);
+
+    // route.parameters.optimization
+    let optimizationParameterDescription = {};
+    optimizationParameterDescription.name = "optimization";
+    optimizationParameterDescription.in = "query";
+    optimizationParameterDescription.description = "Optimisation utilisée pour le calcul.";
+    optimizationParameterDescription.required = "false";
+    optimizationParameterDescription.default = "true";
+    optimizationParameterDescription.schema = {};
+    optimizationParameterDescription.schema.type = "enumeration";
+    optimizationParameterDescription.example = "fastest";
+    routeDescription.parameters.push(optimizationParameterDescription);
+
+    // route.parameters.getGeometry
+    let getGeometryParameterDescription = {};
+    getGeometryParameterDescription.name = "getGeometry";
+    getGeometryParameterDescription.in = "query";
+    getGeometryParameterDescription.description = "Présence de la géométrie détaillée dans la réponse.";
+    getGeometryParameterDescription.required = "false";
+    getGeometryParameterDescription.default = "true";
+    getGeometryParameterDescription.schema = {};
+    getGeometryParameterDescription.schema.type = "boolean";
+    getGeometryParameterDescription.example = "true";
+    routeDescription.parameters.push(getGeometryParameterDescription);
+
+    // -- end route.parameters
+
     getCapabilities.operations.push(routeDescription);
-    // --- operations
+    // --- end operations
 
     // --- resources
-    // getCapabilities.resources = new Array();
-    //
-    // for(let i = 0; i < ; i++) {
-    //   let resourceDescription = {};
-    //
-    //
-    //   getCapabilities.resources.push(resourceDescription);
-    // }
+    getCapabilities.resources = new Array();
+    let resources = service.resourceCatalog;
 
-    // --- resources
+    for(let resourceId in resources) {
+
+      let resourceDescription = {};
+      let localResource = resources[resourceId];
+
+      // resource.id
+      resourceDescription.id = localResource.id;
+
+      // en fonction de son type, la description d'une ressource pourra être différente
+      if (localResource.type === "osrm") {
+
+        // resource.description
+        resourceDescription.description = localResource.configuration.description;
+
+        // -- resource.availableOperations
+        resourceDescription.availableOperations = new Array();
+
+        // - route
+
+        // - end route
+        
+        // -- end resource.availableOperations
+
+      }
+
+      getCapabilities.resources.push(resourceDescription);
+
+    } // end for(let resourceId in resources)
+
+    // --- end resources
 
     // sauvegarde du getCapabilities
     app.set(uid + "-getcap", getCapabilities);

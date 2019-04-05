@@ -1,10 +1,10 @@
 # Modèle de données d'un GetCapabilities
 
-# un getCapabilities est un objet qui contient toutes les informations utile pour utiliser le service avec les ressources disponibles sur l'instance. 
+# un getCapabilities est un objet qui contient toutes les informations utile pour utiliser le service avec les ressources disponibles sur l'instance.
 "getCapabilities":
 	type: object
 	required: true
-	properties: 
+	properties:
 		# Informations sur le service
 		"info":
 			type: object
@@ -35,7 +35,7 @@
 				"version":
 					type: string
 					required: true
-		# Liste des opérations disponibles pour l'utilisation. Il n'y a pas les opérations d'administrations car ce document aide l'utilisation du service et non son administration. 
+		# Liste des opérations disponibles pour l'utilisation. Il n'y a pas les opérations d'administrations car ce document aide l'utilisation du service et non son administration.
 		"operations":
 			type: array
 			required: true
@@ -51,7 +51,7 @@
 					"description":
 						type: string
 						required: true
-					# Partie de la route qui suit l'url du service. 
+					# Partie de la route qui suit l'url du service.
 					"url":
 						type: string
 						required: true
@@ -63,7 +63,7 @@
 						items:
 							type: string
 							enum: ["GET","POST","PUT","DELETE"]
-					# Paramètres de l'opération. 
+					# Paramètres de l'opération.
 					"parameters":
 						type: array
 						required: true
@@ -74,7 +74,7 @@
 								"name":
 									type: string
 									required: true
-								# Emplacement du paramètre. 
+								# Emplacement du paramètre.
 								"in":
 									type: string
 									required: true
@@ -109,7 +109,7 @@
 									required: false
 									enum: ["pipeDelimited","spaceDelimited","commaDelimited"]
 		# Description des ressources disponibles
-		"ressources":
+		"resources":
 			type: array
 			required: true
 			minItems: 1
@@ -124,14 +124,14 @@
 					"description":
 						type: string
 						required: true
-					# Opérations disponibles sur cette ressource. 
+					# Opérations disponibles sur cette ressource.
 					"availableOperations":
 						type: array
 						required: true
 						items:
 							type: object
 							properties:
-								# Id de l'opération. C'est l'id que l'on trouve dans la description des opérations. 
+								# Id de l'opération. C'est l'id que l'on trouve dans la description des opérations.
 								"id":
 									type: string
 									required: true
@@ -150,13 +150,12 @@
 											"values":
 												type: "schema"
 												required: true
-											# Valeur par défaut s'il y en a une. 
+											# Valeur par défaut s'il y en a une.
 											"default":
 												type: "schema"
 												required: false
-											# Nombre max de valeurs possible si c'est un tableau.  
+											# Nombre max de valeurs possible si c'est un tableau.
 											"maxItems":
 												type: number
 												format: integer
 												required: false
-
