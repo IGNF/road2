@@ -89,5 +89,8 @@ RUN npm install eslint -g
 # http://usejsdoc.org/about-configuring-jsdoc.html
 RUN npm install jsdoc -g
 
+### Volume partagé pour lire les données
+VOLUME ["/home/docker/data-volume"]
+
 ### Commande de lancement de l'application
 CMD npm start

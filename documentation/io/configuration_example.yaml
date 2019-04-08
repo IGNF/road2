@@ -1,8 +1,9 @@
 application:
-	name: "Road4"
+	name: "Road2"
 	title: "Service d'itinéraire du Géoportail"
 	description: "Ce service permet de calculer des itinéraires sur les données du Géoportail."
-	provider:
+  url: "https://wxs.ign.fr/#KEY/geoportail/itineraire"
+  provider:
 		name: "IGN"
 		site: "https://www.ign.fr"
 		mail: "idev@ign.fr"

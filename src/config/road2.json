@@ -3,6 +3,7 @@
     "name": "Road2",
     "title": "Service de calcul d'itinéraire",
     "description": "Ce service permet de calculer des itinéraires sur les données du Géoportail.",
+    "url": "https://wxs.ign.fr/#KEY/geoportail/itineraire",
     "provider": {
       "name": "IGN",
       "site": "www.ign.fr",

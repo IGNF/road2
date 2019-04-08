@@ -70,6 +70,17 @@ module.exports = class Service {
   * @description Récupérer l'ensemble des ressources
   *
   */
+  get configuration() {
+    return this._configuration;
+  }
+
+  /**
+  *
+  * @function
+  * @name get resourceCatalog
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
   get resourceCatalog() {
     return this._resourceCatalog;
   }
@@ -157,6 +168,17 @@ module.exports = class Service {
     } else {
       return false;
     }
+  }
+
+  /**
+  *
+  * @function
+  * @name get apisManager
+  * @description Récupérer le manager d'apis
+  *
+  */
+  get apisManager() {
+    return this._apisManager;
   }
 
   /**
@@ -381,6 +403,8 @@ module.exports = class Service {
 
         } else {
           // on n'a pas pu se connecter à la source
+          // TODO: remplacer ce comportement par une gestion plus fine des ressources
+          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
           LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
           return false;
         }

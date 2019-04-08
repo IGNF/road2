@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const log4js = require('log4js');
+const Api = require('./api');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("APISMANAGER");
@@ -21,6 +22,9 @@ module.exports = class apisManager {
     // Liste des routes chargées par app
     this._listOfRoutes = new Array();
 
+    // Catalogue des apis
+    this._apisCatalog = {};
+
   }
 
   /**
@@ -32,6 +36,28 @@ module.exports = class apisManager {
   */
   get listOfRoutes () {
     return this._listOfRoutes;
+  }
+
+  /**
+  *
+  * @function
+  * @name get apisCatalog
+  * @description Récupérer la liste des apis disponibles via ce manager
+  *
+  */
+  get apisCatalog () {
+    return this._apisCatalog;
+  }
+
+  /**
+  *
+  * @function
+  * @name getApi
+  * @description Récupérer l'api qui correspond à l'id et la version demandée
+  *
+  */
+  getApi (id, version) {
+    return this._apisCatalog[id+version];
   }
 
   /**
@@ -68,6 +94,8 @@ module.exports = class apisManager {
               //on cherche le fichier index.js qui contient la description de l'API
               if (fs.statSync(APIFile).isFile()) {
 
+                // Gestion du router
+                // ------------------
                 let route;
 
                 if (prefix !== "") {
@@ -79,14 +107,45 @@ module.exports = class apisManager {
                 // On vérifie que la route n'existe pas déjà
                 if (this.verifyRouteExistanceById(route)) {
                   // Si elle existe c'est un vrai problème donc on arrête le chargement
-                  LOGGER.error("La route " + route + " existe deja. Elle n'est donc pas chargée.");
+                  LOGGER.error("La route " + route + " existe deja. L'api n'est donc pas chargee.");
                   return false;
                 }
 
-                // on peut charger l'API
-                let api = require("../apis/" + apiName + "/" + apiVersion + "/index");
+                // on crée un objet Api qui va permettre de suivre l'évolution de l'api au cours de la vie du service
+                let api = new Api(apiName, apiVersion, APIFile);
 
-                app.use(route, api);
+                // Gestion de l'initialisation de l'api
+                // ----------------------
+                let initFile = APIDirectoryVersion + "/init.js";
+                if (fs.statSync(initFile).isFile()) {
+
+                  api.initFile = initFile;
+
+                } else {
+                  // Ce n'est pas obligatoire, on ne fait donc rien
+                }
+                // ----------------------
+
+                // Gestion de l'update de l'api
+                // ----------------------
+                let updateFile = APIDirectoryVersion + "/update.js";
+                if (fs.statSync(updateFile).isFile()) {
+
+                  api.updateFile = updateFile;
+
+                } else {
+                  // Ce n'est pas obligatoire, on ne fait donc rien
+                }
+                // ----------------------
+
+                if (!api.initialize(route, app)) {
+                  LOGGER.error("L'initialisation de l'api s'est mal deroulee.");
+                  return false;
+                }
+
+                // on stocke l'objet Api dans l'apiManager
+                this._apisCatalog[apiName+apiVersion] = api;
+                // on stocke la route
                 this._listOfRoutes.push(route);
 
               } else {

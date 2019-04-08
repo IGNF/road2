@@ -23,13 +23,18 @@ router.all("/", function(req, res) {
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
-  //création du getCapabilities
-  let getCapabilities = {
-    info: {
-      name: "Calcul d'itinéraire"
-    }
-  };
+
+  // récupération du service
+  let service = req.app.get("service");
+
+  // récupération du uid
+  let uid = service.apisManager.getApi("simple","1.0.0").uid;
+
+  // récupération du getCapabilities précalculé dans init.js
+  let getCapabilities = req.app.get(uid + "-getcap");
+
   res.send(getCapabilities);
+  
 });
 
 // Route
