@@ -1,20 +1,6 @@
 version: "3.7"
 
 services:
-  road2-debian:
-    build:
-      context: ..
-      dockerfile: ./docker/debian/Dockerfile
-      args:
-        - dnsIP=172.21.2.14
-        - dnsHost=ign.fr
-        - proxy=http://proxy.ign.fr:3128
-    image: road2-debian
-    container_name: road2-debian-server
-    ports:
-      - 8080:8080
-    volumes:
-      - iti-data-volume:/home/docker/data-volume
   road2-centos:
     build:
       context: ..
@@ -25,11 +11,48 @@ services:
         - proxy=http://proxy.ign.fr:3128
     image: road2-centos
     container_name: road2-centos-server
+    depends_on:
+      - pgrouting-procedures-centos
     ports:
       - 8080:8080
     volumes:
       - iti-data-volume:/home/docker/data-volume
+    networks:
+      - iti-network
+
+  route-graph-generator-centos:
+    build:
+      context: ../../route-graph-generator/
+      # context: https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/route-graph-generator.git
+      dockerfile: ./docker/centos7/Dockerfile
+    image: route-graph-generator-centos
+    container_name: route-graph-generator-centos
+    depends_on:
+      - pgrouting-procedures-centos
+    volumes:
+      - iti-data-volume:/home/data-volume
+    networks:
+      - iti-network
+
+  pgrouting-procedures-centos:
+    build:
+      context: ../../pgrouting-procedures/
+      # context: https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/pgrouting-procedures.git
+      dockerfile: ./docker/centos7/Dockerfile
+    image: pgrouting-procedures-centos
+    container_name: pgrouting-procedures-centos
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    networks:
+      - iti-network
 
 volumes:
   iti-data-volume:
     name: iti-data-volume
+
+networks:
+  iti-network:
+    name: iti-network
+    driver: bridge
