@@ -5,7 +5,7 @@ const logManager = require('../../../logManager');
 const Service = require('../../../../../src/js/service/service');
 const RouteRequest = require('../../../../../src/js/requests/routeRequest');
 const express = require('express');
-const router = require('../../../config/apis/simple/1.0.0/index');
+const router = require('../../../../../src/js/apis/simple/1.0.0/index');
 
 describe('Test de l\'api simple 1.0.0', function() {
 

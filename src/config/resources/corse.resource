@@ -29,7 +29,45 @@
     }
   ],
   "availableOperations":[
-
+    {
+      "id": "route",
+      "rate": 10,
+      "maxIntermediatePoints": 10,
+      "maxNumberOfConstraints": 2,
+      "defaultParameters": [
+        {
+          "id": "algorithm",
+          "default": "contraction-hierarchies"
+        },
+        {
+          "id": "format",
+          "default": "application/json"
+        },
+        {
+          "id": "getGeometry",
+          "default": "true"
+        },
+        {
+          "id": "getBbox",
+          "default": "true"
+        },
+        {
+          "id": "getInstructions",
+          "default": "false"
+        },
+        {
+          "id": "distanceUnit",
+          "default": "kilometer"
+        },
+        {
+          "id": "timeUnit",
+          "default": "h-m-s"
+        }
+      ],
+      "constraints": [
+        
+      ]
+    }
   ],
   "defaultSourceId": "corse-car-fastest",
   "boundingBox": "-90,-180,90,180",

@@ -32,12 +32,12 @@ resource:
 		  			file: "car-shortest.lua"
 	defaultSourceId: "bduni-car-fastest"
 	availableOperations:
-		- type: "route"
+		- id: "route"
 		  rate: 10
 		  maxIntermediatePoints: 10
 		  maxNumberOfConstraints: 2
 		  defaultParameters:
-		  	- id: "algorythme"
+		  	- id: "algorithm"
 		  	  default: "contraction-hierarchies"
 		  	- id: "format"
 		  	  default: "application/json"
@@ -59,7 +59,7 @@ resource:
 			  availableConstraints: {"banned"}
 			  availableOperators: {"="}
 			  values: {"autoroute","tunnel"} #dépend de la génération des .osrm
-	    - type: "nearest"
+	    - id: "nearest"
 		  rate: 20
 		  maxNumber: 100
 		  defaultParameters:

@@ -193,7 +193,7 @@ components:
   		type: object
   		properties:
         # Id de l'opération: route dans ce cas
-  			"type":
+  			"id":
   				type: string
           required: true
           enum: ["route"]
@@ -226,7 +226,7 @@ components:
   		type: object
   		properties:
         # Id de l'opération: nearest dans ce cas
-  			"type":
+  			"id":
   				type: string
           required: true
           enum: ["nearest"]
