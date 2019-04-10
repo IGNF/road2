@@ -40,9 +40,9 @@ COPY test/www/ /home/docker/web/www/road2
 RUN ln -s /home/docker/web/www/road2/ /var/www/html/road2
 
 ### Récupération de la documentation de l'API
-WORKDIR /home/docker/web/www/documentation/api
-COPY documentation/api/ /home/docker/web/www/documentation/api
-RUN ln -s /home/docker/web/www/documentation/api/ /var/www/html/api
+WORKDIR /home/docker/web/www/documentation/apis
+COPY documentation/apis/ /home/docker/web/www/documentation/apis
+RUN ln -s /home/docker/web/www/documentation/apis/ /var/www/html/apis
 
 ### Création d'un lien symbolique pour visualiser la documentation du code
 WORKDIR /home/docker/web/www/documentation/code

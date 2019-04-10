@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   description: "Description de l'API du service d'itinéraire."
-  version: "0.0.1"
+  version: "1.0.0"
   title: "Service d'itinéraire"
   contact:
     email: "idev@ign.fr"
@@ -13,8 +13,6 @@ tags:
   description: "Découvrir le service et les ressources disponibles"
 - name: "Utilisation"
   description: "Utiliser le service d'itinéraire"
-- name: "Administration"
-  description: "Administrer le service d'itinéraire"
 paths:
   /getcapabilities:
     get:
@@ -26,6 +24,13 @@ paths:
       responses:
         200:
           description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getcapabilities"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/getcapabilities"
         404:
           description: "Not found"
   /route:
@@ -556,305 +561,6 @@ paths:
             application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-  /administration/server:
-    get:
-      tags:
-      - "Administration"
-      summary: "Obtenir la configuration du server."
-      description: "Cette requête retourne la configuration du server. "
-      operationId: "server"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-  /administration/resource:
-    get:
-      tags:
-      - "Administration"
-      summary: "Obtenir la configuration d'une ressource."
-      description: "Cette requête retourne la configuration d'une ressource."
-      operationId: "get-resource"
-      parameters:
-      - name: "id"
-        in: "query"
-        description: "Tableau des ids de ressources à décrire. Chaque id peut être complet ou incomplet. S'il est complet, seule cette ressource sera décrite. Si aucune ressource ne correspond, alors toutes les ressources pouvant correspondre vont être décrite. Équivalent du LIKE en SQL."
-        required: true
-        schema:
-          type: "array"
-          items:
-            type: "string"
-        explode: false
-        style: "pipeDelimited"
-        example: "bduni"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
-                    configFile:
-                      type: "string"
-                    configuration:
-                      type: "object"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
-                    configFile:
-                      type: "string"
-                    configuration:
-                      type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    post:
-      tags:
-      - "Administration"
-      summary: "Modifier une ressource existante. Il faut fournir la configuration de la ressource à modifier."
-      description: ""
-      operationId: "post-resource"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createResource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createResource"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    put:
-      tags:
-      - "Administration"
-      summary: "Intégrer une nouvelle ressource. Il faut fournir la configuration de la ressource à intégrer."
-      description: ""
-      operationId: "put-resource"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createResource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createResource"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    delete:
-      tags:
-      - "Administration"
-      summary: "Intégrer une nouvelle ressource. Il faut fournir l'id des ressources à supprimer."
-      description: ""
-      operationId: "delete-resource"
-      parameters:
-      - name: "id"
-        in: "query"
-        description: "Tableau des ids de ressources à supprimer. Les ids doivent être complets."
-        required: true
-        schema:
-          type: "array"
-          items:
-            type: "string"
-        explode: false
-        style: "pipeDelimited"
-        example: "bduni"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
 components:
   schemas:
     point:
@@ -986,14 +692,6 @@ components:
           type: "string"
         crs:
           type: "string"
-    createResource:
-      type: "object"
-      properties:
-        resource:
-          type: "object"
-          properties:
-            file:
-              type: "string"
     errorResponse:
       type: "object"
       properties:
@@ -1175,3 +873,86 @@ components:
             properties:
               message:
                 type: "string"
+    getcapabilities:
+      type: "object"
+      properties:
+        info:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            url:
+              type: "string"
+            description:
+              type: "string"
+        api:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              example: "simple"
+            version:
+              type: "string"
+              example: "1.0.0"
+        operations:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              description:
+                type: "string"
+              url:
+                type: "string"
+              methods:
+                type: "array"
+                items:
+                  type: "string"
+                  enum: ["GET","POST","PUT","DELETE"]
+              parameters:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    in:
+                      type: "string"
+                    description:
+                      type: "string"
+                    required:
+                      type: "boolean"
+                    default:
+                      type: "boolean"
+                    schema:
+                      type: "string"
+                    example:
+                      type: "string"
+        resources:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              description:
+                type: "string"
+              availableOperations:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "string"
+                    availableParameters:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          values:
+                            type: "string"
+                          default:
+                            type: "string"
