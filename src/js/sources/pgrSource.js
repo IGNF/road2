@@ -1,17 +1,17 @@
 'use strict';
 
-var Source = require('./source');
+const Source = require('./source');
 const { Client } = require('pg');
-var RouteResponse = require('../responses/routeResponse');
-var Route = require('../responses/route');
-var Portion = require('../responses/portion');
-var Step = require('../responses/step');
-var errorManager = require('../utils/errorManager');
+const fs = require('fs');
+const RouteResponse = require('../responses/routeResponse');
+const Route = require('../responses/route');
+const Portion = require('../responses/portion');
+const Step = require('../responses/step');
+const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = log4js.getLogger("PGRSOURCE");
-
+const LOGGER = log4js.getLogger("PGRSOURCE");
 
 /**
 *
@@ -20,10 +20,7 @@ var LOGGER = log4js.getLogger("PGRSOURCE");
 * @description Classe modélisant une source pgRouting.
 *
 */
-
 module.exports = class pgrSource extends Source {
-
-
   /**
   *
   * @function
@@ -32,16 +29,16 @@ module.exports = class pgrSource extends Source {
   *
   */
   constructor(sourceJsonObject) {
-
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
-
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
+    // Client de base de données
+    let db_config_path = this._configuration.storage.db_config;
+    let raw_config = fs.readFileSync(db_config_path);
+    this._db_config = JSON.parse(raw_config);
 
-    // Connection à la base de données
-    this._client = {};
-
+    this._client = new Client(this._db_config);
   }
 
   /**
@@ -74,23 +71,18 @@ module.exports = class pgrSource extends Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  connect() {
-
+  async connect() {
     // Connection à la base de données
-    let db_config = this._configuration.storage.file; // objet similaire à config de https://node-postgres.com/api/client
+    LOGGER.info("Connection à la base : " + this._db_config.database);
 
-    LOGGER.info("Connection à la base : " + db_config.database);
-    this._client = new Client(db_config);
-    this._client.connect((err) => {
-      if (err) {
-        LOGGER.error('erreur de connection : ', err.stack)
-      } else {
-        LOGGER.info('connection réussie')
-      }
-    });
+    const err = await this._client.connect();
+    if (err) {
+      LOGGER.error('connection error', err.stack)
+      return false;
+    }
+    LOGGER.info("Connecté à la base : " + this._db_config.database);
     super.connected = true;
     return true;
-
   }
 
   /**
@@ -101,14 +93,14 @@ module.exports = class pgrSource extends Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  disconnect() {
-    await this._client.end((err) => {
-      LOGGER.info('client déconecté')
-      if (err) {
-        LOGGER.error('error pendant la deconnection : ', err.stack)
-      }
-    });
-    super.connected = false;
+  async disconnect() {
+    const err = await this._client.end();
+    if (err) {
+      LOGGER.error('connection error', err.stack)
+      return false;
+    }
+    LOGGER.info("Connecté à la base : " + this._db_config.database);
+    super.connected = true;
     return true;
   }
 
@@ -119,26 +111,26 @@ module.exports = class pgrSource extends Source {
   * @description Traiter une requête.
   * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
-  computeRequest (request, callback) {
+  computeRequest (request) {
 
     if (request.operation === "route") {
 
-      // Construction de l'objet pour la requête OSRM
+      // Construction de l'objet pour la requête pgr
       // Cette construction dépend du type de la requête fournie
       // ---
-      var pgrRequest = {};
+      let pgrRequest = {};
+      let sql_function;
 
       if (request.type === "routeRequest") {
         // Coordonnées
-        var coordinatesTable = new Array();
+        const coordinatesTable = new Array();
         // start
         coordinatesTable.push([request.start.lon, request.start.lat]);
         // intermediates
         if (request.intermediates.length !== 0) {
-          for (var i = 0; i < request.intermediates.length; i++) {
+          for (let i = 0; i < request.intermediates.length; i++) {
             coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
           }
         }
@@ -147,7 +139,6 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
-        let sql_function;
         // steps
         if (request.computeGeometry) {
           sql_function = "coord_dijkstra";
@@ -160,18 +151,22 @@ module.exports = class pgrSource extends Source {
       }
 
       // ---
-      let query_string = "SELECT " + sql_function + "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
+      const query_string = "SELECT * FROM " + sql_function +
+        "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
         this._configuration.storage.costColumn +
         "','" +
         this._configuration.storage.reverseCostColumn +
         "')";
 
-      this._client.query(query_string, pgrRequest, (err, result) => {
-        if (err) {
-          callback(err);
-        } else {
-          this.writeRouteResponse(request, result, callback);
-        }
+      return new Promise( (resolve, reject) => {
+        this._client.query(query_string, pgrRequest, (err, result) => {
+          if (err) {
+            LOGGER.error(err);
+            reject(err);
+          } else {
+            resolve(this.writeRouteResponse(request, result));
+          }
+        });
       });
 
     } else {
@@ -189,18 +184,18 @@ module.exports = class pgrSource extends Source {
   * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {osrmResponse} osrmResponse - Objet osrmResponse
+  * @param {pgrResponse} pgrResponse - Objet pgrResponse
   * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
   writeRouteResponse (routeRequest, pgrResponse, callback) {
 
-    var resource;
-    var start;
-    var end;
-    var profile;
-    var optimization;
-    var routes = new Array();
+    let resource;
+    let start;
+    let end;
+    let profile;
+    let optimization;
+    let routes = new Array();
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
     // ---
@@ -214,34 +209,31 @@ module.exports = class pgrSource extends Source {
     optimization = routeRequest.optimization;
     // ---
 
-    // Lecture de la réponse OSRM
+    // Lecture de la réponse PGR
     // ---
 
     if (pgrResponse.length < 1) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse
       callback(errorManager.createError(" pgr response is invalid: the number of steps is lower than 1. "));
     }
 
-    let vertex_table = "ways_vertices_pgr";
-    let start_id = pgrResponse[0].node;
-    let end_id = pgrResponse[pgrResponse.length - 1].node;
-    let start_request_result = await this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + start_id);
-
+    const vertex_table = "ways_vertices_pgr";
+    const start_id = pgrResponse[0].node;
+    const end_id = pgrResponse[pgrResponse.length - 1].node;
     // start
+    const start_request_result = this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + start_id);
     start = start_request_result.lon +","+ start_request_result.lat;
-
-    let end_request_result = await this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + end_id);
-
     // end
+    const end_request_result = this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + end_id);
     end = end_request_result.lon +","+ end_request_result.lat;
 
-    var routeResponse = new RouteResponse(resource, start, end, profile, optimization);
+    let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     // routes
-    // Il peut y avoir plusieurs itinéraires
-    for (var i = 0; i < 1; i++) {
+    // Il ne peut pas y avoir plusieurs itinéraires
+    for (let i = 0; i < 1; i++) {
 
-      var portions = new Array();
+      let portions = new Array();
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route(currentOsrmRoute.geometry);
@@ -253,21 +245,21 @@ module.exports = class pgrSource extends Source {
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
-      for (var j = 0; j < currentOsrmRoute.legs.length; j++) {
+      for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
 
-        var currentOsrmRouteLeg = currentOsrmRoute.legs[j];
-        var legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
-        var legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
+        const currentOsrmRouteLeg = currentOsrmRoute.legs[j];
+        const legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
+        const legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
 
         portions[j] = new Portion(legStart, legEnd);
 
         if (routeRequest.computeGeometry) {
-          var steps = new Array();
+          let steps = new Array();
 
           // On va associer les étapes à la portion concernée
-          for (var k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+          for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
-            var currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
+            let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
             steps[k] = new Step(currentOsrmRouteStep.geometry);
           }
 

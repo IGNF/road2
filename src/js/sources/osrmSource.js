@@ -96,7 +96,7 @@ module.exports = class osrmSource extends Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  connect() {
+  async connect() {
 
     // Récupération de l'emplacement du fichier OSRM
     let osrmFile = this._configuration.storage.file;
@@ -117,7 +117,7 @@ module.exports = class osrmSource extends Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  disconnect() {
+  async disconnect() {
     super.connected = false;
     return true;
   }
@@ -173,7 +173,7 @@ module.exports = class osrmSource extends Source {
     return new Promise ( (resolve, reject) => {
       this.osrm.route(osrmRequest, (err, result) => {
         if (err) {
-          console.log(err);
+          LOGGER.error(err);
           reject(err);
         } else {
           resolve(this.writeRouteResponse(request, result));

@@ -2,6 +2,7 @@
 
 const storageManager = require('../utils/storageManager');
 const osrmResource = require('../resources/osrmResource');
+const pgrResource = require('../resources/pgrResource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -93,6 +94,20 @@ module.exports = class resourceManager {
         // On va voir si c'est un autre type.
       }
       //------ OSRM
+      //------ PGR
+      if (resourceJsonObject.resource.type === "pgr") {
+        available = true;
+        LOGGER.info("Ressource pgrouting.");
+        if (!this.checkResourcePgr(resourceJsonObject.resource, sourceManager)) {
+          LOGGER.error("Erreur lors de la verification de la ressource pgr.");
+          return false;
+        } else {
+          // il n'y a eu aucun problème, la ressource est correctement configurée.
+        }
+      } else {
+        // On va voir si c'est un autre type.
+      }
+      //------ PGR
 
       // Si ce n'est aucun type valide, on renvoie une erreur.
       if (!available) {
@@ -246,6 +261,139 @@ module.exports = class resourceManager {
   /**
   *
   * @function
+  * @name checkResourcePgr
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource pgr.
+  * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
+  */
+
+ checkResourcePgr(resourceJsonObject, sourceManager) {
+
+  LOGGER.info("Verification de la ressource pgr...");
+
+  // Description
+  if (!resourceJsonObject.description) {
+    LOGGER.error("La ressource ne contient pas de description.");
+    return false;
+  } else {
+    // rien à faire
+  }
+
+  // Topology
+  if (!resourceJsonObject.topology) {
+    LOGGER.error("La ressource ne contient pas de topologie.");
+    return false;
+  } else {
+    // Description de la topologie
+    if (!resourceJsonObject.topology.description) {
+      LOGGER.error("La ressource ne contient pas de description de la topologie.");
+      return false;
+    } else {
+      // rien à faire
+    }
+    // Stockage de la topologie
+    if (!resourceJsonObject.topology.storage) {
+      LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
+      return false;
+    } else {
+      if (!storageManager.checkJsonStorage(resourceJsonObject.topology.storage)) {
+        LOGGER.error("Stockage de la topologie incorrect.");
+        return false;
+      } else {
+        // rien à faire
+      }
+    }
+    // Projection de la topologie
+    if (!resourceJsonObject.topology.projection) {
+      LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
+      return false;
+    } else {
+      // TODO: vérifier la projection
+    }
+  }
+
+  // Sources
+  if (!resourceJsonObject.sources) {
+    LOGGER.error("La ressource ne contient pas de sources.");
+    return false;
+  } else {
+
+    LOGGER.info("Verification des sources...")
+
+    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
+
+      let sourceJsonObject = resourceJsonObject.sources[i];
+      if (!sourceManager.checkSource(sourceJsonObject)) {
+        LOGGER.error("La ressource contient une source invalide.");
+        return false;
+      } else {
+        // on ne fait rien
+      }
+
+    }
+  }
+
+  // AvailableOperations
+  if (!resourceJsonObject.availableOperations) {
+    LOGGER.error("La ressource ne contient pas de descriptions sur les operations possibles.");
+    return false;
+  } else {
+
+  }
+
+  // DefaultSourceId
+  if (!resourceJsonObject.defaultSourceId) {
+    LOGGER.error("La ressource ne contient pas un id de source par defaut.");
+    return false;
+  } else {
+
+    let foundId = false;
+
+    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
+      let sourceJsonObject = resourceJsonObject.sources[i];
+
+      if (sourceJsonObject.id === resourceJsonObject.defaultSourceId) {
+        foundId = true;
+        break;
+      }
+    }
+    if (!foundId) {
+      LOGGER.error("L'id par defaut de la ressource ne correspond a aucun id de sources definies.");
+      return false;
+    }
+
+  }
+
+  // DefaultProjection
+  if (!resourceJsonObject.defaultProjection) {
+    LOGGER.warn("La ressource ne contient pas de projection par défaut. C'est celle de la topologie qui sera utilisee.");
+  } else {
+    // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
+  }
+
+  // BoundingBox
+  if (!resourceJsonObject.boundingBox) {
+    LOGGER.warn("La ressource ne contient pas de boundingBox.");
+  } else {
+    // TODO: vérification géométrique et cohérence avec la projection par défaut ou de la topologie.
+  }
+
+  // AvailableProjection
+  if (!resourceJsonObject.availableProjections) {
+    LOGGER.warn("La ressource ne contient pas de projections rendues disponibles. C'est celle de la topologie qui sera utilisee.");
+  } else {
+    // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
+  }
+
+  LOGGER.info("Fin de la verification de la ressource osrm.");
+  return true;
+}
+
+
+  /**
+  *
+  * @function
   * @name createResource
   * @description Fonction utilisée pour créer une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
@@ -291,6 +439,8 @@ module.exports = class resourceManager {
 
     if (resourceJsonObject.resource.type === "osrm") {
       resource = new osrmResource(resourceJsonObject);
+    } else if (resourceJsonObject.resource.type === "pgr") {
+      resource = new pgrResource(resourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
     }

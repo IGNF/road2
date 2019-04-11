@@ -38,8 +38,22 @@ module.exports = {
         return false;
       }
 
+    } else if (jsonStorage.db_config) {
+      try {
+        fs.accessSync(jsonStorage.db_config, fs.constants.R_OK);
+      } catch (err) {
+        LOGGER.error("Le fichier " + jsonStorage.db_config + " ne peut etre lu.");
+        return false;
+      }
+      storageFound = true;
+    } else if (jsonStorage.cost_column) {
+      // TODO: Pas trop possible de vérifier sans requête
+      storageFound = true;
+    } else if (jsonStorage.rcost_column) {
+      // TODO: Pas trop possible de vérifier sans requête
+      storageFound = true;
     } else {
-      // Ce n'est pas un storage de type file, on va tester d'autres types
+      // on va tester d'autres types
     }
 
     return storageFound;
