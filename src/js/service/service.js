@@ -376,7 +376,7 @@ module.exports = class Service {
   *
   */
 
-  loadSources() {
+  async loadSources() {
 
     LOGGER.info("Chargement des sources...");
 
@@ -397,16 +397,25 @@ module.exports = class Service {
         let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
 
         // On vérifie que le source peut bien être chargée ou connectée
-        if (this._sourceManager.connectSource(currentSource)) {
-          // On la stocke
-          this._sourceCatalog[sourceId] = currentSource;
+        try {
+          const connectedSource = await this._sourceManager.connectSource(currentSource);
+          if (connectedSource) {
+            // On la stocke
+            this._sourceCatalog[sourceId] = currentSource;
 
-        } else {
-          // on n'a pas pu se connecter à la source
-          // TODO: remplacer ce comportement par une gestion plus fine des ressources
-          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
-          LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
-          return false;
+          } else {
+            // on n'a pas pu se connecter à la source
+            // TODO: remplacer ce comportement par une gestion plus fine des ressources
+            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
+            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
+            return false;
+          }
+        } catch (err) {
+            // on n'a pas pu se connecter à la source
+            // TODO: remplacer ce comportement par une gestion plus fine des ressources
+            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
+            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
+            return false;
         }
 
       }

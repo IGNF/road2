@@ -73,14 +73,18 @@ module.exports = class pgrSource extends Source {
   */
   async connect() {
     // Connection à la base de données
-    LOGGER.info("Connection à la base : " + this._db_config.database);
-
-    const err = await this._client.connect();
-    if (err) {
+    LOGGER.info("Connection à la base de données : " + this._db_config.database);
+    try {
+      const err = await this._client.connect();
+      if (err) {
+        LOGGER.error('connection error', err.stack)
+        return false;
+      }
+    } catch (err) {
       LOGGER.error('connection error', err.stack)
       return false;
     }
-    LOGGER.info("Connecté à la base : " + this._db_config.database);
+    LOGGER.info("Connecté à la base de données : " + this._db_config.database);
     super.connected = true;
     return true;
   }
@@ -209,47 +213,77 @@ module.exports = class pgrSource extends Source {
     optimization = routeRequest.optimization;
     // ---
 
-    // Lecture de la réponse PGR
+    // Traitement de la réponse PGR
     // ---
+    const response = {
+      waypoints: [],
+      routes: []
+    };
+    const route_geometry = {
+      type: "LineString",
+      coordinates: []
+    };
 
-    if (pgrResponse.length < 1) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse
-      callback(errorManager.createError(" pgr response is invalid: the number of steps is lower than 1. "));
+    for (let row of pgrResponse) {
+      // TODO: Il n'y a qu'une route pour l'instant
+      response.routes.push( {geometry: route_geometry, legs: [] } );
+
+      if (row.node_lon) {
+        response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
+      }
+      if (row.geom_json) {
+        current_geom = JSON.parse(row.geom_json);
+        for (let i = 0; i++; i < current_geom.coordinates.length - 1) {
+          route_geometry.coordinates.push( current_geom.coordinates[i] );
+        }
+      }
+      if (row.path_seq === 1) {
+        response.routes.legs.push( { steps: [] } );
+      }
+
+      response.routes.legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
 
-    const vertex_table = "ways_vertices_pgr";
-    const start_id = pgrResponse[0].node;
-    const end_id = pgrResponse[pgrResponse.length - 1].node;
+    if (response.waypoints.length < 2) {
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
+      throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
+    }
+
     // start
-    const start_request_result = this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + start_id);
-    start = start_request_result.lon +","+ start_request_result.lat;
+    start = response.waypoints[0].location[0] +","+ response.waypoints[0].location[1];
+
     // end
-    const end_request_result = this._client.query("SELECT * FROM " + vertex_table + " WHERE id=" + end_id);
-    end = end_request_result.lon +","+ end_request_result.lat;
+    end = response.waypoints[response.waypoints.length-1].location[0] +","+ response.waypoints[response.waypoints.length-1].location[1];
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
+    if (response.routes.length === 0) {
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
+      throw errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. ");
+    }
+
     // routes
-    // Il ne peut pas y avoir plusieurs itinéraires
-    for (let i = 0; i < 1; i++) {
+    // Il peut y avoir plusieurs itinéraires
+    for (let i = 0; i < response.routes.length; i++) {
 
       let portions = new Array();
+      let currentPgrRoute = response.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route(currentOsrmRoute.geometry);
+      routes[i] = new Route(currentPgrRoute.geometry);
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
-      if (currentOsrmRoute.legs.length !== osrmResponse.waypoints.length-1) {
-        callback(errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. "));
+      if (currentPgrRoute.legs.length !== response.waypoints.length-1) {
+        throw errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
-      for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
+      for (let j = 0; j < currentPgrRoute.legs.length; j++) {
 
-        const currentOsrmRouteLeg = currentOsrmRoute.legs[j];
-        const legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
-        const legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
+        let currentPgrRouteLeg = currentPgrRoute.legs[j];
+        let legStart = response.waypoints[j].location[0] +","+ response.waypoints[j].location[1];
+        let legEnd = response.waypoints[j+1].location[0] +","+ response.waypoints[j+1].location[1];
 
         portions[j] = new Portion(legStart, legEnd);
 
@@ -257,10 +291,10 @@ module.exports = class pgrSource extends Source {
           let steps = new Array();
 
           // On va associer les étapes à la portion concernée
-          for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+          for (let k=0; k < currentPgrRouteLeg.steps.length; k++) {
 
-            let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-            steps[k] = new Step(currentOsrmRouteStep.geometry);
+            let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
+            steps[k] = new Step(currentPgrRouteStep.geometry);
           }
 
           portions[j].steps = steps;
@@ -278,8 +312,7 @@ module.exports = class pgrSource extends Source {
     routeResponse.routes = routes;
 
     // ---
-
-    callback(null, routeResponse);
+    return routeResponse;
 
   }
 
