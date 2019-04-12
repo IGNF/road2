@@ -117,23 +117,26 @@ module.exports = class apisManager {
                 // Gestion de l'initialisation de l'api
                 // ----------------------
                 let initFile = APIDirectoryVersion + "/init.js";
-                if (fs.statSync(initFile).isFile()) {
+                try {
 
+                  fs.statSync(initFile);
                   api.initFile = initFile;
 
-                } else {
+                } catch(err) {
                   // Ce n'est pas obligatoire, on ne fait donc rien
                 }
+
                 // ----------------------
 
                 // Gestion de l'update de l'api
                 // ----------------------
                 let updateFile = APIDirectoryVersion + "/update.js";
-                if (fs.statSync(updateFile).isFile()) {
+                try {
 
+                  fs.statSync(updateFile);
                   api.updateFile = updateFile;
 
-                } else {
+                } catch(err) {
                   // Ce n'est pas obligatoire, on ne fait donc rien
                 }
                 // ----------------------

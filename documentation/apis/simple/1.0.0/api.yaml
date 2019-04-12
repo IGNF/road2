@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   description: "Description de l'API du service d'itinéraire."
-  version: "0.0.1"
+  version: "1.0.0"
   title: "Service d'itinéraire"
   contact:
     email: "idev@ign.fr"
@@ -13,8 +13,6 @@ tags:
   description: "Découvrir le service et les ressources disponibles"
 - name: "Utilisation"
   description: "Utiliser le service d'itinéraire"
-- name: "Administration"
-  description: "Administrer le service d'itinéraire"
 paths:
   /getcapabilities:
     get:
@@ -26,6 +24,13 @@ paths:
       responses:
         200:
           description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getcapabilities"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/getcapabilities"
         404:
           description: "Not found"
   /route:
@@ -38,33 +43,34 @@ paths:
       parameters:
       - name: "resource"
         in: "query"
-        description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans le GetCapabilities."
+        description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver l'itinéraire le plus court pour une voiture. "
         required: true
         schema:
           type: "string"
-        example: "bduni"
+        example: "bdtopo-v3"
       - name: "start"
         in: "query"
-        description: "Point de départ"
+        description: "Point de départ. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
         required: true
         schema:
           $ref: "#/components/schemas/point"
         example: "48.849319,2.337306"
       - name: "end"
         in: "query"
-        description: "Point d'arrivée"
+        description: "Point d'arrivée. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
         required: true
         schema:
           $ref: "#/components/schemas/point"
         example: "48.852891,2.367776"
       - name: "intermediates"
         in: "query"
-        description: "Points intermédiaires"
+        description: "Points intermédiaires. Ils devront être exprimés dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities). S'il y a plusieurs points, ils devront être séparé par un pipe et l'ordre considéré sera celui donné."
         required: false
         schema:
           $ref: "#/components/schemas/coordinates"
         explode: false
         style: "pipeDelimited"
+        example: "48.852890,2.368776|48.842891,2.367976"
       - name: "profile"
         in: "query"
         description: "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
@@ -74,7 +80,7 @@ paths:
         example: "car"
       - name: "optimization"
         in: "query"
-        description: "Optimisation utilisée pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        description: "Mode de calcul utilisé pour déterminer l'itinéraire. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: false
         schema:
           type: "string"
@@ -87,7 +93,7 @@ paths:
           $ref: "#/components/schemas/response-type"
       - name: "algorithm"
         in: "query"
-        description: "Algorithme utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        description: "Algorithme utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. L'algorithme est la méthode informatitque employée par le service pour calculer un itinéraire."
         required: false
         schema:
           type: "string"
@@ -100,21 +106,21 @@ paths:
         example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}"
       - name: "getGeometry"
         in: "query"
-        description: "Présence de la géométrie dans la réponse."
+        description: "Présence de la géométrie dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: false
         schema:
           type: "boolean"
         example: true
       - name: "getBbox"
         in: "query"
-        description: "Présence de l'emprise de l'itinéraire dans la réponse."
+        description: "Présence de l'emprise de l'itinéraire dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: false
         schema:
           type: "boolean"
         example: true
       - name: "getInstructions"
         in: "query"
-        description: "Présence des instructions de navigation dans la réponse."
+        description: "Présence des instructions de navigation dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: false
         schema:
           type: "boolean"
@@ -252,7 +258,7 @@ paths:
         schema:
           $ref: "#/components/schemas/point"
         example: "48.849319,2.337306"
-      - name: "ressource"
+      - name: "resource"
         in: "query"
         description: "Ressource utilisée pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: true
@@ -393,7 +399,7 @@ paths:
         schema:
           $ref: "#/components/schemas/point"
         example: "48.849319,2.337306"
-      - name: "ressource"
+      - name: "resource"
         in: "query"
         description: "Ressource utilisée pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: true
@@ -410,7 +416,7 @@ paths:
         example: "temps"
       - name: "costValue"
         in: "query"
-        description: "Valeur du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        description: "Valeur du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. On pourra, par exemple, préciser une distance ou un temps, selon le costType choisi. L'unité dépendra du type et des paramètres distanceUnit et timeUnit."
         required: true
         schema:
           type: "number"
@@ -429,7 +435,7 @@ paths:
         required: false
         schema:
           type: "string"
-          enum: ["départ","arrivé"]
+          enum: ["departure","arrival"]
         example: "départ"
       - name: "constraints"
         in: "query"
@@ -555,305 +561,6 @@ paths:
             application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-  /administration/server:
-    get:
-      tags:
-      - "Administration"
-      summary: "Obtenir la configuration du server."
-      description: "Cette requête retourne la configuration du server. "
-      operationId: "server"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-  /administration/ressource:
-    get:
-      tags:
-      - "Administration"
-      summary: "Obtenir la configuration d'une ressource."
-      description: "Cette requête retourne la configuration d'une ressource."
-      operationId: "get-ressource"
-      parameters:
-      - name: "id"
-        in: "query"
-        description: "Tableau des ids de ressources à décrire. Chaque id peut être complet ou incomplet. S'il est complet, seule cette ressource sera décrite. Si aucune ressource ne correspond, alors toutes les ressources pouvant correspondre vont être décrite. Équivalent du LIKE en SQL."
-        required: true
-        schema:
-          type: "array"
-          items:
-            type: "string"
-        explode: false
-        style: "pipeDelimited"
-        example: "bduni"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    ressourceId:
-                      type: "string"
-                    configFile:
-                      type: "string"
-                    configuration:
-                      type: "object"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    ressourceId:
-                      type: "string"
-                    configFile:
-                      type: "string"
-                    configuration:
-                      type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    post:
-      tags:
-      - "Administration"
-      summary: "Modifier une ressource existante. Il faut fournir la configuration de la ressource à modifier."
-      description: ""
-      operationId: "post-ressource"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createRessource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createRessource"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    put:
-      tags:
-      - "Administration"
-      summary: "Intégrer une nouvelle ressource. Il faut fournir la configuration de la ressource à intégrer."
-      description: ""
-      operationId: "put-ressource"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createRessource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createRessource"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-    delete:
-      tags:
-      - "Administration"
-      summary: "Obtenir la configuration du server."
-      description: "Cette requête retourne la configuration d'une ressource."
-      operationId: "delete-ressource"
-      parameters:
-      - name: "id"
-        in: "query"
-        description: "Tableau des ids de ressources à supprimer. Les ids doivent être complets."
-        required: true
-        schema:
-          type: "array"
-          items:
-            type: "string"
-        explode: false
-        style: "pipeDelimited"
-        example: "bduni"
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    ressourceId:
-                      type: "string"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    ressourceId:
-                      type: "string"
-        400:
-          description: "Invalid parameters"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        403:
-          description: "Not allowed"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-        404:
-          description: "Not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
 components:
   schemas:
     point:
@@ -902,7 +609,7 @@ components:
     routeBody:
       type: "object"
       properties:
-        ressource:
+        resource:
           type: "string"
         start:
           $ref: "#/components/schemas/point"
@@ -943,7 +650,7 @@ components:
       properties:
         point:
           $ref: "#/components/schemas/point"
-        ressource:
+        resource:
           type: "string"
         format:
           $ref: "#/components/schemas/response-type"
@@ -960,7 +667,7 @@ components:
       properties:
         point:
           $ref: "#/components/schemas/point"
-        ressource:
+        resource:
           type: "string"
         costType:
           type: "string"
@@ -985,14 +692,6 @@ components:
           type: "string"
         crs:
           type: "string"
-    createRessource:
-      type: "object"
-      properties:
-        ressource:
-          type: "object"
-          properties:
-            file:
-              type: "string"
     errorResponse:
       type: "object"
       properties:
@@ -1010,6 +709,8 @@ components:
           $ref: "#/components/schemas/point"
         end:
           $ref: "#/components/schemas/point"
+        geometry:
+          type: "string"
         algorithm:
           type: "string"
         duration:
@@ -1026,7 +727,7 @@ components:
         arrival:
           type: "string"
           format: "date"
-        ressource:
+        resource:
           type: "string"
         profile:
           type: "string"
@@ -1111,7 +812,7 @@ components:
       properties:
         point:
           $ref: "#/components/schemas/point"
-        ressource:
+        resource:
           type: "string"
         numberAsked:
           type: "number"
@@ -1143,7 +844,7 @@ components:
       properties:
         point:
           $ref: "#/components/schemas/point"
-        ressource:
+        resource:
           type: "string"
         costType:
           type: "string"
@@ -1172,3 +873,86 @@ components:
             properties:
               message:
                 type: "string"
+    getcapabilities:
+      type: "object"
+      properties:
+        info:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            url:
+              type: "string"
+            description:
+              type: "string"
+        api:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              example: "simple"
+            version:
+              type: "string"
+              example: "1.0.0"
+        operations:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              description:
+                type: "string"
+              url:
+                type: "string"
+              methods:
+                type: "array"
+                items:
+                  type: "string"
+                  enum: ["GET","POST","PUT","DELETE"]
+              parameters:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    in:
+                      type: "string"
+                    description:
+                      type: "string"
+                    required:
+                      type: "boolean"
+                    default:
+                      type: "boolean"
+                    schema:
+                      type: "string"
+                    example:
+                      type: "string"
+        resources:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              description:
+                type: "string"
+              availableOperations:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "string"
+                    availableParameters:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          values:
+                            type: "string"
+                          default:
+                            type: "string"

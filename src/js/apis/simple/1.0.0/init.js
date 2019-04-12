@@ -177,9 +177,75 @@ module.exports = {
         resourceDescription.availableOperations = new Array();
 
         // - route
+        let routeAvailableOperation = {};
+        routeAvailableOperation.id = "route";
+        routeAvailableOperation.availableParameters = new Array();
 
+        // récupération de la description
+        let routeDescriptionFromResource = {};
+        for (let i = 0; i < localResource.configuration.availableOperations.length; i++) {
+          if (localResource.configuration.availableOperations[i].id === "route") {
+            routeDescriptionFromResource = localResource.configuration.availableOperations[i];
+          }
+        }
+
+        // route.resource
+        let routeResource = {};
+        routeResource.id = "resource";
+        routeResource.values = localResource.id;
+        routeAvailableOperation.availableParameters.push(routeResource);
+
+        // route.start
+        let routeStart = {};
+        routeStart.id = "start";
+        routeStart.values = {};
+        routeStart.values.bbox = localResource.configuration.boundingBox;
+        routeStart.values.projection = localResource.configuration.defaultProjection;
+        routeAvailableOperation.availableParameters.push(routeStart);
+
+        // route.end
+        let routeEnd = {};
+        routeEnd.id = "end";
+        routeEnd.values = {};
+        routeEnd.values.bbox = localResource.configuration.boundingBox;
+        routeEnd.values.projection = localResource.configuration.defaultProjection;
+        routeAvailableOperation.availableParameters.push(routeEnd);
+
+        // route.intermediates
+        let routeIntermediates = {};
+        routeIntermediates.id = "intermediates";
+        routeIntermediates.values = {};
+        routeIntermediates.values.bbox = localResource.configuration.boundingBox;
+        routeIntermediates.values.projection = localResource.configuration.defaultProjection;
+        routeIntermediates.maxItems = routeDescriptionFromResource.maxIntermediatePoints;
+        routeAvailableOperation.availableParameters.push(routeIntermediates);
+
+        // route.profile
+        let routeProfile = {};
+        routeProfile.id = "profile";
+        routeProfile.values = localResource.defaultProfile;
+        routeAvailableOperation.availableParameters.push(routeProfile);
+
+        // route.optimization
+        let routeOptimization = {};
+        routeOptimization.id = "optimization";
+        routeOptimization.values = localResource.defaultOptimization;
+        routeAvailableOperation.availableParameters.push(routeOptimization);
+
+        // route.getGeometry
+        let routeGetGeometry = {};
+        routeGetGeometry.id = "getGeometry";
+        for (let i= 0; i < routeDescriptionFromResource.defaultParameters.length; i++) {
+          if (routeDescriptionFromResource.defaultParameters[i].id === "getGeometry") {
+            routeGetGeometry.values = routeDescriptionFromResource.defaultParameters[i].default;
+            break;
+          }
+        }
+        routeAvailableOperation.availableParameters.push(routeGetGeometry);
+
+        resourceDescription.availableOperations.push(routeAvailableOperation);
         // - end route
-        
+
         // -- end resource.availableOperations
 
       }
