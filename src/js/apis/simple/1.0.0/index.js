@@ -34,7 +34,7 @@ router.all("/getcapabilities", function(req, res) {
   let getCapabilities = req.app.get(uid + "-getcap");
 
   res.send(getCapabilities);
-  
+
 });
 
 // Route
@@ -113,7 +113,7 @@ function checkRouteParameters(parameters, service) {
       throw errorManager.createError(" Parameter 'start' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
-    tmpStringCoordinates = parameters.start.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = parameters.start.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
       throw errorManager.createError(" Parameter 'start' is invalid ", 400);
     } else {
@@ -129,7 +129,7 @@ function checkRouteParameters(parameters, service) {
       throw errorManager.createError(" Parameter 'end' not found ", 400);
   } else {
     // Vérification de la validité des coordonnées fournies
-    tmpStringCoordinates = parameters.end.match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
+    tmpStringCoordinates = parameters.end.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
     if (!tmpStringCoordinates) {
       throw errorManager.createError(" Parameter 'end' is invalid ", 400);
     } else {

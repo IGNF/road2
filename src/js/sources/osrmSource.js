@@ -176,7 +176,11 @@ module.exports = class osrmSource extends Source {
           LOGGER.error(err);
           reject(err);
         } else {
-          resolve(this.writeRouteResponse(request, result));
+          try {
+            resolve(this.writeRouteResponse(request, result));
+          } catch (err) {
+            reject(err);
+          }
         }
       });
     });

@@ -22,8 +22,8 @@
         "optimization": "fastest",
         "compute": {
           "storage": {
-            "cost_column": "cost_fastest",
-            "rcost_column": "rcost_fastest"
+            "cost_column": "cost_m_car",
+            "rcost_column": "reverse_cost_m_car"
           }
         }
       }

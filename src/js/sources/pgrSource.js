@@ -126,20 +126,23 @@ module.exports = class pgrSource extends Source {
       // ---
       let pgrRequest = {};
       let sql_function;
+      const coordinatesTable = new Array();
 
       if (request.type === "routeRequest") {
         // Coordonnées
-        const coordinatesTable = new Array();
         // start
-        coordinatesTable.push([request.start.lon, request.start.lat]);
+        coordinatesTable.push(request.start.lon);
+        coordinatesTable.push(request.start.lat);
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+            coordinatesTable.push(request.intermediates[i].lon);
+            coordinatesTable.push(request.intermediates[i].lat);
           }
         }
         // end
-        coordinatesTable.push([request.end.lon, request.end.lat]);
+        coordinatesTable.push(request.end.lon);
+        coordinatesTable.push(request.end.lat);
 
         pgrRequest.coordinates = coordinatesTable;
 
@@ -157,18 +160,22 @@ module.exports = class pgrSource extends Source {
       // ---
       const query_string = "SELECT * FROM " + sql_function +
         "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
-        this._configuration.storage.costColumn +
+        this._configuration.cost.compute.storage.cost_column +
         "','" +
-        this._configuration.storage.reverseCostColumn +
+        this._configuration.cost.compute.storage.rcost_column +
         "')";
 
       return new Promise( (resolve, reject) => {
-        this._client.query(query_string, pgrRequest, (err, result) => {
+        this._client.query(query_string, coordinatesTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
             reject(err);
           } else {
-            resolve(this.writeRouteResponse(request, result));
+            try {
+              resolve(this.writeRouteResponse(request, result));
+            } catch (err) {
+              reject(err);
+            }
           }
         });
       });
@@ -192,7 +199,7 @@ module.exports = class pgrSource extends Source {
   * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
-  writeRouteResponse (routeRequest, pgrResponse, callback) {
+  writeRouteResponse (routeRequest, pgrResponse) {
 
     let resource;
     let start;
@@ -220,33 +227,38 @@ module.exports = class pgrSource extends Source {
       routes: []
     };
     const route_geometry = {
-      type: "LineString",
+      type: "MultiLineString",
       coordinates: []
     };
 
-    for (let row of pgrResponse) {
-      // TODO: Il n'y a qu'une route pour l'instant
-      response.routes.push( {geometry: route_geometry, legs: [] } );
+    // TODO: Il n'y a qu'une route pour l'instant
+    response.routes.push( {geometry: route_geometry, legs: [] } );
+
+    for (let row of pgrResponse.rows) {
 
       if (row.node_lon) {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
       if (row.geom_json) {
-        current_geom = JSON.parse(row.geom_json);
-        for (let i = 0; i++; i < current_geom.coordinates.length - 1) {
-          route_geometry.coordinates.push( current_geom.coordinates[i] );
+        let current_geom = JSON.parse(row.geom_json);
+        console.log(current_geom.coordinates.length);
+        for (let i = 0; i < current_geom.coordinates.length - 1; i++) {
+          // TODO: Il n'y a qu'une route pour l'instant
+          route_geometry.coordinates.push( current_geom.coordinates );
         }
       }
       if (row.path_seq === 1) {
-        response.routes.legs.push( { steps: [] } );
+        // TODO: Il n'y a qu'une route pour l'instant
+        response.routes[0].legs.push( { steps: [] } );
       }
 
-      response.routes.legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
+      // TODO: Il n'y a qu'une route pour l'instant
+      response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
 
     if (response.waypoints.length < 2) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
+      throw errorManager.createError(" PGR response is invalid: the number of waypoints is lower than 2. ");
     }
 
     // start
@@ -258,8 +270,8 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      throw errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. ");
+      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
+      throw errorManager.createError(" PGR response is invalid: the number of routes is equal to 0. ");
     }
 
     // routes
@@ -273,9 +285,9 @@ module.exports = class pgrSource extends Source {
       routes[i] = new Route(currentPgrRoute.geometry);
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
-      // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
+      // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
       if (currentPgrRoute.legs.length !== response.waypoints.length-1) {
-        throw errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
+        throw errorManager.createError(" PGR response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
