@@ -241,11 +241,7 @@ module.exports = class pgrSource extends Source {
       }
       if (row.geom_json) {
         let current_geom = JSON.parse(row.geom_json);
-        console.log(current_geom.coordinates.length);
-        for (let i = 0; i < current_geom.coordinates.length - 1; i++) {
-          // TODO: Il n'y a qu'une route pour l'instant
-          route_geometry.coordinates.push( current_geom.coordinates );
-        }
+        route_geometry.coordinates.push( current_geom.coordinates );
       }
       if (row.path_seq === 1) {
         // TODO: Il n'y a qu'une route pour l'instant
