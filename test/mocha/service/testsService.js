@@ -44,8 +44,9 @@ describe('Test de la classe Service', function() {
 
   describe('Test de loadSources()', function() {
 
-    it('loadSources() return true avec une configuration correcte', function() {
-      assert.equal(service.loadSources(), true);
+    it('loadSources() return true avec une configuration correcte', async function() {
+      const sourcesLoaded = await service.loadSources();
+      assert.equal(sourcesLoaded, true);
     });
 
   });

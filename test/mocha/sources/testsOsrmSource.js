@@ -77,16 +77,18 @@ describe('Test de la classe osrmSource', function() {
 
   describe('Test de connect()', function() {
 
-    it('Connect()', function() {
-      assert.equal(source.connect(), true);
+    it('Connect()', async function() {
+      const sourceConnected = await source.connect();
+      assert.equal(sourceConnected, true);
     });
 
   });
 
   describe('Test de disconnect()', function() {
 
-    it('Disconnect()', function() {
-      assert.equal(source.disconnect(), true);
+    it('Disconnect()', async function() {
+      const sourceDisonnected = await source.disconnect();
+      assert.equal(sourceDisonnected, true);
     });
 
   });
