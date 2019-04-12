@@ -173,7 +173,6 @@ module.exports = class osrmSource extends Source {
     return new Promise ( (resolve, reject) => {
       this.osrm.route(osrmRequest, (err, result) => {
         if (err) {
-          console.log(err);
           reject(err);
         } else {
           resolve(this.writeRouteResponse(request, result));
