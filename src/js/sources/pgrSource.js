@@ -226,6 +226,7 @@ module.exports = class pgrSource extends Source {
       waypoints: [],
       routes: []
     };
+    // TODO: refonte gestion géométrie
     const route_geometry = {
       type: "MultiLineString",
       coordinates: []
@@ -240,6 +241,7 @@ module.exports = class pgrSource extends Source {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
       if (row.geom_json) {
+        // TODO: refonte gestion géométrie
         let current_geom = JSON.parse(row.geom_json);
         route_geometry.coordinates.push( current_geom.coordinates );
       }
@@ -248,6 +250,7 @@ module.exports = class pgrSource extends Source {
         response.routes[0].legs.push( { steps: [] } );
       }
 
+      // TODO: refonte gestion géométrie
       // TODO: Il n'y a qu'une route pour l'instant
       response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
