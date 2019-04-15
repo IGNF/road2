@@ -103,7 +103,7 @@ describe('Test de la classe osrmSource', function() {
     let routeRequest = new RouteRequest(resource, start, end, profile, optimization);
 
     it('computeRequest() should return a routeResponse', async function() {
-      source.connect();
+      await source.connect();
       const routeResponse = await source.computeRequest(routeRequest);
       assert.equal(routeResponse.resource, "resource-test");
     });

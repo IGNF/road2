@@ -395,7 +395,6 @@ module.exports = class sourceManager {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-
   async connectSource(source) {
 
     LOGGER.info("Connexion a la source: " + source.id);
@@ -440,7 +439,4 @@ module.exports = class sourceManager {
     }
   }
 
-  // TODO: faire une fonction pour déconnecter toutes les sources : (je ne sais pas dans quelle classe)
-  // for source in sources
-  //  await manager.disconnectSource(source)
 }

@@ -34,7 +34,6 @@ describe('Test de l\'api simple 1.0.0', function() {
 
     service.checkAndSaveGlobalConfiguration(configuration);
     service.loadResources();
-    service.loadSources();
     // service.createServer("../apis/", "");
 
     // Création des paramètres utilisateur
@@ -46,8 +45,10 @@ describe('Test de l\'api simple 1.0.0', function() {
     // Création d'un objet routeRequest
     let routeRequest = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.76385, lat: 41.953932}, "car", "fastest");
 
-    it('checkRouteParameters() avec les bons parametres', function() {
+    it('checkRouteParameters() avec les bons parametres', async function() {
+      await service.loadSources();
       assert.deepEqual(controler.checkRouteParameters(parameters, service), routeRequest);
+      await service.disconnectAllSources();
     });
 
   });
@@ -102,6 +103,8 @@ describe('Test de l\'api simple 1.0.0', function() {
       // Création d'une routeResponse
       let routeResponse = source.writeRouteResponse(routeRequest, osrmResponse);
       assert.deepEqual(controler.writeRouteResponse(routeResponse), referenceResponse);
+      await service.disconnectAllSources();
+
     });
 
   });

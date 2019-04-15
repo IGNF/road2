@@ -532,5 +532,26 @@ module.exports = class Service {
 
   }
 
+  /**
+  *
+  * @function
+  * @name disconnectAllSources
+  * @description Fonction utilisée pour déconnecter toutes les sources.
+  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+  async disconnectAllSources() {
+    LOGGER.info("Déconnection de toutes les sources");
+    try {
+      for (let source_id in this._sourceCatalog) {
+        await this._sourceManager.disconnectSource(this._sourceCatalog[source_id]);
+      }
+    } catch (err) {
+      LOGGER.error("Impossible de déconnecter la source.", err);
+      return false;
+    }
+  }
+
 
 }

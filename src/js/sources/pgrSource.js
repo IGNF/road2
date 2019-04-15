@@ -84,6 +84,7 @@ module.exports = class pgrSource extends Source {
       LOGGER.error('connection error', err.stack)
       return false;
     }
+
     LOGGER.info("Connecté à la base de données : " + this._db_config.database);
     super.connected = true;
     return true;

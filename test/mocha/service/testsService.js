@@ -47,6 +47,7 @@ describe('Test de la classe Service', function() {
     it('loadSources() return true avec une configuration correcte', async function() {
       const sourcesLoaded = await service.loadSources();
       assert.equal(sourcesLoaded, true);
+      await service.disconnectAllSources();
     });
 
   });
