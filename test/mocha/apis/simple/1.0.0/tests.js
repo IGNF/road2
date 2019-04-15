@@ -68,7 +68,7 @@ describe('Test de l\'api simple 1.0.0', function() {
 
     service.checkAndSaveGlobalConfiguration(configuration);
     service.loadResources();
-    service.loadSources();
+    // service.loadSources();
     // service.createServer("../apis/", "");
 
     // Création d'une réponse OSRM
@@ -85,16 +85,22 @@ describe('Test de l\'api simple 1.0.0', function() {
     let routeRequest = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.76385, lat: 41.953932}, "car", "fastest");
 
     // Récupération de la source concernée
-    let source = service.getSourceById("corse-car-fastest");
+    // let source = service.getSourceById("corse-car-fastest");
 
     // Création d'une routeResponse
-    let routeResponse = source.writeRouteResponse(routeRequest, osrmResponse);
+    // let routeResponse = source.writeRouteResponse(routeRequest, osrmResponse);
 
     // Réponse attendue
     let referenceResponse = {};
     referenceResponse = {"resource":"corse-osm","start":"8.732901,41.928821","end":"8.763831,41.953897","profile":"car","optimization":"fastest","geometry":"cf|~Fssht@tAgLFiNqJTaEuFiEpEgIxCsLdDwDw@oIac@mAg@cKkTBiBeAaByCqSkHc[mGaQHiGgB_@wL{[_FvBsDmEuEeB{RjGk@e@Z{B","portions":[{"start":"8.732901,41.928821","end":"8.763831,41.953897","steps":[{"geometry":"cf|~Fssht@B@"},{"geometry":"_f|~Fqsht@Rw@Hq@HwBL_ALw@LoAIuCG{BA]AY@SZkC"},{"geometry":"ec|~Fepit@MC_@Gg@LUFm@PwEEe@Qc@Y"},{"geometry":"aq|~F{pit@CIGOYk@g@aAi@aA"},{"geometry":"yt|~Fewit@SRkAtAa@b@gAbAMF_APs@JQGI@aA\\o@d@Y^]Tc@HuBJ"},{"geometry":"ej}~Fckit@e@PKDIB}Aj@_CfAu@Fu@@e@Q"},{"geometry":"qw}~F{fit@?KAKCIEGGEGAI@"},{"geometry":"wx}~Fkhit@e@aDm@kDs@uDc@_COq@_BgGm@cBOe@"},{"geometry":"qc~~Fsjjt@JS@SCQCKGEMCK?OH"},{"geometry":"}d~~Fyljt@W[[u@uAiCm@gAcDcH[o@Uq@M]Mk@"},{"geometry":"gr~~Fmdkt@HKFM@QAQGMIIKEMB"},{"geometry":"as~~Fegkt@YgAG[WsAKk@Ms@_@qBs@yDG]SgA"},{"geometry":"ey~~Fo|kt@JIDWAMIOSE"},{"geometry":"sy~~Fu~kt@_AaGYkA_C}I_@iAW_A"},{"geometry":"eb__Gkxlt@FMBOCMCKGECCO@"},{"geometry":"}b__Gkzlt@oC}Hg@iBy@qCG_AEm@C}@"},{"geometry":"ak__Gqqmt@LGJKDOBQ?IAKEQGKMIMCK@KDIHEL"},{"geometry":"ql__Gitmt@[e@Uu@s@_D{@oCiB_CkBmE{@iCM_@Q}@"},{"geometry":"e{__Gkrnt@u@h@g@\\k@\\m@Pg@?aAe@i@cAgAcB{Ac@yBaA"},{"geometry":"on`_Ggxnt@iBXyA`@{@`@c@RkAn@s@VaCf@uAh@"},{"geometry":"kba_G{ont@QIQIGQA]DUH[Lk@"},{"geometry":"{ba_G}tnt@"}]}]}
 
-    it('writeRouteResponse() avec les bons parametres', function() {
+    it('writeRouteResponse() avec les bons parametres', async function() {
+      await service.loadSources();
+      // Récupération de la source concernée
+      let source = service.getSourceById("corse-car-fastest");
+
+      // Création d'une routeResponse
+      let routeResponse = source.writeRouteResponse(routeRequest, osrmResponse);
       assert.deepEqual(controler.writeRouteResponse(routeResponse), referenceResponse);
     });
 
