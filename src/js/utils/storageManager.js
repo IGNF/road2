@@ -38,18 +38,18 @@ module.exports = {
         return false;
       }
 
-    } else if (jsonStorage.db_config) {
+    } else if (jsonStorage.dbConfig) {
       try {
-        fs.accessSync(jsonStorage.db_config, fs.constants.R_OK);
+        fs.accessSync(jsonStorage.dbConfig, fs.constants.R_OK);
       } catch (err) {
-        LOGGER.error("Le fichier " + jsonStorage.db_config + " ne peut etre lu.");
+        LOGGER.error("Le fichier " + jsonStorage.dbConfig + " ne peut etre lu.");
         return false;
       }
       storageFound = true;
-    } else if (jsonStorage.cost_column) {
+    } else if (jsonStorage.costColumn) {
       // TODO: Pas trop possible de vérifier sans requête
       storageFound = true;
-    } else if (jsonStorage.rcost_column) {
+    } else if (jsonStorage.rcostColumn) {
       // TODO: Pas trop possible de vérifier sans requête
       storageFound = true;
     } else {

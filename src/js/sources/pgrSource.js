@@ -34,11 +34,11 @@ module.exports = class pgrSource extends Source {
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
     // Client de base de données
-    let db_config_path = this._configuration.storage.db_config;
+    let db_config_path = this._configuration.storage.dbConfig;
     let raw_config = fs.readFileSync(db_config_path);
-    this._db_config = JSON.parse(raw_config);
+    this._dbConfig = JSON.parse(raw_config);
 
-    this._client = new Client(this._db_config);
+    this._client = new Client(this._dbConfig);
   }
 
   /**
@@ -73,7 +73,7 @@ module.exports = class pgrSource extends Source {
   */
   async connect() {
     // Connection à la base de données
-    LOGGER.info("Connection à la base de données : " + this._db_config.database);
+    LOGGER.info("Connection à la base de données : " + this._dbConfig.database);
     try {
       const err = await this._client.connect();
       if (err) {
@@ -85,7 +85,7 @@ module.exports = class pgrSource extends Source {
       return false;
     }
 
-    LOGGER.info("Connecté à la base de données : " + this._db_config.database);
+    LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
     super.connected = true;
     return true;
   }
@@ -104,7 +104,7 @@ module.exports = class pgrSource extends Source {
       LOGGER.error('connection error', err.stack)
       return false;
     }
-    LOGGER.info("Connecté à la base : " + this._db_config.database);
+    LOGGER.info("Connecté à la base : " + this._dbConfig.database);
     super.connected = true;
     return true;
   }
@@ -161,9 +161,9 @@ module.exports = class pgrSource extends Source {
       // ---
       const query_string = "SELECT * FROM " + sql_function +
         "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
-        this._configuration.cost.compute.storage.cost_column +
+        this._configuration.cost.compute.storage.costColumn +
         "','" +
-        this._configuration.cost.compute.storage.rcost_column +
+        this._configuration.cost.compute.storage.rcostColumn +
         "')";
 
       return new Promise( (resolve, reject) => {
