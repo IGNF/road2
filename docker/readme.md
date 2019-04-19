@@ -25,3 +25,10 @@ Pour lancer un service, il suffit d'exécuter la commande `docker-compose up $se
 - `$service=route-graph-generator-centos` pour Route-Graph-Generator. Cela va également instancier un PGRouting.
 
 On pourra utiliser l'option `-d` pour lancer en tâche de fond.
+
+## Ordre de démarrage des services
+
+Pour faire marcher la pipeline complète, il faut pour l'instant lancer les services dans l'ordre suivant :
+`docker-compose up -d pgrouting-procedures-centos`
+`docker-compose up route-graph-generator-centos`
+`docker-compose up road2`

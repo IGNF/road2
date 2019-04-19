@@ -346,7 +346,9 @@ module.exports = class Service {
     let resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
-    fs.readdirSync(resourceDirectory).forEach(fileName => {
+    fs.readdirSync(resourceDirectory).filter( (file) => {
+      return path.extname(file).toLowerCase() === ".resource";
+    }).forEach(fileName => {
       let resourceFile = resourceDirectory + "/" + fileName;
       LOGGER.info("Chargement de: " + resourceFile);
 

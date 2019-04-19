@@ -33,9 +33,11 @@ services:
     depends_on:
       - pgrouting-procedures-centos
     volumes:
+      - ${road2_src}:/home/docker/app/src
       - iti-data-volume:/home/docker/data
     networks:
       - iti-network
+    command: "./populatepivot2osrm.sh ${R2GG_ARG}"
 
   pgrouting-procedures-centos:
     build:
