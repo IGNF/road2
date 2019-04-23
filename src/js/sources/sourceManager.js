@@ -325,7 +325,7 @@ module.exports = class sourceManager {
     }
   }
 
-  LOGGER.info("Fin de la verification de la source osrm.");
+  LOGGER.info("Fin de la verification de la source pgr.");
   return true;
 }
 

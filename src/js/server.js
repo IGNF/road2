@@ -55,6 +55,7 @@ async function start() {
       pm.shutdown(1);
     }
   } catch (err) {
+    LOGGER.fatal("Impossible de charger les sources", err);
     pm.shutdown(1);
   }
 

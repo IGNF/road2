@@ -15,6 +15,7 @@
       "id": "test-car-fastest",
       "type": "pgr",
       "storage": {
+        "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json",
         "costColumn": "cost_s_car",
         "rcostColumn": "reverse_cost_s_car"
       },
@@ -23,7 +24,7 @@
         "optimization": "fastest",
         "compute": {
           "storage": {
-            "file": "/home/docker/route-graph-generator/io/costs_calculation_sample.json"
+            "file": "/home/docker/data/costs_calculation_sample.json"
           }
         }
       }

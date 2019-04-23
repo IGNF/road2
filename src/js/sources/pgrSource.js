@@ -35,8 +35,8 @@ module.exports = class pgrSource extends Source {
     this._configuration = sourceJsonObject;
     // Client de base de données
     let db_config_path = this._configuration.storage.dbConfig;
-    let raw_config = fs.readFileSync(db_config_path);
-    this._dbConfig = JSON.parse(raw_config);
+    let raw_dbconfig = fs.readFileSync(db_config_path);
+    this._dbConfig = JSON.parse(raw_dbconfig);
 
     this._client = new Client(this._dbConfig);
   }
