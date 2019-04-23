@@ -14,6 +14,7 @@ describe('Test de la classe pgrSource', function() {
     "id": "test-car-fastest",
     "type": "pgr",
     "storage": {
+      "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json",
       "costColumn": "cost_s_car",
       "rcostColumn": "reverse_cost_s_car"
     },
