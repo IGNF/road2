@@ -6,39 +6,47 @@ services:
       context: ..
       dockerfile: ./docker/centos/Dockerfile
       args:
-        - dnsIP=172.21.2.14
-        - dnsHost=ign.fr
-        - proxy=http://proxy.ign.fr:3128
+        - dnsIP=${dns_ip}
+        - dnsHost=${dns_host}
+        - proxy=${proxy}
     image: road2-centos
     container_name: road2-centos-server
     depends_on:
       - pgrouting-procedures-centos
+      - route-graph-generator-centos
     ports:
       - 8080:8080
     volumes:
-      - iti-data-volume:/home/docker/data-volume
+      - iti-data-volume:/home/docker/data
+      - ${road2_src}:/home/docker/app/src
+      - ${road2_test}:/home/docker/app/test
     networks:
       - iti-network
 
   route-graph-generator-centos:
     build:
       context: ../../route-graph-generator/
-      # context: https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/route-graph-generator.git
       dockerfile: ./docker/centos7/Dockerfile
+      args:
+        - proxy=${proxy}
     image: route-graph-generator-centos
     container_name: route-graph-generator-centos
     depends_on:
       - pgrouting-procedures-centos
     volumes:
-      - iti-data-volume:/home/data-volume
+      - ${road2_src}:/home/docker/app/src
+      - iti-data-volume:/home/docker/data
     networks:
       - iti-network
+    command: "./populatepivot2osrm.sh ${R2GG_ARG}"
 
   pgrouting-procedures-centos:
     build:
       context: ../../pgrouting-procedures/
-      # context: https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/pgrouting-procedures.git
       dockerfile: ./docker/centos7/Dockerfile
+      args:
+        - proxy=${proxy}
+        - ipRange=${iprange}
     image: pgrouting-procedures-centos
     container_name: pgrouting-procedures-centos-server
     expose:
@@ -53,4 +61,10 @@ volumes:
     name: iti-data-volume
 
 networks:
-  iti-network: {}
+  iti-network:
+    name: iti-network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${iprange}

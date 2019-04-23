@@ -52,6 +52,11 @@ module.exports = class resourceManager {
 
     LOGGER.info("Verification de la ressource...");
 
+    if (!resourceJsonObject.resource.id) {
+      LOGGER.error("Le fichier ne contient pas d'objet resource");
+      return false;
+    }
+
     // ID
     if (!resourceJsonObject.resource.id) {
       LOGGER.error("La ressource ne contient pas d'id.");

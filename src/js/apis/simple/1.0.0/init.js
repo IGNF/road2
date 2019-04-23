@@ -275,16 +275,20 @@ module.exports = {
   */
 
   run: function(app, uid) {
+    try {
+      // Création du GetCapabilities
+      if (!this.createGetCapabilities(app, uid)) {
+        LOGGER.error("Erreur lors de la creation du GetCapabilities.");
+        return false;
+      } else {
+        // tout s'est bien passé
+      }
+      return true;
 
-    // Création du GetCapabilities
-    if (!this.createGetCapabilities(app, uid)) {
-      LOGGER.error("Erreur lors de la creation du GetCapabilities.");
+    } catch (err) {
+      LOGGER.error("Erreur lors de la creation du GetCapabilities.", err);
       return false;
-    } else {
-      // tout s'est bien passé
     }
-
-    return true;
 
   }
 
