@@ -1,6 +1,5 @@
 'use strict';
 
-
 const express = require('express');
 const log4js = require('log4js');
 

@@ -25,7 +25,6 @@ module.exports = {
       err.status = 500;
     }
     return err;
-
   }
 
 }

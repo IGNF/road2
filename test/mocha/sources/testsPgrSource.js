@@ -1,9 +1,9 @@
 const assert = require('assert');
-const osrmSource = require('../../../src/js/sources/osrmSource');
+const pgrSource = require('../../../src/js/sources/pgrSource');
 const RouteRequest = require('../../../src/js/requests/routeRequest');
 const logManager = require('../logManager');
 
-describe('Test de la classe osrmSource', function() {
+describe('Test de la classe pgrSource', function() {
 
   before(function() {
     // runs before all tests in this block
@@ -11,49 +11,52 @@ describe('Test de la classe osrmSource', function() {
   });
 
   let sourceDescription = {
-    "id": "corse-car-fastest",
-    "type": "osrm",
+    "id": "test-car-fastest",
+    "type": "pgr",
     "storage": {
-      "file": "/home/docker/data/corse-latest.osrm"
+      "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json",
+      "costColumn": "cost_s_car",
+      "rcostColumn": "reverse_cost_s_car"
     },
     "cost": {
       "profile": "car",
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua"
+          "file": "/home/docker/route-graph-generator/io/costs_calculation_sample.json"
         }
       }
     }
   };
 
   let otherSourceDescription = {
-    "id": "corse-car-fastest-2",
-    "type": "osrm",
+    "id": "test-car-shortest",
+    "type": "pgr",
     "storage": {
-      "file": "/home/docker/data/corse-latest.osrm"
+      "costColumn": "cost_m_car",
+      "rcostColumn": "reverse_cost_m_car"
     },
     "cost": {
       "profile": "car",
-      "optimization": "fastest",
+      "optimization": "shortest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car-2.lua"
+          "file": "/home/docker/route-graph-generator/io/costs_calculation_sample.json"
         }
       }
     }
   };
 
-  let source = new osrmSource(sourceDescription);
+  let source = new pgrSource(sourceDescription);
 
   describe('Test du constructeur et des getters', function() {
 
     it('Get Source id', function() {
-      assert.equal(source.id, "corse-car-fastest");
+      assert.equal(source.id, "test-car-fastest");
     });
 
     it('Get Source type', function() {
-      assert.equal(source.type, "osrm");
+      assert.equal(source.type, "pgr");
     });
 
     it('Get Source connected', function() {

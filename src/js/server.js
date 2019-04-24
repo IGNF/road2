@@ -18,7 +18,7 @@ var LOGGER;
 *
 */
 
-function start() {
+async function start() {
 
   console.log("===========================");
   console.log("ROAD2 - Calcul d'itineraire");
@@ -49,7 +49,13 @@ function start() {
   }
 
   // Chargement des sources uniques
-  if (!service.loadSources()) {
+  try {
+    const sourcesLoaded = await service.loadSources();
+    if (!sourcesLoaded) {
+      pm.shutdown(1);
+    }
+  } catch (err) {
+    LOGGER.fatal("Impossible de charger les sources", err);
     pm.shutdown(1);
   }
 
@@ -211,7 +217,6 @@ function getLoggerConfiguration(userConfiguration) {
   return logsConf;
 
 }
-
 
 // Lancement de l'application
 start();

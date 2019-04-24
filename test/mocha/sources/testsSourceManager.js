@@ -152,9 +152,10 @@ describe('Test de la classe SourceManager', function() {
 
   describe('Test de la fonction connectSource()', function() {
 
-    it('connectSource() avec une description correcte', function() {
-      let source = sourceManager.createSource(description);
-      assert.equal(sourceManager.connectSource(source), true);
+    it('connectSource() avec une description correcte', async function() {
+      const source = sourceManager.createSource(description);
+      const sourceConnected = await sourceManager.connectSource(source);
+      assert.equal(sourceConnected, true);
     });
 
   });

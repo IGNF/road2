@@ -83,7 +83,7 @@ module.exports = class Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  connect() {
+  async connect() {
     this.connected = true;
     return true;
   }
@@ -96,7 +96,7 @@ module.exports = class Source {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  disconnect() {
+  async disconnect() {
     this.connected = false;
     return true;
   }

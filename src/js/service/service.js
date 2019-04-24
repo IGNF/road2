@@ -378,7 +378,7 @@ module.exports = class Service {
   *
   */
 
-  loadSources() {
+  async loadSources() {
 
     LOGGER.info("Chargement des sources...");
 
@@ -399,16 +399,25 @@ module.exports = class Service {
         let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
 
         // On vérifie que le source peut bien être chargée ou connectée
-        if (this._sourceManager.connectSource(currentSource)) {
-          // On la stocke
-          this._sourceCatalog[sourceId] = currentSource;
+        try {
+          const connectedSource = await this._sourceManager.connectSource(currentSource);
+          if (connectedSource) {
+            // On la stocke
+            this._sourceCatalog[sourceId] = currentSource;
 
-        } else {
-          // on n'a pas pu se connecter à la source
-          // TODO: remplacer ce comportement par une gestion plus fine des ressources
-          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
-          LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
-          return false;
+          } else {
+            // on n'a pas pu se connecter à la source
+            // TODO: remplacer ce comportement par une gestion plus fine des ressources
+            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
+            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
+            return false;
+          }
+        } catch (err) {
+            // on n'a pas pu se connecter à la source
+            // TODO: remplacer ce comportement par une gestion plus fine des ressources
+            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
+            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
+            return false;
         }
 
       }
@@ -523,6 +532,27 @@ module.exports = class Service {
     return source.computeRequest(request);
     // ---
 
+  }
+
+  /**
+  *
+  * @function
+  * @name disconnectAllSources
+  * @description Fonction utilisée pour déconnecter toutes les sources.
+  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+  async disconnectAllSources() {
+    LOGGER.info("Déconnection de toutes les sources");
+    try {
+      for (let source_id in this._sourceCatalog) {
+        await this._sourceManager.disconnectSource(this._sourceCatalog[source_id]);
+      }
+    } catch (err) {
+      LOGGER.error("Impossible de déconnecter la source.", err);
+      return false;
+    }
   }
 
 

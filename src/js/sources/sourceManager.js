@@ -3,6 +3,7 @@
 const assert = require('assert').strict;
 const storageManager = require('../utils/storageManager');
 const osrmSource = require('../sources/osrmSource');
+const pgrSource = require('../sources/pgrSource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -163,6 +164,20 @@ module.exports = class sourceManager {
         // On va voir si c'est un autre type.
       }
       //------ OSRM
+      //------ PGR
+      if (sourceJsonObject.type === "pgr") {
+        available = true;
+        LOGGER.info("Source pgrouting.");
+        if (!this.checkSourcePgr(sourceJsonObject)) {
+          LOGGER.error("Erreur lors de la verification de la source pgr.");
+          return false;
+        } else {
+          // il n'y a eu aucun problème, la ressource est correctement configurée.
+        }
+      } else {
+        // On va voir si c'est un autre type.
+      }
+      //------ PGR
 
       // Si ce n'est aucun type valide, on renvoie une erreur.
       if (!available) {
@@ -243,9 +258,76 @@ module.exports = class sourceManager {
 
     LOGGER.info("Fin de la verification de la source osrm.");
     return true;
-
-
   }
+
+  /**
+  *
+  * @function
+  * @name checkSourcePgr
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source pgr.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+
+ checkSourcePgr(sourceJsonObject) {
+
+  LOGGER.info("Verification de la source pgr...");
+
+  // Storage
+  if (!sourceJsonObject.storage) {
+    LOGGER.error("La ressource contient une source sans stockage.");
+    return false;
+  } else {
+    if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
+      LOGGER.error("Stockage de la source incorrect.");
+      return false;
+    } else {
+      // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+    }
+  }
+
+  // Cost
+  if (!sourceJsonObject.cost) {
+    LOGGER.error("La ressource contient une source sans cout.");
+    return false;
+  } else {
+    // Profile
+    if (!sourceJsonObject.cost.profile) {
+      LOGGER.error("La ressource contient une source sans profile.");
+      return false;
+    } else {
+      // rien à faire
+    }
+    // Optimization
+    if (!sourceJsonObject.cost.optimization) {
+      LOGGER.error("La ressource contient une source sans optimization.");
+      return false;
+    } else {
+      // rien à faire
+    }
+    // Compute
+    if (!sourceJsonObject.cost.compute) {
+      LOGGER.error("La ressource contient une source sans compute.");
+      return false;
+    } else {
+      if (!sourceJsonObject.cost.compute.storage) {
+        LOGGER.error("La ressource contient une source ayant un cout sans stockage.");
+        return false;
+      } else {
+        if (!storageManager.checkJsonStorage(sourceJsonObject.cost.compute.storage)) {
+          LOGGER.error("La ressource contient une source ayant un stockage du cout incorrect.");
+          return false;
+        } else {
+          // rien à faire
+        }
+      }
+    }
+  }
+
+  LOGGER.info("Fin de la verification de la source pgr.");
+  return true;
+}
 
   /**
   *
@@ -296,10 +378,11 @@ module.exports = class sourceManager {
 
     if (sourceJsonObject.type === "osrm") {
       source = new osrmSource(sourceJsonObject);
+    } else if (sourceJsonObject.type === "pgr") {
+      source = new pgrSource(sourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
     }
-
     return source;
   }
 
@@ -312,22 +395,48 @@ module.exports = class sourceManager {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-
-  connectSource(source) {
+  async connectSource(source) {
 
     LOGGER.info("Connexion a la source: " + source.id);
-
-    if (source.connect()) {
-      LOGGER.info("Source connectee.");
-      return true;
-    } else {
-      LOGGER.error("Impossible de connecter la source.");
+    try {
+      const connected = await source.connect();
+      if (connected) {
+        LOGGER.info("Source connectee.");
+        return true;
+      } else {
+        LOGGER.error("Impossible de connecter la source.");
+        return false;
+      }
+    } catch (err) {
+      LOGGER.error("Impossible de connecter la source.", err);
       return false;
     }
-
-    return false;
-
   }
 
+  /**
+  *
+  * @function
+  * @name disconnectSource
+  * @description Fonction utilisée pour déconnecter une source.
+  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+  async disconnectSource(source) {
+    LOGGER.info("Déconnection de la source: " + source.id);
+    try {
+      const disconnected = await source.disconnect();
+      if (disconnected) {
+        LOGGER.info("Source déconnectee.");
+        return true;
+      } else {
+        LOGGER.error("Impossible de déconnecter la source.");
+        return false;
+      }
+    } catch (err) {
+      LOGGER.error("Impossible de déconnecter la source.", err);
+      return false;
+    }
+  }
 
 }

@@ -38,7 +38,7 @@ services:
       - iti-data-volume:/home/docker/data
     networks:
       - iti-network
-    command: "./populatepivot2osrm.sh ${R2GG_ARG}"
+    command: "./populatepivot2pgr.sh ${R2GG_ARG}"
 
   pgrouting-procedures-centos:
     build:
