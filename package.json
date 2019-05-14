@@ -6,8 +6,8 @@
   "main": "src/js/server.js",
   "scripts": {
     "start": "node ./src/js/server.js",
-    "test" : "mocha --recursive './test/mocha/**/*.js'",
-    "lint" : "eslint -c eslint.json ./src/",
+    "test": "mocha --recursive './test/mocha/**/*.js'",
+    "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
@@ -17,5 +17,8 @@
     "nconf": "0.10.0",
     "osrm": "5.20.0",
     "pg": "7.8.1"
+  },
+  "devDependencies": {
+    "sinon": "^7.2.7"
   }
 }
