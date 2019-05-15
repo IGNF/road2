@@ -13,7 +13,6 @@ services:
     container_name: road2-centos-server
     depends_on:
       - pgrouting-procedures-centos
-      - route-graph-generator-centos
     ports:
       - 8080:8080
     volumes:
