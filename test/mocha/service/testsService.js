@@ -8,7 +8,6 @@ const fs = require('fs');
 describe('Test de la classe Service', function() {
 
   let service = new Service();
-  let httpConf;
   let configuration;
 
   before(function() {
