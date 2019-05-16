@@ -37,7 +37,9 @@ services:
       - iti-data-volume:/home/docker/data
     networks:
       - iti-network
-    command: "./populatepivot2pgr.sh ${R2GG_ARG}"
+    command: "./populatepivot2osrm.sh ${R2GG_ARG}"
+    secrets:
+      - db_config
 
   pgrouting-procedures-centos:
     build:
@@ -67,3 +69,7 @@ networks:
       driver: default
       config:
         - subnet: ${iprange}
+
+secrets:
+  db_config:
+    file: ${db_config_file}
