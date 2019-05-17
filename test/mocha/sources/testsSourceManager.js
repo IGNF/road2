@@ -1,12 +1,30 @@
 const assert = require('assert');
 const SourceManager = require('../../../src/js/sources/sourceManager');
 const logManager = require('../logManager');
+const Source = require('../../../src/js/sources/source');
+
+const sinon = require('sinon');
+const mockfs = require('mock-fs');
 
 describe('Test de la classe SourceManager', function() {
 
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();
+
+    mockfs({
+      "/home/docker/data": {
+        "corse-latest.osrm": "",
+        "corse-latest.osm.pbf": "",
+      },
+      "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles": {
+        "car.lua": "",
+      },
+    });
+  });
+
+  after(() => {
+    mockfs.restore();
   });
 
   let sourceManager = new SourceManager();
@@ -153,7 +171,8 @@ describe('Test de la classe SourceManager', function() {
   describe('Test de la fonction connectSource()', function() {
 
     it('connectSource() avec une description correcte', async function() {
-      const source = sourceManager.createSource(description);
+      const source = sinon.mock(Source);
+      source.connect = sinon.stub().returns(true);
       const sourceConnected = await sourceManager.connectSource(source);
       assert.equal(sourceConnected, true);
     });

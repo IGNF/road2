@@ -4,11 +4,29 @@ const SourceManager = require('../../../src/js/sources/sourceManager');
 const OsrmResource = require('../../../src/js/resources/osrmResource');
 const logManager = require('../logManager');
 
+const sinon = require('sinon');
+const mockfs = require('mock-fs');
+
+
 describe('Test de la classe ResourceManager', function() {
 
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();
+
+    mockfs({
+      "/home/docker/data": {
+        "corse-latest.osrm": "",
+        "corse-latest.osm.pbf": "",
+      },
+      "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles": {
+        "car.lua": "",
+      },
+    });
+  });
+
+  after(() => {
+    mockfs.restore();
   });
 
   let resourceConfiguration = {
@@ -52,7 +70,7 @@ describe('Test de la classe ResourceManager', function() {
   };
 
   let resourceManager = new ResourceManager();
-  let sourceManager = new SourceManager();
+  let sourceManager = sinon.mock(SourceManager);
 
   describe('Test du constructeur et des getters', function() {
 
@@ -65,6 +83,7 @@ describe('Test de la classe ResourceManager', function() {
   describe('Test de checkResource() et checkResourceOsrm()', function() {
 
     it('Avec les bons parametres', function() {
+      sourceManager.checkSource = sinon.stub().withArgs(resourceConfiguration).returns(true);
       assert.equal(resourceManager.checkResource(resourceConfiguration, sourceManager), true);
     });
 
