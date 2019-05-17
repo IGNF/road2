@@ -65,6 +65,7 @@ COPY eslint.json ./
 COPY jsdoc.json ./
 COPY src ./src/
 COPY /test ./test/
+COPY /docker/config /home/docker/data/
 
 ### Installation des dépandences de l'application NodeJS
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
@@ -88,4 +89,4 @@ RUN npm install jsdoc -g
 VOLUME ["/home/docker/data"]
 
 ### Commande de lancement de l'application
-CMD npm start
+CMD npm start -- --ROAD2_CONF_FILE=/home/docker/data/config/road2.json

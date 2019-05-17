@@ -64,6 +64,12 @@ RUN scl enable devtoolset-6 bash && export CC=/opt/rh/devtoolset-6/root/usr/bin/
 ### Dossier des données
 WORKDIR /home/docker/data
 
+### Récupération de données sur la Corse
+# L'objectif est d'avoir un container indépendant du docker-compose
+RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua
+RUN osrm-contract corse-latest.osrm
+
 ### Dossier de l'application
 WORKDIR /home/docker/app
 
@@ -73,6 +79,7 @@ COPY eslint.json ./
 COPY jsdoc.json ./
 COPY /src ./src/
 COPY /test ./test/
+COPY /docker/config /home/docker/data/
 
 ### Installation des dépandences de l'application NodeJS
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
@@ -96,4 +103,4 @@ RUN npm install jsdoc -g
 VOLUME ["/home/docker/data"]
 
 ### Commande de lancement de l'application
-CMD npm start
+CMD npm start -- --ROAD2_CONF_FILE=/home/docker/data/road2.json
