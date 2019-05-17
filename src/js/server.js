@@ -104,11 +104,9 @@ function loadGlobalConfiguration() {
     }
 
   } else {
-    //si aucun fichier n'a été précisé on prend, par défaut, le fichier du projet
-    file = path.resolve(__dirname,'../config/road2.json');
-    console.log("Fichier de configuration: " + file);
-    globalConfiguration = JSON.parse(fs.readFileSync(file));
-    nconf.set('ROAD2_CONF_FILE',file);
+    //si aucun fichier n'a été précisé on renvoie une erreur
+    console.log("Aucun fichier de configuration. Utiliser la variable d'environnement $ROAD2_CONF_FILE ou l'option --ROAD2_CONF_FILE lors de l'initialisation du serveur.");
+    process.exit(1);
   }
 
   console.log("Configuration chargee.")
