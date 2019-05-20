@@ -25,6 +25,9 @@ module.exports = class Step {
     // geometry
     this._geometry = geometry;
 
+    // name
+    this._name = "";
+
   }
 
   /**
@@ -43,11 +46,34 @@ module.exports = class Step {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'étape
-  * @param {string} geometry - Géométrie de l'étape 
+  * @param {string} st - Géométrie de l'étape
   *
   */
   set geometry (st) {
     this._geometry = st;
+  }
+
+  /**
+  *
+  * @function
+  * @name get name
+  * @description Récupérer le nom de l'étape
+  *
+  */
+  get name () {
+    return this._name;
+  }
+
+  /**
+  *
+  * @function
+  * @name set name
+  * @description Attribuer le nom de l'étape
+  * @param {string} na - Nom de l'étape
+  *
+  */
+  set name (na) {
+    this._name = na;
   }
 
 

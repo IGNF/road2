@@ -53,7 +53,7 @@ router.route("/route")
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse
-      const userResponse = controler.writeRouteResponse(routeResponse);
+      const userResponse = controler.writeRouteResponse(routeRequest, routeResponse);
 
       res.status(200).json(userResponse);
 

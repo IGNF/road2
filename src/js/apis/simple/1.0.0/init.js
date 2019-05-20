@@ -150,6 +150,22 @@ module.exports = {
     getGeometryParameterDescription.example = "true";
     routeDescription.parameters.push(getGeometryParameterDescription);
 
+    // route.parameters.getGeometry
+    let waysAttributesParameterDescription = {};
+    waysAttributesParameterDescription.name = "waysAttributes";
+    waysAttributesParameterDescription.in = "query";
+    waysAttributesParameterDescription.description = "Attributs des tronçons à afficher dans la réponse.";
+    waysAttributesParameterDescription.required = "false";
+    waysAttributesParameterDescription.default = "false";
+    waysAttributesParameterDescription.schema = {};
+    waysAttributesParameterDescription.schema.type = "array";
+    waysAttributesParameterDescription.schema.items = {};
+    waysAttributesParameterDescription.schema.items.type = "string";
+    waysAttributesParameterDescription.explode = "false";
+    waysAttributesParameterDescription.style = "pipeDelimited";
+    waysAttributesParameterDescription.example = "name|type";
+    routeDescription.parameters.push(waysAttributesParameterDescription);
+
     // -- end route.parameters
 
     getCapabilities.operations.push(routeDescription);
@@ -242,6 +258,12 @@ module.exports = {
           }
         }
         routeAvailableOperation.availableParameters.push(routeGetGeometry);
+
+        // route.waysAttributes
+        let routeWaysAttributes = {};
+        routeWaysAttributes.id = "waysAttributes";
+        routeWaysAttributes.values = "name";
+        routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
         resourceDescription.availableOperations.push(routeAvailableOperation);
         // - end route

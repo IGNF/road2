@@ -52,6 +52,10 @@ module.exports = class routeRequest extends Request {
     // computeGeometry
     this._computeGeometry = true;
 
+    // waysAttributes
+    // tableau de string
+    this._waysAttributes = new Array();
+
   }
 
   /**
@@ -185,6 +189,42 @@ module.exports = class routeRequest extends Request {
   set computeGeometry (i) {
     this._computeGeometry = i;
   }
+
+  /**
+  *
+  * @function
+  * @name get waysAttributes
+  * @description Récupérer la liste des attributs disponibles pour les voies empruntées.
+  *
+  */
+  get waysAttributes () {
+    return this._waysAttributes;
+  }
+
+
+    /**
+    *
+    * @function
+    * @name isAttributeRequested
+    * @description Permet de savoir si un attribut est demandé dans cette requête.
+    *
+    */
+    isAttributeRequested (attr) {
+
+      if (this._waysAttributes.length !== 0) {
+        for (let i=0; i < this._waysAttributes.length; i++) {
+          if (this._waysAttributes[i] === attr) {
+            return true;
+          } else {
+            // on continue
+          }
+        }
+      } else {
+        return false;
+      }
+
+      return false;
+    }
 
 
 }

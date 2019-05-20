@@ -53,6 +53,11 @@ module.exports = class osrmResource extends Resource {
 
     }
 
+    // Attribut des voies
+    // Par défaut, OSRM ne renvoit que le nom des voies empruntées.
+    this._waysAttributes = new Array();
+    this._waysAttributes.push("name");
+
   }
 
   /**
@@ -108,6 +113,41 @@ module.exports = class osrmResource extends Resource {
   */
   get linkedSource () {
     return this._linkedSource;
+  }
+
+  /**
+  *
+  * @function
+  * @name get waysAttributes
+  * @description Récupérer la liste des attributs disponibles pour les voies empruntées.
+  *
+  */
+  get waysAttributes () {
+    return this._waysAttributes;
+  }
+
+  /**
+  *
+  * @function
+  * @name isWayAttributeAvailable
+  * @description Permet de savoir si un attribut est disponible pour cette ressource.
+  *
+  */
+  isWayAttributeAvailable (attr) {
+    
+    if (this._waysAttributes.length !== 0) {
+      for (let i=0; i < this._waysAttributes.length; i++) {
+        if (this._waysAttributes[i] === attr) {
+          return true;
+        } else {
+          // on continue
+        }
+      }
+    } else {
+      return false;
+    }
+
+    return false;
   }
 
   /**

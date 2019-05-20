@@ -149,6 +149,33 @@ module.exports = {
     }
     // ---
 
+    // waysAttributes
+    // ---
+    if (parameters.waysAttributes) {
+
+      // Vérification de la validité des attributs demandés
+      let attributesTable = parameters.waysAttributes.split("|");
+
+      if (attributesTable.length !== 0) {
+
+        for (let i=0; i < attributesTable.length; i++) {
+          if (resource.isWayAttributeAvailable(attributesTable[i])) {
+            routeRequest.waysAttributes.push(attributesTable[i]);
+          } else {
+            throw errorManager.createError(" Parameter 'waysAttributes' is invalid: " + attributesTable[i], 400);
+          }
+        }
+
+      } else {
+        // rien à faire
+      }
+
+    } else {
+      // on ne fait rien, il n'y aucun attribut à ajouter
+    }
+
+    // ---
+
     return routeRequest;
 
   },
@@ -158,12 +185,13 @@ module.exports = {
   * @function
   * @name writeRouteResponse
   * @description Ré-écriture de la réponse d'un moteur pour une requête sur /route
+  * @param {object} RouteRequest - Instance de la classe RouteRequest
   * @param {object} RouteResponse - Instance de la classe RouteResponse
   * @return {object} userResponse - Réponse envoyée à l'utilisateur
   *
   */
 
-  writeRouteResponse: function(routeResponse) {
+  writeRouteResponse: function(routeRequest, routeResponse) {
 
     let userResponse = {};
     let route = routeResponse.routes[0];
@@ -199,15 +227,23 @@ module.exports = {
       // end
       currentPortion.end = route.portions[i].end;
 
-      // step
+      // Steps
       currentPortion.steps = new Array();
 
-      if (route.portions[i].steps.length !== 0) {
+      if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
+        
         for (let j = 0; j < route.portions[i].steps.length; j++) {
 
           let currentStep = {};
 
           currentStep.geometry = route.portions[i].steps[j].geometry;
+
+          // si c'est demandé et qu'il existe alors on met le nom
+          if (routeRequest.isAttributeRequested("name")) {
+            currentStep.name = route.portions[i].steps[j].name;
+          } else {
+            // on ne fait rien
+          }
 
           currentPortion.steps.push(currentStep);
 

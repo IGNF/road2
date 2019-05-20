@@ -154,6 +154,8 @@ paths:
           type: "array"
           items:
             type: "string"
+        explode: false
+        style: "pipeDelimited"
       responses:
         200:
           description: "successful operation"

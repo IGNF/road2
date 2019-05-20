@@ -270,21 +270,18 @@ module.exports = class osrmSource extends Source {
 
         portions[j] = new Portion(legStart, legEnd);
 
-        if (routeRequest.computeGeometry) {
-          let steps = new Array();
+        // Steps 
+        let steps = new Array();
 
-          // On va associer les étapes à la portion concernée
-          for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
+        // On va associer les étapes à la portion concernée
+        for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
-            let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-            steps[k] = new Step(currentOsrmRouteStep.geometry);
-          }
-
-          portions[j].steps = steps;
-
-        } else {
-          // Comme la géométrie des steps n'est pas demandée, on ne l'a donne pas
+          let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
+          steps[k] = new Step(currentOsrmRouteStep.geometry);
+          steps[k].name = currentOsrmRouteStep.name;
         }
+
+        portions[j].steps = steps;
 
       }
 

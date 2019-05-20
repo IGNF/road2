@@ -212,6 +212,11 @@ module.exports = class resourceManager {
       return false;
     } else {
 
+      // waysAttributes
+      // OSRM ne propose qu'un attribut sur les voies, c'est leur nom
+      // Il n'est donc pas nécessaire préciser que le met à disposition ou pas dans la description d'une ressource
+      // Par contre, il sera précisé dans le GetCapabilities pour que l'utilisateur soit au courant de son existence 
+
     }
 
     // DefaultSourceId
