@@ -7,7 +7,6 @@ const logManager = require('../logManager');
 const sinon = require('sinon');
 const mockfs = require('mock-fs');
 
-
 describe('Test de la classe ResourceManager', function() {
 
   before(function() {

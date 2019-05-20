@@ -23,7 +23,6 @@ var LOGGER = log4js.getLogger("OSRMSOURCE");
 
 module.exports = class osrmSource extends Source {
 
-
   /**
   *
   * @function
