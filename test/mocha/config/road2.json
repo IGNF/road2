@@ -12,7 +12,7 @@
       "configuration": "../config/log4js.json"
     },
     "resources": {
-      "directory": "../../config/resources/"
+      "directory": "/home/docker/app/test/mocha/config/resources/"
     },
     "network": {
       "host": "0.0.0.0",
