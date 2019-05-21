@@ -2,6 +2,7 @@
 
 const assert = require('assert').strict;
 const storageManager = require('../utils/storageManager');
+const errorManager = require('../utils/errorManager');
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
 const log4js = require('log4js');
@@ -392,24 +393,17 @@ module.exports = class sourceManager {
   * @name connectSource
   * @description Fonction utilisée pour connecter une source.
   * @param {Source} source - Objet Source ou hérité de la classe Source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async connectSource(source) {
 
     LOGGER.info("Connexion a la source: " + source.id);
     try {
-      const connected = await source.connect();
-      if (connected) {
-        LOGGER.info("Source connectee.");
-        return true;
-      } else {
-        LOGGER.error("Impossible de connecter la source.");
-        return false;
-      }
+      await source.connect();
+      LOGGER.info("Source connectee.");
     } catch (err) {
       LOGGER.error("Impossible de connecter la source.", err);
-      return false;
+      throw errorManager.createError("Impossible de connecter la source.");
     }
   }
 
@@ -419,23 +413,16 @@ module.exports = class sourceManager {
   * @name disconnectSource
   * @description Fonction utilisée pour déconnecter une source.
   * @param {Source} source - Objet Source ou hérité de la classe Source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnectSource(source) {
     LOGGER.info("Déconnection de la source: " + source.id);
     try {
-      const disconnected = await source.disconnect();
-      if (disconnected) {
-        LOGGER.info("Source déconnectee.");
-        return true;
-      } else {
-        LOGGER.error("Impossible de déconnecter la source.");
-        return false;
-      }
+      await source.disconnect();
+      LOGGER.info("Source déconnectee.");
     } catch (err) {
       LOGGER.error("Impossible de déconnecter la source.", err);
-      return false;
+      throw errorManager.createError("Impossible de déconnecter la source.");
     }
   }
 

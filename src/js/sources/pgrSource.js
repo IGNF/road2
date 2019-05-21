@@ -68,7 +68,6 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name connect
   * @description Connection à la base pgRouting
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async connect() {
@@ -78,16 +77,15 @@ module.exports = class pgrSource extends Source {
       const err = await this._client.connect();
       if (err) {
         LOGGER.error('connection error', err.stack)
-        return false;
+        throw errorManager.createError("Cannot connect source");
+      } else {
+        LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
+        super.connected = true;
       }
     } catch (err) {
       LOGGER.error('connection error', err.stack)
-      return false;
+      throw errorManager.createError("Cannot connect source");
     }
-
-    LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
-    super.connected = true;
-    return true;
   }
 
   /**
@@ -95,18 +93,21 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name disconnect
   * @description Déconnection à la base pgRouting
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnect() {
-    const err = await this._client.end();
-    if (err) {
-      LOGGER.error('connection error', err.stack)
-      return false;
+    try {
+      const err = await this._client.end();
+      if (err) {
+        LOGGER.error('deconnection error', err.stack)
+        throw errorManager.createError("Cannot disconnect source");
+      } else {
+        LOGGER.info("Déonnecté à la base : " + this._dbConfig.database);
+        super.connected = false;
+      }
+    } catch(err) {
+      throw errorManager.createError("Cannot disconnect source");
     }
-    LOGGER.info("Connecté à la base : " + this._dbConfig.database);
-    super.connected = true;
-    return true;
   }
 
   /**
