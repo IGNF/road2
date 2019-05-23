@@ -1,0 +1,9 @@
+{
+  "id": "end",
+  "name": "Arrivée",
+  "description": "Point d'arrivée.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "48.852891,2.367776",
+  "type": "point"
+}

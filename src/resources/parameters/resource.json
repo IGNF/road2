@@ -1,0 +1,9 @@
+{
+  "id": "resource",
+  "name": "Ressource",
+  "description": "Ressource concernée par le calcul.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "48.849319,2.337306",
+  "type": "enum"
+}

@@ -19,6 +19,7 @@ services:
       - iti-data-volume:/home/docker/data
       - ${road2_src}:/home/docker/app/src
       - ${road2_test}:/home/docker/app/test
+      - ${road2_config}:/home/docker/config
     networks:
       - iti-network
 
