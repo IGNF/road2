@@ -89,8 +89,7 @@ describe('Test de la classe pgrSource', function() {
   describe('Test de connect()', function() {
 
     it('Connect()', async function() {
-      const sourceConnected = await source.connect();
-      assert.equal(sourceConnected, true);
+      await source.connect();
     });
 
   });
@@ -98,8 +97,7 @@ describe('Test de la classe pgrSource', function() {
   describe('Test de disconnect()', function() {
 
     it('Disconnect()', async function() {
-      const sourceDisonnected = await source.disconnect();
-      assert.equal(sourceDisonnected, true);
+      await source.disconnect();
     });
 
   });

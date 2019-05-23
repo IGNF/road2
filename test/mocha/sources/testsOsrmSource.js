@@ -131,8 +131,7 @@ describe('Test de la classe osrmSource', function() {
   describe('Test de disconnect()', function() {
 
     it('Disconnect()', async function() {
-      const sourceDisonnected = await source.disconnect();
-      assert.equal(sourceDisonnected, true);
+      await source.disconnect();
     });
 
   });

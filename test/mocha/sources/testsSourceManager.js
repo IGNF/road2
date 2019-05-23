@@ -173,8 +173,7 @@ describe('Test de la classe SourceManager', function() {
     it('connectSource() avec une description correcte', async function() {
       const source = sinon.mock(Source);
       source.connect = sinon.stub().returns(true);
-      const sourceConnected = await sourceManager.connectSource(source);
-      assert.equal(sourceConnected, true);
+      await sourceManager.connectSource(source);
     });
 
   });
