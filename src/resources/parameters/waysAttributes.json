@@ -1,0 +1,13 @@
+{
+  "id": "waysAttributes",
+  "name": "Attributs des routes",
+  "description": "Préciser les attributs de chaque route que l'on souhaite avoir dans la réponse.",
+  "required": "false",
+  "defaultValue": "false",
+  "example": "name",
+  "type": "enum",
+  "min": 0,
+  "max": 4,
+  "explode": "false",
+  "style": "pipeDelimited"
+}

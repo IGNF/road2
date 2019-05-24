@@ -164,7 +164,7 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'id");
       return false;
     } else {
-
+      LOGGER.info(parameterConf.id);
       // On vérifie que l'id n'est pas déjà pris.
       if (this._listOfVerifiedParameterId.length !== 0) {
 
@@ -219,7 +219,7 @@ module.exports = class parameterManager  {
       // TODO: vérification
     }
 
-
+    LOGGER.info("Parametre ok");
     return true;
 
   }

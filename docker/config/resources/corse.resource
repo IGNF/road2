@@ -8,7 +8,8 @@
     "storage": {
       "file": "/home/docker/data/corse-latest.osm.pbf"
     },
-    "projection": "EPSG:4326"
+    "projection": "EPSG:4326",
+    "bbox": "-90,-180,90,180"
   },
   "sources": [
     {
@@ -22,7 +23,13 @@
         "optimization": "fastest",
         "compute": {
           "storage": {
-            "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua"
+            "file": "./test_vitesse_fixe.lua"
+          },
+          "configuration": {
+            "name": "cost_s_car",
+            "storage": {
+              "file": "./io/costs_calculation_sample.json"
+            }
           }
         }
       }
@@ -31,47 +38,57 @@
   "availableOperations":[
     {
       "id": "route",
-      "rate": 10,
-      "maxIntermediatePoints": 10,
-      "maxNumberOfConstraints": 2,
-      "defaultParameters": [
+      "parameters": [
         {
-          "id": "algorithm",
-          "default": "contraction-hierarchies"
+          "id": "resource",
+          "values": [
+            "corse-osm"
+          ]
         },
         {
-          "id": "format",
-          "default": "application/json"
+          "id": "start",
+          "values": {
+            "bbox": "-90,-180,90,180"
+          }
         },
         {
-          "id": "getGeometry",
+          "id": "end",
+          "values": {
+            "bbox": "-90,-180,90,180"
+          }
+        },
+        {
+          "id": "profile",
+          "default": "car",
+          "values": [
+            "car"
+          ]
+        },
+        {
+          "id": "optimization",
+          "default": "fastest",
+          "values": [
+            "fastest"
+          ]
+        },
+        {
+          "id": "intermediates",
+          "values": {
+            "bbox": "-90,-180,90,180"
+          }
+        },
+        {
+          "id": "stepsGeometry",
           "default": "true"
         },
         {
-          "id": "getBbox",
-          "default": "true"
-        },
-        {
-          "id": "getInstructions",
-          "default": "false"
-        },
-        {
-          "id": "distanceUnit",
-          "default": "kilometer"
-        },
-        {
-          "id": "timeUnit",
-          "default": "h-m-s"
+          "id": "waysAttributes",
+          "values": [
+            "name"
+          ]
         }
       ],
-      "constraints": [
-        
-      ]
     }
-  ],
-  "defaultSourceId": "corse-car-fastest",
-  "boundingBox": "-90,-180,90,180",
-  "defaultProjection": "EPSG:4326",
-  "availableProjections": ["EPSG:4326","EPSG:2154"]
+  ]
   }
 }

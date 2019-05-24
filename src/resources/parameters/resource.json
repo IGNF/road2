@@ -4,6 +4,6 @@
   "description": "Ressource concernée par le calcul.",
   "required": "true",
   "defaultValue": "false",
-  "example": "48.849319,2.337306",
+  "example": "bduni",
   "type": "enum"
 }

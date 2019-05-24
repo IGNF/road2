@@ -5,6 +5,11 @@
   "parameters": [
     "resource",
     "start",
-    "end"
+    "end",
+    "profile",
+    "optimization",
+    "intermediates",
+    "stepsGeometry",
+    "waysAttributes"
   ]
 }

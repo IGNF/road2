@@ -95,6 +95,21 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name verifyAvailabilityOperation
+  * @description Savoir si une opération est disponible sur le service
+  *
+  */
+  verifyAvailabilityOperation(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+  *
+  * @function
   * @name get resourceCatalog
   * @description Récupérer l'ensemble des ressources
   *

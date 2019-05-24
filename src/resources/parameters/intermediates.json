@@ -1,0 +1,13 @@
+{
+  "id": "intermediates",
+  "name": "Points intermédiaires",
+  "description": "Liste des points intermédiaires pour l'itinéraire.",
+  "required": "false",
+  "defaultValue": "false",
+  "example": "48.852890,2.368776|48.842891,2.367976",
+  "type": "point",
+  "min": 0,
+  "max": 10,
+  "explode": "false",
+  "style": "pipeDelimited"
+}
