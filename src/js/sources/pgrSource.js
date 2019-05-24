@@ -74,14 +74,9 @@ module.exports = class pgrSource extends Source {
     // Connection à la base de données
     LOGGER.info("Connection à la base de données : " + this._dbConfig.database);
     try {
-      const err = await this._client.connect();
-      if (err) {
-        LOGGER.error('connection error', err.stack)
-        throw errorManager.createError("Cannot connect source");
-      } else {
-        LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
-        super.connected = true;
-      }
+      await this._client.connect();
+      LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
+      super.connected = true;
     } catch (err) {
       LOGGER.error('connection error', err.stack)
       throw errorManager.createError("Cannot connect source");
