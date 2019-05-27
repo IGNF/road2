@@ -495,7 +495,6 @@ module.exports = class Service {
   * La ressource sait comment déterminer la source concernée par la requête.
   * Et la source interrogera le moteur.
   * @param {Request} request - Requête
-  * @param {Promise} Promesse qui sera transmise au moteur pour la fin de son calcul
   *
   */
 
@@ -520,7 +519,11 @@ module.exports = class Service {
     //On renvoie la requête vers le moteur
     // ---
     // C'est la source qui fait le lien avec un moteur
-    return source.computeRequest(request);
+    try {
+      return source.computeRequest(request);
+    } catch(err) {
+      return err
+    }
     // ---
 
   }

@@ -252,9 +252,8 @@ module.exports = class pgrSource extends Source {
       response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
 
-    if (response.waypoints.length < 2) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
-      throw errorManager.createError(" PGR response is invalid: the number of waypoints is lower than 2. ");
+    if (response.waypoints.length < 1) {
+      throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
     }
 
     // start
@@ -266,8 +265,7 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
-      throw errorManager.createError(" PGR response is invalid: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No PGR path found: the number of routes is equal to 0. ");
     }
 
     // routes
