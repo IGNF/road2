@@ -157,9 +157,9 @@ module.exports = class pgrSource extends Source {
       // ---
       const query_string = "SELECT * FROM " + sql_function +
         "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
-        this._configuration.cost.compute.storage.costColumn +
+        this._configuration.storage.costColumn +
         "','" +
-        this._configuration.cost.compute.storage.rcostColumn +
+        this._configuration.storage.rcostColumn +
         "')";
 
       return new Promise( (resolve, reject) => {
