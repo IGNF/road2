@@ -4,6 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const log4js = require('log4js');
 const Parameter = require('../parameters/parameter');
+const ResourceParameter = require('../parameters/resourceParameter');
+const BoolParameter = require('../parameters/boolParameter');
+const EnumParameter = require('../parameters/enumParameter');
+const PointParameter = require('../parameters/pointParameter');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("PARAMETERMANAGER");
@@ -216,7 +220,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut type");
       return false;
     } else {
-      // TODO: vérification
+      if (parameterConf.type !== "boolean" && parameterConf.type !== "enumeration" && parameterConf.type !== "point") {
+        LOGGER.error("Le type du parametre est incorrect");
+        return false;
+      }
     }
 
     LOGGER.info("Parametre ok");
@@ -245,6 +252,210 @@ module.exports = class parameterManager  {
     }
 
     return parametersTable;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkResourceParameterConf
+  * @description Vérifier la configuration d'un paramètre de ressource
+  *
+  */
+  checkResourceParameterConf(resourceParameterJsonObject) {
+
+    LOGGER.info("Verification du parametre de la ressource");
+
+    if (!resourceParameterJsonObject.id) {
+      LOGGER.error("L'objet representant un parametre n'a pas d'id");
+      return false;
+    } else {
+      LOGGER.info(resourceParameterJsonObject.id);
+    }
+
+    // on vérifie qu'il est bien disponible pour cette instance du service
+    if (!this.isParameterAvailable(resourceParameterJsonObject.id)) {
+      LOGGER.error("Le parametre indique n'est pas disponible");
+      return false;
+    } else {
+      // on continue
+    }
+
+    // on récupère la configuration du paramètre
+    let serviceParameterConf = this._parametersConfiguration[resourceParameterJsonObject.id];
+    if (!serviceParameterConf) {
+      LOGGER.fatal("La configuration du parametre de service est introuvable !");
+      return false;
+    }
+
+    // Le reste des vérifications va dépendre du type de paramètre
+
+    if (serviceParameterConf.type === "boolean") {
+
+      // Gestion des valeurs par défaut
+      if (serviceParameterConf.defaultValue === "true") {
+        // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
+        if (!resourceParameterJsonObject.defaultValueContent) {
+          LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+          return false;
+        } else {
+
+          if (resourceParameterJsonObject.defaultValueContent !== "true" && resourceParameterJsonObject.defaultValueContent !== "false") {
+            LOGGER.error("La valeur par defaut est incorrecte par rapport à son type: boolean");
+            return false;
+          } else {
+            // on continue
+          }
+
+        }
+      } else {
+        // il n'y a rien à faire
+      }
+
+      // Analyse des valeur que peut prendre le paramètre
+      if (resourceParameterJsonObject.values) {
+        // vu que c'est un boolean, ce champ permet uniquement de restreindre la valeur du paramètre
+        if (resourceParameterJsonObject.values !== "true" && resourceParameterJsonObject.values !== "false") {
+          LOGGER.error("La valeur du parametre est incorrecte par rapport à son type: boolean");
+          return false;
+        } else {
+          // on continue
+        }
+      } else {
+        // ce n'est pas obligatoire pour ce type
+      }
+
+    } else if (serviceParameterConf.type === "enumeration") {
+
+      // Analyse des valeur que peut prendre le paramètre
+      if (resourceParameterJsonObject.values) {
+
+        if (resourceParameterJsonObject.values.length === 0) {
+          LOGGER.error("Le parametre ne contient aucune valeur alors qu'il doit en avoir");
+          return false;
+        } else {
+          // on continue, on le stockera plus tard
+        }
+
+      } else {
+        LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
+        return false;
+      }
+
+      // Gestion des valeurs par défaut
+      if (serviceParameterConf.defaultValue === "true") {
+        // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
+        if (!resourceParameterJsonObject.defaultValueContent) {
+          LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+          return false;
+        } else {
+
+          let found = false;
+          // ce champ doit contenir une valeur présente dans values
+          for (let i= 0; i < resourceParameterJsonObject.values.length; i++) {
+            if (resourceParameterJsonObject.defaultValueContent === resourceParameterJsonObject.values[i]) {
+              found = true;
+            }
+          }
+
+          if (!found) {
+            LOGGER.error("Le parametre ne contient pas de valeur par defaut qui soit dans la liste des valeurs");
+            return false;
+          }
+
+        }
+      } else {
+        // il n'y a rien à faire
+      }
+
+    } else if (serviceParameterConf.type === "point") {
+
+      // Analyse des valeur que peut prendre le paramètre
+      if (resourceParameterJsonObject.values) {
+
+        if (!resourceParameterJsonObject.values.bbox) {
+          LOGGER.error("Le parametre ne contient pas de bbox alors qu'il doit en avoir une");
+          return false;
+        } else {
+          // TODO: analyse de la bbox
+        }
+
+      } else {
+        LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
+        return false;
+      }
+
+      // Gestion des valeurs par défaut
+      if (serviceParameterConf.defaultValue === "true") {
+        // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
+        if (!resourceParameterJsonObject.defaultValueContent) {
+          LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+          return false;
+        } else {
+          // TODO: vérifier que le point est bien dans le bbox
+        }
+      } else {
+        // il n'y a rien à faire
+      }
+
+    } else {
+      LOGGER.fatal("La configuration du parametre de service est incorrecte !");
+      return false;
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name createResourceParameter
+  * @description Créer l'ensemble des opérations d'une ressource
+  *
+  */
+  createResourceParameter(resourceParameterTable, currentOperationConf) {
+
+    LOGGER.info("Creation des parametres de l'operation");
+
+    // on commence par faire les paramètres
+    for (let j = 0; j < currentOperationConf.parameters.length; j++) {
+
+      // on isole la conf du parametre de ressource
+      let curResParamConf = currentOperationConf.parameters[j];
+      LOGGER.info("Parametre en cours: " + curResParamConf.id);
+
+      // on récupère la conf du paramètre de service correspondante
+      let curSerParamConf = this._parametersConfiguration[curResParamConf.id];
+
+      // en fonction du type, on crée le bon resourceParameter
+      let curResParam = {};
+
+      if (curSerParamConf.type === "boolean") {
+        curResParam = new BoolParameter(curResParamConf.id);
+      } else if (curSerParamConf.type === "enumeration") {
+        curResParam = new EnumParameter(curResParamConf.id);
+      } else if (curSerParamConf.type === "point") {
+        curResParam = new PointParameter(curResParamConf.id);
+      } else {
+        LOGGER.error("Type inconnu");
+        return false;
+      }
+
+      // on initialise le paramètre
+      if (!curResParam.load(curSerParamConf, curResParamConf)) {
+        LOGGER.error("Initialisation du parametre en echec");
+        return false;
+      } else {
+        // on le stocke
+        resourceParameterTable.push(curResParam);
+      }
+
+
+    }
+
+
+    return true;
 
   }
 
