@@ -19,12 +19,13 @@ module.exports = class osrmResource extends Resource {
   * @name constructor
   * @description Constructeur de la classe osrmResource
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {table} operations - Tableau contenant des instances de classes filles de ResourceOperation
   *
   */
-  constructor(resourceJsonObject) {
+  constructor(resourceJsonObject, operations) {
 
     // Constructeur parent
-    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type);
+    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type, operations);
 
     // Stockage de la configuration
     this._configuration = resourceJsonObject.resource;
@@ -134,7 +135,7 @@ module.exports = class osrmResource extends Resource {
   *
   */
   isWayAttributeAvailable (attr) {
-    
+
     if (this._waysAttributes.length !== 0) {
       for (let i=0; i < this._waysAttributes.length; i++) {
         if (this._waysAttributes[i] === attr) {

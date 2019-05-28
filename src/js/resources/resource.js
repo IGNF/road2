@@ -18,12 +18,15 @@ module.exports = class Resource {
   * @description Constructeur de la classe Resource
   *
   */
-  constructor(id,type) {
+  constructor(id, type, operations) {
     // Id d'une ressource. Il doit être unique.
     this._id = id;
 
     // Type de la ressource
     this._type = type;
+
+    // Opérations disponibles sur la ressource
+    this._operations = operations;
 
   }
 
@@ -47,6 +50,17 @@ module.exports = class Resource {
   */
   get type () {
     return this._type;
+  }
+
+  /**
+  *
+  * @function
+  * @name get operation
+  * @description Récupérer les opérations de la resource
+  *
+  */
+  get operations () {
+    return this._operations;
   }
 
   /**
