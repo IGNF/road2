@@ -94,11 +94,13 @@ module.exports = class sourceManager {
   * @name checkSource
   * @description Fonction utilisée pour vérifier la partie source d'un fichier de description d'une ressource.
   * @param {json} sourceJsonObject - Description JSON de la source
+  * @param {object} operationManager - Le manager des opérations du service
+  * @param {table} resourceOperationTable - Tableau contenant l'ensemble des id d'opérations disponibles pour cette ressource
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
-  checkSource(sourceJsonObject) {
+  checkSource(sourceJsonObject, operationManager, resourceOperationTable) {
 
     LOGGER.info("Verification de la source...");
 
@@ -154,6 +156,18 @@ module.exports = class sourceManager {
       if (sourceJsonObject.type === "osrm") {
         available = true;
         LOGGER.info("Source osrm.");
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (!operationManager.isOperationAvailable("route")) {
+          LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+        if (!operationManager.isAvailableInTable("route", resourceOperationTable)) {
+          LOGGER.error("Le ressource ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+
         if (!this.checkSourceOsrm(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source osrm.");
           return false;

@@ -35,6 +35,9 @@ module.exports = class osrmSource extends Source {
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
 
+    // Ajout des opérations possibles sur ce type de source 
+    this.availableOperations.push("route");
+
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
@@ -269,7 +272,7 @@ module.exports = class osrmSource extends Source {
 
         portions[j] = new Portion(legStart, legEnd);
 
-        // Steps 
+        // Steps
         let steps = new Array();
 
         // On va associer les étapes à la portion concernée

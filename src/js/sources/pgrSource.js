@@ -31,6 +31,8 @@ module.exports = class pgrSource extends Source {
   constructor(sourceJsonObject) {
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
+    // Ajout des opérations possibles sur ce type de source
+    this.availableOperations.push("route");
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
     // Client de base de données

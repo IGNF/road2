@@ -121,6 +121,7 @@ module.exports = class resourceManager {
       }
     }
 
+    let currentAvailableOp = new Array();
     // availableOperations
     if (!resourceJsonObject.resource.availableOperations) {
       LOGGER.error("La ressource ne contient pas de availableOperations.");
@@ -130,6 +131,33 @@ module.exports = class resourceManager {
       if (!operationManager.checkResourceOperationConf(resourceJsonObject.resource.availableOperations)) {
         LOGGER.error("Mauvaise configuration des operations dans la ressource.");
         return false;
+      } else {
+        // on récupère la liste des opérations validées pour cette ressource
+        if (!operationManager.getResourceOperationConf(resourceJsonObject.resource.availableOperations, currentAvailableOp)) {
+          LOGGER.error("Impossible de recuperer les operations de la ressource.");
+          return false;
+        }
+      }
+    }
+
+    // Sources
+    if (!resourceJsonObject.resource.sources) {
+      LOGGER.error("La ressource ne contient pas de sources.");
+      return false;
+    } else {
+
+      LOGGER.info("Verification des sources...")
+
+      for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
+
+        let sourceJsonObject = resourceJsonObject.resource.sources[i];
+        if (!sourceManager.checkSource(sourceJsonObject, operationManager, currentAvailableOp)) {
+          LOGGER.error("La ressource contient une source invalide.");
+          return false;
+        } else {
+          // on ne fait rien
+        }
+
       }
     }
 
@@ -204,27 +232,6 @@ module.exports = class resourceManager {
       }
     }
 
-    // Sources
-    if (!resourceJsonObject.sources) {
-      LOGGER.error("La ressource ne contient pas de sources.");
-      return false;
-    } else {
-
-      LOGGER.info("Verification des sources...")
-
-      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-        let sourceJsonObject = resourceJsonObject.sources[i];
-        if (!sourceManager.checkSource(sourceJsonObject)) {
-          LOGGER.error("La ressource contient une source invalide.");
-          return false;
-        } else {
-          // on ne fait rien
-        }
-
-      }
-    }
-
     LOGGER.info("Fin de la verification de la ressource osrm.");
     return true;
 
@@ -282,27 +289,6 @@ module.exports = class resourceManager {
       return false;
     } else {
       // TODO: vérifier la projection
-    }
-  }
-
-  // Sources
-  if (!resourceJsonObject.sources) {
-    LOGGER.error("La ressource ne contient pas de sources.");
-    return false;
-  } else {
-
-    LOGGER.info("Verification des sources...")
-
-    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-      let sourceJsonObject = resourceJsonObject.sources[i];
-      if (!sourceManager.checkSource(sourceJsonObject)) {
-        LOGGER.error("La ressource contient une source invalide.");
-        return false;
-      } else {
-        // on ne fait rien
-      }
-
     }
   }
 

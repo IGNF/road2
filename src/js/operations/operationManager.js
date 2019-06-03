@@ -290,6 +290,81 @@ module.exports = class operationManager  {
   /**
   *
   * @function
+  * @name getResourceOperationConf
+  * @description Récupérer la liste des opérations disponibles sur une ressource
+  *
+  */
+  getResourceOperationConf(resourceOperationJsonObject, operationTable) {
+
+    LOGGER.info("Recuperation des operations de la ressource");
+
+    // on regarde d'abord la taille du tableau donné en entrée
+    if (resourceOperationJsonObject.length === 0) {
+      LOGGER.error("Il n'y aucune operation decrite");
+      return false;
+    } else {
+
+      // on vérifie les opérations unes à une
+      for (let i = 0; i < resourceOperationJsonObject.length; i++) {
+        let currentOperationConf = resourceOperationJsonObject[i];
+
+        if (!currentOperationConf.id) {
+          LOGGER.error("L'objet representant l'operation n'a pas d'id");
+          return false;
+        } else {
+
+          LOGGER.info(currentOperationConf.id);
+
+          // on vérifie qu'elle est bien disponible pour cette instance du service
+          if (!this.isOperationAvailable(currentOperationConf.id)) {
+            LOGGER.error("L'operation indiquee n'est pas disponible");
+            return false;
+          } else {
+            // on le stocke
+            operationTable.push(currentOperationConf.id);
+          }
+
+        }
+
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name isAvailableInTable
+  * @description Savoir si une opération est disponible dans une liste d'opérations de ressource
+  *
+  */
+
+  isAvailableInTable (operationId, resourceOperationTable) {
+    
+    if (resourceOperationTable.length === 0) {
+      LOGGER.error("Le tableau d'operations est vide.")
+      return false;
+    } else {
+      LOGGER.info("Test");
+      for (let i = 0; i < resourceOperationTable.length; i++) {
+        LOGGER.info(resourceOperationTable[i]);
+        if (operationId === resourceOperationTable[i]) {
+          return true;
+        }
+      }
+
+    }
+
+    LOGGER.error("Operation non trouvee.")
+    return false;
+  }
+
+  /**
+  *
+  * @function
   * @name createResourceOperation
   * @description Créer l'ensemble des opérations d'une ressource
   *
