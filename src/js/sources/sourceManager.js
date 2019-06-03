@@ -182,6 +182,18 @@ module.exports = class sourceManager {
       if (sourceJsonObject.type === "pgr") {
         available = true;
         LOGGER.info("Source pgrouting.");
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (!operationManager.isOperationAvailable("route")) {
+          LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+        if (!operationManager.isAvailableInTable("route", resourceOperationTable)) {
+          LOGGER.error("Le ressource ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+        
         if (!this.checkSourcePgr(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source pgr.");
           return false;
