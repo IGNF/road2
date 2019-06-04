@@ -167,7 +167,7 @@ module.exports = class apisManager {
 
     });
 
-    LOGGER.info("APIS chargees.")
+    LOGGER.info("APIS chargees.");
     return true;
 
   }

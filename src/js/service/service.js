@@ -7,6 +7,7 @@ const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
+const OperationManager = require('../operations/operationManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -31,6 +32,12 @@ module.exports = class Service {
   *
   */
   constructor() {
+
+    // Manager des opérations disponibles sur le service
+    this._operationManager = new OperationManager();
+
+    // catalogue des opérations disponibles
+    this._operationCatalog = {};
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager();
@@ -73,6 +80,32 @@ module.exports = class Service {
   */
   get configuration() {
     return this._configuration;
+  }
+
+  /**
+  *
+  * @function
+  * @name get resourceCatalog
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
+  get operationCatalog() {
+    return this._operationCatalog;
+  }
+
+  /**
+  *
+  * @function
+  * @name verifyAvailabilityOperation
+  * @description Savoir si une opération est disponible sur le service
+  *
+  */
+  verifyAvailabilityOperation(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -236,6 +269,61 @@ module.exports = class Service {
     } else {
       LOGGER.warn("Configuration incomplete: Objet 'application:provider' manquant !");
     }
+    // Information sur les opérations
+    if (userConfiguration.application.operations) {
+      // Dossier contenant les fichiers d'opérations
+      if (!userConfiguration.application.operations.directory) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:directory' manquant !");
+        return false;
+      } else {
+        // On vérifie que le dossier existe et qu'il contient des fichiers de description des opérations
+        let directory =  path.resolve(__dirname,userConfiguration.application.operations.directory);
+        if (fs.existsSync(directory)) {
+          // On vérifie que l'application peut lire les fichiers du dossier
+          fs.readdirSync(directory).forEach(operation => {
+            try {
+              var file = directory + "/" + operation;
+              fs.accessSync(file, fs.constants.R_OK);
+            } catch (err) {
+              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+            }
+          });
+          // On vérifie que la partie concernant les paramètres est bien renseignée
+          if (!userConfiguration.application.operations.parameters) {
+            LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters' manquant !");
+            return false;
+          } else {
+            if (!userConfiguration.application.operations.parameters.directory) {
+              LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters:directory' manquant !");
+              return false;
+            } else {
+              // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres
+              let directory =  path.resolve(__dirname,userConfiguration.application.operations.parameters.directory);
+              if (fs.existsSync(directory)) {
+                // On vérifie que l'application peut lire les fichiers du dossier
+                fs.readdirSync(directory).forEach(parameter => {
+                  try {
+                    var file = directory + "/" + parameter;
+                    fs.accessSync(file, fs.constants.R_OK);
+                  } catch (err) {
+                    LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                  }
+                });
+              } else {
+                LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+                return false;
+              }
+            }
+          }
+        } else {
+          LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+          return false;
+        }
+      }
+    } else {
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:operations' manquant !");
+      return false;
+    }
     // Information sur les ressources
     if (userConfiguration.application.resources) {
       // Dossier contenant les fichiers de ressources
@@ -323,6 +411,37 @@ module.exports = class Service {
 
     LOGGER.info("Verification terminee.");
     this._configuration = userConfiguration;
+    return true;
+
+  }
+
+
+  /**
+  *
+  * @function
+  * @name loadOperations
+  * @description Chargement des opérations
+  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
+  *
+  */
+
+  loadOperations(operationsDirectory, parametersDirectory) {
+
+    LOGGER.info("Chargement des operations...");
+
+    if (!operationsDirectory) {
+      operationsDirectory = this._configuration.application.operations.directory;
+    }
+
+    if (!parametersDirectory) {
+      parametersDirectory = this._configuration.application.operations.parameters.directory;
+    }
+
+    if (!this._operationManager.loadOperationDirectory(this._operationCatalog, operationsDirectory, parametersDirectory)) {
+      LOGGER.error("Erreur lors du chargement des operations.");
+      return false;
+    }
+
     return true;
 
   }

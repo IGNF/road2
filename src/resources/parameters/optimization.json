@@ -1,0 +1,11 @@
+{
+  "id": "optimization",
+  "name": "Optimisation",
+  "description": "Optimisation utilisée pour le calcul d'itinéraire.",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "fastest",
+  "type": "enum",
+  "min": 0,
+  "max": 1
+}

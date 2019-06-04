@@ -56,6 +56,16 @@ RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/ && mkdir build && cd 
 ### Dossier des données
 WORKDIR /home/docker/data
 
+### Récupération de données sur la Corse
+# L'objectif est d'avoir un container indépendant du docker-compose
+RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles/car.lua
+RUN osrm-contract corse-latest.osrm
+
+### Dossier contenant la configuration
+WORKDIR /home/docker/config
+COPY /docker/config /home/docker/config/
+
 ### Dossier de l'application
 WORKDIR /home/docker/app
 
@@ -89,4 +99,4 @@ RUN npm install jsdoc -g
 VOLUME ["/home/docker/data"]
 
 ### Commande de lancement de l'application
-CMD npm start -- --ROAD2_CONF_FILE=/home/docker/data/config/road2.json
+CMD npm start -- --ROAD2_CONF_FILE=/home/docker/config/road2.json

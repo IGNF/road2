@@ -1,0 +1,9 @@
+{
+  "id": "resource",
+  "name": "Ressource",
+  "description": "Ressource concernée par le calcul.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "bduni",
+  "type": "enum"
+}
