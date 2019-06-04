@@ -459,6 +459,8 @@ module.exports = class Service {
 
     LOGGER.info("Chargement des ressources...");
 
+    let loadedResources = 0;
+
     if (!userResourceDirectory) {
       userResourceDirectory = this._configuration.application.resources.directory;
     }
@@ -466,25 +468,37 @@ module.exports = class Service {
     let resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
-    fs.readdirSync(resourceDirectory).filter( (file) => {
+    let test = fs.readdirSync(resourceDirectory).filter( (file) => {
       return path.extname(file).toLowerCase() === ".resource";
     }).forEach(fileName => {
+
       let resourceFile = resourceDirectory + "/" + fileName;
       LOGGER.info("Chargement de: " + resourceFile);
 
       // Récupération du contenu en objet pour vérification puis création de la ressource
-      let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
-      LOGGER.debug(resourceContent);
+      try {
 
-      // Vérification du contenu
-      if (!this._resourceManager.checkResource(resourceContent,this._sourceManager)) {
-        LOGGER.error("Erreur lors du chargement de: " + resourceFile);
-      } else {
-        // Création de la ressource
-        this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent);
+        let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
+        // Vérification du contenu
+        if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
+          LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+        } else {
+          // Création de la ressource
+          this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
+          loadedResources++;
+        }
+
+      } catch (error) {
+        LOGGER.error(error);
+        LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
       }
 
     });
+
+    if (loadedResources === 0) {
+      LOGGER.fatal("Aucune ressource n'a pu etre chargee");
+      return false;
+    }
 
     return true;
 
@@ -501,6 +515,8 @@ module.exports = class Service {
   async loadSources() {
 
     LOGGER.info("Chargement des sources...");
+
+    let loadedSources = 0;
 
     // On récupère les informations du resourceManager pour les intégrer au sourceManager du service
     let listOfSourceIds = this._sourceManager.listOfSourceIds;
@@ -522,6 +538,7 @@ module.exports = class Service {
         try {
           await this._sourceManager.connectSource(currentSource);
           this._sourceCatalog[sourceId] = currentSource;
+          loadedSources++;
         } catch (err) {
           // on n'a pas pu se connecter à la source
           // TODO: remplacer ce comportement par une gestion plus fine des ressources
@@ -535,6 +552,11 @@ module.exports = class Service {
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
+    }
+
+    if (loadedSources === 0) {
+      LOGGER.fatal("Aucune source n'a pu etre chargee");
+      return false;
     }
 
     return true;

@@ -5,7 +5,7 @@
   "required": "false",
   "defaultValue": "false",
   "example": "name",
-  "type": "enum",
+  "type": "enumeration",
   "min": 0,
   "max": 4,
   "explode": "false",

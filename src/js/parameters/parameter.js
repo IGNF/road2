@@ -20,8 +20,8 @@ module.exports = class Parameter  {
   * @param {string} type - Type du paramètre
   * @param {string} name - Nom du paramètre, unique au service
   * @param {string} description - Description du paramètre, unique au service
-  * @param {bool} required - Précise si le paramètre est requis
-  * @param {bool} defaultValue - Précise si le paramètre contient une valeur par défaut
+  * @param {string} required - Précise si le paramètre est requis
+  * @param {string} defaultValue - Précise si le paramètre contient une valeur par défaut
   *
   */
   constructor(id, type, name, description, required, defaultValue) {
@@ -110,21 +110,6 @@ module.exports = class Parameter  {
   */
   get defaultValue () {
     return this._defaultValue;
-  }
-
-  /**
-  *
-  * @function
-  * @name createResourceOperation
-  * @description Créer une opération pour une ressource avec ses paramètres spécifiques
-  * @param {json} resourceOperationConf - Configuration de l'opération dans la ressource
-  *
-  */
-  createResourceParameter (resourceOperationConf) {
-
-    // TODO: selon le type du parametre, appeler la bonne classe fille de parameter
-    // c'est à ce niveau que les valeurs seront lues et ajoutées dans la classe fille
-
   }
 
 

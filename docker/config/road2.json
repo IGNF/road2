@@ -19,7 +19,7 @@
       }
     },
     "resources": {
-      "directory": "/home/docker/data/resources/"
+      "directory": "/home/docker/config/resources/"
     },
     "network": {
       "host": "0.0.0.0",

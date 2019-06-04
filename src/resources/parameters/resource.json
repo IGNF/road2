@@ -5,5 +5,5 @@
   "required": "true",
   "defaultValue": "false",
   "example": "bduni",
-  "type": "enum"
+  "type": "enumeration"
 }

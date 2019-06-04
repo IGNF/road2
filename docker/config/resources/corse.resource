@@ -23,12 +23,12 @@
         "optimization": "fastest",
         "compute": {
           "storage": {
-            "file": "./test_vitesse_fixe.lua"
+            "file": "/home/docker/data/bduniv2_avec_sens_vitesse_fixe.lua"
           },
           "configuration": {
             "name": "cost_s_car",
             "storage": {
-              "file": "./io/costs_calculation_sample.json"
+              "file": "/home/docker/data/costs_calculation_sample.json"
             }
           }
         }
@@ -59,14 +59,14 @@
         },
         {
           "id": "profile",
-          "default": "car",
+          "defaultValueContent": "car",
           "values": [
             "car"
           ]
         },
         {
           "id": "optimization",
-          "default": "fastest",
+          "defaultValueContent": "fastest",
           "values": [
             "fastest"
           ]
@@ -79,7 +79,7 @@
         },
         {
           "id": "stepsGeometry",
-          "default": "true"
+          "defaultValueContent": "true"
         },
         {
           "id": "waysAttributes",
@@ -87,7 +87,7 @@
             "name"
           ]
         }
-      ],
+      ]
     }
   ]
   }

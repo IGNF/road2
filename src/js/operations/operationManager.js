@@ -5,6 +5,7 @@ const path = require('path');
 const log4js = require('log4js');
 const ParameterManager = require('../parameters/parameterManager');
 const Operation = require('../operations/operation');
+const ResourceOperation = require('../operations/resourceOperation');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("OPERATIONMANAGER");
@@ -46,6 +47,28 @@ module.exports = class operationManager  {
   */
   get listOfVerifiedOperationId() {
     return this._listOfVerifiedOperationId;
+  }
+
+  /**
+  *
+  * @function
+  * @name isOperationAvailable
+  * @description Savoir si une opération est disponible
+  *
+  */
+  isOperationAvailable(id) {
+    if (this._listOfVerifiedOperationId.length !== 0) {
+      for (let i = 0; i < this._listOfVerifiedOperationId.length; i++) {
+        if (id === this._listOfVerifiedOperationId[i]) {
+          return true;
+        } else {
+          // on continue
+        }
+      }
+    } else {
+      return false;
+    }
+    return false;
   }
 
   /**
@@ -187,6 +210,115 @@ module.exports = class operationManager  {
       }
 
     }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkResourceOperationConf
+  * @description Vérifier la configuration d'une opération de ressource
+  *
+  */
+  checkResourceOperationConf(resourceOperationJsonObject) {
+
+    LOGGER.info("Verification de l'operation de la ressource");
+
+    // on regarde d'abord la taille du tableau donné en entrée
+    if (resourceOperationJsonObject.length === 0) {
+      LOGGER.error("Il n'y aucune operation decrite");
+      return false;
+    } else {
+
+      // on vérifie les opérations unes à une
+      for (let i = 0; i < resourceOperationJsonObject.length; i++) {
+        let currentOperationConf = resourceOperationJsonObject[i];
+
+        if (!currentOperationConf.id) {
+          LOGGER.error("L'objet representant l'operation n'a pas d'id");
+          return false;
+        } else {
+
+          LOGGER.info(currentOperationConf.id);
+
+          // on vérifie qu'elle est bien disponible pour cette instance du service
+          if (!this.isOperationAvailable(currentOperationConf.id)) {
+            LOGGER.error("L'operation indiquee n'est pas disponible");
+            return false;
+          } else {
+            // on continue
+          }
+
+        }
+
+        if (!currentOperationConf.parameters) {
+          LOGGER.error("L'objet representant l'operation n'a pas de parametres");
+          return false;
+        } else {
+
+          if (currentOperationConf.parameters.length === 0) {
+            LOGGER.error("L'objet representant l'operation ne contient aucun parametre");
+            return false;
+          } else {
+
+            for (let j = 0; j < currentOperationConf.parameters.length; j++) {
+              let currentParameterConf = currentOperationConf.parameters[j];
+
+              if (!this._parameterManager.checkResourceParameterConf(currentParameterConf)) {
+                LOGGER.error("L'objet representant un parametre est mal configure");
+                return false;
+              } else {
+                // on continue
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name createResourceOperation
+  * @description Créer l'ensemble des opérations d'une ressource
+  *
+  */
+  createResourceOperation(resourceOperationTable, resourceJsonObject) {
+
+    LOGGER.info("Creation des operations de la ressource");
+
+    // on crée les opérations unes à une
+    for (let i = 0; i < resourceJsonObject.resource.availableOperations.length; i++) {
+
+      // on isole la conf de l'opération
+      let currentOperationConf = resourceJsonObject.resource.availableOperations[i];
+      LOGGER.info("Operation en cours: " + currentOperationConf.id);
+
+      // création des paramètres de l'opération de ressource
+      let resourceParameterTable = new Array();
+
+      if (!this._parameterManager.createResourceParameter(resourceParameterTable, currentOperationConf)) {
+        LOGGER.error("Erreur lors de la creation des parametres de l'operation");
+        return false;
+      }
+
+      // création de l'objet et stockage
+      resourceOperationTable.push(new ResourceOperation(currentOperationConf.id, resourceParameterTable));
+
+    }
+
+    LOGGER.info("La creation des operations s'est bien deroulee");
 
     return true;
 

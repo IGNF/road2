@@ -82,17 +82,5 @@ module.exports = class Operation  {
     return this._parameters;
   }
 
-  /**
-  *
-  * @function
-  * @name createResourceOperation
-  * @description Créer une opération pour une ressource avec ses paramètres spécifiques
-  * @param {json} resourceOperationConf - Configuration de l'opération dans la ressource
-  *
-  */
-  createResourceOperation (resourceOperationConf) {
-
-  }
-
 
 }

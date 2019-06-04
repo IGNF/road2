@@ -5,7 +5,7 @@
   "required": "false",
   "defaultValue": "true",
   "example": "fastest",
-  "type": "enum",
+  "type": "enumeration",
   "min": 0,
   "max": 1
 }
