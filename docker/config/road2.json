@@ -10,7 +10,7 @@
       "mail": "sav@ign.fr"
     },
     "logs": {
-      "configuration": "/home/docker/data/log4js.json"
+      "configuration": "/home/docker/config/log4js.json"
     },
     "operations":{
       "directory": "/home/docker/app/src/resources/operations",

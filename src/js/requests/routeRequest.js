@@ -56,6 +56,10 @@ module.exports = class routeRequest extends Request {
     // tableau de string
     this._waysAttributes = new Array();
 
+    // algorith
+    // algorithme utilisé
+    this._algorithm = "";
+
   }
 
   /**
@@ -188,6 +192,28 @@ module.exports = class routeRequest extends Request {
   */
   set computeGeometry (i) {
     this._computeGeometry = i;
+  }
+
+  /**
+  *
+  * @function
+  * @name get algorithm
+  * @description Récupérer le choix de l'algorithme
+  *
+  */
+  get algorithm () {
+    return this._algorithm;
+  }
+
+  /**
+  *
+  * @function
+  * @name set algorithm
+  * @description Attribuer le choix de l'algorithme
+  *
+  */
+  set algorithm (i) {
+    this._algorithm = i;
   }
 
   /**

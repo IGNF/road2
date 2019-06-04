@@ -149,6 +149,12 @@ module.exports = {
     }
     // ---
 
+    if (parameters.algorithm) {
+      routeRequest.algorithm = parameters.algorithm;
+    } else {
+      // TODO: on met la valeur par défaut issue de la configuration
+    }
+
     // waysAttributes
     // ---
     if (parameters.waysAttributes) {
@@ -231,7 +237,7 @@ module.exports = {
       currentPortion.steps = new Array();
 
       if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
-        
+
         for (let j = 0; j < route.portions[i].steps.length; j++) {
 
           let currentStep = {};
