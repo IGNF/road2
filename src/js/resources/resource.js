@@ -80,5 +80,20 @@ module.exports = class Resource {
     return sourceId;
   }
 
+  /**
+  *
+  * @function
+  * @name getOperationById
+  * @description Récupérer une opération si elle est disponible sur la ressource
+  *
+  */
+  getOperationById(operationId) {
+    if (this._operations[operationId]) {
+      return this._operations[operationId];
+    } else {
+      return {};
+    }
+  }
+
 
 }

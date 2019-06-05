@@ -110,6 +110,21 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name getOperationById
+  * @description Récupérer une opération si elle est disponible sur le service
+  *
+  */
+  getOperationById(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return this._operationCatalog[operationId];
+    } else {
+      return {};
+    }
+  }
+
+  /**
+  *
+  * @function
   * @name get resourceCatalog
   * @description Récupérer l'ensemble des ressources
   *

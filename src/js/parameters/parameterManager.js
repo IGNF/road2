@@ -247,7 +247,7 @@ module.exports = class parameterManager  {
       let parameterId = operationConf.parameters[i];
       let parameterConf = this._parametersConfiguration[parameterId];
 
-      parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.default);
+      parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.defaultValue);
 
     }
 
@@ -414,7 +414,7 @@ module.exports = class parameterManager  {
   * @description Créer l'ensemble des opérations d'une ressource
   *
   */
-  createResourceParameter(resourceParameterTable, currentOperationConf) {
+  createResourceParameter(resourceParameterHash, currentOperationConf) {
 
     LOGGER.info("Creation des parametres de l'operation");
 
@@ -448,7 +448,7 @@ module.exports = class parameterManager  {
         return false;
       } else {
         // on le stocke
-        resourceParameterTable.push(curResParam);
+        resourceParameterHash[curResParam.serviceParameterId] = curResParam;
       }
 
 

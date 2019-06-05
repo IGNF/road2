@@ -346,9 +346,9 @@ module.exports = class resourceManager {
     // Création des opérations
     // ---
 
-    let resourceOperationTable = new Array();
+    let resourceOperationHash = {};
 
-    if (!operationManager.createResourceOperation(resourceOperationTable, resourceJsonObject)) {
+    if (!operationManager.createResourceOperation(resourceOperationHash, resourceJsonObject)) {
       LOGGER.error("Erreur lors de la creation des operations de la ressource");
       return null;
     } else {
@@ -358,9 +358,9 @@ module.exports = class resourceManager {
     // ---
 
     if (resourceJsonObject.resource.type === "osrm") {
-      resource = new osrmResource(resourceJsonObject, resourceOperationTable);
+      resource = new osrmResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "pgr") {
-      resource = new pgrResource(resourceJsonObject, resourceOperationTable);
+      resource = new pgrResource(resourceJsonObject, resourceOperationHash);
     } else {
       // On va voir si c'est un autre type.
     }

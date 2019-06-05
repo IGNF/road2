@@ -343,7 +343,7 @@ module.exports = class operationManager  {
   */
 
   isAvailableInTable (operationId, resourceOperationTable) {
-    
+
     if (resourceOperationTable.length === 0) {
       LOGGER.error("Le tableau d'operations est vide.")
       return false;
@@ -369,7 +369,7 @@ module.exports = class operationManager  {
   * @description Créer l'ensemble des opérations d'une ressource
   *
   */
-  createResourceOperation(resourceOperationTable, resourceJsonObject) {
+  createResourceOperation(resourceOperationHash, resourceJsonObject) {
 
     LOGGER.info("Creation des operations de la ressource");
 
@@ -381,15 +381,15 @@ module.exports = class operationManager  {
       LOGGER.info("Operation en cours: " + currentOperationConf.id);
 
       // création des paramètres de l'opération de ressource
-      let resourceParameterTable = new Array();
+      let resourceParameterHash = {};
 
-      if (!this._parameterManager.createResourceParameter(resourceParameterTable, currentOperationConf)) {
+      if (!this._parameterManager.createResourceParameter(resourceParameterHash, currentOperationConf)) {
         LOGGER.error("Erreur lors de la creation des parametres de l'operation");
         return false;
       }
-
+      
       // création de l'objet et stockage
-      resourceOperationTable.push(new ResourceOperation(currentOperationConf.id, resourceParameterTable));
+      resourceOperationHash[currentOperationConf.id] = new ResourceOperation(currentOperationConf.id, resourceParameterHash);
 
     }
 

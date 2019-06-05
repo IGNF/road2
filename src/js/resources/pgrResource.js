@@ -19,7 +19,7 @@ module.exports = class pgrResource extends Resource {
   * @name constructor
   * @description Constructeur de la classe pgrResource
   * @param {json} resourceJsonObject - Description JSON de la ressource
-  * @param {table} operations - Tableau contenant des instances de classes filles de ResourceOperation
+  * @param {object} operations - Objet contenant des instances de classes filles de ResourceOperation
   *
   */
   constructor(resourceJsonObject, operations) {

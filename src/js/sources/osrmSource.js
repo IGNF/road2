@@ -35,7 +35,7 @@ module.exports = class osrmSource extends Source {
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
 
-    // Ajout des opérations possibles sur ce type de source 
+    // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
 
     // Stockage de la configuration
@@ -172,20 +172,20 @@ module.exports = class osrmSource extends Source {
 
       // ---
 
-    return new Promise ( (resolve, reject) => {
-      this.osrm.route(osrmRequest, (err, result) => {
-        if (err) {
-          // on ne renvoie pas l'erreur d'OSRM
-          reject(errorManager.createError(" Internal OSRM error. "));
-        } else {
-          try {
-            resolve(this.writeRouteResponse(request, result));
-          } catch (error) {
-            reject(error);
+      return new Promise ( (resolve, reject) => {
+        this.osrm.route(osrmRequest, (err, result) => {
+          if (err) {
+            // on ne renvoie pas l'erreur d'OSRM
+            reject(errorManager.createError(" Internal OSRM error. "));
+          } else {
+            try {
+              resolve(this.writeRouteResponse(request, result));
+            } catch (error) {
+              reject(error);
+            }
           }
-        }
+        });
       });
-    });
 
     } else {
       // on va voir si c'est une autre opération

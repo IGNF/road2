@@ -48,127 +48,146 @@ module.exports = {
     getCapabilities.operations = new Array();
 
     // route
-    let routeDescription = {};
-    // route.id
-    routeDescription.id = "route";
-    // route.description
-    routeDescription.description = "Calculer un itinéraire.";
-    // route.url
-    routeDescription.url = "/route?";
-    // route.methods
-    routeDescription.methods = new Array();
-    routeDescription.methods.push("GET");
 
-    // -- route.parameters
-    routeDescription.parameters = new Array();
+    // On vérifie que l'opération route est disponible et on l'intégre seulement si elle est
+    if (service.verifyAvailabilityOperation("route")) {
 
-    // route.parameters.resource
-    let resourceParameterDescription = {};
-    resourceParameterDescription.name = "resource";
-    resourceParameterDescription.in = "query";
-    resourceParameterDescription.description = "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans la partie ressources du GetCapabilities.";
-    resourceParameterDescription.required = "true";
-    resourceParameterDescription.default = "false";
-    resourceParameterDescription.schema = {};
-    resourceParameterDescription.schema.type = "string";
-    resourceParameterDescription.example = "bduni";
-    routeDescription.parameters.push(resourceParameterDescription);
+      // récupération de l'opération route du service
+      let serviceOpRoute = service.getOperationById("route");
 
-    // route.parameters.start
-    let startParameterDescription = {};
-    startParameterDescription.name = "start";
-    startParameterDescription.in = "query";
-    startParameterDescription.description = "Point de départ.";
-    startParameterDescription.required = "true";
-    startParameterDescription.default = "false";
-    startParameterDescription.schema = {};
-    startParameterDescription.schema.type = "string";
-    startParameterDescription.example = "48.849319,2.337306";
-    routeDescription.parameters.push(startParameterDescription);
+      let routeDescription = {};
+      // route.id
+      routeDescription.id = "route";
+      // route.description
+      routeDescription.description = serviceOpRoute.description;
+      // route.url
+      routeDescription.url = "/route?";
+      // route.methods
+      routeDescription.methods = new Array();
+      routeDescription.methods.push("GET");
 
-    // route.parameters.end
-    let endParameterDescription = {};
-    endParameterDescription.name = "end";
-    endParameterDescription.in = "query";
-    endParameterDescription.description = "Point d'arrivée.";
-    endParameterDescription.required = "true";
-    endParameterDescription.default = "false";
-    endParameterDescription.schema = {};
-    endParameterDescription.schema.type = "string";
-    endParameterDescription.example = "48.852891,2.367776";
-    routeDescription.parameters.push(endParameterDescription);
+      // -- route.parameters
+      routeDescription.parameters = new Array();
 
-    // route.parameters.intermediates
-    let intermediatesParameterDescription = {};
-    intermediatesParameterDescription.name = "intermediates";
-    intermediatesParameterDescription.in = "query";
-    intermediatesParameterDescription.description = "Point(s) intermédiaires.";
-    intermediatesParameterDescription.required = "true";
-    intermediatesParameterDescription.default = "false";
-    intermediatesParameterDescription.schema = {};
-    intermediatesParameterDescription.schema.type = "array";
-    intermediatesParameterDescription.schema.items = {};
-    intermediatesParameterDescription.schema.items.type = "string";
-    intermediatesParameterDescription.explode = "false";
-    intermediatesParameterDescription.style = "pipeDelimited";
-    intermediatesParameterDescription.example = "48.852890,2.368776|48.842891,2.367976";
-    routeDescription.parameters.push(intermediatesParameterDescription);
+      // route.parameters.resource
+      let resourceServiceParameter = serviceOpRoute.getParameterById("resource");
+      let resourceParameterDescription = {};
+      resourceParameterDescription.name = "resource";
+      resourceParameterDescription.in = "query";
+      resourceParameterDescription.description = resourceServiceParameter.description;
+      resourceParameterDescription.required = resourceServiceParameter.required;
+      resourceParameterDescription.default = resourceServiceParameter.defaultValue;
+      resourceParameterDescription.schema = {};
+      resourceParameterDescription.schema.type = "string";
+      resourceParameterDescription.example = "bduni";
+      routeDescription.parameters.push(resourceParameterDescription);
 
-    // route.parameters.profile
-    let profileParameterDescription = {};
-    profileParameterDescription.name = "profile";
-    profileParameterDescription.in = "query";
-    profileParameterDescription.description = "Mode de déplacement utilisé pour le calcul.";
-    profileParameterDescription.required = "false";
-    profileParameterDescription.default = "true";
-    profileParameterDescription.schema = {};
-    profileParameterDescription.schema.type = "enumeration";
-    profileParameterDescription.example = "car";
-    routeDescription.parameters.push(profileParameterDescription);
+      // route.parameters.start
+      let startServiceParameter = serviceOpRoute.getParameterById("start");
+      let startParameterDescription = {};
+      startParameterDescription.name = "start";
+      startParameterDescription.in = "query";
+      startParameterDescription.description = startServiceParameter.description;
+      startParameterDescription.required = startServiceParameter.required;
+      startParameterDescription.default = startServiceParameter.defaultValue;
+      startParameterDescription.schema = {};
+      startParameterDescription.schema.type = "string";
+      startParameterDescription.example = "48.849319,2.337306";
+      routeDescription.parameters.push(startParameterDescription);
 
-    // route.parameters.optimization
-    let optimizationParameterDescription = {};
-    optimizationParameterDescription.name = "optimization";
-    optimizationParameterDescription.in = "query";
-    optimizationParameterDescription.description = "Optimisation utilisée pour le calcul.";
-    optimizationParameterDescription.required = "false";
-    optimizationParameterDescription.default = "true";
-    optimizationParameterDescription.schema = {};
-    optimizationParameterDescription.schema.type = "enumeration";
-    optimizationParameterDescription.example = "fastest";
-    routeDescription.parameters.push(optimizationParameterDescription);
+      // route.parameters.end
+      let endServiceParameter = serviceOpRoute.getParameterById("end");
+      let endParameterDescription = {};
+      endParameterDescription.name = "end";
+      endParameterDescription.in = "query";
+      endParameterDescription.description = endServiceParameter.description;
+      endParameterDescription.required = endServiceParameter.required;
+      endParameterDescription.default = endServiceParameter.defaultValue;
+      endParameterDescription.schema = {};
+      endParameterDescription.schema.type = "string";
+      endParameterDescription.example = "48.852891,2.367776";
+      routeDescription.parameters.push(endParameterDescription);
 
-    // route.parameters.getGeometry
-    let getGeometryParameterDescription = {};
-    getGeometryParameterDescription.name = "getGeometry";
-    getGeometryParameterDescription.in = "query";
-    getGeometryParameterDescription.description = "Présence de la géométrie détaillée dans la réponse.";
-    getGeometryParameterDescription.required = "false";
-    getGeometryParameterDescription.default = "true";
-    getGeometryParameterDescription.schema = {};
-    getGeometryParameterDescription.schema.type = "boolean";
-    getGeometryParameterDescription.example = "true";
-    routeDescription.parameters.push(getGeometryParameterDescription);
+      // route.parameters.intermediates
+      let intermediatesServiceParameter = serviceOpRoute.getParameterById("intermediates");
+      let intermediatesParameterDescription = {};
+      intermediatesParameterDescription.name = "intermediates";
+      intermediatesParameterDescription.in = "query";
+      intermediatesParameterDescription.description = intermediatesServiceParameter.description;
+      intermediatesParameterDescription.required = intermediatesServiceParameter.required;
+      intermediatesParameterDescription.default = intermediatesServiceParameter.defaultValue;
+      intermediatesParameterDescription.schema = {};
+      intermediatesParameterDescription.schema.type = "array";
+      intermediatesParameterDescription.schema.items = {};
+      intermediatesParameterDescription.schema.items.type = "string";
+      intermediatesParameterDescription.explode = "false";
+      intermediatesParameterDescription.style = "pipeDelimited";
+      intermediatesParameterDescription.example = "48.852890,2.368776|48.842891,2.367976";
+      routeDescription.parameters.push(intermediatesParameterDescription);
 
-    // route.parameters.getGeometry
-    let waysAttributesParameterDescription = {};
-    waysAttributesParameterDescription.name = "waysAttributes";
-    waysAttributesParameterDescription.in = "query";
-    waysAttributesParameterDescription.description = "Attributs des tronçons à afficher dans la réponse.";
-    waysAttributesParameterDescription.required = "false";
-    waysAttributesParameterDescription.default = "false";
-    waysAttributesParameterDescription.schema = {};
-    waysAttributesParameterDescription.schema.type = "array";
-    waysAttributesParameterDescription.schema.items = {};
-    waysAttributesParameterDescription.schema.items.type = "string";
-    waysAttributesParameterDescription.explode = "false";
-    waysAttributesParameterDescription.style = "pipeDelimited";
-    waysAttributesParameterDescription.example = "name|type";
-    routeDescription.parameters.push(waysAttributesParameterDescription);
+      // route.parameters.profile
+      let profilesServiceParameter = serviceOpRoute.getParameterById("profile");
+      let profileParameterDescription = {};
+      profileParameterDescription.name = "profile";
+      profileParameterDescription.in = "query";
+      profileParameterDescription.description = profilesServiceParameter.description;
+      profileParameterDescription.required = profilesServiceParameter.required;
+      profileParameterDescription.default = profilesServiceParameter.defaultValue;
+      profileParameterDescription.schema = {};
+      profileParameterDescription.schema.type = "enumeration";
+      profileParameterDescription.example = "car";
+      routeDescription.parameters.push(profileParameterDescription);
 
-    // -- end route.parameters
+      // route.parameters.optimization
+      let optimizationServiceParameter = serviceOpRoute.getParameterById("optimization");
+      let optimizationParameterDescription = {};
+      optimizationParameterDescription.name = "optimization";
+      optimizationParameterDescription.in = "query";
+      optimizationParameterDescription.description = optimizationServiceParameter.description;
+      optimizationParameterDescription.required = optimizationServiceParameter.required;
+      optimizationParameterDescription.default = optimizationServiceParameter.defaultValue;
+      optimizationParameterDescription.schema = {};
+      optimizationParameterDescription.schema.type = "enumeration";
+      optimizationParameterDescription.example = "fastest";
+      routeDescription.parameters.push(optimizationParameterDescription);
 
-    getCapabilities.operations.push(routeDescription);
+      // route.parameters.getGeometry
+      let getGeometryServiceParameter = serviceOpRoute.getParameterById("stepsGeometry");
+      let getGeometryParameterDescription = {};
+      getGeometryParameterDescription.name = "getGeometry";
+      getGeometryParameterDescription.in = "query";
+      getGeometryParameterDescription.description = getGeometryServiceParameter.description;
+      getGeometryParameterDescription.required = getGeometryServiceParameter.required;
+      getGeometryParameterDescription.default = getGeometryServiceParameter.defaultValue;
+      getGeometryParameterDescription.schema = {};
+      getGeometryParameterDescription.schema.type = "boolean";
+      getGeometryParameterDescription.example = "true";
+      routeDescription.parameters.push(getGeometryParameterDescription);
+
+      // route.parameters.waysAttributes
+      let waysAttributesServiceParameter = serviceOpRoute.getParameterById("waysAttributes");
+      let waysAttributesParameterDescription = {};
+      waysAttributesParameterDescription.name = "waysAttributes";
+      waysAttributesParameterDescription.in = "query";
+      waysAttributesParameterDescription.description = waysAttributesServiceParameter.description;
+      waysAttributesParameterDescription.required = waysAttributesServiceParameter.required;
+      waysAttributesParameterDescription.default = waysAttributesServiceParameter.defaultValue;
+      waysAttributesParameterDescription.schema = {};
+      waysAttributesParameterDescription.schema.type = "array";
+      waysAttributesParameterDescription.schema.items = {};
+      waysAttributesParameterDescription.schema.items.type = "string";
+      waysAttributesParameterDescription.explode = "false";
+      waysAttributesParameterDescription.style = "pipeDelimited";
+      waysAttributesParameterDescription.example = "name|type";
+      routeDescription.parameters.push(waysAttributesParameterDescription);
+
+      // -- end route.parameters
+
+      getCapabilities.operations.push(routeDescription);
+
+    }
+    // --- end route
+
     // --- end operations
 
     // --- resources
@@ -183,16 +202,20 @@ module.exports = {
       // resource.id
       resourceDescription.id = localResource.id;
 
-      // en fonction de son type, la description d'une ressource pourra être différente
-      if (localResource.type === "osrm") {
+      // resource.description
+      resourceDescription.description = localResource.configuration.description;
 
-        // resource.description
-        resourceDescription.description = localResource.configuration.description;
+      // -- resource.availableOperations
+      resourceDescription.availableOperations = new Array();
 
-        // -- resource.availableOperations
-        resourceDescription.availableOperations = new Array();
+      // - route
 
-        // - route
+      // On vérifie que l'opération route est disponible et on l'intégre seulement si elle est
+      if (service.verifyAvailabilityOperation("route")) {
+
+        // on récupère l'opération de ressource
+        let resourceOperation = localResource.getOperationById("route");
+
         let routeAvailableOperation = {};
         routeAvailableOperation.id = "route";
         routeAvailableOperation.availableParameters = new Array();
@@ -206,71 +229,69 @@ module.exports = {
         }
 
         // route.resource
+        let resourceParameter = resourceOperation.getParameterById("resource");
         let routeResource = {};
         routeResource.id = "resource";
-        routeResource.values = localResource.id;
+        routeResource.values = resourceParameter.values;
         routeAvailableOperation.availableParameters.push(routeResource);
 
         // route.start
+        let startParameter = resourceOperation.getParameterById("start");
         let routeStart = {};
         routeStart.id = "start";
-        routeStart.values = {};
-        routeStart.values.bbox = localResource.configuration.boundingBox;
-        routeStart.values.projection = localResource.configuration.defaultProjection;
+        routeStart.values = startParameter.values;
         routeAvailableOperation.availableParameters.push(routeStart);
 
         // route.end
+        let endParameter = resourceOperation.getParameterById("end");
         let routeEnd = {};
         routeEnd.id = "end";
-        routeEnd.values = {};
-        routeEnd.values.bbox = localResource.configuration.boundingBox;
-        routeEnd.values.projection = localResource.configuration.defaultProjection;
+        routeEnd.values = endParameter.values;
         routeAvailableOperation.availableParameters.push(routeEnd);
 
         // route.intermediates
+        let intermediatesParameter = resourceOperation.getParameterById("intermediates");
         let routeIntermediates = {};
         routeIntermediates.id = "intermediates";
-        routeIntermediates.values = {};
-        routeIntermediates.values.bbox = localResource.configuration.boundingBox;
-        routeIntermediates.values.projection = localResource.configuration.defaultProjection;
-        routeIntermediates.maxItems = routeDescriptionFromResource.maxIntermediatePoints;
+        routeIntermediates.values = intermediatesParameter.values;
         routeAvailableOperation.availableParameters.push(routeIntermediates);
 
         // route.profile
+        let profileParameter = resourceOperation.getParameterById("profile");
         let routeProfile = {};
         routeProfile.id = "profile";
-        routeProfile.values = localResource.defaultProfile;
+        routeProfile.values = profileParameter.values;
         routeAvailableOperation.availableParameters.push(routeProfile);
 
         // route.optimization
+        let optmizationParameter = resourceOperation.getParameterById("optimization");
         let routeOptimization = {};
         routeOptimization.id = "optimization";
-        routeOptimization.values = localResource.defaultOptimization;
+        routeOptimization.values = optmizationParameter.values;
         routeAvailableOperation.availableParameters.push(routeOptimization);
 
         // route.getGeometry
+        let getGeometryParameter = resourceOperation.getParameterById("stepsGeometry");
         let routeGetGeometry = {};
         routeGetGeometry.id = "getGeometry";
-        for (let i= 0; i < routeDescriptionFromResource.defaultParameters.length; i++) {
-          if (routeDescriptionFromResource.defaultParameters[i].id === "getGeometry") {
-            routeGetGeometry.values = routeDescriptionFromResource.defaultParameters[i].default;
-            break;
-          }
-        }
+        routeGetGeometry.values = getGeometryParameter.values;
         routeAvailableOperation.availableParameters.push(routeGetGeometry);
 
         // route.waysAttributes
+        let waysAttributesParameter = resourceOperation.getParameterById("waysAttributes");
         let routeWaysAttributes = {};
         routeWaysAttributes.id = "waysAttributes";
-        routeWaysAttributes.values = "name";
+        routeWaysAttributes.values = waysAttributesParameter.values;
         routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
         resourceDescription.availableOperations.push(routeAvailableOperation);
-        // - end route
-
-        // -- end resource.availableOperations
 
       }
+      // - end route
+
+      // -- end resource.availableOperations
+
+
 
       getCapabilities.resources.push(resourceDescription);
 
