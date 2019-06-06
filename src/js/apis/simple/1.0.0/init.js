@@ -319,6 +319,10 @@ module.exports = {
 
   run: function(app, uid) {
     try {
+
+      // TODO: vérification que l'ensemble des opérations et paramètres soient disponibles
+      // ils sont utilisés dans l'api mais leur existence n'est pas vérifiée
+      
       // Création du GetCapabilities
       if (!this.createGetCapabilities(app, uid)) {
         LOGGER.error("Erreur lors de la creation du GetCapabilities.");

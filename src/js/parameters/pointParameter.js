@@ -77,7 +77,13 @@ module.exports = class PointParameter extends ResourceParameter {
   */
   check(userValue) {
 
-    // TODO: faire la vérification géométrique
+    let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
+
+    if (!tmpStringCoordinates) {
+      return false;
+    } else {
+      // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+    }
 
     return true;
   }

@@ -30,9 +30,6 @@ module.exports = class pgrResource extends Resource {
     // Stockage de la configuration
     this._configuration = resourceJsonObject.resource;
 
-    // Source par défaut
-    this._defaultSourceId = this._configuration.defaultSourceId;
-
     // Correspondance entre profile/optimization et sourceId
     this._linkedSource = {};
 
@@ -42,15 +39,6 @@ module.exports = class pgrResource extends Resource {
 
       const linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
-
-      if (this._configuration.sources[i].id === this._defaultSourceId) {
-
-        // Profile par défaut
-        this._defaultProfile = this._configuration.sources[i].cost.profile;
-        // Optimisation par défaut
-        this._defaultOptimization = this._configuration.sources[i].cost.optimization;
-
-      }
 
     }
 
@@ -65,39 +53,6 @@ module.exports = class pgrResource extends Resource {
   */
   get configuration () {
     return this._configuration;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultProfile
-  * @description Récupérer le profile par défaut de la ressource
-  *
-  */
-  get defaultProfile () {
-    return this._defaultProfile;
-  }
-
-  /**
-  *
-  * @function
-  * @name set defaultProfile
-  * @description Attribuer le profile par défaut de la ressource
-  *
-  */
-  set defaultProfile (pr) {
-    this._defaultProfile = pr;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultOptimization
-  * @description Récupérer l'optmisation par défaut de la ressource
-  *
-  */
-  get defaultOptimization () {
-    return this._defaultOptimization;
   }
 
   /**
@@ -174,4 +129,5 @@ module.exports = class pgrResource extends Resource {
     }
 
   }
+
 }

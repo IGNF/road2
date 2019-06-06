@@ -5,6 +5,7 @@ const express = require('express');
 const log4js = require('log4js');
 const cors = require('cors');
 const controler = require('./controler/controler');
+const errorManager = require('../../../utils/errorManager');
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -43,6 +44,12 @@ router.route("/route")
 
     // On récupère l'instance de Service pour faire les calculs
     let service = req.app.get("service");
+
+    // on vérifie que l'on peut faire cette opération sur l'instance du service
+    if (!service.verifyAvailabilityOperation("route")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
     // on récupère l'ensemble des paramètres de la requête
     let parameters = req.query;
 

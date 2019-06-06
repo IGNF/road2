@@ -35,39 +35,43 @@ module.exports = {
         throw errorManager.createError(" Parameter 'resource' is invalid ", 400);
       } else {
         resource = service.getResourceById(parameters.resource);
-        // TODO: vérification de la compatibilité de son type avec la requête
+        // On vérifie que la ressource peut accepter cette opération
+        if (!resource.verifyAvailabilityOperation("route")){
+          throw errorManager.createError(" Operation not permitted on this resource ", 400);
+        }
       }
     }
+
+    // On récupère l'opération route pour faire des vérifications
+    let routeOperation = resource.getOperationById("route");
 
     // Start
     if (!parameters.start) {
         throw errorManager.createError(" Parameter 'start' not found ", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      tmpStringCoordinates = parameters.start.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
-      if (!tmpStringCoordinates) {
+      if (!routeOperation.getParameterById("start").check(parameters.start)) {
         throw errorManager.createError(" Parameter 'start' is invalid ", 400);
       } else {
-        tmpStringCoordinates = tmpStringCoordinates[0].split(",");
+        tmpStringCoordinates = parameters.start.split(",");
         start.lon = Number(tmpStringCoordinates[0]);
         start.lat = Number(tmpStringCoordinates[1]);
-        // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
       }
     }
+
+
 
     // End
     if (!parameters.end) {
         throw errorManager.createError(" Parameter 'end' not found ", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      tmpStringCoordinates = parameters.end.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
-      if (!tmpStringCoordinates) {
+      if (!routeOperation.getParameterById("end").check(parameters.end)) {
         throw errorManager.createError(" Parameter 'end' is invalid ", 400);
       } else {
-        tmpStringCoordinates = tmpStringCoordinates[0].split(",");
+        tmpStringCoordinates = parameters.end.split(",");
         end.lon = Number(tmpStringCoordinates[0]);
         end.lat = Number(tmpStringCoordinates[1]);
-        // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
       }
     }
 
@@ -76,17 +80,25 @@ module.exports = {
 
     if (!parameters.profile) {
       // Récupération du paramètre par défaut
-      profile = resource.defaultProfile;
+      profile = routeOperation.getParameterById("profile").defaultValueContent;
     } else {
-      // TODO: vérification de la validité du paramètre
-      profile = parameters.profile;
+      // Vérification de la validité du paramètre
+      if (!routeOperation.getParameterById("profile").check(parameters.profile)) {
+        throw errorManager.createError(" Parameter 'profile' is invalid ", 400);
+      } else {
+        profile = parameters.profile;
+      }
     }
     if (!parameters.optimization) {
       // Récupération du paramètre par défaut
-      optimization = resource.defaultOptimization;
+      optimization = routeOperation.getParameterById("optimization").defaultValueContent;
     } else {
-      // TODO: vérification de la validité du paramètre
-      optimization = parameters.optimization;
+      // Vérification de la validité du paramètre
+      if (!routeOperation.getParameterById("optimization").check(parameters.optimization)) {
+        throw errorManager.createError(" Parameter 'optimization' is invalid ", 400);
+      } else {
+        profile = parameters.optimization;
+      }
     }
     // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
     if (!resource.linkedSource[profile+optimization]) {
@@ -110,16 +122,13 @@ module.exports = {
 
       for (let i = 0; i < intermediatesTable.length; i++) {
 
-        tmpStringCoordinates = intermediatesTable[i].match(/^(\d+\.?\d*),(\d+\.?\d*)/g);
-
-        if (!tmpStringCoordinates) {
+        // Vérification de la validité des coordonnées fournies
+        if (!routeOperation.getParameterById("intermediates").check(intermediatesTable[i])) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
         } else {
-          tmpStringCoordinates = tmpStringCoordinates[0].split(",");
-          intermediatesPoints[i] = {};
+          tmpStringCoordinates = intermediatesTable[i].split(",");
           intermediatesPoints[i].lon = Number(tmpStringCoordinates[0]);
           intermediatesPoints[i].lat = Number(tmpStringCoordinates[1]);
-          // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
         }
 
       }
@@ -134,18 +143,15 @@ module.exports = {
     // getGeometry
     // ---
     if (parameters.getGeometry) {
-      if (parameters.getGeometry === "true") {
-        routeRequest.computeGeometry = true;
+      // Vérification de la validité des coordonnées fournies
+      if (!routeOperation.getParameterById("stepsGeometry").check(parameters.getGeometry)) {
+        throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
       } else {
-        if (parameters.getGeometry === "false") {
-          routeRequest.computeGeometry = false;
-        } else {
-          throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
-        }
+        routeRequest.computeGeometry = parameters.getGeometry;
       }
-
     } else {
-      // TODO: on met la valeur par défaut issue de la configuration
+      // On met la valeur par défaut issue de la configuration
+      routeRequest.computeGeometry = routeOperation.getParameterById("stepsGeometry").defaultValueContent;
     }
     // ---
 
@@ -159,10 +165,10 @@ module.exports = {
       if (attributesTable.length !== 0) {
 
         for (let i=0; i < attributesTable.length; i++) {
-          if (resource.isWayAttributeAvailable(attributesTable[i])) {
-            routeRequest.waysAttributes.push(attributesTable[i]);
-          } else {
+          if (!routeOperation.getParameterById("waysAttributes").check(parameters.waysAttributes)) {
             throw errorManager.createError(" Parameter 'waysAttributes' is invalid: " + attributesTable[i], 400);
+          } else {
+            routeRequest.waysAttributes.push(attributesTable[i]);
           }
         }
 
@@ -231,7 +237,7 @@ module.exports = {
       currentPortion.steps = new Array();
 
       if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
-        
+
         for (let j = 0; j < route.portions[i].steps.length; j++) {
 
           let currentStep = {};

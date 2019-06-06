@@ -83,6 +83,21 @@ module.exports = class Resource {
   /**
   *
   * @function
+  * @name verifyAvailabilityOperation
+  * @description Savoir si une opération est disponible sur la ressource
+  *
+  */
+  verifyAvailabilityOperation(operationId) {
+    if (this._operations[operationId]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+  *
+  * @function
   * @name getOperationById
   * @description Récupérer une opération si elle est disponible sur la ressource
   *
