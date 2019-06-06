@@ -18,13 +18,13 @@ module.exports = class PointParameter extends ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe PointParameter
-  * @param {string} id - Id du paramètre de service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    super(id);
+    super(parameter);
 
     // Bbox
     this._bbox = "";
@@ -60,7 +60,7 @@ module.exports = class PointParameter extends ResourceParameter {
   * @description Charger la configuration
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
     this._bbox = parameterConf.values.bbox;
 
@@ -75,8 +75,8 @@ module.exports = class PointParameter extends ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   *
   */
-  check(userValue) {
-
+  specificCheck(userValue) {
+    console.log(userValue);
     let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
 
     if (!tmpStringCoordinates) {

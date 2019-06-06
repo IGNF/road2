@@ -16,25 +16,25 @@ module.exports = class ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe ResourceParameter
-  * @param {string} id - Id du paramètre, unique au service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    this._serviceParameterId = id;
+    this._serviceParameter = parameter;
 
   }
 
   /**
   *
   * @function
-  * @name get serviceParameterId
+  * @name get serviceParameter
   * @description Récupérer l'id du paramètre
   *
   */
-  get serviceParameterId () {
-    return this._serviceParameterId;
+  get serviceParameter () {
+    return this._serviceParameter;
   }
 
   /**
@@ -44,7 +44,7 @@ module.exports = class ResourceParameter {
   * @description Charger la configuration
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
     return false;
 
@@ -58,6 +58,63 @@ module.exports = class ResourceParameter {
   *
   */
   check(userValue) {
+
+    let userTable = new Array();
+
+    // La vérification dépend de plusieurs attributs du paramètre de service associé
+
+    if (this.serviceParameter.explode === "true") {
+
+      // on lit un tableau de valeurs
+      // on vérifie donc que c'est un tableau qui contient des valeurs
+      if (!Array.isArray(userValue)) {
+        return false;
+      }
+      if (userValue.length === 0) {
+        return false;
+      }
+      userTable = userValue;
+
+    } else {
+
+      // on lit une string qui contient plusieurs valeurs
+      if (typeof userValue !== "string") {
+        return false;
+      }
+
+      // on sépare les valeurs
+      if (this.serviceParameter.style === "pipeDelimited") {
+        userTable = userValue.split("|");
+      } else {
+        return false;
+      }
+
+    }
+
+    // on vérifie le nombre valeur
+    if (userTable.length < this.serviceParameter.min || userTable.length > this.serviceParameter.max) {
+      return false;
+    }
+
+    for (let i = 0; i < userTable.length; i++) {
+      if (!this.specificCheck(userTable[i])) {
+        return false;
+      }
+    }
+
+    // tout s'est bien passé
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name specificCheck
+  * @description Vérifier la validité d'une valeur par rapport au paramètre
+  *
+  */
+  specificCheck(userValue) {
 
     return false;
 

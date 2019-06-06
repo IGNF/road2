@@ -18,13 +18,13 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe BoolParameter
-  * @param {string} id - Id du paramètre de service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    super(id);
+    super(parameter);
 
     // defaultValueContent
     this._defaultValueContent = "";
@@ -63,9 +63,9 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @description Charger la configuration
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
-    if (serviceParameterConf.defaultValue === "true") {
+    if (super.serviceParameter.defaultValue === "true") {
       this._defaultValueContent = parameterConf.defaultValueContent;
     }
 
@@ -80,7 +80,7 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   *
   */
-  check(userValue) {
+  specificCheck(userValue) {
 
     if (userValue !== "true" && userValue !== "false") {
       return false;

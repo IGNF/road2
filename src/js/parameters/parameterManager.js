@@ -35,8 +35,11 @@ module.exports = class parameterManager  {
     // Liste des ids appartenant aux paramètres vérifiés par le manager
     this._listOfVerifiedParameterId = new Array();
 
-    // Stockage des configurations des paramètres
+    // Stockage des configurations des paramètres de service
     this._parametersConfiguration = {};
+
+    // Stockage des paramètres de service
+    this._parameters = {};
 
   }
 
@@ -331,6 +334,9 @@ module.exports = class parameterManager  {
         parametersTable[parameterId].style = parameterConf.style;
       }
 
+      // Stocakge du paramètre
+      this._parameters[parameterId] = parametersTable[parameterId];
+
     }
 
     return parametersTable;
@@ -510,27 +516,30 @@ module.exports = class parameterManager  {
       // on récupère la conf du paramètre de service correspondante
       let curSerParamConf = this._parametersConfiguration[curResParamConf.id];
 
+      // on récupère le paramètre de service
+      let curSerParam = this._parameters[curResParamConf.id];
+
       // en fonction du type, on crée le bon resourceParameter
       let curResParam = {};
 
       if (curSerParamConf.type === "boolean") {
-        curResParam = new BoolParameter(curResParamConf.id);
+        curResParam = new BoolParameter(curSerParam);
       } else if (curSerParamConf.type === "enumeration") {
-        curResParam = new EnumParameter(curResParamConf.id);
+        curResParam = new EnumParameter(curSerParam);
       } else if (curSerParamConf.type === "point") {
-        curResParam = new PointParameter(curResParamConf.id);
+        curResParam = new PointParameter(curSerParam);
       } else {
         LOGGER.error("Type inconnu");
         return false;
       }
 
       // on initialise le paramètre
-      if (!curResParam.load(curSerParamConf, curResParamConf)) {
+      if (!curResParam.load(curResParamConf)) {
         LOGGER.error("Initialisation du parametre en echec");
         return false;
       } else {
         // on le stocke
-        resourceParameterHash[curResParam.serviceParameterId] = curResParam;
+        resourceParameterHash[curResParamConf.id] = curResParam;
       }
 
 

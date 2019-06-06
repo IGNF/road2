@@ -59,11 +59,11 @@ module.exports = class Parameter  {
 
     // explode
     // dans le cas où il y a plusieurs valeurs, cela indique si c'est dans un tableau (true) ou dans une string (false)
-    this._explode = "true";
+    this._explode = "false";
 
     // style
     // si explode = false alors il faut préciser le séparateur utilisé pour différencier les valeurs
-    this._style = "";
+    this._style = "pipeDelimited";
 
   }
 
