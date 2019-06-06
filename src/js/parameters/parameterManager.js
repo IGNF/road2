@@ -161,6 +161,9 @@ module.exports = class parameterManager  {
   */
   checkParameterConf(parameterConf) {
 
+    let tmpMin;
+    let tmpMax;
+
     LOGGER.info("Verification du parametre");
 
     // ID
@@ -204,7 +207,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut required");
       return false;
     } else {
-      //TODO: vérification
+      if (!(parameterConf.required === "true" || parameterConf.required === "false")) {
+        LOGGER.error("Le parametre contient un attribut required mal configure");
+        return false;
+      }
     }
 
     // default
@@ -212,7 +218,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut defaultValue");
       return false;
     } else {
-      //TODO: vérification
+      if (!(parameterConf.defaultValue === "true" || parameterConf.defaultValue === "false")) {
+        LOGGER.error("Le parametre contient un attribut defaultValue mal configure");
+        return false;
+      }
     }
 
     // type
@@ -222,6 +231,59 @@ module.exports = class parameterManager  {
     } else {
       if (parameterConf.type !== "boolean" && parameterConf.type !== "enumeration" && parameterConf.type !== "point") {
         LOGGER.error("Le type du parametre est incorrect");
+        return false;
+      }
+    }
+
+    // example
+    if (!parameterConf.example) {
+      LOGGER.warn("Le parametre ne contient pas d'exemple");
+    }
+
+    // min
+    if (parameterConf.min) {
+
+      tmpMin = parseInt(parameterConf.min, 10);
+
+      if (isNaN(tmpMin)) {
+        LOGGER.error("Le parametre min est incorrect: valeur non entiere");
+        return false;
+      }
+      if (parameter.required === "true") {
+        if (tmpMin < 1) {
+          LOGGER.error("Le parametre min est incorrect: valeur inferieure a 1");
+          return false;
+        }
+      } else {
+        if (tmpMin > 0) {
+          LOGGER.error("Le parametre min est incorrect: valeur superieure a 0");
+          return false;
+        }
+      }
+
+    }
+
+    // max
+    if (parameterConf.max) {
+
+      tmpMax = parseInt(parameterConf.max, 10);
+
+      if (isNaN(tmpMax)) {
+        LOGGER.error("Le parametre max est incorrect: valeur non entiere");
+        return false;
+      }
+
+      if (tmpMax < 1) {
+        LOGGER.error("Le parametre max est incorrect: valeur inferieure a 1");
+        return false;
+      }
+
+    }
+
+    // cohérence entre min et max
+    if (parameterConf.max && parameterConf.min) {
+      if (tmpMax < tmpMin) {
+        LOGGER.error("Le parametre max est incorrect: valeur inferieure au parametre min");
         return false;
       }
     }
@@ -248,6 +310,26 @@ module.exports = class parameterManager  {
       let parameterConf = this._parametersConfiguration[parameterId];
 
       parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.defaultValue);
+
+      if (parameterConf.example) {
+        parametersTable[parameterId].example = parameterConf.example;
+      }
+
+      if (parameterConf.min) {
+        parametersTable[parameterId].min = parameterConf.min;
+      }
+
+      if (parameterConf.max) {
+        parametersTable[parameterId].max = parameterConf.max;
+      }
+
+      if (parameterConf.explode) {
+        parametersTable[parameterId].explode = parameterConf.explode;
+      }
+
+      if (parameterConf.style) {
+        parametersTable[parameterId].style = parameterConf.style;
+      }
 
     }
 
