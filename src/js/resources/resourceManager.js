@@ -151,7 +151,6 @@ module.exports = class resourceManager {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-
   checkResourceOsrm(resourceJsonObject, sourceManager) {
 
     LOGGER.info("Verification de la ressource osrm...");
@@ -240,75 +239,82 @@ module.exports = class resourceManager {
   * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
   */
 
- checkResourcePgr(resourceJsonObject, sourceManager) {
+  checkResourcePgr(resourceJsonObject, sourceManager) {
 
-  LOGGER.info("Verification de la ressource pgr...");
+    LOGGER.info("Verification de la ressource pgr...");
 
-  // Description
-  if (!resourceJsonObject.description) {
-    LOGGER.error("La ressource ne contient pas de description.");
-    return false;
-  } else {
-    // rien à faire
-  }
-
-  // Topology
-  if (!resourceJsonObject.topology) {
-    LOGGER.error("La ressource ne contient pas de topologie.");
-    return false;
-  } else {
-    // Description de la topologie
-    if (!resourceJsonObject.topology.description) {
-      LOGGER.error("La ressource ne contient pas de description de la topologie.");
+    // Description
+    if (!resourceJsonObject.description) {
+      LOGGER.error("La ressource ne contient pas de description.");
       return false;
     } else {
       // rien à faire
     }
-    // Stockage de la topologie
-    if (!resourceJsonObject.topology.storage) {
-      LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
+
+    // Topology
+    if (!resourceJsonObject.topology) {
+      LOGGER.error("La ressource ne contient pas de topologie.");
       return false;
     } else {
-      if (!storageManager.checkJsonStorage(resourceJsonObject.topology.storage)) {
-        LOGGER.error("Stockage de la topologie incorrect.");
+      // Description de la topologie
+      if (!resourceJsonObject.topology.description) {
+        LOGGER.error("La ressource ne contient pas de description de la topologie.");
         return false;
       } else {
         // rien à faire
       }
-    }
-    // Projection de la topologie
-    if (!resourceJsonObject.topology.projection) {
-      LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
-      return false;
-    } else {
-      // TODO: vérifier la projection
-    }
-  }
-
-  // Sources
-  if (!resourceJsonObject.sources) {
-    LOGGER.error("La ressource ne contient pas de sources.");
-    return false;
-  } else {
-
-    LOGGER.info("Verification des sources...")
-
-    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-      let sourceJsonObject = resourceJsonObject.sources[i];
-      if (!sourceManager.checkSource(sourceJsonObject)) {
-        LOGGER.error("La ressource contient une source invalide.");
+      // Stockage de la topologie
+      if (!resourceJsonObject.topology.storage) {
+        LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
         return false;
       } else {
-        // on ne fait rien
+        if (!storageManager.checkJsonStorage(resourceJsonObject.topology.storage)) {
+          LOGGER.error("Stockage de la topologie incorrect.");
+          return false;
+        } else {
+          // rien à faire
+        }
       }
-
+      // Projection de la topologie
+      if (!resourceJsonObject.topology.projection) {
+        LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
+        return false;
+      } else {
+        // TODO: vérifier la projection
+      }
+      // Bbox de la topologie
+      if (!resourceJsonObject.topology.bbox) {
+        LOGGER.error("La ressource ne contient pas d'information sur la bbox de la topologie.")
+        return false;
+      } else {
+        // TODO: vérifier la bbox
+      }
     }
-  }
 
-  LOGGER.info("Fin de la verification de la ressource osrm.");
-  return true;
-}
+    // Sources
+    if (!resourceJsonObject.sources) {
+      LOGGER.error("La ressource ne contient pas de sources.");
+      return false;
+    } else {
+
+      LOGGER.info("Verification des sources...")
+
+      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
+
+        let sourceJsonObject = resourceJsonObject.sources[i];
+        if (!sourceManager.checkSource(sourceJsonObject)) {
+          LOGGER.error("La ressource contient une source invalide.");
+          return false;
+        } else {
+          // on ne fait rien
+        }
+
+      }
+    }
+
+    LOGGER.info("Fin de la verification de la ressource osrm.");
+    return true;
+  }
 
 
   /**
@@ -361,7 +367,7 @@ module.exports = class resourceManager {
     // ---
 
     let resourceOperationTable = new Array();
-    
+
     if (!operationManager.createResourceOperation(resourceOperationTable, resourceJsonObject)) {
       LOGGER.error("Erreur lors de la creation des operations de la ressource");
       return null;
