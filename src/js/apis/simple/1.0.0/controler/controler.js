@@ -116,24 +116,13 @@ module.exports = {
     if (parameters.intermediates) {
 
       // Vérification de la validité des coordonnées fournies
-      let intermediatesTable = parameters.intermediates.split("|");
-
-      // TODO: vérifier le nombre de point intermédiaires par rapport à la configuration
-
-      for (let i = 0; i < intermediatesTable.length; i++) {
-
-        // Vérification de la validité des coordonnées fournies
-        if (!routeOperation.getParameterById("intermediates").check(intermediatesTable[i])) {
+      if (!routeOperation.getParameterById("intermediates").check(parameters.intermediates)) {
+        throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
+      } else {
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates)) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
-        } else {
-          tmpStringCoordinates = intermediatesTable[i].split(",");
-          intermediatesPoints[i].lon = Number(tmpStringCoordinates[0]);
-          intermediatesPoints[i].lat = Number(tmpStringCoordinates[1]);
         }
-
       }
-
-      routeRequest.intermediates = intermediatesPoints;
 
     } else {
       // il n'y a rien à faire
@@ -160,20 +149,12 @@ module.exports = {
     if (parameters.waysAttributes) {
 
       // Vérification de la validité des attributs demandés
-      let attributesTable = parameters.waysAttributes.split("|");
-
-      if (attributesTable.length !== 0) {
-
-        for (let i=0; i < attributesTable.length; i++) {
-          if (!routeOperation.getParameterById("waysAttributes").check(parameters.waysAttributes)) {
-            throw errorManager.createError(" Parameter 'waysAttributes' is invalid: " + attributesTable[i], 400);
-          } else {
-            routeRequest.waysAttributes.push(attributesTable[i]);
-          }
-        }
-
+      if (!routeOperation.getParameterById("waysAttributes").check(parameters.waysAttributes)) {
+        throw errorManager.createError(" Parameter 'waysAttributes' is invalid ", 400);
       } else {
-        // rien à faire
+        if (!routeOperation.getParameterById("waysAttributes").convertIntoTable(parameters.waysAttributes, routeRequest.waysAttributes)) {
+          throw errorManager.createError(" Parameter 'waysAttributes' is invalid ", 400);
+        }
       }
 
     } else {

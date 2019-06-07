@@ -120,5 +120,53 @@ module.exports = class ResourceParameter {
 
   }
 
+  /**
+  *
+  * @function
+  * @name convertIntoTable
+  * @description Convertir l'entrée utilisateur en tableau de points pour une request
+  *
+  */
+  convertIntoTable(userValue, finalTable) {
+
+    let userTable = new Array();
+
+    if (this.serviceParameter.explode === "true") {
+      userTable = userValue;
+    } else {
+
+      if (this.serviceParameter.style === "pipeDelimited") {
+        userTable = userValue.split("|");
+      } else {
+        return false;
+      }
+
+    }
+
+    for (let i = 0; i < userTable.length; i++) {
+
+      if (!this.specificConvertion(userTable[i], finalTable[i])) {
+        return false;
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name specificCheck
+  * @description Vérifier la validité d'une valeur par rapport au paramètre
+  *
+  */
+  specificConvertion(userValue, finalTable) {
+
+    return false;
+
+  }
+
 
 }

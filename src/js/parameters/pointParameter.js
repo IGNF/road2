@@ -71,12 +71,12 @@ module.exports = class PointParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name check
+  * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   *
   */
   specificCheck(userValue) {
-    console.log(userValue);
+
     let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
 
     if (!tmpStringCoordinates) {
@@ -86,6 +86,23 @@ module.exports = class PointParameter extends ResourceParameter {
     }
 
     return true;
+  }
+
+  /**
+  *
+  * @function
+  * @name specificConvertion
+  * @description Convertir une valeur dans un format adapté aux requêtes
+  *
+  */
+  specificConvertion(userValue, finalValue) {
+
+    let tmpStringCoordinates = userValue.split(",");
+    finalValue[i].lon = Number(tmpStringCoordinates[0]);
+    finalValue[i].lat = Number(tmpStringCoordinates[1]);
+
+    return true;
+
   }
 
 

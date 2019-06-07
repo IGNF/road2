@@ -94,5 +94,20 @@ module.exports = class EnumParameter extends ResourceParameter {
 
   }
 
+  /**
+  *
+  * @function
+  * @name specificConvertion
+  * @description Convertir une valeur dans un format adapté aux requêtes
+  *
+  */
+  specificConvertion(userValue, finalValue) {
+
+    finalValue = userValue;
+
+    return true;
+
+  }
+
 
 }
