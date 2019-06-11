@@ -9,8 +9,12 @@ application:
 		mail: "idev@ign.fr"
 	logs:
 		configuration: "configuration_logs.yaml"
+  operations:
+    directory: "/home/src/resources/operations/"
+    parameters:
+      directory: "/home/src/resources/parameters/"
 	resources:
-		directory: "/directory/"
+		directory: "/home/config/resources/"
   network:
     host: "0.0.0.0"
     port: "8080"

@@ -47,6 +47,24 @@
 				"configuration":
 					type: string
 					required: true
+    # Configuration des opérations autorisées dans le service
+    "operations":
+      type: object
+      required: true
+      properties:
+        # Dossier contenant la configuration des ressources
+        "directory":
+          type: string
+          required: true
+        # Configuration des paramètres
+        "parameters":
+          type: object
+          required: true
+          properties:
+            # Dossier contenant la configuration des paramètres
+            "directory":
+              type: string
+              required: true
 		# Configuration des ressources diffusées sur le service
 		"resources":
 			type: object
