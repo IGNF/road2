@@ -16,6 +16,8 @@ module.exports = class Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe source
+  * @param {string} id - Identifiant de la source
+  * @param {string} type - Type de la source
   *
   */
   constructor(id, type) {
@@ -72,10 +74,11 @@ module.exports = class Source {
   * @function
   * @name setConnected
   * @description Attribuer l'état de connexion de la source
+  * @param {boolean} conn - État de la connexion
   *
   */
-  set connected (c) {
-    this._connected = c;
+  set connected (conn) {
+    this._connected = conn;
   }
 
   /**
@@ -94,6 +97,7 @@ module.exports = class Source {
   * @function
   * @name isOperationAvailable
   * @description Savoir si une opération est disponible sur la source
+  * @param {string} operationId - Id de l'opération
   *
   */
   isOperationAvailable (operationId) {

@@ -57,6 +57,8 @@ module.exports = class ResourceOperation  {
   * @function
   * @name getParameterById
   * @description Récupérer un paramètre si il est disponible sur la ressource
+  * @param {string} id - Id du paramètre de ressource
+  * @return {object} Instance d'une classe fille de ResourceParameter, paramètre de ressource
   *
   */
   getParameterById(parameterId) {

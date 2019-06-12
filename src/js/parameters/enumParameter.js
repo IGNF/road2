@@ -61,6 +61,8 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
   load(parameterConf) {
@@ -80,6 +82,8 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
   specificCheck(userValue) {
@@ -99,6 +103,9 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
+  * @param {string} userValue - Valeur à vérifier
+  * @param {table} finalTable - Tableau à remplir
+  * @return {boolean}
   *
   */
   specificConvertion(userValue, finalValue) {

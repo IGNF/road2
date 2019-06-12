@@ -59,6 +59,7 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name set configuration
   * @description Attribuer la configuration de la source
+  * @param {json} conf - Description de la source en json
   *
   */
   set configuration (conf) {
@@ -118,6 +119,7 @@ module.exports = class pgrSource extends Source {
   * @description Traiter une requête.
   * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
+  * @return {Promise}
   *
   */
   computeRequest (request) {
@@ -199,7 +201,6 @@ module.exports = class pgrSource extends Source {
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
   * @param {pgrResponse} pgrResponse - Objet pgrResponse
-  * @param {function} callback - Callback de succès (Objet Response ou dérivant de la classe Response) et d'erreur
   *
   */
   writeRouteResponse (routeRequest, pgrResponse) {

@@ -87,6 +87,7 @@ module.exports = class osrmResource extends Resource {
   * @function
   * @name isWayAttributeAvailable
   * @description Permet de savoir si un attribut est disponible pour cette ressource.
+  * @param {string} attr - Attribut à vérifier
   *
   */
   isWayAttributeAvailable (attr) {

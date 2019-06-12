@@ -28,6 +28,7 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe osrmSource
+  * @param {json} sourceJsonObject - Description de la source en json
   *
   */
   constructor(sourceJsonObject) {
@@ -62,6 +63,7 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name set configuration
   * @description Attribuer la configuration de la source
+  * @param {json} conf - Description de la source en json
   *
   */
   set configuration (conf) {
@@ -84,10 +86,11 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name set osrm
   * @description Attribuer l'objet osrm de la source
+  * @param {object} osrmObject - Objet OSRM
   *
   */
-  set osrm (o) {
-    this._osrm = o;
+  set osrm (osrmObject) {
+    this._osrm = osrmObject;
   }
 
   /**

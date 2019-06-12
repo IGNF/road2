@@ -87,7 +87,7 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée des itinéraires
-  * @param {string} end - Point d'arrivée
+  * @param {string} en - Point d'arrivée
   *
   */
   set end (en) {

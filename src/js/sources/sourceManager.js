@@ -55,6 +55,7 @@ module.exports = class sourceManager {
   * @function
   * @name set listOfSourceIds
   * @description Attribuer l'ensemble des ids de sources
+  * @param {table} list - État de la connexion
   *
   */
   set listOfSourceIds(list) {
@@ -66,6 +67,7 @@ module.exports = class sourceManager {
   * @function
   * @name set sourceDescriptions
   * @description Attribuer l'ensemble des descriptions des sources conservées
+  * @param {object} descriptions - Objet contenant les descriptions
   *
   */
   set sourceDescriptions(descriptions) {
@@ -77,6 +79,7 @@ module.exports = class sourceManager {
   * @function
   * @name getSourceDescriptionById
   * @description Récupérer la description de la source indiquée par son id
+  * @param {string} id - Id de la source 
   *
   */
   getSourceDescriptionById(id) {
@@ -193,7 +196,7 @@ module.exports = class sourceManager {
           LOGGER.error("Le ressource ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
           return false;
         }
-        
+
         if (!this.checkSourcePgr(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source pgr.");
           return false;

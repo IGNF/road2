@@ -16,6 +16,9 @@ module.exports = class Resource {
   * @function
   * @name constructor
   * @description Constructeur de la classe Resource
+  * @param {string} id - Id de la ressource
+  * @param {string} type - Type de la ressource
+  * @param {object} operations - Objet contenant les opérations disponibles sur la ressource
   *
   */
   constructor(id, type, operations) {
@@ -85,6 +88,8 @@ module.exports = class Resource {
   * @function
   * @name verifyAvailabilityOperation
   * @description Savoir si une opération est disponible sur la ressource
+  * @param {string} id - Id de l'opération
+  * @return {boolean}
   *
   */
   verifyAvailabilityOperation(operationId) {
@@ -100,6 +105,8 @@ module.exports = class Resource {
   * @function
   * @name getOperationById
   * @description Récupérer une opération si elle est disponible sur la ressource
+  * @param {string} id - Id de l'opération
+  * @return {object} Instance de l'opération de ressource (ResourceOperation)
   *
   */
   getOperationById(operationId) {

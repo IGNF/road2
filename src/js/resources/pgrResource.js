@@ -58,39 +58,6 @@ module.exports = class pgrResource extends Resource {
   /**
   *
   * @function
-  * @name set defaultOptimization
-  * @description Attribuer l'optmisation par défaut de la ressource
-  *
-  */
-  set defaultOptimization (op) {
-    this._defaultOptimization = op;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultSourceId
-  * @description Récupérer la source par défaut de la ressource
-  *
-  */
-  get defaultSourceId () {
-    return this._defaultSourceId;
-  }
-
-  /**
-  *
-  * @function
-  * @name set defaultSourceId
-  * @description Attribuer la source par défaut de la ressource
-  *
-  */
-  set defaultSourceId (id) {
-    this._defaultSourceId = id;
-  }
-
-  /**
-  *
-  * @function
   * @name get linkedSource
   * @description Récupérer la correspondance entre profile/optimization et sourceId de la ressource
   *

@@ -42,6 +42,8 @@ module.exports = class ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
   load(parameterConf) {
@@ -55,6 +57,8 @@ module.exports = class ResourceParameter {
   * @function
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
   check(userValue) {
@@ -112,6 +116,8 @@ module.exports = class ResourceParameter {
   * @function
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
   specificCheck(userValue) {
@@ -125,6 +131,9 @@ module.exports = class ResourceParameter {
   * @function
   * @name convertIntoTable
   * @description Convertir l'entrée utilisateur en tableau de points pour une request
+  * @param {string} userValue - Valeur à vérifier
+  * @param {table} finalTable - Tableau à remplir
+  * @return {boolean}
   *
   */
   convertIntoTable(userValue, finalTable) {
@@ -160,6 +169,9 @@ module.exports = class ResourceParameter {
   * @function
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @param {table} finalTable - Tableau à remplir
+  * @return {boolean}
   *
   */
   specificConvertion(userValue, finalTable) {

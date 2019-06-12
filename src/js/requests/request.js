@@ -50,6 +50,7 @@ module.exports = class Request {
   * @function
   * @name set resource
   * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
   *
   */
   set resource (res) {
@@ -72,6 +73,7 @@ module.exports = class Request {
   * @function
   * @name set operation
   * @description Attribuer l'opération de la requête
+  * @param {string} op - Nom de l'opération
   *
   */
   set operation (op) {
@@ -94,6 +96,7 @@ module.exports = class Request {
   * @function
   * @name set type
   * @description Attribuer le type de la requête
+  * @param {string} ty - Type de la requête 
   *
   */
   set type (ty) {

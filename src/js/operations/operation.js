@@ -87,6 +87,8 @@ module.exports = class Operation  {
   * @function
   * @name getParameterById
   * @description Récupérer un paramètre de l'opération via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {object} Instance de la classe Parameter, paramètre de service
   *
   */
   getParameterById (id) {

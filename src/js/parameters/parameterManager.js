@@ -70,6 +70,8 @@ module.exports = class parameterManager  {
   * @function
   * @name getParameterConfigurationById
   * @description Récupérer la configuration d'un paramètre via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {object} Instance de Parameter, paramètre de service
   *
   */
   getParameterConfigurationById(id) {
@@ -85,6 +87,8 @@ module.exports = class parameterManager  {
   * @function
   * @name isParameterAvailable
   * @description Permet de savoir si un paramètre est disponible, via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {boolean}
   *
   */
   isParameterAvailable(id) {
@@ -107,6 +111,8 @@ module.exports = class parameterManager  {
   * @function
   * @name loadParameterDirectory
   * @description Charger les paramètres du dossier
+  * @param {string} parametersDirectory - Dossier contenant la description des paramètres
+  * @return {boolean}
   *
   */
   loadParameterDirectory(parametersDirectory) {
@@ -160,6 +166,8 @@ module.exports = class parameterManager  {
   * @function
   * @name checkParameterConf
   * @description Vérifier la configuration d'un paramètre
+  * @param {json} parametersConf - Configuration du paramètre de service
+  * @return {boolean}
   *
   */
   checkParameterConf(parameterConf) {
@@ -301,6 +309,8 @@ module.exports = class parameterManager  {
   * @function
   * @name createParameters
   * @description Créer les objets paramètres à partir de la configuration d'une opération
+  * @param {json} operationConf - Configuration d'une opération de service
+  * @return {table} Tableau d'instance de Parameter, paramètre de service
   *
   */
   createParameters(operationConf) {
@@ -348,6 +358,8 @@ module.exports = class parameterManager  {
   * @function
   * @name checkResourceParameterConf
   * @description Vérifier la configuration d'un paramètre de ressource
+  * @param {json} resourceParameterJsonObject - Configuration d'un paramètre de ressource
+  * @return {boolean}
   *
   */
   checkResourceParameterConf(resourceParameterJsonObject) {
@@ -500,6 +512,9 @@ module.exports = class parameterManager  {
   * @function
   * @name createResourceParameter
   * @description Créer l'ensemble des opérations d'une ressource
+  * @param {object} resourceParameterHash - Objet contenant l'ensemble des paramètres de ressource pour une ressource
+  * @param {json} currentOperationConf - Configuraton de l'opération de ressource pour une ressource 
+  * @return {boolean}
   *
   */
   createResourceParameter(resourceParameterHash, currentOperationConf) {

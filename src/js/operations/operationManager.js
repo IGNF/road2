@@ -54,6 +54,8 @@ module.exports = class operationManager  {
   * @function
   * @name isOperationAvailable
   * @description Savoir si une opération est disponible
+  * @param {string} id - Id de l'opération de service
+  * @return {boolean}
   *
   */
   isOperationAvailable(id) {
@@ -76,6 +78,10 @@ module.exports = class operationManager  {
   * @function
   * @name loadOperationDirectory
   * @description Charger les opérations du dossier
+  * @param {object} operationCatalog - Catalogue des opérations sur le service
+  * @param {string} userOperationDirectory - Dossier contenant les opérations
+  * @param {string} userParameterDirectory - Dossier contenant les paramètres
+  * @return {boolean}
   *
   */
   loadOperationDirectory(operationCatalog, userOperationDirectory, userParameterDirectory) {
@@ -146,6 +152,8 @@ module.exports = class operationManager  {
   * @function
   * @name checkOperationConf
   * @description Vérifier la configuration d'une opération
+  * @param {json} operationConf - Configuration d'une opération de service
+  * @return {boolean}
   *
   */
   checkOperationConf(operationConf) {
@@ -220,6 +228,8 @@ module.exports = class operationManager  {
   * @function
   * @name checkResourceOperationConf
   * @description Vérifier la configuration d'une opération de ressource
+  * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
+  * @return {boolean}
   *
   */
   checkResourceOperationConf(resourceOperationJsonObject) {
@@ -292,6 +302,9 @@ module.exports = class operationManager  {
   * @function
   * @name getResourceOperationConf
   * @description Récupérer la liste des opérations disponibles sur une ressource
+  * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
+  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
+  * @return {boolean}
   *
   */
   getResourceOperationConf(resourceOperationJsonObject, operationTable) {
@@ -339,6 +352,9 @@ module.exports = class operationManager  {
   * @function
   * @name isAvailableInTable
   * @description Savoir si une opération est disponible dans une liste d'opérations de ressource
+  * @param {string} operationId - Id de l'opération de ressource recherchée
+  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
+  * @return {boolean}
   *
   */
 
@@ -367,6 +383,9 @@ module.exports = class operationManager  {
   * @function
   * @name createResourceOperation
   * @description Créer l'ensemble des opérations d'une ressource
+  * @param {object} resourceOperationHash - Objet contenant les opérations de ressource
+  * @param {json} resourceJsonObject - Configuration d'une opération de ressource 
+  * @return {boolean}
   *
   */
   createResourceOperation(resourceOperationHash, resourceJsonObject) {
@@ -387,7 +406,7 @@ module.exports = class operationManager  {
         LOGGER.error("Erreur lors de la creation des parametres de l'operation");
         return false;
       }
-      
+
       // création de l'objet et stockage
       resourceOperationHash[currentOperationConf.id] = new ResourceOperation(currentOperationConf.id, resourceParameterHash);
 
