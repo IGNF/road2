@@ -114,12 +114,14 @@ module.exports = class Source {
   * @function
   * @name connect
   * @description Fonction pour utiliser pour connecter une source. Elle doit être ré-écrite dans chaque classe fille.
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async connect() {
-    this.connected = true;
-    return true;
+    try {
+      this.connected = true;
+    } catch (err) {
+      throw errorManager.createError("Cannot connect source");
+    }
   }
 
   /**
@@ -127,12 +129,10 @@ module.exports = class Source {
   * @function
   * @name disconnect
   * @description Fonction pour utiliser pour déconnecter une source. Elle doit être ré-écrite dans chaque classe fille.
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnect() {
     this.connected = false;
-    return true;
   }
 
   /**

@@ -71,26 +71,19 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name connect
   * @description Connection à la base pgRouting
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async connect() {
     // Connection à la base de données
     LOGGER.info("Connection à la base de données : " + this._dbConfig.database);
     try {
-      const err = await this._client.connect();
-      if (err) {
-        LOGGER.error('connection error', err.stack)
-        return false;
-      }
+      await this._client.connect();
+      LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
+      super.connected = true;
     } catch (err) {
       LOGGER.error('connection error', err.stack)
-      return false;
+      throw errorManager.createError("Cannot connect source");
     }
-
-    LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
-    super.connected = true;
-    return true;
   }
 
   /**
@@ -98,18 +91,21 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name disconnect
   * @description Déconnection à la base pgRouting
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnect() {
-    const err = await this._client.end();
-    if (err) {
-      LOGGER.error('connection error', err.stack)
-      return false;
+    try {
+      const err = await this._client.end();
+      if (err) {
+        LOGGER.error('deconnection error', err.stack)
+        throw errorManager.createError("Cannot disconnect source");
+      } else {
+        LOGGER.info("Déonnecté à la base : " + this._dbConfig.database);
+        super.connected = false;
+      }
+    } catch(err) {
+      throw errorManager.createError("Cannot disconnect source");
     }
-    LOGGER.info("Connecté à la base : " + this._dbConfig.database);
-    super.connected = true;
-    return true;
   }
 
   /**
@@ -165,9 +161,9 @@ module.exports = class pgrSource extends Source {
       // ---
       const query_string = "SELECT * FROM " + sql_function +
         "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
-        this._configuration.cost.compute.storage.costColumn +
+        this._configuration.storage.costColumn +
         "','" +
-        this._configuration.cost.compute.storage.rcostColumn +
+        this._configuration.storage.rcostColumn +
         "')";
 
       return new Promise( (resolve, reject) => {
@@ -259,9 +255,8 @@ module.exports = class pgrSource extends Source {
       response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
 
-    if (response.waypoints.length < 2) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
-      throw errorManager.createError(" PGR response is invalid: the number of waypoints is lower than 2. ");
+    if (response.waypoints.length < 1) {
+      throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
     }
 
     // start
@@ -273,8 +268,7 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      // Cela veut dire que l'on n'a pas un start et un end dans la réponse pgr
-      throw errorManager.createError(" PGR response is invalid: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No PGR path found: the number of routes is equal to 0. ");
     }
 
     // routes

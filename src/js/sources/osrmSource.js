@@ -98,19 +98,20 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name connect
   * @description Chargement de la source OSRM, donc du fichier osrm
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async connect() {
+    try {
+      // Récupération de l'emplacement du fichier OSRM
+      let osrmFile = this._configuration.storage.file;
+      LOGGER.info("Chargement du fichier OSRM: " + osrmFile);
 
-    // Récupération de l'emplacement du fichier OSRM
-    let osrmFile = this._configuration.storage.file;
-    LOGGER.info("Chargement du fichier OSRM: " + osrmFile);
-
-    // Chargement du fichier OSRM
-    this._osrm = new OSRM(osrmFile);
-    super.connected = true;
-    return true;
+      // Chargement du fichier OSRM
+      this._osrm = new OSRM(osrmFile);
+      super.connected = true;
+    } catch (err) {
+      throw errorManager.createError("Cannot connect source");
+    }
 
   }
 
@@ -119,12 +120,10 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name disconnect
   * @description Déchargement de la source OSRM, donc du fichier osrm
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnect() {
     super.connected = false;
-    return true;
   }
 
   /**

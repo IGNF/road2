@@ -17,7 +17,7 @@ describe('Test de la classe pgrSource', function() {
     "id": "test-car-fastest",
     "type": "pgr",
     "storage": {
-      "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json",
+      "dbConfig": "/home/docker/app/test/mocha/config/dbs/db_config_test.json",
       "costColumn": "cost_s_car",
       "rcostColumn": "reverse_cost_s_car"
     },
@@ -89,8 +89,7 @@ describe('Test de la classe pgrSource', function() {
   describe('Test de connect()', function() {
 
     it('Connect()', async function() {
-      const sourceConnected = await source.connect();
-      assert.equal(sourceConnected, true);
+      await source.connect();
     });
 
   });
@@ -98,8 +97,7 @@ describe('Test de la classe pgrSource', function() {
   describe('Test de disconnect()', function() {
 
     it('Disconnect()', async function() {
-      const sourceDisonnected = await source.disconnect();
-      assert.equal(sourceDisonnected, true);
+      await source.disconnect();
     });
 
   });

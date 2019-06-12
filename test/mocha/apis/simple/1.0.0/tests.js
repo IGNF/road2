@@ -79,7 +79,9 @@ describe('Test de l\'api simple 1.0.0', function() {
       routeResponse.optimization = 'fastest';
       routeResponse.routes = [route];
 
-      assert.deepEqual(controler.writeRouteResponse(routeResponse), referenceResponse);
+      const routeRequest = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.76385, lat: 41.953932}, "car", "fastest");
+
+      assert.deepEqual(controler.writeRouteResponse(routeRequest, routeResponse), referenceResponse);
     });
 
   });

@@ -55,10 +55,7 @@ async function start() {
 
   // Chargement des sources uniques
   try {
-    const sourcesLoaded = await service.loadSources();
-    if (!sourcesLoaded) {
-      pm.shutdown(1);
-    }
+    await service.loadSources();
   } catch (err) {
     LOGGER.fatal("Impossible de charger les sources", err);
     pm.shutdown(1);

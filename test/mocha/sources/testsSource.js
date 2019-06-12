@@ -43,8 +43,7 @@ describe('Test de la classe Source', function() {
     let source = new Source("mon-id", "osrm");
 
     it('Connect()', async function() {
-      const sourceConnected = await source.connect();
-      assert.equal(sourceConnected, true);
+      await source.connect();
     });
 
   });
@@ -54,8 +53,7 @@ describe('Test de la classe Source', function() {
     let source = new Source("mon-id", "osrm");
 
     it('Disconnect()', async function() {
-      const sourceDisconnected = await source.disconnect();
-      assert.equal(sourceDisconnected, true);
+      await source.disconnect();
     });
 
   });

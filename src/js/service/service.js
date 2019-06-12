@@ -5,6 +5,7 @@ const path = require('path');
 const express = require('express');
 const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
+const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
 const log4js = require('log4js');
@@ -558,32 +559,21 @@ module.exports = class Service {
 
         // On vérifie que le source peut bien être chargée ou connectée
         try {
-          const connectedSource = await this._sourceManager.connectSource(currentSource);
-          if (connectedSource) {
-            // On la stocke
-            this._sourceCatalog[sourceId] = currentSource;
-            loadedSources++;
-
-          } else {
-            // on n'a pas pu se connecter à la source
-            // TODO: remplacer ce comportement par une gestion plus fine des ressources
-            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
-            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId);
-            return false;
-          }
+          await this._sourceManager.connectSource(currentSource);
+          this._sourceCatalog[sourceId] = currentSource;
         } catch (err) {
-            // on n'a pas pu se connecter à la source
-            // TODO: remplacer ce comportement par une gestion plus fine des ressources
-            // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
-            LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
-            return false;
-        }
+          // on n'a pas pu se connecter à la source
+          // TODO: remplacer ce comportement par une gestion plus fine des ressources
+          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
+          LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
+          throw errorManager.createError("Impossible de se connecter a la source");
+      }
 
       }
 
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
-      return false;
+      throw errorManager.createError("No source found");
     }
 
     if (loadedSources === 0) {
@@ -668,7 +658,6 @@ module.exports = class Service {
   * La ressource sait comment déterminer la source concernée par la requête.
   * Et la source interrogera le moteur.
   * @param {Request} request - Requête
-  * @param {Promise} Promesse qui sera transmise au moteur pour la fin de son calcul
   *
   */
 
@@ -693,7 +682,11 @@ module.exports = class Service {
     //On renvoie la requête vers le moteur
     // ---
     // C'est la source qui fait le lien avec un moteur
-    return source.computeRequest(request);
+    try {
+      return source.computeRequest(request);
+    } catch(err) {
+      return err
+    }
     // ---
 
   }
@@ -704,7 +697,6 @@ module.exports = class Service {
   * @name disconnectAllSources
   * @description Fonction utilisée pour déconnecter toutes les sources.
   * @param {Source} source - Objet Source ou hérité de la classe Source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
   async disconnectAllSources() {
@@ -715,7 +707,6 @@ module.exports = class Service {
       }
     } catch (err) {
       LOGGER.error("Impossible de déconnecter la source.", err);
-      return false;
     }
   }
 
