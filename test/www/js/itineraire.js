@@ -1,6 +1,6 @@
 //Variables Globales
 
-var road2Url = 'http://lambiek.ign.fr:8080/simple/1.0.0/route?resource=corse-osm'
+var road2Url = 'http://localhost:8080/simple/1.0.0/route?resource=corse-osm'
 
 
 //Carte

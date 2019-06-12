@@ -43,6 +43,11 @@ async function start() {
   // Sauvegarde de la configuration des logs
   service.logConfiguration = logConfiguration;
 
+  // Chargement des opérations rendues disponibles sur le service
+  if (!service.loadOperations()) {
+    pm.shutdown(1);
+  }
+
   // Chargement des ressources
   if (!service.loadResources()) {
     pm.shutdown(1);

@@ -7,6 +7,7 @@ const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
+const OperationManager = require('../operations/operationManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -31,6 +32,12 @@ module.exports = class Service {
   *
   */
   constructor() {
+
+    // Manager des opérations disponibles sur le service
+    this._operationManager = new OperationManager();
+
+    // catalogue des opérations disponibles
+    this._operationCatalog = {};
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager();
@@ -82,6 +89,49 @@ module.exports = class Service {
   * @description Récupérer l'ensemble des ressources
   *
   */
+  get operationCatalog() {
+    return this._operationCatalog;
+  }
+
+  /**
+  *
+  * @function
+  * @name verifyAvailabilityOperation
+  * @description Savoir si une opération est disponible sur le service
+  * @param {string} operationId - Id de l'opération
+  *
+  */
+  verifyAvailabilityOperation(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+  *
+  * @function
+  * @name getOperationById
+  * @description Récupérer une opération si elle est disponible sur le service
+  * @param {string} operationId - Id de l'opération
+  *
+  */
+  getOperationById(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return this._operationCatalog[operationId];
+    } else {
+      return {};
+    }
+  }
+
+  /**
+  *
+  * @function
+  * @name get resourceCatalog
+  * @description Récupérer l'ensemble des ressources
+  *
+  */
   get resourceCatalog() {
     return this._resourceCatalog;
   }
@@ -102,6 +152,7 @@ module.exports = class Service {
   * @function
   * @name set logConfiguration
   * @description Attribuer la configuration des logs
+  * @param {json} lc - Configuration des logs
   *
   */
   set logConfiguration(lc) {
@@ -113,6 +164,7 @@ module.exports = class Service {
   * @function
   * @name getResourceById
   * @description Récupérer une ressource par son id
+  * @param {string} id - Id de la ressource
   *
   */
   getResourceById(id) {
@@ -124,6 +176,7 @@ module.exports = class Service {
   * @function
   * @name verifyResourceExistenceById
   * @description Savoir si une ressource existe à partir de son id
+  * @param {string} id - Id de la ressource
   *
   */
   verifyResourceExistenceById(id) {
@@ -150,6 +203,7 @@ module.exports = class Service {
   * @function
   * @name getSourceById
   * @description Récupérer une source par son id
+  * @param {string} id - Id de la source
   *
   */
   getSourceById(id) {
@@ -160,7 +214,8 @@ module.exports = class Service {
   *
   * @function
   * @name verifySourceExistenceById
-  * @description Savoir si une ressource existe à partir de son id
+  * @description Savoir si une source existe à partir de son id
+  * @param {string} id - Id de la source
   *
   */
   verifySourceExistenceById(id) {
@@ -235,6 +290,61 @@ module.exports = class Service {
       }
     } else {
       LOGGER.warn("Configuration incomplete: Objet 'application:provider' manquant !");
+    }
+    // Information sur les opérations
+    if (userConfiguration.application.operations) {
+      // Dossier contenant les fichiers d'opérations
+      if (!userConfiguration.application.operations.directory) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:directory' manquant !");
+        return false;
+      } else {
+        // On vérifie que le dossier existe et qu'il contient des fichiers de description des opérations
+        let directory =  path.resolve(__dirname,userConfiguration.application.operations.directory);
+        if (fs.existsSync(directory)) {
+          // On vérifie que l'application peut lire les fichiers du dossier
+          fs.readdirSync(directory).forEach(operation => {
+            try {
+              var file = directory + "/" + operation;
+              fs.accessSync(file, fs.constants.R_OK);
+            } catch (err) {
+              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+            }
+          });
+          // On vérifie que la partie concernant les paramètres est bien renseignée
+          if (!userConfiguration.application.operations.parameters) {
+            LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters' manquant !");
+            return false;
+          } else {
+            if (!userConfiguration.application.operations.parameters.directory) {
+              LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters:directory' manquant !");
+              return false;
+            } else {
+              // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres
+              let directory =  path.resolve(__dirname,userConfiguration.application.operations.parameters.directory);
+              if (fs.existsSync(directory)) {
+                // On vérifie que l'application peut lire les fichiers du dossier
+                fs.readdirSync(directory).forEach(parameter => {
+                  try {
+                    var file = directory + "/" + parameter;
+                    fs.accessSync(file, fs.constants.R_OK);
+                  } catch (err) {
+                    LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                  }
+                });
+              } else {
+                LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+                return false;
+              }
+            }
+          }
+        } else {
+          LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+          return false;
+        }
+      }
+    } else {
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:operations' manquant !");
+      return false;
     }
     // Information sur les ressources
     if (userConfiguration.application.resources) {
@@ -327,6 +437,38 @@ module.exports = class Service {
 
   }
 
+
+  /**
+  *
+  * @function
+  * @name loadOperations
+  * @description Chargement des opérations
+  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
+  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
+  *
+  */
+
+  loadOperations(operationsDirectory, parametersDirectory) {
+
+    LOGGER.info("Chargement des operations...");
+
+    if (!operationsDirectory) {
+      operationsDirectory = this._configuration.application.operations.directory;
+    }
+
+    if (!parametersDirectory) {
+      parametersDirectory = this._configuration.application.operations.parameters.directory;
+    }
+
+    if (!this._operationManager.loadOperationDirectory(this._operationCatalog, operationsDirectory, parametersDirectory)) {
+      LOGGER.error("Erreur lors du chargement des operations.");
+      return false;
+    }
+
+    return true;
+
+  }
+
   /**
   *
   * @function
@@ -340,6 +482,8 @@ module.exports = class Service {
 
     LOGGER.info("Chargement des ressources...");
 
+    let loadedResources = 0;
+
     if (!userResourceDirectory) {
       userResourceDirectory = this._configuration.application.resources.directory;
     }
@@ -347,25 +491,37 @@ module.exports = class Service {
     let resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
 
     // Pour chaque fichier du dossier des ressources, on crée une ressource
-    fs.readdirSync(resourceDirectory).filter( (file) => {
+    let test = fs.readdirSync(resourceDirectory).filter( (file) => {
       return path.extname(file).toLowerCase() === ".resource";
     }).forEach(fileName => {
+
       let resourceFile = resourceDirectory + "/" + fileName;
       LOGGER.info("Chargement de: " + resourceFile);
 
       // Récupération du contenu en objet pour vérification puis création de la ressource
-      let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
-      LOGGER.debug(resourceContent);
+      try {
 
-      // Vérification du contenu
-      if (!this._resourceManager.checkResource(resourceContent,this._sourceManager)) {
-        LOGGER.error("Erreur lors du chargement de: " + resourceFile);
-      } else {
-        // Création de la ressource
-        this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent);
+        let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
+        // Vérification du contenu
+        if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
+          LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+        } else {
+          // Création de la ressource
+          this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
+          loadedResources++;
+        }
+
+      } catch (error) {
+        LOGGER.error(error);
+        LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
       }
 
     });
+
+    if (loadedResources === 0) {
+      LOGGER.fatal("Aucune ressource n'a pu etre chargee");
+      return false;
+    }
 
     return true;
 
@@ -382,6 +538,8 @@ module.exports = class Service {
   async loadSources() {
 
     LOGGER.info("Chargement des sources...");
+
+    let loadedSources = 0;
 
     // On récupère les informations du resourceManager pour les intégrer au sourceManager du service
     let listOfSourceIds = this._sourceManager.listOfSourceIds;
@@ -416,6 +574,11 @@ module.exports = class Service {
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
+    }
+
+    if (loadedSources === 0) {
+      LOGGER.fatal("Aucune source n'a pu etre chargee");
+      return false;
     }
 
     return true;

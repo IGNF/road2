@@ -12,8 +12,14 @@
     "logs": {
       "configuration": "/home/docker/data/log4js.json"
     },
+    "operations":{
+      "directory": "/home/docker/app/src/resources/operations",
+      "parameters": {
+        "directory": "/home/docker/app/src/resources/parameters"
+      }
+    },
     "resources": {
-      "directory": "/home/docker/data/resources/"
+      "directory": "/home/docker/config/resources/"
     },
     "network": {
       "host": "0.0.0.0",

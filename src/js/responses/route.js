@@ -47,7 +47,7 @@ module.exports = class Route {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'itinéraire
-  * @param {string} geometry - Géométrie de l'étape
+  * @param {string} st - Géométrie de l'étape
   *
   */
   set geometry (st) {

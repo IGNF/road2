@@ -40,6 +40,22 @@ Ce qui fait le lien entre un moteur de calcul et le reste de l'application est l
 
 Pour ajouter un moteur, il faut donc ajouter une source. Cette source peut ensuite être utilisée dans plusieurs ressources. Et cela, conjointement à d'autres types de sources.
 
+### Les opérations
+
+Une opération est un calcul que l'on veut réaliser. Un calcul d'itinéraire, un calcul d'isochrone, un distancier sont des exemples d'opérations attendues. Or, un moteur donné ne peut pas forcément réaliser toutes ces opérations. Il se peut que l'un puisse faire des itinéraires et des distancier mais pas des isochrones. Il est donc nécessaire de savoir ce qu'un moteur peut faire.
+
+De plus, une opération donnée peut être plus ou moins gourmandes en ressource. On voudra donc potentiellement gérer finement les autorisations d'opérations sur le service ou une ressource.
+
+Road2 intègre donc la notion d'opération pour gérer ces différentes problématiques.
+
+#### Les paramètres
+
+Chaque opération possède des paramètres pour pouvoir effectuer un calcul. La plupart des paramètres peuvent se regrouper dans des catégories. Par exemple, un paramètre pourra être un mot clé issue d'une liste ou un point représentant des coordonnées.
+
+Au sein de ces catégories, la vérification de la validité d'un paramètre suivra le même principe. Par exemple, pour un point, on va toujours vérifier s'il est inclue dans une emprise. Pour un mot clé, on va vérifier qu'il fait bien partie d'une liste prédéfinie.
+
+Afin de mutualiser le code, des classes de paramètres ont été créées. Et elles peuvent être utilisées n'importe où dans le code. On trouvera un exemple dans l'api simple.
+
 ## Modification du code
 
 ### API
@@ -49,7 +65,7 @@ La gestion des APIs se fait dans le dossier `src/js/apis`. Ce dossier suit l'arb
 L'ensemble des APIs est chargé par `src/js/utils/apisManager.js`. Ce fichier permet la lecture du dossier des APIs et leurs prises en compte dans l'application.
 
 Il est parfois utile d'effectuer des traitements lors du chargement de l'application. On voudra par exemple générer un getCapabilities. On pourra également vouloir le mettre à jour durant la vie de l'application. Un router ExpressJS ne permet pas de stocker des objets, ni d'effectuer des traitements avant la mise en place du serveur, ni pendant la vie de l'application.
-Pour gérer de telles problématiques, il est possible de créer les fichiers `init.js` et `update.js` qui seront dans dans le dossier de l'api. Ces fichiers devront être des modules NodeJS qui exportent une fonction `run(app, uid)`. C'est cette fonction qui sera appelée lors de l'initialisation de l'application et lors des mises à jours nécessaires. Le paramètre `app` est l'instance d'ExpressJS qui permet de stocker des références à des objets. Et le paramètre `uid` est un identifiant propre à chaque api qui permet de stocker des objets avec un faible risque de le perdre écrasé par un autre. 
+Pour gérer de telles problématiques, il est possible de créer les fichiers `init.js` et `update.js` qui seront dans dans le dossier de l'api. Ces fichiers devront être des modules NodeJS qui exportent une fonction `run(app, uid)`. C'est cette fonction qui sera appelée lors de l'initialisation de l'application et lors des mises à jours nécessaires. Le paramètre `app` est l'instance d'ExpressJS qui permet de stocker des références à des objets. Et le paramètre `uid` est un identifiant propre à chaque api qui permet de stocker des objets avec un faible risque de le perdre écrasé par un autre.
 
 #### Modifier une API existante
 
@@ -123,6 +139,23 @@ Il suffit de supprimer la classe concernée et ses usages dans les APIs et les s
 
 Il suffit de créer une classe fille de `Request` et d'implémenter son usage dans une ou plusieurs APIs et sources.
 
+### Operation
+
+Une opération est définie par un id et des paramètres. Un paramètre est quant à lui définie par un id et d'autres attributs. Tout cela se définit via des fichiers de configuration JSON. Ces documents doivent être placés dans deux dossiers: un pour les opérations et un pour les paramètres. Actuellement, ils sont dans `src/resources/`. Ces dossiers sont précisés dans le fichier de configuration de l'application.
+
+Les dossiers `src/js/operations` et `src/js/parameters` contiennent le code nécessaire à la gestion des opérations et des paramètres.
+
+Il y a une distinction à faire entre les opérations de service et les opérations de ressource. Les opérations de services sont les opérations permises sur le service. Elles sont décrites par les JSON de `src/resources/`. Les opérations de ressource sont la déclinaison de ces opérations avec des paramètres spécifiques à chaque ressource. Ils sont décrits dans le fichier ressource.
+Par exemple, on peut déclarer une opération de service que l'on nommera `route`. Pour le service, cette opération existe, est disponible et est décrite via des fichiers JSON. Cette opération peut nécessiter un paramètre `start`. À ce niveau, on sait que l'opération, que le paramètre existe et est obligatoire. Mais on ne sait pas quelles valeurs il peut prendre. Cela dépend de la ressource. Chaque ressource peut avoir une emprise différente.
+
+#### Ajouter/modifier/supprimer une opération
+
+Il suffit de travailler sur les fichiers JSON qui décrivent les opérations.
+
+#### Ajouter/modifier/supprimer un type de paramètre
+
+Il suffit de travailler sur les classes filles de `resourceParameter` et le `parameterManager`. 
+
 ## Fonctionnement du code
 
 ### Au lancement de l'application
@@ -145,7 +178,7 @@ On peut supposer que l'objectif sera de faire un calcul d'itinéraire. Road2 int
 
 S'il y a des pré-traitements à effectuer avant de lancer un calcul, il sera préférable de les définir dans le fichier `index.js` qui contient la définition du router ou dans d'autres fichiers mais qui seront dans le dossier de l'API `${apiName}/${apiVersion}`. On préférera le même fonctionnement pour les post-traitements. Cela permettra de garder un code modulaire. Par exemple, la suppression d'une API n'entraînera pas la mort de certaines parties du code.
 
-Une fois les potientiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au service de l'application via la fonction `service.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
+Une fois les potentiels pré-traitements faits, il faut nécessairement créer un objet `request` pour l'envoyer au service de l'application via la fonction `service.computeRequest()`. Cette fonction va lancer le calcul et créer un objet `response` que l'API pourra alors ré-écrire pour répondre au client.
 
 Lors du traitement d'une requête `req` issue d'ExpressJS, il sera possible d'accéder à l'instance de la classe `Service` qui contient de nombreuses informations utiles. Cela sera possible par la méthode `req.app.get("service")` qui retourne l'instance du service.
 

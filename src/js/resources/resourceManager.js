@@ -44,11 +44,13 @@ module.exports = class resourceManager {
   * @name checkResource
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
+  * @param {object} operationManager - Manager d'opération du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
-  checkResource(resourceJsonObject, sourceManager) {
+  checkResource(resourceJsonObject, sourceManager, operationManager) {
 
     LOGGER.info("Verification de la ressource...");
 
@@ -121,6 +123,46 @@ module.exports = class resourceManager {
       }
     }
 
+    let currentAvailableOp = new Array();
+    // availableOperations
+    if (!resourceJsonObject.resource.availableOperations) {
+      LOGGER.error("La ressource ne contient pas de availableOperations.");
+      return false;
+    } else {
+      // on fait la vérification via le operationManager
+      if (!operationManager.checkResourceOperationConf(resourceJsonObject.resource.availableOperations)) {
+        LOGGER.error("Mauvaise configuration des operations dans la ressource.");
+        return false;
+      } else {
+        // on récupère la liste des opérations validées pour cette ressource
+        if (!operationManager.getResourceOperationConf(resourceJsonObject.resource.availableOperations, currentAvailableOp)) {
+          LOGGER.error("Impossible de recuperer les operations de la ressource.");
+          return false;
+        }
+      }
+    }
+
+    // Sources
+    if (!resourceJsonObject.resource.sources) {
+      LOGGER.error("La ressource ne contient pas de sources.");
+      return false;
+    } else {
+
+      LOGGER.info("Verification des sources...")
+
+      for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
+
+        let sourceJsonObject = resourceJsonObject.resource.sources[i];
+        if (!sourceManager.checkSource(sourceJsonObject, operationManager, currentAvailableOp)) {
+          LOGGER.error("La ressource contient une source invalide.");
+          return false;
+        } else {
+          // on ne fait rien
+        }
+
+      }
+    }
+
     // on sauvegarde l'id de la ressource pour savoir qu'elle a déjà été vérifiée et que sa description est valide
     this._listOfVerifiedResourceIds.push(resourceJsonObject.resource.id);
 
@@ -136,6 +178,7 @@ module.exports = class resourceManager {
   * @name checkResourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource osrm.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
@@ -183,84 +226,13 @@ module.exports = class resourceManager {
       } else {
         // TODO: vérifier la projection
       }
-    }
-
-    // Sources
-    if (!resourceJsonObject.sources) {
-      LOGGER.error("La ressource ne contient pas de sources.");
-      return false;
-    } else {
-
-      LOGGER.info("Verification des sources...")
-
-      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-        let sourceJsonObject = resourceJsonObject.sources[i];
-        if (!sourceManager.checkSource(sourceJsonObject)) {
-          LOGGER.error("La ressource contient une source invalide.");
-          return false;
-        } else {
-          // on ne fait rien
-        }
-
-      }
-    }
-
-    // AvailableOperations
-    if (!resourceJsonObject.availableOperations) {
-      LOGGER.error("La ressource ne contient pas de descriptions sur les operations possibles.");
-      return false;
-    } else {
-
-      // waysAttributes
-      // OSRM ne propose qu'un attribut sur les voies, c'est leur nom
-      // Il n'est donc pas nécessaire préciser que le met à disposition ou pas dans la description d'une ressource
-      // Par contre, il sera précisé dans le GetCapabilities pour que l'utilisateur soit au courant de son existence 
-
-    }
-
-    // DefaultSourceId
-    if (!resourceJsonObject.defaultSourceId) {
-      LOGGER.error("La ressource ne contient pas un id de source par defaut.");
-      return false;
-    } else {
-
-      let foundId = false;
-
-      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-        let sourceJsonObject = resourceJsonObject.sources[i];
-
-        if (sourceJsonObject.id === resourceJsonObject.defaultSourceId) {
-          foundId = true;
-          break;
-        }
-      }
-      if (!foundId) {
-        LOGGER.error("L'id par defaut de la ressource ne correspond a aucun id de sources definies.");
+      // Bbox de la topologie
+      if (!resourceJsonObject.topology.bbox) {
+        LOGGER.error("La ressource ne contient pas d'information sur la bbox de la topologie.")
         return false;
+      } else {
+        // TODO: vérifier la bbox
       }
-
-    }
-
-    // DefaultProjection
-    if (!resourceJsonObject.defaultProjection) {
-      LOGGER.warn("La ressource ne contient pas de projection par défaut. C'est celle de la topologie qui sera utilisee.");
-    } else {
-      // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
-    }
-
-    // BoundingBox
-    if (!resourceJsonObject.boundingBox) {
-      LOGGER.warn("La ressource ne contient pas de boundingBox.");
-    } else {
-      // TODO: vérification géométrique et cohérence avec la projection par défaut ou de la topologie.
-    }
-
-    // AvailableProjection
-    if (!resourceJsonObject.availableProjections) {
-      LOGGER.warn("La ressource ne contient pas de projections rendues disponibles. C'est celle de la topologie qui sera utilisee.");
-    } else {
-      // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
     }
 
     LOGGER.info("Fin de la verification de la ressource osrm.");
@@ -274,6 +246,7 @@ module.exports = class resourceManager {
   * @name checkResourcePgr
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource pgr.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
   */
@@ -323,79 +296,6 @@ module.exports = class resourceManager {
     }
   }
 
-  // Sources
-  if (!resourceJsonObject.sources) {
-    LOGGER.error("La ressource ne contient pas de sources.");
-    return false;
-  } else {
-
-    LOGGER.info("Verification des sources...")
-
-    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-      let sourceJsonObject = resourceJsonObject.sources[i];
-      if (!sourceManager.checkSource(sourceJsonObject)) {
-        LOGGER.error("La ressource contient une source invalide.");
-        return false;
-      } else {
-        // on ne fait rien
-      }
-
-    }
-  }
-
-  // AvailableOperations
-  if (!resourceJsonObject.availableOperations) {
-    LOGGER.error("La ressource ne contient pas de descriptions sur les operations possibles.");
-    return false;
-  } else {
-
-  }
-
-  // DefaultSourceId
-  if (!resourceJsonObject.defaultSourceId) {
-    LOGGER.error("La ressource ne contient pas un id de source par defaut.");
-    return false;
-  } else {
-
-    let foundId = false;
-
-    for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-      let sourceJsonObject = resourceJsonObject.sources[i];
-
-      if (sourceJsonObject.id === resourceJsonObject.defaultSourceId) {
-        foundId = true;
-        break;
-      }
-    }
-    if (!foundId) {
-      LOGGER.error("L'id par defaut de la ressource ne correspond a aucun id de sources definies.");
-      return false;
-    }
-
-  }
-
-  // DefaultProjection
-  if (!resourceJsonObject.defaultProjection) {
-    LOGGER.warn("La ressource ne contient pas de projection par défaut. C'est celle de la topologie qui sera utilisee.");
-  } else {
-    // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
-  }
-
-  // BoundingBox
-  if (!resourceJsonObject.boundingBox) {
-    LOGGER.warn("La ressource ne contient pas de boundingBox.");
-  } else {
-    // TODO: vérification géométrique et cohérence avec la projection par défaut ou de la topologie.
-  }
-
-  // AvailableProjection
-  if (!resourceJsonObject.availableProjections) {
-    LOGGER.warn("La ressource ne contient pas de projections rendues disponibles. C'est celle de la topologie qui sera utilisee.");
-  } else {
-    // TODO: vérification de la disponibilité et de la cohérence avec la projection de la topologie.
-  }
-
   LOGGER.info("Fin de la verification de la ressource osrm.");
   return true;
 }
@@ -407,11 +307,12 @@ module.exports = class resourceManager {
   * @name createResource
   * @description Fonction utilisée pour créer une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} operationManager - Manager d'opération du service
   * @return {Resource} Ressource créée
   *
   */
 
-  createResource(resourceJsonObject) {
+  createResource(resourceJsonObject, operationManager) {
 
     let resource;
 
@@ -447,10 +348,24 @@ module.exports = class resourceManager {
       // C'est la première ressource.
     }
 
+    // Création des opérations
+    // ---
+
+    let resourceOperationHash = {};
+
+    if (!operationManager.createResourceOperation(resourceOperationHash, resourceJsonObject)) {
+      LOGGER.error("Erreur lors de la creation des operations de la ressource");
+      return null;
+    } else {
+      // on continue
+    }
+
+    // ---
+
     if (resourceJsonObject.resource.type === "osrm") {
-      resource = new osrmResource(resourceJsonObject);
+      resource = new osrmResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "pgr") {
-      resource = new pgrResource(resourceJsonObject);
+      resource = new pgrResource(resourceJsonObject, resourceOperationHash);
     } else {
       // On va voir si c'est un autre type.
     }
