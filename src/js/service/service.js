@@ -561,16 +561,15 @@ module.exports = class Service {
         try {
           await this._sourceManager.connectSource(currentSource);
           this._sourceCatalog[sourceId] = currentSource;
+          loadedSources++;
         } catch (err) {
           // on n'a pas pu se connecter à la source
           // TODO: remplacer ce comportement par une gestion plus fine des ressources
           // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
           LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
           throw errorManager.createError("Impossible de se connecter a la source");
+        }
       }
-
-      }
-
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
@@ -578,11 +577,8 @@ module.exports = class Service {
 
     if (loadedSources === 0) {
       LOGGER.fatal("Aucune source n'a pu etre chargee");
-      return false;
+      throw errorManager.createError("No source found");
     }
-
-    return true;
-
   }
 
   /**
