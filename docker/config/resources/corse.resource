@@ -86,6 +86,24 @@
           "values": [
             "name"
           ]
+        },
+        {
+          "id": "algorithm",
+          "defaultValueContent": "",
+          "values": [
+            "",
+            "dijkstra",
+            "astar",
+            "trsp"
+          ]
+        },
+        {
+          "id": "geometries_type",
+          "defaultValueContent": "geojson",
+          "values": [
+            "geojson",
+            "polyline"
+          ]
         }
       ]
     }

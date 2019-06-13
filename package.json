@@ -16,7 +16,8 @@
     "log4js": "3.0.6",
     "nconf": "0.10.0",
     "osrm": "5.20.0",
-    "pg": "7.8.1"
+    "pg": "7.8.1",
+    "@mapbox/polyline": "1.1.0"
   },
   "devDependencies": {
     "sinon": "^7.2.7",

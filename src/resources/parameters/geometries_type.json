@@ -1,0 +1,9 @@
+{
+  "id": "geometries_type",
+  "name": "Type des géométries",
+  "description": "Type des géométries en sortie",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "polyline",
+  "type": "enumeration"
+}

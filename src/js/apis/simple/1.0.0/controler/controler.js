@@ -2,6 +2,7 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
+const geometryConverter = require('../../../../utils/geometryConverter');
 
 module.exports = {
 
@@ -148,11 +149,6 @@ module.exports = {
     }
     // ---
 
-    if (parameters.algorithm) {
-      routeRequest.algorithm = parameters.algorithm;
-    } else {
-      // TODO: on met la valeur par défaut issue de la configuration
-    }
 
     // waysAttributes
     // ---
@@ -170,7 +166,34 @@ module.exports = {
     } else {
       // on ne fait rien, il n'y aucun attribut à ajouter
     }
+    // ---
 
+    // algoritm
+    if (parameters.algorithm) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("algorithm").check(parameters.algorithm)) {
+        throw errorManager.createError(" Parameter 'algorithm' is invalid ", 400);
+      }
+      routeRequest.algorithm = parameters.algorithm;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.algorithm = routeOperation.getParameterById("algorithm").defaultValueContent;
+    }
+    // ---
+
+    // geometries_type
+    if (parameters.geometries_type) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("geometries_type").check(parameters.geometries_type)) {
+        throw errorManager.createError(" Parameter 'geometries_type' is invalid ", 400);
+      }
+      routeRequest.geometries_type = parameters.geometries_type;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.geometries_type = routeOperation.getParameterById("geometries_type").defaultValueContent;
+    }
     // ---
 
     return routeRequest;
@@ -209,7 +232,14 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    userResponse.geometry = route.geometry;
+    if (routeRequest.geometries_type === routeResponse.geometries_type) {
+      userResponse.geometry = route.geometry;
+    } else {
+      userResponse.geometry = geometryConverter.convertGeometry(route.geometry,
+        routeResponse.geometries_type,
+        routeRequest.geometries_type
+      )
+    }
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -233,7 +263,15 @@ module.exports = {
 
           let currentStep = {};
 
-          currentStep.geometry = route.portions[i].steps[j].geometry;
+          if (routeRequest.geometries_type === routeResponse.geometries_type) {
+            currentStep.geometry = route.portions[i].steps[j].geometry;
+          } else {
+            currentStep.geometry = geometryConverter.convertGeometry(
+              route.portions[i].steps[j].geometry,
+              routeResponse.geometries_type,
+              routeRequest.geometries_type
+            );
+          }
 
           // si c'est demandé et qu'il existe alors on met le nom
           if (routeRequest.isAttributeRequested("name")) {

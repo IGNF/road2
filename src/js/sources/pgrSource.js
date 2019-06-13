@@ -235,7 +235,6 @@ module.exports = class pgrSource extends Source {
       waypoints: [],
       routes: []
     };
-    // TODO: refonte gestion géométrie
     const route_geometry = {
       type: "LineString",
       coordinates: []
@@ -250,7 +249,6 @@ module.exports = class pgrSource extends Source {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
       if (row.geom_json) {
-        // TODO: refonte gestion géométrie
         let current_geom = JSON.parse(row.geom_json);
         route_geometry.coordinates.push( current_geom.coordinates );
       }
@@ -259,7 +257,6 @@ module.exports = class pgrSource extends Source {
         response.routes[0].legs.push( { steps: [] } );
       }
 
-      // TODO: refonte gestion géométrie
       // TODO: Il n'y a qu'une route pour l'instant
       response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
@@ -269,8 +266,8 @@ module.exports = class pgrSource extends Source {
     const first_line = route_geometry.coordinates[0];
     const second_line = route_geometry.coordinates[1];
 
+    // Pour tester l'égalité entre couple de coordonnées
     function arraysEquals(a, b) {
-      // Pour tester l'égalité entre couple de coordonnées
       if (a === b) return true;
       if (a == null || b == null) return false;
       if (a.length != b.length) return false;
@@ -286,8 +283,8 @@ module.exports = class pgrSource extends Source {
       return true;
     }
 
+    // Pour tester l'intersection entre 2 suites de paires de coordonnées
     function arrays_intersection(a, b) {
-      // Pour tester l'intersection entre 2 suites de paires de coordonnées
       const result = [];
       for (let arr_a of a) {
         for (let arr_b of b) {
@@ -300,8 +297,6 @@ module.exports = class pgrSource extends Source {
     }
 
     const common_point = arrays_intersection(first_line, second_line)[0];
-
-    console.log(common_point);
 
     if (first_line.indexOf(common_point) == 0) {
       first_line.reverse();
@@ -373,7 +368,7 @@ module.exports = class pgrSource extends Source {
           portions[j].steps = steps;
 
         } else {
-          // Comme la géométrie des steps n'est pas demandée, on ne l'a donne pas
+          // Comme la géométrie des steps n'est pas demandée, on ne la donne pas
         }
 
       }
@@ -385,6 +380,9 @@ module.exports = class pgrSource extends Source {
     routeResponse.routes = routes;
 
     // ---
+    // TODO: éventuellement à rendre plus propre
+    routeResponse.geometries_type = "geojson";
+
     return routeResponse;
 
   }

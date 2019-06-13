@@ -1,0 +1,9 @@
+{
+  "id": "algorithm",
+  "name": "Algorithme",
+  "description": "Algoritme utilisé",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "dijkstra",
+  "type": "enumeration"
+}

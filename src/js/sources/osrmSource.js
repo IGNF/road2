@@ -145,6 +145,9 @@ module.exports = class osrmSource extends Source {
       // ---
       let osrmRequest = {};
 
+      // Types de géométries : GeoJSON
+      osrmRequest.geometries = "geojson";
+
       if (request.type === "routeRequest") {
         // Coordonnées
         let coordinatesTable = new Array();
@@ -297,6 +300,8 @@ module.exports = class osrmSource extends Source {
 
     // ---
 
+    // TODO: éventuellement à rendre plus propre
+    routeResponse.geometries_type = "geojson";
     return routeResponse;
 
   }
