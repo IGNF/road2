@@ -98,17 +98,18 @@ module.exports = class PointParameter extends ResourceParameter {
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
   * @param {string} userValue - Valeur à vérifier
-  * @param {table} finalTable - Tableau à remplir
-  * @return {boolean}
+  * @return {object}
   *
   */
-  specificConvertion(userValue, finalValue) {
+  specificConvertion(userValue) {
+
+    let finalValue = {};
 
     let tmpStringCoordinates = userValue.split(",");
-    finalValue[i].lon = Number(tmpStringCoordinates[0]);
-    finalValue[i].lat = Number(tmpStringCoordinates[1]);
+    finalValue.lon = Number(tmpStringCoordinates[0]);
+    finalValue.lat = Number(tmpStringCoordinates[1]);
 
-    return true;
+    return finalValue;
 
   }
 

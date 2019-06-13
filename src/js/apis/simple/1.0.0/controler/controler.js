@@ -97,7 +97,7 @@ module.exports = {
       if (!routeOperation.getParameterById("optimization").check(parameters.optimization)) {
         throw errorManager.createError(" Parameter 'optimization' is invalid ", 400);
       } else {
-        profile = parameters.optimization;
+        optimization = parameters.optimization;
       }
     }
     // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
@@ -136,10 +136,14 @@ module.exports = {
       if (!routeOperation.getParameterById("stepsGeometry").check(parameters.getGeometry)) {
         throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
       } else {
-        routeRequest.computeGeometry = parameters.getGeometry;
+        routeRequest.computeGeometry = routeOperation.getParameterById("stepsGeometry").specificConvertion(parameters.getGeometry)
+        if (routeRequest.computeGeometry === null) {
+          throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
+        }
       }
     } else {
       // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
       routeRequest.computeGeometry = routeOperation.getParameterById("stepsGeometry").defaultValueContent;
     }
     // ---

@@ -154,7 +154,8 @@ module.exports = class ResourceParameter {
 
     for (let i = 0; i < userTable.length; i++) {
 
-      if (!this.specificConvertion(userTable[i], finalTable[i])) {
+      finalTable[i] = this.specificConvertion(userTable[i]);
+      if (finalTable[i] === null) {
         return false;
       }
 
@@ -170,13 +171,12 @@ module.exports = class ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {table} finalTable - Tableau à remplir
-  * @return {boolean}
+  * @return {object}
   *
   */
-  specificConvertion(userValue, finalTable) {
+  specificConvertion(userValue) {
 
-    return false;
+    return null;
 
   }
 

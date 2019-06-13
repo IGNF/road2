@@ -27,10 +27,10 @@ module.exports = class BoolParameter extends ResourceParameter {
     super(parameter);
 
     // defaultValueContent
-    this._defaultValueContent = "";
+    this._defaultValueContent = new Boolean();
 
     // values
-    this._values = ["true", "false"];
+    this._values = [true, false];
 
   }
 
@@ -68,7 +68,13 @@ module.exports = class BoolParameter extends ResourceParameter {
   load(parameterConf) {
 
     if (super.serviceParameter.defaultValue === "true") {
-      this._defaultValueContent = parameterConf.defaultValueContent;
+
+      if (this.specificConvertion(parameterConf.defaultValueContent, this._defaultValueContent)) {
+        return true;
+      } else {
+        return false;
+      }
+
     }
 
     return true;
@@ -100,15 +106,20 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
   * @param {string} userValue - Valeur à vérifier
-  * @param {table} finalTable - Tableau à remplir
-  * @return {boolean}
+  * @return {object}
   *
   */
-  specificConvertion(userValue, finalValue) {
+  specificConvertion(userValue) {
 
-    finalValue = userValue;
+    if (userValue === "true") {
+      return true;
+    } else if (userValue === "false") {
+      return false;
+    } else {
+      return null;
+    }
 
-    return true;
+    return null;
 
   }
 

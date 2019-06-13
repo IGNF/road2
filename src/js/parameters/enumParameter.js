@@ -104,15 +104,12 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
   * @param {string} userValue - Valeur à vérifier
-  * @param {table} finalTable - Tableau à remplir
-  * @return {boolean}
+  * @return {object}
   *
   */
-  specificConvertion(userValue, finalValue) {
+  specificConvertion(userValue) {
 
-    finalValue = userValue;
-
-    return true;
+    return userValue;
 
   }
 
