@@ -18,11 +18,11 @@ module.exports = {
   */
 
   convertGeometry: function(geom, src_type, out_type) {
-    if (src_type === out_type) {
+    if (src_type == out_type) {
       return geom;
-    } else if (src_type === "polyline" && out_type === "geojson") {
+    } else if (src_type == "polyline" && out_type == "geojson") {
       return polyline.toGeoJSON(geom);
-    } else if (src_type === "polyline" && out_type === "geojson") {
+    } else if (src_type == "geojson" && out_type == "polyline") {
       return polyline.fromGeoJSON(geom);
     } else {
       throw errorManager.createError("Unsupported geometry conversion");

@@ -89,12 +89,10 @@
         },
         {
           "id": "algorithm",
-          "defaultValueContent": "",
+          "defaultValueContent": "ch",
           "values": [
-            "",
-            "dijkstra",
-            "astar",
-            "trsp"
+            "ch",
+            "mld"
           ]
         },
         {
