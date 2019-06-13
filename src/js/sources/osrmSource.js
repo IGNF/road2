@@ -301,7 +301,7 @@ module.exports = class osrmSource extends Source {
     // ---
 
     // TODO: éventuellement à rendre plus propre
-    routeResponse.geometries_type = "geojson";
+    routeResponse.geometriesFormat = "geojson";
     return routeResponse;
 
   }

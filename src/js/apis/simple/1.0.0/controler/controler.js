@@ -182,17 +182,17 @@ module.exports = {
     }
     // ---
 
-    // geometries_type
-    if (parameters.geometries_type) {
+    // geometriesFormat
+    if (parameters.geometriesFormat) {
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("geometries_type").check(parameters.geometries_type)) {
-        throw errorManager.createError(" Parameter 'geometries_type' is invalid ", 400);
+      if (!routeOperation.getParameterById("geometriesFormat").check(parameters.geometriesFormat)) {
+        throw errorManager.createError(" Parameter 'geometriesFormat' is invalid ", 400);
       }
-      routeRequest.geometries_type = parameters.geometries_type;
+      routeRequest.geometriesFormat = parameters.geometriesFormat;
     } else {
       // On met la valeur par défaut issue de la configuration
       // TODO: que faire s'il n'y a pas de valeur par défaut ?
-      routeRequest.geometries_type = routeOperation.getParameterById("geometries_type").defaultValueContent;
+      routeRequest.geometriesFormat = routeOperation.getParameterById("geometriesFormat").defaultValueContent;
     }
     // ---
 
@@ -232,12 +232,12 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    if (routeRequest.geometries_type === routeResponse.geometries_type) {
+    if (routeRequest.geometriesFormat === routeResponse.geometriesFormat) {
       userResponse.geometry = route.geometry;
     } else {
       userResponse.geometry = geometryConverter.convertGeometry(route.geometry,
-        routeResponse.geometries_type,
-        routeRequest.geometries_type
+        routeResponse.geometriesFormat,
+        routeRequest.geometriesFormat
       )
     }
 
@@ -263,13 +263,13 @@ module.exports = {
 
           let currentStep = {};
 
-          if (routeRequest.geometries_type === routeResponse.geometries_type) {
+          if (routeRequest.geometriesFormat === routeResponse.geometriesFormat) {
             currentStep.geometry = route.portions[i].steps[j].geometry;
           } else {
             currentStep.geometry = geometryConverter.convertGeometry(
               route.portions[i].steps[j].geometry,
-              routeResponse.geometries_type,
-              routeRequest.geometries_type
+              routeResponse.geometriesFormat,
+              routeRequest.geometriesFormat
             );
           }
 

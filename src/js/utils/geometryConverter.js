@@ -11,18 +11,18 @@ module.exports = {
   * @name convertGeometry
   * @description Convertit une géométrie depuis un format vers un autre
   * @param {Object|string} geom - Géométrie source
-  * @param {string} src_type - type de la gémétrie source pour l'instant, dans {geojson, polyline}
-  * @param {string} out_type - type voulu en sortie pour l'instant, dans {geojson, polyline}
+  * @param {string} srcType - type de la gémétrie source pour l'instant, dans {geojson, polyline}
+  * @param {string} outType - type voulu en sortie pour l'instant, dans {geojson, polyline}
   * @return {Object|string} out_geom - géométrie convertie
   *
   */
 
-  convertGeometry: function(geom, src_type, out_type) {
-    if (src_type == out_type) {
+  convertGeometry: function(geom, srcType, outType) {
+    if (srcType == outType) {
       return geom;
-    } else if (src_type == "polyline" && out_type == "geojson") {
+    } else if (srcType == "polyline" && outType == "geojson") {
       return polyline.toGeoJSON(geom);
-    } else if (src_type == "geojson" && out_type == "polyline") {
+    } else if (srcType == "geojson" && outType == "polyline") {
       return polyline.fromGeoJSON(geom);
     } else {
       throw errorManager.createError("Unsupported geometry conversion");

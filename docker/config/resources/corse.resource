@@ -96,7 +96,7 @@
           ]
         },
         {
-          "id": "geometries_type",
+          "id": "geometriesFormat",
           "defaultValueContent": "geojson",
           "values": [
             "geojson",
