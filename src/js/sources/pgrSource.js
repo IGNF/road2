@@ -228,7 +228,7 @@ module.exports = class pgrSource extends Source {
     };
     // TODO: refonte gestion géométrie
     const route_geometry = {
-      type: "MultiLineString",
+      type: "LineString",
       coordinates: []
     };
 
@@ -254,6 +254,61 @@ module.exports = class pgrSource extends Source {
       // TODO: Il n'y a qu'une route pour l'instant
       response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
     }
+
+    // Transformation des coordonnées en mode MultiLineString vers LineString
+    const dissolved_coords = [];
+    const first_line = route_geometry.coordinates[0];
+    const second_line = route_geometry.coordinates[1];
+
+    function arraysEquals(a, b) {
+      // Pour tester l'égalité entre couple de coordonnées
+      if (a === b) return true;
+      if (a == null || b == null) return false;
+      if (a.length != b.length) return false;
+
+      // If you don't care about the order of the elements inside
+      // the array, you should sort both arrays here.
+      // Please note that calling sort on an array will modify that array.
+      // you might want to clone your array first.
+
+      for (var i = 0; i < a.length; ++i) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    function arrays_intersection(a, b) {
+      // Pour tester l'intersection entre 2 suites de paires de coordonnées
+      const result = [];
+      for (let arr_a of a) {
+        for (let arr_b of b) {
+          if (arraysEquals(arr_a, arr_b)) {
+            result.push(arr_a);
+          }
+        }
+      }
+      return result;
+    }
+
+    const common_point = arrays_intersection(first_line, second_line)[0];
+
+    console.log(common_point);
+
+    if (first_line.indexOf(common_point) == 0) {
+      first_line.reverse();
+    }
+    dissolved_coords.push(...first_line);
+
+    for (let i = 1; i < route_geometry.coordinates.length; i++) {
+      let curr_line = route_geometry.coordinates[i];
+      if (!arraysEquals(dissolved_coords[dissolved_coords.length - 1 ], curr_line[0])) {
+        curr_line.reverse();
+      }
+      curr_line.splice(0, 1);
+      dissolved_coords.push(...curr_line);
+    }
+
+    route_geometry.coordinates = dissolved_coords;
 
     if (response.waypoints.length < 1) {
       throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
