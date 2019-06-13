@@ -19,7 +19,7 @@ module.exports = class Operation  {
   * @param {string} id - Id de l'opération, unique au service
   * @param {string} name - Nom de l'opération, unique au service
   * @param {string} description - Description de l'opération, unique au service
-  * @param {table} parameters - Tableau de paramètres de l'opération, unique au service
+  * @param {object} parameters - Objet de paramètres de l'opération, unique au service
   *
   */
   constructor(id, name, description, parameters) {
@@ -80,6 +80,23 @@ module.exports = class Operation  {
   */
   get parameters () {
     return this._parameters;
+  }
+
+  /**
+  *
+  * @function
+  * @name getParameterById
+  * @description Récupérer un paramètre de l'opération via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {object} Instance de la classe Parameter, paramètre de service
+  *
+  */
+  getParameterById (id) {
+    if (this._parameters[id]) {
+      return this._parameters[id];
+    } else {
+      return {};
+    }
   }
 
 

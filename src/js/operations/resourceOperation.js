@@ -17,7 +17,7 @@ module.exports = class ResourceOperation  {
   * @name constructor
   * @description Constructeur de la classe ResourceOperation
   * @param {string} id - id de l'opération, unique au service
-  * @param {table} resourceParameters - Tableau de paramètres de l'opération
+  * @param {object} resourceParameters - Objet de paramètres de l'opération
   *
   */
   constructor(id, resourceParameters) {
@@ -50,6 +50,23 @@ module.exports = class ResourceOperation  {
   */
   get resourceParameters () {
     return this._resourceParameters;
+  }
+
+  /**
+  *
+  * @function
+  * @name getParameterById
+  * @description Récupérer un paramètre si il est disponible sur la ressource
+  * @param {string} id - Id du paramètre de ressource
+  * @return {object} Instance d'une classe fille de ResourceParameter, paramètre de ressource
+  *
+  */
+  getParameterById(parameterId) {
+    if (this._resourceParameters[parameterId]) {
+      return this._resourceParameters[parameterId];
+    } else {
+      return {};
+    }
   }
 
 

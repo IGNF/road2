@@ -28,12 +28,16 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe osrmSource
+  * @param {json} sourceJsonObject - Description de la source en json
   *
   */
   constructor(sourceJsonObject) {
 
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
+
+    // Ajout des opérations possibles sur ce type de source
+    this.availableOperations.push("route");
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
@@ -59,6 +63,7 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name set configuration
   * @description Attribuer la configuration de la source
+  * @param {json} conf - Description de la source en json
   *
   */
   set configuration (conf) {
@@ -81,10 +86,11 @@ module.exports = class osrmSource extends Source {
   * @function
   * @name set osrm
   * @description Attribuer l'objet osrm de la source
+  * @param {object} osrmObject - Objet OSRM
   *
   */
-  set osrm (o) {
-    this._osrm = o;
+  set osrm (osrmObject) {
+    this._osrm = osrmObject;
   }
 
   /**
@@ -168,20 +174,20 @@ module.exports = class osrmSource extends Source {
 
       // ---
 
-    return new Promise ( (resolve, reject) => {
-      this.osrm.route(osrmRequest, (err, result) => {
-        if (err) {
-          // on ne renvoie pas l'erreur d'OSRM
-          reject(errorManager.createError(" Internal OSRM error. "));
-        } else {
-          try {
-            resolve(this.writeRouteResponse(request, result));
-          } catch (error) {
-            reject(error);
+      return new Promise ( (resolve, reject) => {
+        this.osrm.route(osrmRequest, (err, result) => {
+          if (err) {
+            // on ne renvoie pas l'erreur d'OSRM
+            reject(errorManager.createError(" Internal OSRM error. "));
+          } else {
+            try {
+              resolve(this.writeRouteResponse(request, result));
+            } catch (error) {
+              reject(error);
+            }
           }
-        }
+        });
       });
-    });
 
     } else {
       // on va voir si c'est une autre opération

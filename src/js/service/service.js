@@ -98,6 +98,7 @@ module.exports = class Service {
   * @function
   * @name verifyAvailabilityOperation
   * @description Savoir si une opération est disponible sur le service
+  * @param {string} operationId - Id de l'opération
   *
   */
   verifyAvailabilityOperation(operationId) {
@@ -105,6 +106,22 @@ module.exports = class Service {
       return true;
     } else {
       return false;
+    }
+  }
+
+  /**
+  *
+  * @function
+  * @name getOperationById
+  * @description Récupérer une opération si elle est disponible sur le service
+  * @param {string} operationId - Id de l'opération
+  *
+  */
+  getOperationById(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return this._operationCatalog[operationId];
+    } else {
+      return {};
     }
   }
 
@@ -135,6 +152,7 @@ module.exports = class Service {
   * @function
   * @name set logConfiguration
   * @description Attribuer la configuration des logs
+  * @param {json} lc - Configuration des logs
   *
   */
   set logConfiguration(lc) {
@@ -146,6 +164,7 @@ module.exports = class Service {
   * @function
   * @name getResourceById
   * @description Récupérer une ressource par son id
+  * @param {string} id - Id de la ressource
   *
   */
   getResourceById(id) {
@@ -157,6 +176,7 @@ module.exports = class Service {
   * @function
   * @name verifyResourceExistenceById
   * @description Savoir si une ressource existe à partir de son id
+  * @param {string} id - Id de la ressource
   *
   */
   verifyResourceExistenceById(id) {
@@ -183,6 +203,7 @@ module.exports = class Service {
   * @function
   * @name getSourceById
   * @description Récupérer une source par son id
+  * @param {string} id - Id de la source
   *
   */
   getSourceById(id) {
@@ -193,7 +214,8 @@ module.exports = class Service {
   *
   * @function
   * @name verifySourceExistenceById
-  * @description Savoir si une ressource existe à partir de son id
+  * @description Savoir si une source existe à partir de son id
+  * @param {string} id - Id de la source
   *
   */
   verifySourceExistenceById(id) {
@@ -422,6 +444,7 @@ module.exports = class Service {
   * @name loadOperations
   * @description Chargement des opérations
   * @param {string} operationsDirectory - Dossier contenant les opérations à charger
+  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
   *
   */
 
@@ -545,10 +568,8 @@ module.exports = class Service {
           // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
           LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
           throw errorManager.createError("Impossible de se connecter a la source");
+        }
       }
-
-      }
-
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
@@ -556,11 +577,8 @@ module.exports = class Service {
 
     if (loadedSources === 0) {
       LOGGER.fatal("Aucune source n'a pu etre chargee");
-      return false;
+      throw errorManager.createError("No source found");
     }
-
-    return true;
-
   }
 
   /**

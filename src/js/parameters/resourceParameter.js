@@ -16,25 +16,25 @@ module.exports = class ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe ResourceParameter
-  * @param {string} id - Id du paramètre, unique au service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    this._serviceParameterId = id;
+    this._serviceParameter = parameter;
 
   }
 
   /**
   *
   * @function
-  * @name get serviceParameterId
+  * @name get serviceParameter
   * @description Récupérer l'id du paramètre
   *
   */
-  get serviceParameterId () {
-    return this._serviceParameterId;
+  get serviceParameter () {
+    return this._serviceParameter;
   }
 
   /**
@@ -42,9 +42,11 @@ module.exports = class ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
     return false;
 
@@ -55,11 +57,126 @@ module.exports = class ResourceParameter {
   * @function
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
   check(userValue) {
 
+    let userTable = new Array();
+
+    // La vérification dépend de plusieurs attributs du paramètre de service associé
+
+    if (this.serviceParameter.explode === "true") {
+
+      // on lit un tableau de valeurs
+      // on vérifie donc que c'est un tableau qui contient des valeurs
+      if (!Array.isArray(userValue)) {
+        return false;
+      }
+      if (userValue.length === 0) {
+        return false;
+      }
+      userTable = userValue;
+
+    } else {
+
+      // on lit une string qui contient plusieurs valeurs
+      if (typeof userValue !== "string") {
+        return false;
+      }
+
+      // on sépare les valeurs
+      if (this.serviceParameter.style === "pipeDelimited") {
+        userTable = userValue.split("|");
+      } else {
+        return false;
+      }
+
+    }
+
+    // on vérifie le nombre valeur
+    if (userTable.length < this.serviceParameter.min || userTable.length > this.serviceParameter.max) {
+      return false;
+    }
+
+    for (let i = 0; i < userTable.length; i++) {
+      if (!this.specificCheck(userTable[i])) {
+        return false;
+      }
+    }
+
+    // tout s'est bien passé
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name specificCheck
+  * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
+  *
+  */
+  specificCheck(userValue) {
+
     return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name convertIntoTable
+  * @description Convertir l'entrée utilisateur en tableau de points pour une request
+  * @param {string} userValue - Valeur à vérifier
+  * @param {table} finalTable - Tableau à remplir
+  * @return {boolean}
+  *
+  */
+  convertIntoTable(userValue, finalTable) {
+
+    let userTable = new Array();
+
+    if (this.serviceParameter.explode === "true") {
+      userTable = userValue;
+    } else {
+
+      if (this.serviceParameter.style === "pipeDelimited") {
+        userTable = userValue.split("|");
+      } else {
+        return false;
+      }
+
+    }
+
+    for (let i = 0; i < userTable.length; i++) {
+
+      finalTable[i] = this.specificConvertion(userTable[i]);
+      if (finalTable[i] === null) {
+        return false;
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name specificCheck
+  * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {object}
+  *
+  */
+  specificConvertion(userValue) {
+
+    return null;
 
   }
 

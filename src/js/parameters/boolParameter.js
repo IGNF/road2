@@ -18,19 +18,19 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe BoolParameter
-  * @param {string} id - Id du paramètre de service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    super(id);
+    super(parameter);
 
     // defaultValueContent
-    this._defaultValueContent = "";
+    this._defaultValueContent = new Boolean();
 
     // values
-    this._values = ["true", "false"];
+    this._values = [true, false];
 
   }
 
@@ -61,12 +61,20 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
-    if (serviceParameterConf.defaultValue === "true") {
-      this._defaultValueContent = parameterConf.defaultValueContent;
+    if (super.serviceParameter.defaultValue === "true") {
+
+      if (this.specificConvertion(parameterConf.defaultValueContent, this._defaultValueContent)) {
+        return true;
+      } else {
+        return false;
+      }
+
     }
 
     return true;
@@ -78,15 +86,40 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @function
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
-  check(userValue) {
+  specificCheck(userValue) {
 
     if (userValue !== "true" && userValue !== "false") {
       return false;
     } else {
       return true;
     }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name specificConvertion
+  * @description Convertir une valeur dans un format adapté aux requêtes
+  * @param {string} userValue - Valeur à vérifier
+  * @return {object}
+  *
+  */
+  specificConvertion(userValue) {
+
+    if (userValue === "true") {
+      return true;
+    } else if (userValue === "false") {
+      return false;
+    } else {
+      return null;
+    }
+
+    return null;
 
   }
 

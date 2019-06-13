@@ -27,33 +27,22 @@
 				"description":
 					type: string
           required: true
+        # Bbox dans laquelle les requêtes seront autorisées. Cette bbox doit être exprimée dans la projection d'origine des données.
+        "bbox":
+          type: string
+          required: true
+        # Projection de diffusion par défaut
+        "projection":
+          type: string
+          required: true
         # Permet de savoir où est stocké la topologie utilisée. Cela est utile uniquement pour l'administrateur.
-				"storage":
+        "storage":
 					$ref: "#/components/schemas/storage"
           required: true
         # Projection d'origine des données
         "projection":
           type: string
           required: true
-    # Bbox dans laquelle les requêtes seront autorisées. Cette bbox doit être exprimée dans la projection d'origine des données.
-		"boundingBox":
-			type: string
-      required: false
-    # Projection de diffusion par défaut
-		"defaultProjection":
-			type: string
-      required: false
-    # Liste des projections que l'on veut rendre disponible
-		"availableProjections":
-			type: array
-      required: false
-			minItems: 1
-			items:
-				type: string
-    # Id de la source qui va être utilisée pour initialiser le profile et l'optimisation par défaut.
-		"defaultSourceId":
-			type: string
-      required: true
     # Liste des sources permettants de construire la ressource.
 		"sources":
 			type: array
@@ -95,6 +84,18 @@
 									"storage":
 										$ref: "#/components/schemas/storage"
                     required: true
+                  # Indique ou se trouve le fichier json qui a permis de générer le lua
+                  "configuration":
+                    type: object
+                    required: true
+                    properties:
+                      # Nom de la propriété qui est utilisé dans le fichier json
+                      "name":
+                        type: string
+                        required: true
+                      "storage":
+                        $ref: "#/components/schemas/storage"
+                        required: true
     # Liste des opérations rendus disponibles
 		"availableOperations":
 			type: array
@@ -102,144 +103,40 @@
 			minItems: 1
       uniqueItems: true
 			items:
-				anyOf:
-					- $ref: "#/components/schemas/routeOperation"
-					- $ref: "#/components/schemas/nearestOperation"
-
+        type: object
+        properties:
+          # Id de l'opération
+          "id":
+            type: string
+          # Tableau des parametres de l'opération
+          "parameters":
+            type: array
+            items:
+              type: object
+              properties:
+                # Id du paramètre
+                "id":
+                  type: string
+                  required: true
+                # Valeur par défaut
+                "defaultValueContent":
+                  type: string
+                  required: false
+                # Valeurs possibles
+                "values":
+                  required: false
+                  type:
+                    oneOf:
+                      - array
+                      - string
+                      - object
 components:
   schemas:
     # storage d'un document: fichier ou ceph
   	"storage":
   		type: object
   		properties:
-  			oneOf:
-          # Fichier
-  				- "file":
-  						type: string
-              required: false
-          # storage objet ceph. Les informations de connexion sont dans la configuration principale de l'application.
-  				- "ceph":
-  						type: object
-              required: false
-  						properties:
-                # Pool contenant l'objet.
-  							"pool":
-  								type: string
-                  required: true
-                # Id de l'objet.
-  							"objectId":
-  								type: string
-                  required: true
-    # Configuration des contraintes que l'on peut formuler dans les requêtes.
-  	"constraint":
-  		type: object
-      properties:
-        # Id de la contrainte
-      	"id":
-      		type: string
-          required: true
-        # type de la contrainte: parmi une liste prédéfinie. Le type va indiquer les opérations possibles.
-      	"type":
-      		type: string
-          required: true
-      		enum: ["filter-osrm"]
-        # Description de la contrainte qui va apparaître dans le getcap.
-      	"description":
-      		type: string
-          required: true
-        # Mot clé permettant de formuler la contrainte. Indiqué dans le getcap.
-        "key":
-          type: string
-          required: true
-        # Valeurs possibles pour la contrainte. Dans le cas d'OSRM, il n'y aura que des filtres précalculés lors de la génération des .osrm. Ce sont ces valeurs qui devront être indiquée ici. Elles seront alors visible dans le getcap.
-        "values":
-        	type: array
-          required: true
-        	minItems: 1
-        	items:
-          	type: string
-        "availableConstraintType":
-          type: array
-          required: false
-          minItems: 1
-          items:
-            type: string
-            enum: {"banned"}
-        "availableOperators":
-          type: array
-          required: false
-          minItems: 1
-          items:
-            type: string
-            enum: {"="}
-    # Configuration des paramètres par défaut d'une opération
-    "defaultParameters":
-      type: array
-      required: false
-      minItems: 1
-      items:
-        type: object
-        properties:
-          # Id du paramètre concerné
-          "id":
-            type: string
-            required: true
-          # valeur par défaut du paramètre concerné
-          "default":
-            type: string
-            required: true
-    # Configuration nécessaire pour paramètrer l'opération route d'OSRM.
-  	"routeOperation":
-  		type: object
-  		properties:
-        # Id de l'opération: route dans ce cas
-  			"id":
-  				type: string
-          required: true
-          enum: ["route"]
-        # Nombre de requête par seconde maximal
-  			"rate":
-  				type: number
-          required: false
-  				foramt: integer
-        # Nombre maximal de points intermédiaires par requête
-  			"maxIntermediatePoints":
-  				type: number
-          required: false
-  				foramt: integer
-        # Nombre maximal de contraintes formulables par requête
-  			"maxNumberOfConstraints":
-   				type: number
-          required: false
-  				foramt: integer
-        # Contraintes
-  			"constraints":
-  				type: array
-          required: false
-  				minItems: 1
-  				items:
-  					$ref: "#/components/schemas/constraint"
-        # Paramètres par défaut
-        "defaultParameters":
-          $ref: "#/components/schemas/defaultParameters"
-  	"nearestOperation":
-  		type: object
-  		properties:
-        # Id de l'opération: nearest dans ce cas
-  			"id":
-  				type: string
-          required: true
-          enum: ["nearest"]
-        # Nombre de requête par seconde maximal
-  			"rate":
-  				type: number
-          required: false
-  				foramt: integer
-        # Nombre maximal d'entités que l'opération peut renvoyé.
-  			"maxNumber":
-  				type: number
-          required: false
-  				foramt: integer
-        # Paramètres par défaut
-        "defaultParameters":
-          $ref: "#/components/schemas/defaultParameters"
+        # Fichier
+				- "file":
+						type: string
+            required: false

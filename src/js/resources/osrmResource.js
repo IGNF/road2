@@ -19,18 +19,16 @@ module.exports = class osrmResource extends Resource {
   * @name constructor
   * @description Constructeur de la classe osrmResource
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} operations - Objet contenant des instances de classes filles de ResourceOperation
   *
   */
-  constructor(resourceJsonObject) {
+  constructor(resourceJsonObject, operations) {
 
     // Constructeur parent
-    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type);
+    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type, operations);
 
     // Stockage de la configuration
     this._configuration = resourceJsonObject.resource;
-
-    // Source par défaut
-    this._defaultSourceId = this._configuration.defaultSourceId;
 
     // Correspondance entre profile/optimization et sourceId
     this._linkedSource = {};
@@ -41,15 +39,6 @@ module.exports = class osrmResource extends Resource {
 
       let linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
-
-      if (this._configuration.sources[i].id === this._defaultSourceId) {
-
-        // Profile par défaut
-        this._defaultProfile = this._configuration.sources[i].cost.profile;
-        // Optimisation par défaut
-        this._defaultOptimization = this._configuration.sources[i].cost.optimization;
-
-      }
 
     }
 
@@ -69,39 +58,6 @@ module.exports = class osrmResource extends Resource {
   */
   get configuration () {
     return this._configuration;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultProfile
-  * @description Récupérer le profile par défaut de la ressource
-  *
-  */
-  get defaultProfile () {
-    return this._defaultProfile;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultOptimization
-  * @description Récupérer l'optmisation par défaut de la ressource
-  *
-  */
-  get defaultOptimization () {
-    return this._defaultOptimization;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultSourceId
-  * @description Récupérer la source par défaut de la ressource
-  *
-  */
-  get defaultSourceId () {
-    return this._defaultSourceId;
   }
 
   /**
@@ -131,10 +87,11 @@ module.exports = class osrmResource extends Resource {
   * @function
   * @name isWayAttributeAvailable
   * @description Permet de savoir si un attribut est disponible pour cette ressource.
+  * @param {string} attr - Attribut à vérifier
   *
   */
   isWayAttributeAvailable (attr) {
-    
+
     if (this._waysAttributes.length !== 0) {
       for (let i=0; i < this._waysAttributes.length; i++) {
         if (this._waysAttributes[i] === attr) {
@@ -169,6 +126,5 @@ module.exports = class osrmResource extends Resource {
     }
 
   }
-
 
 }

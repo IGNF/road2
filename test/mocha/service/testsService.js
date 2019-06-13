@@ -58,8 +58,7 @@ describe('Test de la classe Service', function() {
       sourceManager.disconnectSource = sinon.stub().returns(true);
       service._sourceManager = sourceManager;
 
-      const sourcesLoaded = await service.loadSources();
-      assert.equal(sourcesLoaded, true);
+      await service.loadSources();
       await service.disconnectAllSources();
     });
 

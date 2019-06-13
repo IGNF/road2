@@ -44,6 +44,8 @@ module.exports = class resourceManager {
   * @name checkResource
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
+  * @param {object} operationManager - Manager d'opération du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
@@ -121,6 +123,7 @@ module.exports = class resourceManager {
       }
     }
 
+    let currentAvailableOp = new Array();
     // availableOperations
     if (!resourceJsonObject.resource.availableOperations) {
       LOGGER.error("La ressource ne contient pas de availableOperations.");
@@ -130,6 +133,33 @@ module.exports = class resourceManager {
       if (!operationManager.checkResourceOperationConf(resourceJsonObject.resource.availableOperations)) {
         LOGGER.error("Mauvaise configuration des operations dans la ressource.");
         return false;
+      } else {
+        // on récupère la liste des opérations validées pour cette ressource
+        if (!operationManager.getResourceOperationConf(resourceJsonObject.resource.availableOperations, currentAvailableOp)) {
+          LOGGER.error("Impossible de recuperer les operations de la ressource.");
+          return false;
+        }
+      }
+    }
+
+    // Sources
+    if (!resourceJsonObject.resource.sources) {
+      LOGGER.error("La ressource ne contient pas de sources.");
+      return false;
+    } else {
+
+      LOGGER.info("Verification des sources...")
+
+      for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
+
+        let sourceJsonObject = resourceJsonObject.resource.sources[i];
+        if (!sourceManager.checkSource(sourceJsonObject, operationManager, currentAvailableOp)) {
+          LOGGER.error("La ressource contient une source invalide.");
+          return false;
+        } else {
+          // on ne fait rien
+        }
+
       }
     }
 
@@ -148,6 +178,7 @@ module.exports = class resourceManager {
   * @name checkResourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource osrm.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
@@ -203,27 +234,6 @@ module.exports = class resourceManager {
       }
     }
 
-    // Sources
-    if (!resourceJsonObject.sources) {
-      LOGGER.error("La ressource ne contient pas de sources.");
-      return false;
-    } else {
-
-      LOGGER.info("Verification des sources...")
-
-      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-        let sourceJsonObject = resourceJsonObject.sources[i];
-        if (!sourceManager.checkSource(sourceJsonObject)) {
-          LOGGER.error("La ressource contient une source invalide.");
-          return false;
-        } else {
-          // on ne fait rien
-        }
-
-      }
-    }
-
     LOGGER.info("Fin de la verification de la ressource osrm.");
     return true;
 
@@ -235,6 +245,7 @@ module.exports = class resourceManager {
   * @name checkResourcePgr
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource pgr.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
   */
@@ -312,7 +323,7 @@ module.exports = class resourceManager {
       }
     }
 
-    LOGGER.info("Fin de la verification de la ressource osrm.");
+    LOGGER.info("Fin de la verification de la ressource pgr.");
     return true;
   }
 
@@ -323,6 +334,7 @@ module.exports = class resourceManager {
   * @name createResource
   * @description Fonction utilisée pour créer une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
+  * @param {object} operationManager - Manager d'opération du service
   * @return {Resource} Ressource créée
   *
   */
@@ -366,9 +378,9 @@ module.exports = class resourceManager {
     // Création des opérations
     // ---
 
-    let resourceOperationTable = new Array();
+    let resourceOperationHash = {};
 
-    if (!operationManager.createResourceOperation(resourceOperationTable, resourceJsonObject)) {
+    if (!operationManager.createResourceOperation(resourceOperationHash, resourceJsonObject)) {
       LOGGER.error("Erreur lors de la creation des operations de la ressource");
       return null;
     } else {
@@ -378,9 +390,9 @@ module.exports = class resourceManager {
     // ---
 
     if (resourceJsonObject.resource.type === "osrm") {
-      resource = new osrmResource(resourceJsonObject);
+      resource = new osrmResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "pgr") {
-      resource = new pgrResource(resourceJsonObject);
+      resource = new pgrResource(resourceJsonObject, resourceOperationHash);
     } else {
       // On va voir si c'est un autre type.
     }

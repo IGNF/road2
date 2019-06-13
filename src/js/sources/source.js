@@ -16,9 +16,11 @@ module.exports = class Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe source
+  * @param {string} id - Identifiant de la source
+  * @param {string} type - Type de la source
   *
   */
-  constructor(id,type) {
+  constructor(id, type) {
 
     // Id d'une source. Il doit être unique.
     this._id = id;
@@ -28,6 +30,9 @@ module.exports = class Source {
 
     // État de la connexion de la source
     this._connected = false;
+
+    // Liste d'opérations possibles sur la source
+    this._availableOperations = new Array();
 
   }
 
@@ -69,10 +74,39 @@ module.exports = class Source {
   * @function
   * @name setConnected
   * @description Attribuer l'état de connexion de la source
+  * @param {boolean} conn - État de la connexion
   *
   */
-  set connected (c) {
-    this._connected = c;
+  set connected (conn) {
+    this._connected = conn;
+  }
+
+  /**
+  *
+  * @function
+  * @name get availableOperations
+  * @description Récupérer la liste des opérations possibles sur la source
+  *
+  */
+  get availableOperations () {
+    return this._availableOperations;
+  }
+
+  /**
+  *
+  * @function
+  * @name isOperationAvailable
+  * @description Savoir si une opération est disponible sur la source
+  * @param {string} operationId - Id de l'opération
+  *
+  */
+  isOperationAvailable (operationId) {
+    for (let i = 0; i < this._availableOperations.length; i++ ) {
+      if (this._availableOperations[i] === operationId) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

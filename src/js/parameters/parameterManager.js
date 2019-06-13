@@ -35,8 +35,11 @@ module.exports = class parameterManager  {
     // Liste des ids appartenant aux paramètres vérifiés par le manager
     this._listOfVerifiedParameterId = new Array();
 
-    // Stockage des configurations des paramètres
+    // Stockage des configurations des paramètres de service
     this._parametersConfiguration = {};
+
+    // Stockage des paramètres de service
+    this._parameters = {};
 
   }
 
@@ -67,6 +70,8 @@ module.exports = class parameterManager  {
   * @function
   * @name getParameterConfigurationById
   * @description Récupérer la configuration d'un paramètre via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {object} Instance de Parameter, paramètre de service
   *
   */
   getParameterConfigurationById(id) {
@@ -82,6 +87,8 @@ module.exports = class parameterManager  {
   * @function
   * @name isParameterAvailable
   * @description Permet de savoir si un paramètre est disponible, via son id
+  * @param {string} id - Id du paramètre de service
+  * @return {boolean}
   *
   */
   isParameterAvailable(id) {
@@ -104,6 +111,8 @@ module.exports = class parameterManager  {
   * @function
   * @name loadParameterDirectory
   * @description Charger les paramètres du dossier
+  * @param {string} parametersDirectory - Dossier contenant la description des paramètres
+  * @return {boolean}
   *
   */
   loadParameterDirectory(parametersDirectory) {
@@ -157,9 +166,14 @@ module.exports = class parameterManager  {
   * @function
   * @name checkParameterConf
   * @description Vérifier la configuration d'un paramètre
+  * @param {json} parametersConf - Configuration du paramètre de service
+  * @return {boolean}
   *
   */
   checkParameterConf(parameterConf) {
+
+    let tmpMin;
+    let tmpMax;
 
     LOGGER.info("Verification du parametre");
 
@@ -204,7 +218,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut required");
       return false;
     } else {
-      //TODO: vérification
+      if (!(parameterConf.required === "true" || parameterConf.required === "false")) {
+        LOGGER.error("Le parametre contient un attribut required mal configure");
+        return false;
+      }
     }
 
     // default
@@ -212,7 +229,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut defaultValue");
       return false;
     } else {
-      //TODO: vérification
+      if (!(parameterConf.defaultValue === "true" || parameterConf.defaultValue === "false")) {
+        LOGGER.error("Le parametre contient un attribut defaultValue mal configure");
+        return false;
+      }
     }
 
     // type
@@ -222,6 +242,59 @@ module.exports = class parameterManager  {
     } else {
       if (parameterConf.type !== "boolean" && parameterConf.type !== "enumeration" && parameterConf.type !== "point") {
         LOGGER.error("Le type du parametre est incorrect");
+        return false;
+      }
+    }
+
+    // example
+    if (!parameterConf.example) {
+      LOGGER.warn("Le parametre ne contient pas d'exemple");
+    }
+
+    // min
+    if (parameterConf.min) {
+
+      tmpMin = parseInt(parameterConf.min, 10);
+
+      if (isNaN(tmpMin)) {
+        LOGGER.error("Le parametre min est incorrect: valeur non entiere");
+        return false;
+      }
+      if (parameter.required === "true") {
+        if (tmpMin < 1) {
+          LOGGER.error("Le parametre min est incorrect: valeur inferieure a 1");
+          return false;
+        }
+      } else {
+        if (tmpMin > 0) {
+          LOGGER.error("Le parametre min est incorrect: valeur superieure a 0");
+          return false;
+        }
+      }
+
+    }
+
+    // max
+    if (parameterConf.max) {
+
+      tmpMax = parseInt(parameterConf.max, 10);
+
+      if (isNaN(tmpMax)) {
+        LOGGER.error("Le parametre max est incorrect: valeur non entiere");
+        return false;
+      }
+
+      if (tmpMax < 1) {
+        LOGGER.error("Le parametre max est incorrect: valeur inferieure a 1");
+        return false;
+      }
+
+    }
+
+    // cohérence entre min et max
+    if (parameterConf.max && parameterConf.min) {
+      if (tmpMax < tmpMin) {
+        LOGGER.error("Le parametre max est incorrect: valeur inferieure au parametre min");
         return false;
       }
     }
@@ -236,6 +309,8 @@ module.exports = class parameterManager  {
   * @function
   * @name createParameters
   * @description Créer les objets paramètres à partir de la configuration d'une opération
+  * @param {json} operationConf - Configuration d'une opération de service
+  * @return {table} Tableau d'instance de Parameter, paramètre de service
   *
   */
   createParameters(operationConf) {
@@ -247,7 +322,30 @@ module.exports = class parameterManager  {
       let parameterId = operationConf.parameters[i];
       let parameterConf = this._parametersConfiguration[parameterId];
 
-      parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.default);
+      parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.defaultValue);
+
+      if (parameterConf.example) {
+        parametersTable[parameterId].example = parameterConf.example;
+      }
+
+      if (parameterConf.min) {
+        parametersTable[parameterId].min = parameterConf.min;
+      }
+
+      if (parameterConf.max) {
+        parametersTable[parameterId].max = parameterConf.max;
+      }
+
+      if (parameterConf.explode) {
+        parametersTable[parameterId].explode = parameterConf.explode;
+      }
+
+      if (parameterConf.style) {
+        parametersTable[parameterId].style = parameterConf.style;
+      }
+
+      // Stocakge du paramètre
+      this._parameters[parameterId] = parametersTable[parameterId];
 
     }
 
@@ -260,6 +358,8 @@ module.exports = class parameterManager  {
   * @function
   * @name checkResourceParameterConf
   * @description Vérifier la configuration d'un paramètre de ressource
+  * @param {json} resourceParameterJsonObject - Configuration d'un paramètre de ressource
+  * @return {boolean}
   *
   */
   checkResourceParameterConf(resourceParameterJsonObject) {
@@ -412,9 +512,12 @@ module.exports = class parameterManager  {
   * @function
   * @name createResourceParameter
   * @description Créer l'ensemble des opérations d'une ressource
+  * @param {object} resourceParameterHash - Objet contenant l'ensemble des paramètres de ressource pour une ressource
+  * @param {json} currentOperationConf - Configuraton de l'opération de ressource pour une ressource 
+  * @return {boolean}
   *
   */
-  createResourceParameter(resourceParameterTable, currentOperationConf) {
+  createResourceParameter(resourceParameterHash, currentOperationConf) {
 
     LOGGER.info("Creation des parametres de l'operation");
 
@@ -428,27 +531,30 @@ module.exports = class parameterManager  {
       // on récupère la conf du paramètre de service correspondante
       let curSerParamConf = this._parametersConfiguration[curResParamConf.id];
 
+      // on récupère le paramètre de service
+      let curSerParam = this._parameters[curResParamConf.id];
+
       // en fonction du type, on crée le bon resourceParameter
       let curResParam = {};
 
       if (curSerParamConf.type === "boolean") {
-        curResParam = new BoolParameter(curResParamConf.id);
+        curResParam = new BoolParameter(curSerParam);
       } else if (curSerParamConf.type === "enumeration") {
-        curResParam = new EnumParameter(curResParamConf.id);
+        curResParam = new EnumParameter(curSerParam);
       } else if (curSerParamConf.type === "point") {
-        curResParam = new PointParameter(curResParamConf.id);
+        curResParam = new PointParameter(curSerParam);
       } else {
         LOGGER.error("Type inconnu");
         return false;
       }
 
       // on initialise le paramètre
-      if (!curResParam.load(curSerParamConf, curResParamConf)) {
+      if (!curResParam.load(curResParamConf)) {
         LOGGER.error("Initialisation du parametre en echec");
         return false;
       } else {
         // on le stocke
-        resourceParameterTable.push(curResParam);
+        resourceParameterHash[curResParamConf.id] = curResParam;
       }
 
 

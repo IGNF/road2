@@ -18,13 +18,13 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe EnumParameter
-  * @param {string} id - Id du paramètre de service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    super(id);
+    super(parameter);
 
     // defaultValueContent
     this._defaultValueContent = "";
@@ -61,11 +61,13 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
-    if (serviceParameterConf.defaultValue === "true") {
+    if (super.serviceParameter.defaultValue === "true") {
       this._defaultValueContent = parameterConf.defaultValueContent;
     }
 
@@ -80,18 +82,34 @@ module.exports = class EnumParameter extends ResourceParameter {
   * @function
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
-  check(userValue) {
+  specificCheck(userValue) {
 
-    for (let i = 0; i < this._values.length; i++) {
-      if (userValue === this._values[i]) {
+    for (let j = 0; j < this._values.length; j++) {
+      if (userValue === this._values[j]) {
         return true;
       }
     }
 
     return false;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name specificConvertion
+  * @description Convertir une valeur dans un format adapté aux requêtes
+  * @param {string} userValue - Valeur à vérifier
+  * @return {object}
+  *
+  */
+  specificConvertion(userValue) {
+
+    return userValue;
 
   }
 

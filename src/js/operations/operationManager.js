@@ -54,6 +54,8 @@ module.exports = class operationManager  {
   * @function
   * @name isOperationAvailable
   * @description Savoir si une opération est disponible
+  * @param {string} id - Id de l'opération de service
+  * @return {boolean}
   *
   */
   isOperationAvailable(id) {
@@ -76,6 +78,10 @@ module.exports = class operationManager  {
   * @function
   * @name loadOperationDirectory
   * @description Charger les opérations du dossier
+  * @param {object} operationCatalog - Catalogue des opérations sur le service
+  * @param {string} userOperationDirectory - Dossier contenant les opérations
+  * @param {string} userParameterDirectory - Dossier contenant les paramètres
+  * @return {boolean}
   *
   */
   loadOperationDirectory(operationCatalog, userOperationDirectory, userParameterDirectory) {
@@ -146,6 +152,8 @@ module.exports = class operationManager  {
   * @function
   * @name checkOperationConf
   * @description Vérifier la configuration d'une opération
+  * @param {json} operationConf - Configuration d'une opération de service
+  * @return {boolean}
   *
   */
   checkOperationConf(operationConf) {
@@ -220,6 +228,8 @@ module.exports = class operationManager  {
   * @function
   * @name checkResourceOperationConf
   * @description Vérifier la configuration d'une opération de ressource
+  * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
+  * @return {boolean}
   *
   */
   checkResourceOperationConf(resourceOperationJsonObject) {
@@ -290,11 +300,95 @@ module.exports = class operationManager  {
   /**
   *
   * @function
-  * @name createResourceOperation
-  * @description Créer l'ensemble des opérations d'une ressource
+  * @name getResourceOperationConf
+  * @description Récupérer la liste des opérations disponibles sur une ressource
+  * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
+  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
+  * @return {boolean}
   *
   */
-  createResourceOperation(resourceOperationTable, resourceJsonObject) {
+  getResourceOperationConf(resourceOperationJsonObject, operationTable) {
+
+    LOGGER.info("Recuperation des operations de la ressource");
+
+    // on regarde d'abord la taille du tableau donné en entrée
+    if (resourceOperationJsonObject.length === 0) {
+      LOGGER.error("Il n'y aucune operation decrite");
+      return false;
+    } else {
+
+      // on vérifie les opérations unes à une
+      for (let i = 0; i < resourceOperationJsonObject.length; i++) {
+        let currentOperationConf = resourceOperationJsonObject[i];
+
+        if (!currentOperationConf.id) {
+          LOGGER.error("L'objet representant l'operation n'a pas d'id");
+          return false;
+        } else {
+
+          LOGGER.info(currentOperationConf.id);
+
+          // on vérifie qu'elle est bien disponible pour cette instance du service
+          if (!this.isOperationAvailable(currentOperationConf.id)) {
+            LOGGER.error("L'operation indiquee n'est pas disponible");
+            return false;
+          } else {
+            // on le stocke
+            operationTable.push(currentOperationConf.id);
+          }
+
+        }
+
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name isAvailableInTable
+  * @description Savoir si une opération est disponible dans une liste d'opérations de ressource
+  * @param {string} operationId - Id de l'opération de ressource recherchée
+  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
+  * @return {boolean}
+  *
+  */
+
+  isAvailableInTable (operationId, resourceOperationTable) {
+
+    if (resourceOperationTable.length === 0) {
+      LOGGER.error("Le tableau d'operations est vide.")
+      return false;
+    } else {
+      LOGGER.info("Test");
+      for (let i = 0; i < resourceOperationTable.length; i++) {
+        LOGGER.info(resourceOperationTable[i]);
+        if (operationId === resourceOperationTable[i]) {
+          return true;
+        }
+      }
+
+    }
+
+    LOGGER.error("Operation non trouvee.")
+    return false;
+  }
+
+  /**
+  *
+  * @function
+  * @name createResourceOperation
+  * @description Créer l'ensemble des opérations d'une ressource
+  * @param {object} resourceOperationHash - Objet contenant les opérations de ressource
+  * @param {json} resourceJsonObject - Configuration d'une opération de ressource 
+  * @return {boolean}
+  *
+  */
+  createResourceOperation(resourceOperationHash, resourceJsonObject) {
 
     LOGGER.info("Creation des operations de la ressource");
 
@@ -306,15 +400,15 @@ module.exports = class operationManager  {
       LOGGER.info("Operation en cours: " + currentOperationConf.id);
 
       // création des paramètres de l'opération de ressource
-      let resourceParameterTable = new Array();
+      let resourceParameterHash = {};
 
-      if (!this._parameterManager.createResourceParameter(resourceParameterTable, currentOperationConf)) {
+      if (!this._parameterManager.createResourceParameter(resourceParameterHash, currentOperationConf)) {
         LOGGER.error("Erreur lors de la creation des parametres de l'operation");
         return false;
       }
 
       // création de l'objet et stockage
-      resourceOperationTable.push(new ResourceOperation(currentOperationConf.id, resourceParameterTable));
+      resourceOperationHash[currentOperationConf.id] = new ResourceOperation(currentOperationConf.id, resourceParameterHash);
 
     }
 

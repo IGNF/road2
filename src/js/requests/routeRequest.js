@@ -78,6 +78,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set start
   * @description Attribuer le point de départ de la requête
+  * @param {object} st - Point de départ concerné (ex. {lon: 8.732901, lat: 41.928821})
   *
   */
   set start (st) {
@@ -100,6 +101,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée de la requête
+  * @param {object} en - Point d'arrivée concerné (ex. {lon: 8.732901, lat: 41.953932})
   *
   */
   set end (en) {
@@ -122,6 +124,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set profile
   * @description Attribuer le profile de la requête
+  * @param {string} pr - Profile
   *
   */
   set profile (pr) {
@@ -144,6 +147,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set optmization
   * @description Attribuer l'optmisation de la requête
+  * @param {string} op - Optimisation
   *
   */
   set optimization (op) {
@@ -166,6 +170,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set intermediates
   * @description Attribuer les points intermédiaires de la requête
+  * @param {table} i - Tableau de points (ex. [{lon: 8.732901, lat: 41.953932},{lon: 8.732902, lat: 41.953930}])
   *
   */
   set intermediates (i) {
@@ -188,6 +193,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set computeGeometry
   * @description Attribuer le choix de l'affichage de la géoémtrie
+  * @param {boolean} i - computeGeometry
   *
   */
   set computeGeometry (i) {
@@ -233,6 +239,7 @@ module.exports = class routeRequest extends Request {
     * @function
     * @name isAttributeRequested
     * @description Permet de savoir si un attribut est demandé dans cette requête.
+    * @param {string} attr - Attribut
     *
     */
     isAttributeRequested (attr) {

@@ -18,13 +18,13 @@ module.exports = class PointParameter extends ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe PointParameter
-  * @param {string} id - Id du paramètre de service
+  * @param {object} parameter - Référence au paramètre de service
   *
   */
-  constructor(id) {
+  constructor(parameter) {
 
     // id
-    super(id);
+    super(parameter);
 
     // Bbox
     this._bbox = "";
@@ -58,9 +58,11 @@ module.exports = class PointParameter extends ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
+  * @param {string} parameterConf - Configuration d'un paramètre
+  * @return {boolean}
   *
   */
-  load(serviceParameterConf, parameterConf) {
+  load(parameterConf) {
 
     this._bbox = parameterConf.values.bbox;
 
@@ -71,15 +73,44 @@ module.exports = class PointParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name check
+  * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
+  * @param {string} userValue - Valeur à vérifier
+  * @return {boolean}
   *
   */
-  check(userValue) {
+  specificCheck(userValue) {
 
-    // TODO: faire la vérification géométrique
+    let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
+
+    if (!tmpStringCoordinates) {
+      return false;
+    } else {
+      // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+    }
 
     return true;
+  }
+
+  /**
+  *
+  * @function
+  * @name specificConvertion
+  * @description Convertir une valeur dans un format adapté aux requêtes
+  * @param {string} userValue - Valeur à vérifier
+  * @return {object}
+  *
+  */
+  specificConvertion(userValue) {
+
+    let finalValue = {};
+
+    let tmpStringCoordinates = userValue.split(",");
+    finalValue.lon = Number(tmpStringCoordinates[0]);
+    finalValue.lat = Number(tmpStringCoordinates[1]);
+
+    return finalValue;
+
   }
 
 
