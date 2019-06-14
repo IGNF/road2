@@ -5,6 +5,7 @@ const OSRM = require("osrm");
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
+const Geometry = require('../geometry/geometry');
 const Step = require('../responses/step');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
@@ -260,7 +261,7 @@ module.exports = class osrmSource extends Source {
       let currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route(currentOsrmRoute.geometry);
+      routes[i] = new Route( new Geometry(currentOsrmRoute.geometry, "LineString", "geojson") );
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
@@ -284,7 +285,7 @@ module.exports = class osrmSource extends Source {
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step(currentOsrmRouteStep.geometry);
+          steps[k] = new Step( new Geometry(currentOsrmRouteStep.geometry, "LineString", "geojson") );
           steps[k].name = currentOsrmRouteStep.name;
         }
 
@@ -301,7 +302,6 @@ module.exports = class osrmSource extends Source {
     // ---
 
     // TODO: éventuellement à rendre plus propre
-    routeResponse.geometriesFormat = "geojson";
     return routeResponse;
 
   }

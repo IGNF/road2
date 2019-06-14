@@ -46,10 +46,6 @@ module.exports = class routeResponse extends Response {
     //Tableau contenant l'ensemble des itinéraires calculés par le moteur
     this._routes = new Array();
 
-    // geometriesFormat
-    // type des géométries renvoyé
-    this._geometriesFormat = null;
-
   }
 
   /**
@@ -166,28 +162,5 @@ module.exports = class routeResponse extends Response {
   set routes (st) {
     this._routes = st;
   }
-
-    /**
-  *
-  * @function
-  * @name get geometriesFormat
-  * @description Récupérer le choix du type de geometries
-  *
-  */
-  get geometriesFormat () {
-    return this._geometriesFormat;
-  }
-
-  /**
-  *
-  * @function
-  * @name set geometriesFormat
-  * @description Attribuer le choix du type de geometries
-  *
-  */
-  set geometriesFormat (i) {
-    this._geometriesFormat = i;
-  }
-
 
 }

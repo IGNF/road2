@@ -2,7 +2,6 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
-const geometryConverter = require('../../../../utils/geometryConverter');
 
 module.exports = {
 
@@ -232,14 +231,7 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    if (routeRequest.geometriesFormat === routeResponse.geometriesFormat) {
-      userResponse.geometry = route.geometry;
-    } else {
-      userResponse.geometry = geometryConverter.convertGeometry(route.geometry,
-        routeResponse.geometriesFormat,
-        routeRequest.geometriesFormat
-      )
-    }
+    userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -263,15 +255,7 @@ module.exports = {
 
           let currentStep = {};
 
-          if (routeRequest.geometriesFormat === routeResponse.geometriesFormat) {
-            currentStep.geometry = route.portions[i].steps[j].geometry;
-          } else {
-            currentStep.geometry = geometryConverter.convertGeometry(
-              route.portions[i].steps[j].geometry,
-              routeResponse.geometriesFormat,
-              routeRequest.geometriesFormat
-            );
-          }
+          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
 
           // si c'est demandé et qu'il existe alors on met le nom
           if (routeRequest.isAttributeRequested("name")) {
