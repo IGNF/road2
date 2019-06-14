@@ -17,7 +17,7 @@ module.exports = class Route {
   * @function
   * @name constructor
   * @description Constructeur de la classe Route
-  * @param {string} geometry - Géométrie de l'étape
+  * @param {object} geometry - Instance de la classe Geometry, Géométrie de l'itinéraire
   *
   */
   constructor(geometry) {

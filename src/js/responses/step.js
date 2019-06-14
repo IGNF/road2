@@ -17,7 +17,7 @@ module.exports = class Step {
   * @function
   * @name constructor
   * @description Constructeur de la classe Step
-  * @param {string} geometry - Géométrie de l'étape
+    * @param {object} geometry - Instance de la classe Geometry, Géométrie de l'étape
   *
   */
   constructor(geometry) {

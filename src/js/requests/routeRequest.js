@@ -56,7 +56,7 @@ module.exports = class routeRequest extends Request {
     // tableau de string
     this._waysAttributes = new Array();
 
-    // algorith
+    // algorithm
     // algorithme utilisé
     this._algorithm = "";
 

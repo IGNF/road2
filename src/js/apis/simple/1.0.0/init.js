@@ -181,6 +181,32 @@ module.exports = {
       waysAttributesParameterDescription.example = "name|type";
       routeDescription.parameters.push(waysAttributesParameterDescription);
 
+      // route.parameters.geometriesFormat
+      let geometriesFormatServiceParameter = serviceOpRoute.getParameterById("geometriesFormat");
+      let geometriesFormatParameterDescription = {};
+      geometriesFormatParameterDescription.name = "geometriesFormat";
+      geometriesFormatParameterDescription.in = "query";
+      geometriesFormatParameterDescription.description = geometriesFormatServiceParameter.description;
+      geometriesFormatParameterDescription.required = geometriesFormatServiceParameter.required;
+      geometriesFormatParameterDescription.default = geometriesFormatServiceParameter.defaultValue;
+      geometriesFormatParameterDescription.schema = {};
+      geometriesFormatParameterDescription.schema.type = "enumeration";
+      geometriesFormatParameterDescription.example = "geojson";
+      routeDescription.parameters.push(geometriesFormatParameterDescription);
+
+      // route.parameters.algorithm
+      let algorithmServiceParameter = serviceOpRoute.getParameterById("algorithm");
+      let algorithmParameterDescription = {};
+      algorithmParameterDescription.name = "algorithm";
+      algorithmParameterDescription.in = "query";
+      algorithmParameterDescription.description = algorithmServiceParameter.description;
+      algorithmParameterDescription.required = algorithmServiceParameter.required;
+      algorithmParameterDescription.default = algorithmServiceParameter.defaultValue;
+      algorithmParameterDescription.schema = {};
+      algorithmParameterDescription.schema.type = "enumeration";
+      algorithmParameterDescription.example = "ch";
+      routeDescription.parameters.push(algorithmParameterDescription);
+
       // -- end route.parameters
 
       getCapabilities.operations.push(routeDescription);
@@ -284,6 +310,20 @@ module.exports = {
         routeWaysAttributes.values = waysAttributesParameter.values;
         routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
+        // route.geometriesFormat
+        let geometriesFormatParameter = resourceOperation.getParameterById("geometriesFormat");
+        let routeGeometriesFormat = {};
+        routeGeometriesFormat.id = "geometriesFormat";
+        routeGeometriesFormat.values = geometriesFormatParameter.values;
+        routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
+
+        // route.algorithm
+        let algorithmParameter = resourceOperation.getParameterById("algorithm");
+        let routeAlgorithm = {};
+        routeAlgorithm.id = "algorithm";
+        routeAlgorithm.values = algorithmParameter.values;
+        routeAvailableOperation.availableParameters.push(routeAlgorithm);
+
         resourceDescription.availableOperations.push(routeAvailableOperation);
 
       }
@@ -322,7 +362,7 @@ module.exports = {
 
       // TODO: vérification que l'ensemble des opérations et paramètres soient disponibles
       // ils sont utilisés dans l'api mais leur existence n'est pas vérifiée
-      
+
       // Création du GetCapabilities
       if (!this.createGetCapabilities(app, uid)) {
         LOGGER.error("Erreur lors de la creation du GetCapabilities.");

@@ -91,8 +91,7 @@
           "id": "algorithm",
           "defaultValueContent": "ch",
           "values": [
-            "ch",
-            "mld"
+            "ch"
           ]
         },
         {
