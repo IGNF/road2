@@ -302,27 +302,6 @@ module.exports = class resourceManager {
       }
     }
 
-    // Sources
-    if (!resourceJsonObject.sources) {
-      LOGGER.error("La ressource ne contient pas de sources.");
-      return false;
-    } else {
-
-      LOGGER.info("Verification des sources...")
-
-      for (let i = 0; i < resourceJsonObject.sources.length; i++ ) {
-
-        let sourceJsonObject = resourceJsonObject.sources[i];
-        if (!sourceManager.checkSource(sourceJsonObject)) {
-          LOGGER.error("La ressource contient une source invalide.");
-          return false;
-        } else {
-          // on ne fait rien
-        }
-
-      }
-    }
-
     LOGGER.info("Fin de la verification de la ressource pgr.");
     return true;
   }

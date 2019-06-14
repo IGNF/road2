@@ -60,6 +60,10 @@ module.exports = class routeRequest extends Request {
     // algorithme utilisé
     this._algorithm = "";
 
+    // geometriesFormat
+    // type des géométries demandé
+    this._geometriesFormat = "geojson"
+
   }
 
   /**
@@ -221,6 +225,29 @@ module.exports = class routeRequest extends Request {
   set algorithm (i) {
     this._algorithm = i;
   }
+
+  /**
+  *
+  * @function
+  * @name get geometriesFormat
+  * @description Récupérer le choix du type de geometries
+  *
+  */
+  get geometriesFormat () {
+    return this._geometriesFormat;
+  }
+
+  /**
+  *
+  * @function
+  * @name set geometriesFormat
+  * @description Attribuer le choix du type de geometries
+  *
+  */
+  set geometriesFormat (i) {
+    this._geometriesFormat = i;
+  }
+
 
   /**
   *

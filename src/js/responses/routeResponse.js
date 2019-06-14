@@ -163,6 +163,4 @@ module.exports = class routeResponse extends Response {
     this._routes = st;
   }
 
-
-
 }

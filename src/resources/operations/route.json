@@ -10,6 +10,8 @@
     "optimization",
     "intermediates",
     "stepsGeometry",
-    "waysAttributes"
+    "waysAttributes",
+    "algorithm",
+    "geometriesFormat"
   ]
 }

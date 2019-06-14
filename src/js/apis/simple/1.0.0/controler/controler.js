@@ -148,11 +148,6 @@ module.exports = {
     }
     // ---
 
-    if (parameters.algorithm) {
-      routeRequest.algorithm = parameters.algorithm;
-    } else {
-      // TODO: on met la valeur par défaut issue de la configuration
-    }
 
     // waysAttributes
     // ---
@@ -170,7 +165,34 @@ module.exports = {
     } else {
       // on ne fait rien, il n'y aucun attribut à ajouter
     }
+    // ---
 
+    // algoritm
+    if (parameters.algorithm) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("algorithm").check(parameters.algorithm)) {
+        throw errorManager.createError(" Parameter 'algorithm' is invalid ", 400);
+      }
+      routeRequest.algorithm = parameters.algorithm;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.algorithm = routeOperation.getParameterById("algorithm").defaultValueContent;
+    }
+    // ---
+
+    // geometriesFormat
+    if (parameters.geometriesFormat) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("geometriesFormat").check(parameters.geometriesFormat)) {
+        throw errorManager.createError(" Parameter 'geometriesFormat' is invalid ", 400);
+      }
+      routeRequest.geometriesFormat = parameters.geometriesFormat;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.geometriesFormat = routeOperation.getParameterById("geometriesFormat").defaultValueContent;
+    }
     // ---
 
     return routeRequest;
@@ -209,7 +231,7 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    userResponse.geometry = route.geometry;
+    userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -233,7 +255,7 @@ module.exports = {
 
           let currentStep = {};
 
-          currentStep.geometry = route.portions[i].steps[j].geometry;
+          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
 
           // si c'est demandé et qu'il existe alors on met le nom
           if (routeRequest.isAttributeRequested("name")) {

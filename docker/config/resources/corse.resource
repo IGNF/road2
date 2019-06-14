@@ -86,6 +86,22 @@
           "values": [
             "name"
           ]
+        },
+        {
+          "id": "algorithm",
+          "defaultValueContent": "ch",
+          "values": [
+            "ch",
+            "mld"
+          ]
+        },
+        {
+          "id": "geometriesFormat",
+          "defaultValueContent": "geojson",
+          "values": [
+            "geojson",
+            "polyline"
+          ]
         }
       ]
     }
