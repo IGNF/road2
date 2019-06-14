@@ -77,15 +77,40 @@ module.exports = class apisManager {
 
     LOGGER.info("Chargement des APIS...");
 
-    fs.readdirSync(APIsDirectory).forEach(apiName => {
+    // on lit le contenu du dossier
+    let APIsDirectoryTable = fs.readdirSync(APIsDirectory);
+
+    // S'il est vide ce n'est pas normal
+    if (APIsDirectoryTable.length === 0) {
+      LOGGER.error("Le dossier des apis est vide.");
+      return false;
+    }
+
+    // Pour chaque sous-dossier on a potentiellement une api
+    for (let i = 0; i < APIsDirectoryTable.length; i++) {
+
+      let apiName = APIsDirectoryTable[i];
+
       let APIDirectory = APIsDirectory + "/" + apiName;
+
       if (fs.statSync(APIDirectory).isDirectory()) {
         // c'est un dossier qui contient potentiellement une API
 
         LOGGER.info("Nouvelle API: " + apiName);
 
-        fs.readdirSync(APIDirectory).forEach(apiVersion => {
+        let APIDirectoryTable = fs.readdirSync(APIDirectory);
+
+        if (APIDirectoryTable.length === 0) {
+          LOGGER.error("Le dossier de l'api est vide.");
+          return false;
+        }
+
+        for (let j = 0; j < APIDirectoryTable.length; j++) {
+
+          let apiVersion = APIDirectoryTable[j];
+
           let APIDirectoryVersion = APIDirectory + "/" + apiVersion;
+
           if (fs.statSync(APIDirectoryVersion).isDirectory()) {
               // c'est un dossier qui contient potentiellement une version de l'API
 
@@ -159,13 +184,14 @@ module.exports = class apisManager {
           } else {
             // Si ce n'est pas un dossier, on ne fait rien
           }
-        });
+
+        }
 
       } else {
         // Si ce n'est pas un dossier, on ne fait rien
       }
 
-    });
+    }
 
     LOGGER.info("APIS chargees.");
     return true;
