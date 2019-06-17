@@ -181,17 +181,17 @@ module.exports = {
     }
     // ---
 
-    // geometriesFormat
-    if (parameters.geometriesFormat) {
+    // geometryFormat
+    if (parameters.geometryFormat) {
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("geometriesFormat").check(parameters.geometriesFormat)) {
-        throw errorManager.createError(" Parameter 'geometriesFormat' is invalid ", 400);
+      if (!routeOperation.getParameterById("geometryFormat").check(parameters.geometryFormat)) {
+        throw errorManager.createError(" Parameter 'geometryFormat' is invalid ", 400);
       }
-      routeRequest.geometriesFormat = parameters.geometriesFormat;
+      routeRequest.geometryFormat = parameters.geometryFormat;
     } else {
       // On met la valeur par défaut issue de la configuration
       // TODO: que faire s'il n'y a pas de valeur par défaut ?
-      routeRequest.geometriesFormat = routeOperation.getParameterById("geometriesFormat").defaultValueContent;
+      routeRequest.geometryFormat = routeOperation.getParameterById("geometryFormat").defaultValueContent;
     }
     // ---
 
@@ -231,7 +231,7 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
+    userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -255,7 +255,7 @@ module.exports = {
 
           let currentStep = {};
 
-          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometriesFormat);
+          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
           // si c'est demandé et qu'il existe alors on met le nom
           if (routeRequest.isAttributeRequested("name")) {
