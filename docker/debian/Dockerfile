@@ -54,7 +54,7 @@ RUN unzip v5.20.0.zip -d ./osrm-backend
 RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/ && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && cmake --build . --target install
 
 ### Dossier des données
-WORKDIR /home/docker/data
+WORKDIR /home/docker/internal
 
 ### Récupération de données sur la Corse
 # L'objectif est d'avoir un container indépendant du docker-compose

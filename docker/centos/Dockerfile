@@ -62,7 +62,7 @@ WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/build
 RUN scl enable devtoolset-6 bash && export CC=/opt/rh/devtoolset-6/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-6/root/usr/bin/g++ && make && make install
 
 ### Dossier des données
-WORKDIR /home/docker/data
+WORKDIR /home/docker/internal
 
 ### Récupération de données sur la Corse
 # L'objectif est d'avoir un container indépendant du docker-compose

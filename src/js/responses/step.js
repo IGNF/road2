@@ -25,8 +25,8 @@ module.exports = class Step {
     // geometry
     this._geometry = geometry;
 
-    // name
-    this._name = "";
+    // attributes
+    this._attributes = {};
 
   }
 
@@ -56,24 +56,54 @@ module.exports = class Step {
   /**
   *
   * @function
-  * @name get name
-  * @description Récupérer le nom de l'étape
+  * @name get attributes
+  * @description Récupérer les attributs de l'étape
   *
   */
-  get name () {
-    return this._name;
+  get attributes () {
+    return this._attributes;
   }
 
   /**
   *
   * @function
-  * @name set name
-  * @description Attribuer le nom de l'étape
-  * @param {string} na - Nom de l'étape
+  * @name getAttributById
+  * @description Récupérer la valeur d'un attribut par son id
   *
   */
-  set name (na) {
-    this._name = na;
+  getAttributById (id) {
+
+    if (this._attributes[id]) {
+      return this._attributes[id];
+    } else {
+      return null;
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name setAttributById
+  * @description Définir la valeur d'un attribut avec son id
+  *
+  */
+  setAttributById (id, value) {
+
+    this._attributes[id] = value;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name set attributes
+  * @description Attribuer les attributs de l'étape
+  * @param {string} at - Attributs de l'étape
+  *
+  */
+  set attributes (at) {
+    this._attributes = at;
   }
 
 

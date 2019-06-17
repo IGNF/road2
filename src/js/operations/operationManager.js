@@ -364,7 +364,7 @@ module.exports = class operationManager  {
       LOGGER.error("Le tableau d'operations est vide.")
       return false;
     } else {
-      LOGGER.info("Test");
+
       for (let i = 0; i < resourceOperationTable.length; i++) {
         LOGGER.info(resourceOperationTable[i]);
         if (operationId === resourceOperationTable[i]) {
@@ -384,7 +384,7 @@ module.exports = class operationManager  {
   * @name createResourceOperation
   * @description Créer l'ensemble des opérations d'une ressource
   * @param {object} resourceOperationHash - Objet contenant les opérations de ressource
-  * @param {json} resourceJsonObject - Configuration d'une opération de ressource 
+  * @param {json} resourceJsonObject - Configuration d'une opération de ressource
   * @return {boolean}
   *
   */
