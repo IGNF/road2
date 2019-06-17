@@ -70,10 +70,13 @@
 			type: object
 			required: true
 			properties:
-				# Dossier contenant l'ensemble des fichiers de configuration des ressources.
-				"directory":
-					type: string
+				# Dossiers contenant l'ensemble des fichiers de configuration des ressources.
+				"directories":
+					type: table
 					required: true
+          minItems: 1
+          items:
+            type: string
 		# Configuration du network
 		"network":
 			type: object
