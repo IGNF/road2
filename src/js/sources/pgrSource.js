@@ -11,6 +11,7 @@ const Step = require('../responses/step');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const log4js = require('log4js');
+const simplify = require('../utils/simplify');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("PGRSOURCE");
@@ -265,8 +266,11 @@ module.exports = class pgrSource extends Source {
       }
     }
 
+    // Conversion en LineString
     const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(route_geometry.coordinates);
-    route_geometry.coordinates = dissolvedCoords;
+    // Simplification de la géométrie, tolérance à environ 5m
+    const simplifiedDissolvedCoords = simplify(dissolvedCoords, 0.00005);
+    route_geometry.coordinates = simplifiedDissolvedCoords;
 
     if (response.waypoints.length < 1) {
       throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
