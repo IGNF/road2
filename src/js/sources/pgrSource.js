@@ -246,7 +246,6 @@ module.exports = class pgrSource extends Source {
     response.routes.push( {geometry: route_geometry, legs: [] } );
 
     for (let row of pgrResponse.rows) {
-
       if (row.node_lon) {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
@@ -260,7 +259,10 @@ module.exports = class pgrSource extends Source {
       }
 
       // TODO: Il n'y a qu'une route pour l'instant
-      response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } )
+      // TODO: à revoir pour la gestion des coûts
+      if (row.geom_json) {
+        response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } );
+      }
     }
 
     const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(route_geometry.coordinates);
@@ -294,7 +296,7 @@ module.exports = class pgrSource extends Source {
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
-      if (currentPgrRoute.legs.length !== response.waypoints.length-1) {
+      if (currentPgrRoute.legs.length !== response.waypoints.length - 1) {
         throw errorManager.createError(" PGR response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
       }
 
