@@ -37,7 +37,10 @@ services:
       - iti-data-volume:/home/docker/data
     networks:
       - iti-network
-    command: "./populatepivot2osrm.sh ${R2GG_ARG}"
+    command: "./r2gg_pipeline.sh"
+    environment:
+      - R2GG_ARG=${R2GG_ARG}
+      - GENERATION_TYPE=${GENERATION_TYPE}
     secrets:
       - db_config
 
