@@ -129,8 +129,8 @@ module.exports = class pgrSource extends Source {
       // Cette construction dépend du type de la requête fournie
       // ---
       let pgrRequest = {};
-      let sql_function;
       const coordinatesTable = new Array();
+      const intermediates = new Array();
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -140,8 +140,7 @@ module.exports = class pgrSource extends Source {
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push(request.intermediates[i].lon);
-            coordinatesTable.push(request.intermediates[i].lat);
+            intermediates.push([request.intermediates[i].lon, request.intermediates[i].lat]);
           }
         }
         // end
@@ -150,31 +149,25 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
-        if (request.algorithm == "" || request.algorithm == "dijkstra") {
-          sql_function = "coord_dijkstra";
-        } else if (request.algorithm == "astar") {
-          sql_function = "coord_astar";
-        } else if (request.algorithm == "trsp") {
-          sql_function = "coord_trsp";
-        } else {
-          // TODO: On ne devrait pas arriver dans ce cas là, renvoyer une erreur ?
-          sql_function = "coord_dijkstra";
-        }
-
       } else {
         // on va voir si c'est un autre type de requête
       }
 
       // ---
-      const query_string = "SELECT * FROM " + sql_function +
-        "($1::double precision, $2::double precision, $3::double precision, $4::double precision,'" +
+      const queryString = "SELECT * FROM shortest_path_with_algorithm" +
+        "($1::double precision,$2::double precision, $3::double precision, $4::double precision,'" +
         this._configuration.storage.costColumn +
         "','" +
         this._configuration.storage.rcostColumn +
-        "')";
+        "','" +
+        request.algorithm +
+        "'," +
+        "ARRAY " + JSON.stringify(intermediates) +
+        ")";
+      console.log(queryString);
 
       return new Promise( (resolve, reject) => {
-        this._client.query(query_string, coordinatesTable, (err, result) => {
+        this._client.query(queryString, coordinatesTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
             reject(err);
@@ -233,21 +226,21 @@ module.exports = class pgrSource extends Source {
       waypoints: [],
       routes: []
     };
-    const route_geometry = {
+    const routeGeometry = {
       type: "LineString",
       coordinates: []
     };
 
     // TODO: Il n'y a qu'une route pour l'instant
-    response.routes.push( {geometry: route_geometry, legs: [] } );
+    response.routes.push( {geometry: routeGeometry, legs: [] } );
 
     for (let row of pgrResponse.rows) {
       if (row.node_lon) {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
       if (row.geom_json) {
-        let current_geom = JSON.parse(row.geom_json);
-        route_geometry.coordinates.push( current_geom.coordinates );
+        let currentGeom = JSON.parse(row.geom_json);
+        routeGeometry.coordinates.push( currentGeom.coordinates );
       }
       if (row.path_seq === 1) {
         // TODO: Il n'y a qu'une route pour l'instant
@@ -262,10 +255,10 @@ module.exports = class pgrSource extends Source {
     }
 
     // Conversion en LineString
-    const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(route_geometry.coordinates);
+    const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(routeGeometry.coordinates);
     // Simplification de la géométrie, tolérance à environ 5m
     const simplifiedDissolvedCoords = simplify(dissolvedCoords, 0.00005);
-    route_geometry.coordinates = simplifiedDissolvedCoords;
+    routeGeometry.coordinates = simplifiedDissolvedCoords;
 
     if (response.waypoints.length < 1) {
       throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
