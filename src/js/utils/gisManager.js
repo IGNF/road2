@@ -1,5 +1,57 @@
 'use strict';
 
+/**
+*
+* @function
+* @name arraysEquals
+* @description Détermine si 2 array sont égaux
+* @param {Array} arr1 - array
+* @param {Array} arr2 - array
+* @return {boolean} - true si les array sont égaux, false sinon
+*
+*/
+function arraysEquals(arr1, arr2) {
+  if (arr1 === arr2) return true;
+  if (arr1 == null || arr2 == null) return false;
+  if (arr1.length != arr2.length) return false;
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < arr1.length; ++i) {
+    if (arr1[i] !== arr2[i]) return false;
+  }
+  return true;
+}
+
+/**
+*
+* @function
+* @name arrays_intersection
+* @description Retourne l'intersection entre 2 arrays d'arrays
+* @param {Array} arr1 - array
+* @param {Array} arr2 - array
+* @return {Array} - intersection entre les arrays
+*
+*/
+function arrays_intersection(arr1, arr2) {
+  const result = [];
+  for (let arr_a of arr1) {
+    for (let arr_b of arr2) {
+      if (arraysEquals(arr_a, arr_b)) {
+        result.push(arr_a);
+      }
+    }
+  }
+  return result;
+}
+
+
+
+
+
 module.exports = {
 
   /**
@@ -12,42 +64,16 @@ module.exports = {
   *
   */
 
- geoJsonMultiLineStringCoordsToSingleLineStringCoords: function(srcCoords) {
+  geoJsonMultiLineStringCoordsToSingleLineStringCoords: function(srcCoords) {
+
+    if (srcCoords.length === 0) {
+      return [];
+    }
 
     // Transformation des coordonnées en mode MultiLineString vers LineString
     const dissolvedCoords = [];
     const firstLine = srcCoords[0];
     const secondLine = srcCoords[1];
-
-    // Pour tester l'égalité entre couple de coordonnées
-    function arraysEquals(a, b) {
-      if (a === b) return true;
-      if (a == null || b == null) return false;
-      if (a.length != b.length) return false;
-
-      // If you don't care about the order of the elements inside
-      // the array, you should sort both arrays here.
-      // Please note that calling sort on an array will modify that array.
-      // you might want to clone your array first.
-
-      for (var i = 0; i < a.length; ++i) {
-        if (a[i] !== b[i]) return false;
-      }
-      return true;
-    }
-
-    // Pour tester l'intersection entre 2 suites de paires de coordonnées
-    function arrays_intersection(a, b) {
-      const result = [];
-      for (let arr_a of a) {
-        for (let arr_b of b) {
-          if (arraysEquals(arr_a, arr_b)) {
-            result.push(arr_a);
-          }
-        }
-      }
-      return result;
-    }
 
     const common_point = arrays_intersection(firstLine, secondLine)[0];
 
