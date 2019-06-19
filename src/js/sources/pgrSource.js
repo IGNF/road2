@@ -150,7 +150,6 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
-        // steps
         if (request.algorithm == "" || request.algorithm == "dijkstra") {
           sql_function = "coord_dijkstra";
         } else if (request.algorithm == "astar") {
@@ -160,10 +159,6 @@ module.exports = class pgrSource extends Source {
         } else {
           // TODO: On ne devrait pas arriver dans ce cas là, renvoyer une erreur ?
           sql_function = "coord_dijkstra";
-        }
-
-        if (!request.computeGeometry) {
-          sql_function += "_no_geom";
         }
 
       } else {
