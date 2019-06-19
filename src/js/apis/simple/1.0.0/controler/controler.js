@@ -257,11 +257,17 @@ module.exports = {
 
           currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
-          // si c'est demandé et qu'il existe alors on met le nom
-          if (routeRequest.isAttributeRequested("name")) {
-            currentStep.name = route.portions[i].steps[j].name;
+          if (routeRequest.waysAttributes.length !== 0) {
+
+            currentStep.attributes = {};
+            // si c'est demandé et qu'il existe alors on met l'attribut
+            for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
+              let attribut = routeRequest.waysAttributes[i];
+              currentStep.attributes[attribut] = route.portions[i].steps[j].getAttributById(attribut);
+            }
+
           } else {
-            // on ne fait rien
+            // on ne fait rien 
           }
 
           currentPortion.steps.push(currentStep);

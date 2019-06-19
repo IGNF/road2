@@ -87,7 +87,7 @@
                   # Indique ou se trouve le fichier json qui a permis de générer le lua
                   "configuration":
                     type: object
-                    required: true
+                    required: false
                     properties:
                       # Nom de la propriété qui est utilisé dans le fichier json
                       "name":
