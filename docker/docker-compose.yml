@@ -59,10 +59,15 @@ services:
       - 5432:5432
     networks:
       - iti-network
+    volumes:
+      - pgr-data-volume:/var/lib/pgsql 
+
 
 volumes:
   iti-data-volume:
     name: iti-data-volume
+  pgr-data-volume:
+    name: pgr-data-volume
 
 networks:
   iti-network:
