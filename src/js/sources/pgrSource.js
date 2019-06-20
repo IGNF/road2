@@ -130,22 +130,19 @@ module.exports = class pgrSource extends Source {
       // ---
       let pgrRequest = {};
       const coordinatesTable = new Array();
-      const intermediates = new Array();
 
       if (request.type === "routeRequest") {
         // Coordonnées
         // start
-        coordinatesTable.push(request.start.lon);
-        coordinatesTable.push(request.start.lat);
+        coordinatesTable.push([request.start.lon, request.start.lat]);
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            intermediates.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+            coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
           }
         }
         // end
-        coordinatesTable.push(request.end.lon);
-        coordinatesTable.push(request.end.lat);
+        coordinatesTable.push([request.end.lon, request.end.lat]);
 
         pgrRequest.coordinates = coordinatesTable;
 
@@ -154,20 +151,16 @@ module.exports = class pgrSource extends Source {
       }
 
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm" +
-        "($1::double precision,$2::double precision, $3::double precision, $4::double precision,'" +
-        this._configuration.storage.costColumn +
-        "','" +
-        this._configuration.storage.rcostColumn +
-        "','" +
-        request.algorithm +
-        "'," +
-        "ARRAY " + JSON.stringify(intermediates) +
-        ")";
-      console.log(queryString);
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3)";
+
+      const SQLParametersTable = [
+        this._configuration.storage.costColumn,
+        this._configuration.storage.rcostColumn,
+        request.algorithm
+      ];
 
       return new Promise( (resolve, reject) => {
-        this._client.query(queryString, coordinatesTable, (err, result) => {
+        this._client.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
             reject(err);
@@ -206,6 +199,7 @@ module.exports = class pgrSource extends Source {
     let end;
     let profile;
     let optimization;
+    let lastPathSeq = 0;
     let routes = new Array();
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
@@ -235,23 +229,26 @@ module.exports = class pgrSource extends Source {
     response.routes.push( {geometry: routeGeometry, legs: [] } );
 
     for (let row of pgrResponse.rows) {
-      if (row.node_lon) {
-        response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
-      }
+      console.log(row.edge);
+
       if (row.geom_json) {
         let currentGeom = JSON.parse(row.geom_json);
         routeGeometry.coordinates.push( currentGeom.coordinates );
       }
-      if (row.path_seq === 1) {
+      if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
         // TODO: Il n'y a qu'une route pour l'instant
         response.routes[0].legs.push( { steps: [] } );
       }
+      if (row.path_seq === 1 || row.edge === -2 ||(row.path_seq < 0 && row.path_seq != lastPathSeq)) {
+        response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
+      }
 
       // TODO: Il n'y a qu'une route pour l'instant
-      // TODO: à revoir pour la gestion des coûts
+      // TODO: à revoir pour la gestion des coûts : dernier step non pris en compte
       if (row.geom_json) {
         response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } );
       }
+      lastPathSeq = row.path_seq;
     }
 
     // Conversion en LineString
@@ -324,9 +321,6 @@ module.exports = class pgrSource extends Source {
     }
 
     routeResponse.routes = routes;
-
-    // ---
-    // TODO: éventuellement à rendre plus propre
 
     return routeResponse;
 
