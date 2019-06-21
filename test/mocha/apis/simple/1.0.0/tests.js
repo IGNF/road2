@@ -8,7 +8,7 @@ const RouteRequest = require('../../../../../src/js/requests/routeRequest');
 const Resource = require('../../../../../src/js/resources/resource');
 const Source = require('../../../../../src/js/sources/source');
 
-const controler = require('../../../../../src/js/apis/simple/1.0.0/controler/controler');
+const controller = require('../../../../../src/js/apis/simple/1.0.0/controller/controller');
 const sinon = require('sinon');
 
 describe('Test de l\'api simple 1.0.0', function() {
@@ -47,7 +47,7 @@ describe('Test de l\'api simple 1.0.0', function() {
 
     it('checkRouteParameters() avec les bons parametres', async function() {
       // await service.loadSources();
-      assert.deepEqual(controler.checkRouteParameters(parameters, service), routeRequest);
+      assert.deepEqual(controller.checkRouteParameters(parameters, service), routeRequest);
       // await service.disconnectAllSources();
     });
 
@@ -81,7 +81,7 @@ describe('Test de l\'api simple 1.0.0', function() {
 
       const routeRequest = new RouteRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, {lon: 8.76385, lat: 41.953932}, "car", "fastest");
 
-      assert.deepEqual(controler.writeRouteResponse(routeRequest, routeResponse), referenceResponse);
+      assert.deepEqual(controller.writeRouteResponse(routeRequest, routeResponse), referenceResponse);
     });
 
   });
