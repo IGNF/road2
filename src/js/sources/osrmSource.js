@@ -299,9 +299,6 @@ module.exports = class osrmSource extends Source {
 
     routeResponse.routes = routes;
 
-    // ---
-
-    // TODO: éventuellement à rendre plus propre
     return routeResponse;
 
   }
