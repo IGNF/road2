@@ -228,9 +228,9 @@ module.exports = class pgrSource extends Source {
     // TODO: Il n'y a qu'une route pour l'instant
     response.routes.push( {geometry: routeGeometry, legs: [] } );
 
-    for (let row of pgrResponse.rows) {
-      console.log(row.edge);
-
+    let row;
+    for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
+      row = pgrResponse.rows[rowIdx];
       if (row.geom_json) {
         let currentGeom = JSON.parse(row.geom_json);
         routeGeometry.coordinates.push( currentGeom.coordinates );
@@ -239,7 +239,7 @@ module.exports = class pgrSource extends Source {
         // TODO: Il n'y a qu'une route pour l'instant
         response.routes[0].legs.push( { steps: [] } );
       }
-      if (row.path_seq === 1 || row.edge === -2 ||(row.path_seq < 0 && row.path_seq != lastPathSeq)) {
+      if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
 
