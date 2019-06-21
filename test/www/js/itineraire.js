@@ -102,7 +102,7 @@ function createMap() {
       }
 
       // on calcule l'itinéraire
-      fetch(road2Url + '&start=' + clickedPoints[clickedPoints.length-2] + "&end="  + clickedPoints[clickedPoints.length-1] + "&geometriesFormat=polyline")
+      fetch(road2Url + '&start=' + clickedPoints[clickedPoints.length-2] + "&end="  + clickedPoints[clickedPoints.length-1] + "&geometryFormat=polyline")
       .then(function(r) {
         return r.json();
       })

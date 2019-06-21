@@ -349,26 +349,43 @@ module.exports = class Service {
     // Information sur les ressources
     if (userConfiguration.application.resources) {
       // Dossier contenant les fichiers de ressources
-      if (!userConfiguration.application.resources.directory) {
-        LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directory' manquant !");
+      if (!userConfiguration.application.resources.directories) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directories' manquant !");
         return false;
       } else {
-        // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
-        let directory =  path.resolve(__dirname,userConfiguration.application.resources.directory);
-        if (fs.existsSync(directory)) {
-          // On vérifie que l'application peut lire les fichiers du dossier
-          fs.readdirSync(directory).forEach(resource => {
-            try {
-              var file = directory + "/" + resource;
-              fs.accessSync(file, fs.constants.R_OK);
-            } catch (err) {
-              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
-            }
-          });
-        } else {
-          LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+
+        let resourcesDirectories = userConfiguration.application.resources.directories;
+        // On vérifie que c'est un tableau non vide
+        if (!Array.isArray(resourcesDirectories)) {
+          LOGGER.error("Mauvaise configuration: Champ 'application:resources:directories' n'est pas un tableau !");
           return false;
         }
+        if (resourcesDirectories.length === 0) {
+          LOGGER.error("Mauvaise configuration: Champ 'application:resources:directories' est un tableau vide !");
+          return false;
+        }
+
+        for (let i = 0; i < resourcesDirectories.length; i++) {
+
+          // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
+          let directory =  path.resolve(__dirname, resourcesDirectories[i]);
+          if (fs.existsSync(directory)) {
+            // On vérifie que l'application peut lire les fichiers du dossier
+            fs.readdirSync(directory).forEach(resource => {
+              try {
+                var file = directory + "/" + resource;
+                fs.accessSync(file, fs.constants.R_OK);
+              } catch (err) {
+                LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+              }
+            });
+          } else {
+            LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+            return false;
+          }
+
+        }
+
       }
     } else {
       LOGGER.fatal("Mauvaise configuration: Objet 'application:resources' manquant !");
@@ -474,49 +491,64 @@ module.exports = class Service {
   * @function
   * @name loadResources
   * @description Chargement des ressources
-  * @param {string} userResourceDirectory - Dossier contenant les ressources à charger
+  * @param {table} userResourceDirectories - Tableau de dossiers contenant les ressources à charger
   *
   */
 
-  loadResources(userResourceDirectory) {
+  loadResources(userResourceDirectories) {
 
     LOGGER.info("Chargement des ressources...");
 
+    // Nombre de ressources chargées
     let loadedResources = 0;
 
-    if (!userResourceDirectory) {
-      userResourceDirectory = this._configuration.application.resources.directory;
+    if (!userResourceDirectories) {
+      userResourceDirectories = this._configuration.application.resources.directories;
     }
 
-    let resourceDirectory =  path.resolve(__dirname, userResourceDirectory);
+    if (!Array.isArray(userResourceDirectories)) {
+      LOGGER.error("La variable contenant les dossiers de ressources n'est pas un tableau");
+      return false;
+    }
 
-    // Pour chaque fichier du dossier des ressources, on crée une ressource
-    let test = fs.readdirSync(resourceDirectory).filter( (file) => {
-      return path.extname(file).toLowerCase() === ".resource";
-    }).forEach(fileName => {
+    if (userResourceDirectories.length === 0) {
+      LOGGER.error("Le tableau contenant les dossiers de ressources est vide");
+      return false;
+    }
 
-      let resourceFile = resourceDirectory + "/" + fileName;
-      LOGGER.info("Chargement de: " + resourceFile);
+    for (let i = 0; i < userResourceDirectories.length; i++) {
 
-      // Récupération du contenu en objet pour vérification puis création de la ressource
-      try {
+      let resourceDirectory =  path.resolve(__dirname, userResourceDirectories[i]);
 
-        let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
-        // Vérification du contenu
-        if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
-          LOGGER.error("Erreur lors du chargement de: " + resourceFile);
-        } else {
-          // Création de la ressource
-          this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
-          loadedResources++;
+      // Pour chaque fichier du dossier des ressources, on crée une ressource
+      let test = fs.readdirSync(resourceDirectory).filter( (file) => {
+        return path.extname(file).toLowerCase() === ".resource";
+      }).forEach(fileName => {
+
+        let resourceFile = resourceDirectory + "/" + fileName;
+        LOGGER.info("Chargement de: " + resourceFile);
+
+        // Récupération du contenu en objet pour vérification puis création de la ressource
+        try {
+
+          let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
+          // Vérification du contenu
+          if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
+            LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+          } else {
+            // Création de la ressource
+            this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
+            loadedResources++;
+          }
+
+        } catch (error) {
+          LOGGER.error(error);
+          LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
         }
 
-      } catch (error) {
-        LOGGER.error(error);
-        LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
-      }
+      });
 
-    });
+    }
 
     if (loadedResources === 0) {
       LOGGER.fatal("Aucune ressource n'a pu etre chargee");

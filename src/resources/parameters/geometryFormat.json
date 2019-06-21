@@ -1,5 +1,5 @@
 {
-  "id": "geometriesFormat",
+  "id": "geometryFormat",
   "name": "Type des géométries",
   "description": "Type des géométries en sortie",
   "required": "false",

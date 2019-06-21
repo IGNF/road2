@@ -181,18 +181,18 @@ module.exports = {
       waysAttributesParameterDescription.example = "name|type";
       routeDescription.parameters.push(waysAttributesParameterDescription);
 
-      // route.parameters.geometriesFormat
-      let geometriesFormatServiceParameter = serviceOpRoute.getParameterById("geometriesFormat");
-      let geometriesFormatParameterDescription = {};
-      geometriesFormatParameterDescription.name = "geometriesFormat";
-      geometriesFormatParameterDescription.in = "query";
-      geometriesFormatParameterDescription.description = geometriesFormatServiceParameter.description;
-      geometriesFormatParameterDescription.required = geometriesFormatServiceParameter.required;
-      geometriesFormatParameterDescription.default = geometriesFormatServiceParameter.defaultValue;
-      geometriesFormatParameterDescription.schema = {};
-      geometriesFormatParameterDescription.schema.type = "enumeration";
-      geometriesFormatParameterDescription.example = "geojson";
-      routeDescription.parameters.push(geometriesFormatParameterDescription);
+      // route.parameters.geometryFormat
+      let geometryFormatServiceParameter = serviceOpRoute.getParameterById("geometryFormat");
+      let geometryFormatParameterDescription = {};
+      geometryFormatParameterDescription.name = "geometryFormat";
+      geometryFormatParameterDescription.in = "query";
+      geometryFormatParameterDescription.description = geometryFormatServiceParameter.description;
+      geometryFormatParameterDescription.required = geometryFormatServiceParameter.required;
+      geometryFormatParameterDescription.default = geometryFormatServiceParameter.defaultValue;
+      geometryFormatParameterDescription.schema = {};
+      geometryFormatParameterDescription.schema.type = "enumeration";
+      geometryFormatParameterDescription.example = "geojson";
+      routeDescription.parameters.push(geometryFormatParameterDescription);
 
       // route.parameters.algorithm
       let algorithmServiceParameter = serviceOpRoute.getParameterById("algorithm");
@@ -310,11 +310,11 @@ module.exports = {
         routeWaysAttributes.values = waysAttributesParameter.values;
         routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
-        // route.geometriesFormat
-        let geometriesFormatParameter = resourceOperation.getParameterById("geometriesFormat");
+        // route.geometryFormat
+        let geometryFormatParameter = resourceOperation.getParameterById("geometryFormat");
         let routeGeometriesFormat = {};
-        routeGeometriesFormat.id = "geometriesFormat";
-        routeGeometriesFormat.values = geometriesFormatParameter.values;
+        routeGeometriesFormat.id = "geometryFormat";
+        routeGeometriesFormat.values = geometryFormatParameter.values;
         routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
 
         // route.algorithm

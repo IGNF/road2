@@ -6,7 +6,9 @@ info:
   contact:
     email: "idev@ign.fr"
 servers:
-  - url: "https://localhost"
+  - url: "https://itineraire.ign.fr/simple/1.0.0/"
+    description: "Serveur de test IGN"
+  - url: "https://localhost:8080/simple/1.0.0/"
     description: "Serveur de test local"
 tags:
 - name: "Découverte"
@@ -91,6 +93,13 @@ paths:
         required: false
         schema:
           $ref: "#/components/schemas/response-type"
+      - name: "geometryFormat"
+        in: "query"
+        description: "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline."
+        required: false
+        schema:
+          type: "string"
+          enum: ["geojson","polyline"]
       - name: "algorithm"
         in: "query"
         description: "Algorithme utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. L'algorithme est la méthode informatitque employée par le service pour calculer un itinéraire."

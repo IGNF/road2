@@ -14,7 +14,8 @@ application:
     parameters:
       directory: "/home/src/resources/parameters/"
 	resources:
-		directory: "/home/config/resources/"
+		directories:
+      - "/home/config/resources/"
   network:
     host: "0.0.0.0"
     port: "8080"

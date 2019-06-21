@@ -286,7 +286,7 @@ module.exports = class osrmSource extends Source {
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
           steps[k] = new Step( new Geometry(currentOsrmRouteStep.geometry, "LineString", "geojson") );
-          steps[k].name = currentOsrmRouteStep.name;
+          steps[k].setAttributById("name", currentOsrmRouteStep.name);
         }
 
         portions[j].steps = steps;
@@ -299,9 +299,6 @@ module.exports = class osrmSource extends Source {
 
     routeResponse.routes = routes;
 
-    // ---
-
-    // TODO: éventuellement à rendre plus propre
     return routeResponse;
 
   }
