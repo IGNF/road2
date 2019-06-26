@@ -256,6 +256,8 @@ module.exports = class operationManager  {
           // on vérifie qu'elle est bien disponible pour cette instance du service
           if (!this.isOperationAvailable(currentOperationConf.id)) {
             LOGGER.error("L'operation indiquee n'est pas disponible");
+            // TODO: remplacer ce return par un continue pour affiner le chargement des ressources
+            // par exemple, si la ressource indique une opération non disponible mais qu'on veuille quand même la charger pour les opérations disponibles
             return false;
           } else {
             // on continue
@@ -395,6 +397,9 @@ module.exports = class operationManager  {
     // on crée les opérations unes à une
     for (let i = 0; i < resourceJsonObject.resource.availableOperations.length; i++) {
 
+      // TODO: tester à nouveau si l'opération est bien disponible sur le service
+      // cela permet de ne charger que les opérations disponibles
+      
       // on isole la conf de l'opération
       let currentOperationConf = resourceJsonObject.resource.availableOperations[i];
       LOGGER.info("Operation en cours: " + currentOperationConf.id);
