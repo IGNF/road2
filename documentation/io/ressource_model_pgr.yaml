@@ -46,18 +46,19 @@
 				# 			type: string
         #       required: true
         # # Descriptif des colonnes contenant les attributs de chaque tronçon.
-        "attributeColumns":
-          type: array
-          required: false
-          minItems: 1
-          items:
+        # Descriptif des colonnes contenant les attributs de chaque tronçon.
+				"attributes":
+					type: array
+                    required: false
+					minItems: 1
+					items:
             # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
-            "key":
-              type: string
+						"key":
+							type: string
               required: true
             # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
-            "column":
-              type: string
+						"column":
+							type: string
               required: true
             # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
             "default":

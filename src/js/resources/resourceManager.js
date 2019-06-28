@@ -300,6 +300,80 @@ module.exports = class resourceManager {
       } else {
         // TODO: vérifier la bbox
       }
+      // Attributs
+      if (resourceJsonObject.topology.attributes) {
+
+        // on vérifie que c'est un tableau
+        if (!Array.isArray(resourceJsonObject.topology.attributes)) {
+          LOGGER.error("Le parametre resource.topology.attributes n'est pas un tableau.");
+          return false;
+        }
+
+        // que le tableau n'est pas vide
+        if (resourceJsonObject.topology.attributes.length === 0) {
+          LOGGER.error("Le parametre resource.topology.attributes est un tableau vide.");
+          return false;
+        }
+
+        // on va vérifier que chaque attribut est complet et unique dans sa description
+        let attributesKeyTable = new Array();
+        let attributesColumnTable = new Array();
+
+        for (let i = 0; i < resourceJsonObject.topology.attributes.length; i++) {
+          let curAttribute = resourceJsonObject.topology.attributes[i];
+
+
+          if (!curAttribute.key) {
+            LOGGER.error("La description de l'attribut est incomplete: key");
+            return false;
+          } else {
+
+            if (attributesKeyTable.length !== 0) {
+              for (let j = 0; j < attributesKeyTable.length; j++) {
+                if (curAttribute.key === attributesKeyTable[j]) {
+                  LOGGER.error("La description de l'attribut indique une cle deja utilisee.");
+                  return false;
+                }
+              }
+            }
+
+          }
+
+          if (!curAttribute.column) {
+            LOGGER.error("La description de l'attribut est incomplete: column");
+            return false;
+          } else {
+
+            if (attributesColumnTable.length !== 0) {
+              for (let j = 0; j < attributesColumnTable.length; j++) {
+                if (curAttribute.column === attributesColumnTable[j]) {
+                  LOGGER.error("La description de l'attribut indique une colonne deja utilisee.");
+                  return false;
+                }
+              }
+            }
+
+          }
+
+          if (!curAttribute.default) {
+            LOGGER.error("La description de l'attribut est incomplete: default");
+            return false;
+          } else {
+
+            if (curAttribute.default !== "true" && curAttribute.default !== "false") {
+              LOGGER.error("La description de l'attribut a un parametre 'default' incorrect.");
+              return false;
+            }
+
+          }
+
+          attributesKeyTable.push(curAttribute.key);
+          attributesColumnTable.push(curAttribute.column);
+
+        }
+      } else {
+        // rien à faire
+      }
     }
 
     LOGGER.info("Fin de la verification de la ressource pgr.");
