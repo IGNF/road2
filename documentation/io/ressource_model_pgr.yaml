@@ -35,31 +35,21 @@
         "projection":
           type: string
           required: true
-        # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
-				"base":
-					type: object
-          required: true
-					properties:
-            # Table contenant la topologie des tronçons navigables.
-						"table":
-							type: string
-              required: true
-            # Nom de la colonne des débuts de tronçons.
-						"startColumn":
-							type: string
-              required: true
-            # Nom de la colonne des fins de tronçons.
-						"endColumn":
-							type: string
-              required: true
-            # Nom de la colonne contenant les ids des tronçons.
-						"idColumn":
-							type: string
-              required: true
+        ## Peut être utile plus tard
+        # # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
+				# "base":
+				# 	type: object
+        #   required: true
+				# 	properties:
+        #     # Table contenant la topologie des tronçons navigables.
+				# 		"table":
+				# 			type: string
+        #       required: true
+        # # Descriptif des colonnes contenant les attributs de chaque tronçon.
         # Descriptif des colonnes contenant les attributs de chaque tronçon.
-				"attributeColumns":
+				"attributes":
 					type: array
-          required: false
+                    required: false
 					minItems: 1
 					items:
             # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
