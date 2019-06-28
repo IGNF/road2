@@ -130,6 +130,7 @@ module.exports = class pgrSource extends Source {
       // ---
       let pgrRequest = {};
       const coordinatesTable = new Array();
+      let attributes = "";
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -146,17 +147,35 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
+        // waysAttributes
+        // attributes est déjà vide, on met les attributs par défaut
+        
+
+        // on complète avec les attributs demandés
+        if (request.waysAttributes.length !== 0) {
+
+          for (let i = 0; i < request.waysAttributes.length; i++) {
+            // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+
+          }
+
+        } else {
+          // on ne fait rien
+        }
+        console.log(attributes);
+
       } else {
         // on va voir si c'est un autre type de requête
       }
 
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3)";
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [$4])";
 
       const SQLParametersTable = [
         this._configuration.storage.costColumn,
         this._configuration.storage.rcostColumn,
-        request.algorithm
+        request.algorithm,
+        attributes
       ];
 
       return new Promise( (resolve, reject) => {
