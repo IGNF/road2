@@ -80,7 +80,7 @@ module.exports = class sourceManager {
   * @function
   * @name getSourceDescriptionById
   * @description Récupérer la description de la source indiquée par son id
-  * @param {string} id - Id de la source 
+  * @param {string} id - Id de la source
   *
   */
   getSourceDescriptionById(id) {
@@ -409,7 +409,7 @@ module.exports = class sourceManager {
     if (sourceJsonObject.type === "osrm") {
       source = new osrmSource(sourceJsonObject);
     } else if (sourceJsonObject.type === "pgr") {
-      source = new pgrSource(sourceJsonObject);
+      source = new pgrSource(sourceJsonObject, topology);
     } else {
       // On va voir si c'est un autre type.
     }

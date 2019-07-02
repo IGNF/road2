@@ -29,21 +29,30 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe pgrSource
+  * @param{json} sourceJsonObject - Description de la source
+  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject) {
+  constructor(sourceJsonObject, topology) {
+
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type);
+    super(sourceJsonObject.id, "pgr");
+
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
+
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
-    // Client de base de données
-    let db_config_path = this._configuration.storage.dbConfig;
-    let raw_dbconfig = fs.readFileSync(db_config_path);
-    this._dbConfig = JSON.parse(raw_dbconfig);
 
-    this._client = new Client(this._dbConfig);
+    // Topologie de la source
+    this._topology = topology;
+
+    // Coût
+    this._cost = sourceJsonObject.storage.costColumn;
+
+    // Coût inverse
+    this._reverseCost = sourceJsonObject.storage.rcostColumn;
+
   }
 
   /**
@@ -77,16 +86,28 @@ module.exports = class pgrSource extends Source {
   *
   */
   async connect() {
-    // Connection à la base de données
-    LOGGER.info("Connection à la base de données : " + this._dbConfig.database);
-    try {
-      await this._client.connect();
-      LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
-      super.connected = true;
-    } catch (err) {
-      LOGGER.error('connection error', err.stack)
-      throw errorManager.createError("Cannot connect source");
+
+    if (!this._topology.base.connected) {
+
+      // Connection à la base de données
+      try {
+
+        await this._topology.base.connect();
+        this._connected = true;
+
+      } catch (err) {
+
+        LOGGER.error('connection error', err.stack)
+        throw errorManager.createError("Cannot connect to source database");
+
+      }
+
+    } else {
+      // Road2 est déjà connecté à la base
+      this._connected = true;
     }
+
+
   }
 
   /**
@@ -97,18 +118,26 @@ module.exports = class pgrSource extends Source {
   *
   */
   async disconnect() {
-    try {
-      const err = await this._client.end();
-      if (err) {
-        LOGGER.error('deconnection error', err.stack)
-        throw errorManager.createError("Cannot disconnect source");
-      } else {
-        LOGGER.info("Déonnecté à la base : " + this._dbConfig.database);
-        super.connected = false;
+
+    if (!this._topology.base.connected) {
+
+      try {
+
+        await this._topology.base.disconnect();
+        this._connected = false;
+
+      } catch(err) {
+
+        LOGGER.error('deconnection error', err.stack);
+        throw errorManager.createError("Cannot disconnect to source database");
+
       }
-    } catch(err) {
-      throw errorManager.createError("Cannot disconnect source");
+
+    } else {
+      // Road2 est déjà déconnecté à la base
+      this._connected = false;
     }
+
   }
 
   /**
@@ -147,22 +176,50 @@ module.exports = class pgrSource extends Source {
 
         pgrRequest.coordinates = coordinatesTable;
 
-        // waysAttributes
+        // --- waysAttributes
         // attributes est déjà vide, on met les attributs par défaut
-        
+        attributes = this._topology.defaultAttributesString;
 
         // on complète avec les attributs demandés
         if (request.waysAttributes.length !== 0) {
+          let requestedAttributes = new Array();
 
           for (let i = 0; i < request.waysAttributes.length; i++) {
             // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+            let isDefault = false;
+
+            for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
+              if (request.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+                isDefault = true;
+                break;
+              }
+            }
+
+            if (!isDefault) {
+              for (let j = 0; j < this._topology.otherAttributes.length; j++) {
+                if (request.waysAttributes[i] === this._topology.otherAttributes[j].key) {
+                  requestedAttributes.push(this._topology.otherAttributes[j].column);
+                  break;
+                }
+              }
+            } else {
+              // on passe au suivant
+            }
 
           }
+
+          if (requestedAttributes.length !== 0) {
+            if (attributes !== "") {
+              attributes = attributes + ",";
+            }
+            attributes = attributes + requestedAttributes.join(",");
+          }
+
+          // --- waysAttributes
 
         } else {
           // on ne fait rien
         }
-        console.log(attributes);
 
       } else {
         // on va voir si c'est un autre type de requête
@@ -172,14 +229,14 @@ module.exports = class pgrSource extends Source {
       const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [$4])";
 
       const SQLParametersTable = [
-        this._configuration.storage.costColumn,
-        this._configuration.storage.rcostColumn,
+        this._cost,
+        this._reverseCost,
         request.algorithm,
         attributes
       ];
 
       return new Promise( (resolve, reject) => {
-        this._client.query(queryString, SQLParametersTable, (err, result) => {
+        this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
             reject(err);

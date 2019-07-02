@@ -30,12 +30,6 @@ module.exports = class pgrResource extends Resource {
     // Stockage de la configuration
     this._configuration = resourceJsonObject.resource;
 
-    // stockage des attributs par défaut
-    this._defaultAttributes = new Array();
-
-    // stockage des attributs restants et disponibles
-    this._otherAttributes = new Array();
-
     // Correspondance entre profile/optimization et sourceId
     this._linkedSource = {};
 
@@ -45,20 +39,6 @@ module.exports = class pgrResource extends Resource {
 
       const linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
       this._linkedSource[linkedId] = this._configuration.sources[i].id;
-
-    }
-
-    // Instanciation des attributs
-    for (let i = 0; i < this._configuration.topology.attributes.length; i++) {
-      let curAttribute = this._configuration.topology.attributes[i];
-
-      if (curAttribute.default === "true") {
-        this._defaultAttributes.push(curAttribute);
-      } else if (curAttribute.default === "false") {
-        this._otherAttributes.push(curAttribute);
-      } else {
-        // cela ne doit pas arriver
-      }
 
     }
 
@@ -95,28 +75,6 @@ module.exports = class pgrResource extends Resource {
   */
   set linkedSource (ls) {
     this._linkedSource = ls;
-  }
-
-  /**
-  *
-  * @function
-  * @name get defaultAttributes
-  * @description Récupérer les attributs par défaut de la ressource
-  *
-  */
-  get defaultAttributes () {
-    return this._defaultAttributes;
-  }
-
-  /**
-  *
-  * @function
-  * @name get otherAttributes
-  * @description Récupérer les attributs facultatifs de la ressource
-  *
-  */
-  get otherAttributes () {
-    return this._otherAttributes;
   }
 
   /**

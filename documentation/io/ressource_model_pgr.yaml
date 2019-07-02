@@ -35,35 +35,38 @@
         "projection":
           type: string
           required: true
-        ## Peut être utile plus tard
-        # # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
-				# "base":
-				# 	type: object
-        #   required: true
-				# 	properties:
-        #     # Table contenant la topologie des tronçons navigables.
-				# 		"table":
-				# 			type: string
-        #       required: true
-        # # Descriptif des colonnes contenant les attributs de chaque tronçon.
-        # Descriptif des colonnes contenant les attributs de chaque tronçon.
-				"attributes":
-					type: array
-                    required: false
-					minItems: 1
-					items:
-            # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
-						"key":
-							type: string
-              required: true
-            # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
-						"column":
-							type: string
-              required: true
-            # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
-            "default":
-              type: boolean
-              required: true
+        # Stocakge de la topologie
+        "storage":
+          type: object
+          retquired: true
+          # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
+  				"base":
+  					type: object
+            required: true
+  					properties:
+              # Table contenant la topologie des tronçons navigables.
+  						"table":
+  							type: string
+                required: true
+              # Descriptif des colonnes contenant les attributs de chaque tronçon.
+              Descriptif des colonnes contenant les attributs de chaque tronçon.
+      				"attributes":
+      					type: array
+                required: false
+      					minItems: 1
+      					items:
+                  # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
+      						"key":
+      							type: string
+                    required: true
+                  # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
+      						"column":
+      							type: string
+                    required: true
+                  # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
+                  "default":
+                    type: boolean
+                    required: true
     # Liste des sources permettants de construire la ressource.
 		"sources":
 			type: array
