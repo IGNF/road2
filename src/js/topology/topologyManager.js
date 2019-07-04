@@ -56,6 +56,23 @@ module.exports = class topologyManager {
   /**
   *
   * @function
+  * @name getTopologyById
+  * @description Récupérer une topologie via son id
+  * @param{string} id - Id de la topologie
+  *
+  */
+  getTopologyById(id) {
+    if (this._topologiesCatalog[id]) {
+      return this._topologiesCatalog[id];
+    } else {
+      return {};
+    }
+
+  }
+
+  /**
+  *
+  * @function
   * @name checkTopology
   * @description Vérification de la description d'une topologie
   * @param{json} topologyJsonDescription - JSON décrivant une topologie
@@ -356,17 +373,17 @@ module.exports = class topologyManager {
     if (topologyJsonObject.type === "osm") {
 
       topology = new OsmTopology(topologyJsonObject.id, topologyJsonObject.description,
-        topologyJsonObject.projection, topologyJsonObject.bbox, topologyJsonObject.id.storage.file);
+        topologyJsonObject.projection, topologyJsonObject.bbox, topologyJsonObject.storage.file);
 
     } else if (topologyJsonObject.type === "db") {
 
       // récupération de la base
-      let base = this._baseManager.createBase(topologyJsonDescription.storage.base.dbConfig);
+      let base = this._baseManager.createBase(topologyJsonObject.storage.base.dbConfig);
       // création des tableaux d'attributs
       let defaultAttributes = new Array();
-      let othertAttributes = new Array();
-      for (let i = 0; i < topologyJsonDescription.storage.base.attributes.length; i++) {
-        let curAttribute = topologyJsonDescription.storage.base.attributes[i];
+      let otherAttributes = new Array();
+      for (let i = 0; i < topologyJsonObject.storage.base.attributes.length; i++) {
+        let curAttribute = topologyJsonObject.storage.base.attributes[i];
         if (curAttribute.default === "true") {
           defaultAttributes.push(curAttribute);
         } else if (curAttribute.default === "false") {
@@ -378,7 +395,7 @@ module.exports = class topologyManager {
       // création de la topologie
       topology = new DbTopology(topologyJsonObject.id, topologyJsonObject.description,
         topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.table,
-        defaultAttributes, othertAttributes);
+        defaultAttributes, otherAttributes);
 
     } else {
       // On va voir si c'est un autre type.
@@ -387,6 +404,36 @@ module.exports = class topologyManager {
     this._topologiesCatalog[topologyJsonObject.id] = topology;
 
     return topology;
+  }
+
+  /**
+  *
+  * @function
+  * @name loadAllTopologies
+  * @description Fonction utilisée pour créer une source.
+  *
+  */
+
+  loadAllTopologies() {
+
+    if (this._listOfTopologyIds.length === 0) {
+      LOGGER.error("Aucune topologie a charger.");
+      return false;
+    } else {
+      // on continue
+    }
+
+    for (let i = 0; i < this._listOfTopologyIds.length; i++) {
+
+      let id = this._listOfTopologyIds[i];
+      let configuration = this._topologyDescriptions[id];
+
+      this._topologiesCatalog[id] = this.createTopology(configuration);
+
+    }
+
+    return true;
+
   }
 
 }

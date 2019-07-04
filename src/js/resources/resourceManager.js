@@ -125,6 +125,17 @@ module.exports = class resourceManager {
       }
     }
 
+    // Topology
+    if (!resourceJsonObject.resource.topology) {
+      LOGGER.error("La ressource ne contient pas de topologie.");
+      return false;
+    } else {
+      if (!topologyManager.checkTopology(resourceJsonObject.resource.topology)) {
+        LOGGER.error("La ressource contient une topologie incorrecte.");
+        return false;
+      }
+    }
+
     let currentAvailableOp = new Array();
     // availableOperations
     if (!resourceJsonObject.resource.availableOperations) {
@@ -162,6 +173,12 @@ module.exports = class resourceManager {
           // on ne fait rien
         }
 
+        // Lien avec la topologie
+        // TODO: vérifier que le type de la topologie soit cohérent avec le type de la source 
+
+        // On stocke la correspondance entre une source et la topologie dont elle dérive
+        sourceManager.sourceTopology[sourceJsonObject.id] = resourceJsonObject.resource.topology.id;
+
       }
     }
 
@@ -195,17 +212,6 @@ module.exports = class resourceManager {
       // rien à faire
     }
 
-    // Topology
-    if (!resourceJsonObject.topology) {
-      LOGGER.error("La ressource ne contient pas de topologie.");
-      return false;
-    } else {
-      if (!topologyManager.checkTopology(resourceJsonObject.topology)) {
-        LOGGER.error("La ressource contient une topologie incorrecte.");
-        return false;
-      }
-    }
-
     LOGGER.info("Fin de la verification de la ressource osrm.");
     return true;
 
@@ -231,17 +237,6 @@ module.exports = class resourceManager {
       return false;
     } else {
       // rien à faire
-    }
-
-    // Topology
-    if (!resourceJsonObject.topology) {
-      LOGGER.error("La ressource ne contient pas de topologie.");
-      return false;
-    } else {
-      if (!topologyManager.checkTopology(resourceJsonObject.topology)) {
-        LOGGER.error("La ressource contient une topologie incorrecte.");
-        return false;
-      }
     }
 
     LOGGER.info("Fin de la verification de la ressource pgr.");

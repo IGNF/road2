@@ -3,12 +3,14 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const assert = require('assert').strict;
 const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
 const BaseManager = require('../base/baseManager');
+const TopologyManager = require('../topology/topologyManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -569,6 +571,27 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name loadTopologies
+  * @description Chargement des topologies
+  *
+  */
+
+  loadTopologies() {
+
+    LOGGER.info("Chargement des topologies...");
+
+    if (!this._topologyManager.loadAllTopologies()) {
+      LOGGER.error("Echec lors du chargement des topologies.");
+      return false;
+    }
+
+    LOGGER.info("Topologies chargees.");
+    return true;
+  }
+
+  /**
+  *
+  * @function
   * @name loadSources
   * @description Chargement des sources
   *
@@ -593,8 +616,25 @@ module.exports = class Service {
         LOGGER.info("Chargement de la source: " + sourceId);
         LOGGER.debug(sourceDescriptions[sourceId]);
 
+        // On récupère la bonne topologie
+        let topologyId = this._sourceManager.getSourceTopology(sourceId);
+        if (topologyId === "") {
+          LOGGER.error("Erreur lors de la recuperation de l'id de la topologie associee a la source");
+          throw errorManager.createError("Topology Id not found");
+        }
+
+        let topology = this._topologyManager.getTopologyById(topologyId);
+
+        try {
+          assert.notDeepStrictEqual(topology, {});
+        } catch(err) {
+          LOGGER.error("Erreur lors de la recuperation de la topologie associee a la source");
+          LOGGER.error(err);
+          throw errorManager.createError("Topology not found");
+        }
+
         // On crée la source
-        let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
+        let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId], topology);
 
         // On vérifie que le source peut bien être chargée ou connectée
         try {

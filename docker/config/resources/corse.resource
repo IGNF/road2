@@ -4,6 +4,8 @@
   "type": "osrm",
   "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
   "topology": {
+    "id": "corse-osm",
+    "type": "osm",
     "description": "Données OSM sur la Corse.",
     "storage": {
       "file": "/home/docker/internal/corse-latest.osm.pbf"

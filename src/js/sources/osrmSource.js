@@ -36,7 +36,7 @@ module.exports = class osrmSource extends Source {
   constructor(sourceJsonObject, topology) {
 
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type);
+    super(sourceJsonObject.id,sourceJsonObject.type, topology);
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
@@ -46,9 +46,6 @@ module.exports = class osrmSource extends Source {
 
     // Objet OSRM qui permet de faire les calculs
     this._osrm = {};
-
-    // Topologie de la source
-    this._topology = topology;
 
   }
 

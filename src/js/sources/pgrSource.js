@@ -36,16 +36,13 @@ module.exports = class pgrSource extends Source {
   constructor(sourceJsonObject, topology) {
 
     // Constructeur parent
-    super(sourceJsonObject.id, "pgr");
+    super(sourceJsonObject.id, "pgr", topology);
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
-
-    // Topologie de la source
-    this._topology = topology;
 
     // Coût
     this._cost = sourceJsonObject.storage.costColumn;
