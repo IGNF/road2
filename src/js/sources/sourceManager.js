@@ -407,7 +407,7 @@ module.exports = class sourceManager {
     let source;
 
     if (sourceJsonObject.type === "osrm") {
-      source = new osrmSource(sourceJsonObject);
+      source = new osrmSource(sourceJsonObject, topology);
     } else if (sourceJsonObject.type === "pgr") {
       source = new pgrSource(sourceJsonObject, topology);
     } else {

@@ -23,6 +23,14 @@
 			type: object
       required: true
 			properties:
+          # Id de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
+				  "id":
+					type: string
+          required: true
+          # Type de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
+				  "type":
+					type: string
+          required: true
         # Description de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
 				"description":
 					type: string

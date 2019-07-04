@@ -3,6 +3,7 @@
 const storageManager = require('../utils/storageManager');
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
+const topologyManager = require('../topology/topologyManager');
 const fs = require('fs');
 const log4js = require('log4js');
 
@@ -51,7 +52,7 @@ module.exports = class resourceManager {
   *
   */
 
-  checkResource(resourceJsonObject, sourceManager, operationManager) {
+  checkResource(resourceJsonObject, sourceManager, operationManager, topologyManager) {
 
     LOGGER.info("Verification de la ressource...");
 
@@ -92,7 +93,7 @@ module.exports = class resourceManager {
       if (resourceJsonObject.resource.type === "osrm") {
         available = true;
         LOGGER.info("Ressource osrm.");
-        if (!this.checkResourceOsrm(resourceJsonObject.resource, sourceManager)) {
+        if (!this.checkResourceOsrm(resourceJsonObject.resource)) {
           LOGGER.error("Erreur lors de la verification de la ressource osrm.");
           return false;
         } else {
@@ -106,7 +107,7 @@ module.exports = class resourceManager {
       if (resourceJsonObject.resource.type === "pgr") {
         available = true;
         LOGGER.info("Ressource pgrouting.");
-        if (!this.checkResourcePgr(resourceJsonObject.resource, sourceManager)) {
+        if (!this.checkResourcePgr(resourceJsonObject.resource)) {
           LOGGER.error("Erreur lors de la verification de la ressource pgr.");
           return false;
         } else {
@@ -179,11 +180,10 @@ module.exports = class resourceManager {
   * @name checkResourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource osrm.
   * @param {json} resourceJsonObject - Description JSON de la ressource
-  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  checkResourceOsrm(resourceJsonObject, sourceManager) {
+  checkResourceOsrm(resourceJsonObject, topologyManager) {
 
     LOGGER.info("Verification de la ressource osrm...");
 
@@ -200,38 +200,9 @@ module.exports = class resourceManager {
       LOGGER.error("La ressource ne contient pas de topologie.");
       return false;
     } else {
-      // Description de la topologie
-      if (!resourceJsonObject.topology.description) {
-        LOGGER.error("La ressource ne contient pas de description de la topologie.");
+      if (!topologyManager.checkTopology(resourceJsonObject.topology)) {
+        LOGGER.error("La ressource contient une topologie incorrecte.");
         return false;
-      } else {
-        // rien à faire
-      }
-      // Stockage de la topologie
-      if (!resourceJsonObject.topology.storage) {
-        LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
-        return false;
-      } else {
-        if (!storageManager.checkJsonStorage(resourceJsonObject.topology.storage)) {
-          LOGGER.error("Stockage de la topologie incorrect.");
-          return false;
-        } else {
-          // rien à faire
-        }
-      }
-      // Projection de la topologie
-      if (!resourceJsonObject.topology.projection) {
-        LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
-        return false;
-      } else {
-        // TODO: vérifier la projection
-      }
-      // Bbox de la topologie
-      if (!resourceJsonObject.topology.bbox) {
-        LOGGER.error("La ressource ne contient pas d'information sur la bbox de la topologie.")
-        return false;
-      } else {
-        // TODO: vérifier la bbox
       }
     }
 
@@ -246,12 +217,11 @@ module.exports = class resourceManager {
   * @name checkResourcePgr
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource pgr.
   * @param {json} resourceJsonObject - Description JSON de la ressource
-  * @param {object} sourceManager - Manager de source du service
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
   */
 
-  checkResourcePgr(resourceJsonObject, sourceManager) {
+  checkResourcePgr(resourceJsonObject, topologyManager) {
 
     LOGGER.info("Verification de la ressource pgr...");
 
@@ -267,138 +237,11 @@ module.exports = class resourceManager {
     if (!resourceJsonObject.topology) {
       LOGGER.error("La ressource ne contient pas de topologie.");
       return false;
-    }
-
-    // Description de la topologie
-    if (!resourceJsonObject.topology.description) {
-      LOGGER.error("La ressource ne contient pas de description de la topologie.");
-      return false;
     } else {
-      // rien à faire
-    }
-
-    // Projection de la topologie
-    if (!resourceJsonObject.topology.projection) {
-      LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
-      return false;
-    } else {
-      // TODO: vérifier la projection
-    }
-    // Bbox de la topologie
-    if (!resourceJsonObject.topology.bbox) {
-      LOGGER.error("La ressource ne contient pas d'information sur la bbox de la topologie.")
-      return false;
-    } else {
-      // TODO: vérifier la bbox
-    }
-
-    // Stockage de la topologie
-    if (!resourceJsonObject.topology.storage) {
-      LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
-      return false;
-    }
-
-    if (!resourceJsonObject.topology.storage.base) {
-      LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.base'.");
-      return false;
-    }
-
-    // dbConfig
-    if (!resourceJsonObject.topology.storage.base.dbConfig) {
-      LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.dbConfig'.");
-      return false;
-    } else {
-      try {
-        fs.accessSync(resourceJsonObject.topology.storage.base.dbConfig, fs.constants.R_OK);
-      } catch (err) {
-        LOGGER.error("Le fichier " + resourceJsonObject.topology.storage.base.dbConfig + " ne peut etre lu.");
+      if (!topologyManager.checkTopology(resourceJsonObject.topology)) {
+        LOGGER.error("La ressource contient une topologie incorrecte.");
         return false;
       }
-    }
-
-    // table
-    if (!resourceJsonObject.topology.storage.base.table) {
-      LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.base.table'.");
-      return false;
-    } else {
-      // TODO: vérification que ce n'est pas du code injecté
-    }
-
-    // Attributs
-    if (resourceJsonObject.topology.storage.base.attributes) {
-
-      // on vérifie que c'est un tableau
-      if (!Array.isArray(resourceJsonObject.topology.storage.base.attributes)) {
-        LOGGER.error("Le parametre resource.topology.attributes n'est pas un tableau.");
-        return false;
-      }
-
-      // que le tableau n'est pas vide
-      if (resourceJsonObject.topology.storage.base.attributes.length === 0) {
-        LOGGER.error("Le parametre resource.topology.attributes est un tableau vide.");
-        return false;
-      }
-
-      // on va vérifier que chaque attribut est complet et unique dans sa description
-      let attributesKeyTable = new Array();
-      let attributesColumnTable = new Array();
-
-      for (let i = 0; i < resourceJsonObject.topology.storage.base.attributes.length; i++) {
-        let curAttribute = resourceJsonObject.topology.storage.base.attributes[i];
-
-
-        if (!curAttribute.key) {
-          LOGGER.error("La description de l'attribut est incomplete: key");
-          return false;
-        } else {
-
-          if (attributesKeyTable.length !== 0) {
-            for (let j = 0; j < attributesKeyTable.length; j++) {
-              if (curAttribute.key === attributesKeyTable[j]) {
-                LOGGER.error("La description de l'attribut indique une cle deja utilisee.");
-                return false;
-              }
-            }
-          }
-
-        }
-
-        if (!curAttribute.column) {
-          LOGGER.error("La description de l'attribut est incomplete: column");
-          return false;
-        } else {
-
-          if (attributesColumnTable.length !== 0) {
-            for (let j = 0; j < attributesColumnTable.length; j++) {
-              if (curAttribute.column === attributesColumnTable[j]) {
-                LOGGER.error("La description de l'attribut indique une colonne deja utilisee.");
-                return false;
-              }
-            }
-          }
-
-          // TODO: vérification que ce n'est pas du code injecté
-
-        }
-
-        if (!curAttribute.default) {
-          LOGGER.error("La description de l'attribut est incomplete: default");
-          return false;
-        } else {
-
-          if (curAttribute.default !== "true" && curAttribute.default !== "false") {
-            LOGGER.error("La description de l'attribut a un parametre 'default' incorrect.");
-            return false;
-          }
-
-        }
-
-        attributesKeyTable.push(curAttribute.key);
-        attributesColumnTable.push(curAttribute.column);
-
-      }
-    } else {
-      // rien à faire
     }
 
     LOGGER.info("Fin de la verification de la ressource pgr.");

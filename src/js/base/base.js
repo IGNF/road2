@@ -26,11 +26,8 @@ module.exports = class Base {
   */
   constructor(configuration) {
 
-    // Configuration de la connexion
-    this._dbConfig = configuration;
-
     // Pool de clients PostgreSQL
-    this._pool = new Pool(this._dbConfig);
+    this._pool = new Pool(configuration);
 
     // État de la connexion
     this._connected = false;
@@ -69,15 +66,15 @@ module.exports = class Base {
   async connect() {
 
     // Connection à la base de données
-    LOGGER.info("Connection a la base de données : " + this._dbConfig.database);
+    LOGGER.info("Connection a la base de données");
     try {
 
       await this._pool.connect();
-      LOGGER.info("Connecte a la base de données : " + this._dbConfig.database);
+      LOGGER.info("Connecte a la base de données");
       this._connected = true;
 
     } catch (err) {
-      LOGGER.error('connection error', err.stack)
+      LOGGER.error("connection error", err.stack)
       throw errorManager.createError("Cannot connect to database");
     }
 
@@ -96,10 +93,10 @@ module.exports = class Base {
 
       const err = await this._pool.end();
       if (err) {
-        LOGGER.error('deconnection error', err.stack)
+        LOGGER.error("deconnection error", err.stack)
         throw errorManager.createError("Cannot disconnect to database");
       } else {
-        LOGGER.info("Deconnecte a la base : " + this._dbConfig.database);
+        LOGGER.info("Deconnecte a la base");
         this._connected = false;
       }
 

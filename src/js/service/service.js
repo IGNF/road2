@@ -8,6 +8,7 @@ const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
+const BaseManager = require('../base/baseManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -33,11 +34,17 @@ module.exports = class Service {
   */
   constructor() {
 
+    // Manager des bases du service
+    this._baseManager = new BaseManager();
+
     // Manager des opérations disponibles sur le service
     this._operationManager = new OperationManager();
 
     // catalogue des opérations disponibles
     this._operationCatalog = {};
+
+    // Manager des topologies du service
+    this._topologyManager = new TopologyManager(this._baseManager);
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager();
@@ -533,7 +540,7 @@ module.exports = class Service {
 
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
-          if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
+          if (!this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)) {
             LOGGER.error("Erreur lors du chargement de: " + resourceFile);
           } else {
             // Création de la ressource

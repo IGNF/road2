@@ -30,9 +30,10 @@ module.exports = class osrmSource extends Source {
   * @name constructor
   * @description Constructeur de la classe osrmSource
   * @param {json} sourceJsonObject - Description de la source en json
+  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject) {
+  constructor(sourceJsonObject, topology) {
 
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type);
@@ -45,6 +46,9 @@ module.exports = class osrmSource extends Source {
 
     // Objet OSRM qui permet de faire les calculs
     this._osrm = {};
+
+    // Topologie de la source
+    this._topology = topology;
 
   }
 

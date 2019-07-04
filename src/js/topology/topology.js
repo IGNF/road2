@@ -20,90 +20,85 @@ module.exports = class Topology {
   * @function
   * @name constructor
   * @description Constructeur de la classe Topology
-  * @param{object} base - Instance de la classe Base
-  * @param{string} table - Nom de la table contenant la topologie
-  * @param{table} defaultAttributes - Tableau d'objets {key: 'test', column:'test_column'}
-  * @param{table} otherAttributes - Tableau d'objets {key: 'test', column:'test_column'}
+  * @param{string} id - Id de la topologie
+  * @param{string} type - Type de la topologie
+  * @param{string} description - Description de la topologie
+  * @param{string} projection - Projection de la topologie
+  * @param{string} bbox - Bbox de la topologie
   *
   */
-  constructor(base, table, defaultAttributes, otherAttributes) {
+  constructor(id, type, description, projection, bbox) {
 
-    // Référence à la base de données
-    this._base = base;
+    // ID de la topologie
+    this._id = id;
 
-    // Table contenant la topologie
-    this._table = table;
+    // type
+    this._type = type;
 
-    // stockage des attributs par défaut
-    this._defaultAttributes = defaultAttributes;
+    // Description
+    this._description = description;
 
-    // stockage des attributs dans un tableau
-    this._defaultAttributesTable = new Array();
-    for (let i = 0; i < this._defaultAttributes.length; i++) {
-      this._defaultAttributesTable.push(this._defaultAttributes[i]);
-    }
+    // Projection
+    this._projection = projection;
 
-    // stockage des attributs par défaut en une chaîne de caractères
-    this._defaultAttributesString = this._defaultAttributesTable.join(",");
-
-    // stockage des attributs restants et disponibles
-    this._otherAttributes = otherAttributes;
+    // Bbox
+    this._bbox = bbox;
 
   }
 
   /**
   *
   * @function
-  * @name get base
-  * @description Récupérer la base
+  * @name get id
+  * @description Récupérer l'id
   *
   */
-  get base () {
-    return this._base;
+  get id () {
+    return this._id;
   }
 
   /**
   *
   * @function
-  * @name get table
-  * @description Récupérer la table
+  * @name get type
+  * @description Récupérer le type
   *
   */
-  get table () {
-    return this._table;
+  get type () {
+    return this._type;
   }
 
   /**
   *
   * @function
-  * @name get defaultAttributes
-  * @description Récupérer les attributs par défaut de la topologie
+  * @name get description
+  * @description Récupérer la description
   *
   */
-  get defaultAttributes () {
-    return this._defaultAttributes;
+  get description () {
+    return this._type;
+  }
+
+    /**
+  *
+  * @function
+  * @name get projection
+  * @description Récupérer la projection
+  *
+  */
+  get projection () {
+    return this._type;
   }
 
   /**
   *
   * @function
-  * @name get defaultAttributesString
-  * @description Récupérer les attributs par défaut de la topologie en une chaîne de caractères
+  * @name get bbox
+  * @description Récupérer la bbox
   *
   */
-  get defaultAttributesString () {
-    return this._defaultAttributesString;
-  }
-
-  /**
-  *
-  * @function
-  * @name get otherAttributes
-  * @description Récupérer les attributs facultatifs de la topologie
-  *
-  */
-  get otherAttributes () {
-    return this._otherAttributes;
+  get bbox () {
+    return this._type;
   }
 
 
