@@ -47,8 +47,10 @@ module.exports = class dbTopology extends Topology {
 
     // stockage des attributs dans un tableau
     this._defaultAttributesTable = new Array();
+    this._defaultAttributesKeyTable = new Array();
     for (let i = 0; i < this._defaultAttributes.length; i++) {
       this._defaultAttributesTable.push(this._defaultAttributes[i].column);
+      this._defaultAttributesKeyTable.push(this._defaultAttributes[i].key);
     }
 
     // stockage des attributs par défaut en une chaîne de caractères
@@ -85,7 +87,7 @@ module.exports = class dbTopology extends Topology {
   *
   * @function
   * @name get defaultAttributes
-  * @description Récupérer les attributs par défaut de la topologie
+  * @description Récupérer les attributs (colonne) par défaut de la topologie
   *
   */
   get defaultAttributes () {
@@ -96,11 +98,33 @@ module.exports = class dbTopology extends Topology {
   *
   * @function
   * @name get defaultAttributesString
-  * @description Récupérer les attributs par défaut de la topologie en une chaîne de caractères
+  * @description Récupérer les attributs (colonne) par défaut de la topologie en une chaîne de caractères
   *
   */
   get defaultAttributesString () {
     return this._defaultAttributesString;
+  }
+
+  /**
+  *
+  * @function
+  * @name get defaultAttributesTable
+  * @description Récupérer les attributs (colonne) par défaut de la topologie en tableau
+  *
+  */
+  get defaultAttributesTable () {
+    return this._defaultAttributesTable;
+  }
+
+  /**
+  *
+  * @function
+  * @name get defaultAttributesKeyTable
+  * @description Récupérer les attributs (clé) par défaut de la topologie en tableau
+  *
+  */
+  get defaultAttributesKeyTable () {
+    return this._defaultAttributesKeyTable;
   }
 
   /**

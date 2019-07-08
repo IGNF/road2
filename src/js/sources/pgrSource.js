@@ -298,6 +298,47 @@ module.exports = class pgrSource extends Source {
       coordinates: []
     };
 
+    // Gestion des attributs
+    let finalAttributesKey = new Array();
+
+    // On fait la liste des attributs par défaut
+    if (this._topology.defaultAttributesKeyTable.length !== 0) {
+      for (let i = 0; i < this._topology.defaultAttributesKeyTable.length; i++) {
+        finalAttributesKey.push(this._topology.defaultAttributesKeyTable[i]);
+      }
+    } else {
+      // il n'y a aucun attribut par défaut
+    }
+
+    // On ajoute la liste des attributs demandés
+    if (routeRequest.waysAttributes.length !== 0) {
+      for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
+        // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+        let isDefault = false;
+
+        for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
+          if (routeRequest.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+            isDefault = true;
+            break;
+          }
+        }
+
+        if (!isDefault) {
+          for (let j = 0; j < this._topology.otherAttributes.length; j++) {
+            if (routeRequest.waysAttributes[i] === this._topology.otherAttributes[j].key) {
+              finalAttributesKey.push(this._topology.otherAttributes[j].key);
+              break;
+            }
+          }
+        } else {
+          // on passe au suivant
+        }
+
+      }
+    } else {
+      // il n'y a aucun attribut demandé par l'utilisateur
+    }
+
     // TODO: Il n'y a qu'une route pour l'instant
     response.routes.push( {geometry: routeGeometry, legs: [] } );
 
@@ -316,12 +357,38 @@ module.exports = class pgrSource extends Source {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
       }
 
+      let finalAttributesObject = {};
+      // S'il y a donc bien des attributs à renvoyer, on lit la réponse
+      if (finalAttributesKey.length !== 0) {
+
+        if (row.edge_attributes) {
+
+          // lecture des attributs
+          let attributesResults = row.edge_attributes.split("§§");
+
+          if (attributesResults.length !== finalAttributesKey.length || attributesResults.length === 0) {
+            throw errorManager.createError(" PGR internal server error: attributes number is invalid");
+          }
+
+          for (let j = 0; j < finalAttributesKey.length; j++) {
+            finalAttributesObject[finalAttributesKey[j]] = attributesResults[j];
+          }
+
+        } else {
+          // il n'y a aucun attribut à lire
+        }
+
+      } else {
+        // il n'y a aucun attribut demandé
+      }
+
       // TODO: Il n'y a qu'une route pour l'instant
       // TODO: à revoir pour la gestion des coûts : dernier step non pris en compte
       if (row.geom_json) {
-        response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } );
+        response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json), finalAttributesObject} );
       }
       lastPathSeq = row.path_seq;
+
     }
 
     // Conversion en LineString
@@ -379,6 +446,9 @@ module.exports = class pgrSource extends Source {
 
             let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
             steps[k] = new Step( new Geometry(currentPgrRouteStep.geometry, "LineString", "geojson") );
+            // ajout des attributs
+            steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
+
           }
 
           portions[j].steps = steps;
