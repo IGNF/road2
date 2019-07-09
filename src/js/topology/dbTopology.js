@@ -49,7 +49,7 @@ module.exports = class dbTopology extends Topology {
     this._defaultAttributesTable = new Array();
     this._defaultAttributesKeyTable = new Array();
     for (let i = 0; i < this._defaultAttributes.length; i++) {
-      this._defaultAttributesTable.push(this._defaultAttributes[i].column);
+      this._defaultAttributesTable.push("'" + this._defaultAttributes[i].column + "'");
       this._defaultAttributesKeyTable.push(this._defaultAttributes[i].key);
     }
 

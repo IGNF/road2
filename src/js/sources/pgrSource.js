@@ -195,7 +195,7 @@ module.exports = class pgrSource extends Source {
             if (!isDefault) {
               for (let j = 0; j < this._topology.otherAttributes.length; j++) {
                 if (request.waysAttributes[i] === this._topology.otherAttributes[j].key) {
-                  requestedAttributes.push(this._topology.otherAttributes[j].column);
+                  requestedAttributes.push("'" + this._topology.otherAttributes[j].column + "'");
                   break;
                 }
               }
@@ -221,15 +221,14 @@ module.exports = class pgrSource extends Source {
       } else {
         // on va voir si c'est un autre type de requête
       }
-
+      console.log(attributes);
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [$4])";
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "])";
 
       const SQLParametersTable = [
         this._cost,
         this._reverseCost,
-        request.algorithm,
-        attributes
+        request.algorithm
       ];
 
       return new Promise( (resolve, reject) => {
