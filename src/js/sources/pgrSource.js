@@ -221,9 +221,8 @@ module.exports = class pgrSource extends Source {
       } else {
         // on va voir si c'est un autre type de requête
       }
-      console.log(attributes);
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "])";
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[])";
 
       const SQLParametersTable = [
         this._cost,
