@@ -27,6 +27,9 @@ module.exports = class sourceManager {
     // Description des sources conservées de manière unique dans _listOfSourceIds
     this._sourceDescriptions = {};
 
+    // Correspondance entre l'id d'une source et l'id de la topologie dont elle dérive
+    this._sourceTopology = {};
+
   }
 
   /**
@@ -38,6 +41,17 @@ module.exports = class sourceManager {
   */
   get listOfSourceIds() {
     return this._listOfSourceIds;
+  }
+
+  /**
+  *
+  * @function
+  * @name get sourceTopology
+  * @description Récupérer la correspondance source/topologie
+  *
+  */
+  get sourceTopology() {
+    return this._sourceTopology;
   }
 
   /**
@@ -80,7 +94,7 @@ module.exports = class sourceManager {
   * @function
   * @name getSourceDescriptionById
   * @description Récupérer la description de la source indiquée par son id
-  * @param {string} id - Id de la source 
+  * @param {string} id - Id de la source
   *
   */
   getSourceDescriptionById(id) {
@@ -88,6 +102,26 @@ module.exports = class sourceManager {
       return this._sourceDescriptions[id];
     } else {
       return {};
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name getSourceTopology
+  * @description Récupérer l'id de la topologie dont dérive une source
+  * @param {string} sourceId - Id de la source
+  * @return {string} Id d'une topologie
+  *
+  */
+
+  getSourceTopology(sourceId) {
+
+    if(this._sourceTopology[sourceId]) {
+      return this._sourceTopology[sourceId];
+    } else {
+      return "";
     }
 
   }
@@ -396,20 +430,21 @@ module.exports = class sourceManager {
   * @name createSource
   * @description Fonction utilisée pour créer une source.
   * @param {json} sourceJsonObject - Description JSON de la source
+  * @param {Topology} topology - Instance de la classe Topology
   * @return {Source} Source créée
   *
   */
 
-  createSource(sourceJsonObject) {
+  createSource(sourceJsonObject, topology) {
 
     LOGGER.info("Creation de la source: " + sourceJsonObject.id);
 
     let source;
 
     if (sourceJsonObject.type === "osrm") {
-      source = new osrmSource(sourceJsonObject);
+      source = new osrmSource(sourceJsonObject, topology);
     } else if (sourceJsonObject.type === "pgr") {
-      source = new pgrSource(sourceJsonObject);
+      source = new pgrSource(sourceJsonObject, topology);
     } else {
       // On va voir si c'est un autre type.
     }

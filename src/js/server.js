@@ -53,6 +53,11 @@ async function start() {
     pm.shutdown(1);
   }
 
+  // Chargement des topologies
+  if (!service.loadTopologies()) {
+    pm.shutdown(1);
+  }
+
   // Chargement des sources uniques
   try {
     await service.loadSources();

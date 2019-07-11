@@ -3,11 +3,14 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const assert = require('assert').strict;
 const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
 const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
+const BaseManager = require('../base/baseManager');
+const TopologyManager = require('../topology/topologyManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -33,11 +36,17 @@ module.exports = class Service {
   */
   constructor() {
 
+    // Manager des bases du service
+    this._baseManager = new BaseManager();
+
     // Manager des opérations disponibles sur le service
     this._operationManager = new OperationManager();
 
     // catalogue des opérations disponibles
     this._operationCatalog = {};
+
+    // Manager des topologies du service
+    this._topologyManager = new TopologyManager(this._baseManager);
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager();
@@ -533,7 +542,7 @@ module.exports = class Service {
 
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
-          if (!this._resourceManager.checkResource(resourceContent,this._sourceManager, this._operationManager)) {
+          if (!this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)) {
             LOGGER.error("Erreur lors du chargement de: " + resourceFile);
           } else {
             // Création de la ressource
@@ -557,6 +566,27 @@ module.exports = class Service {
 
     return true;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name loadTopologies
+  * @description Chargement des topologies
+  *
+  */
+
+  loadTopologies() {
+
+    LOGGER.info("Chargement des topologies...");
+
+    if (!this._topologyManager.loadAllTopologies()) {
+      LOGGER.error("Echec lors du chargement des topologies.");
+      return false;
+    }
+
+    LOGGER.info("Topologies chargees.");
+    return true;
   }
 
   /**
@@ -586,8 +616,25 @@ module.exports = class Service {
         LOGGER.info("Chargement de la source: " + sourceId);
         LOGGER.debug(sourceDescriptions[sourceId]);
 
+        // On récupère la bonne topologie
+        let topologyId = this._sourceManager.getSourceTopology(sourceId);
+        if (topologyId === "") {
+          LOGGER.error("Erreur lors de la recuperation de l'id de la topologie associee a la source");
+          throw errorManager.createError("Topology Id not found");
+        }
+
+        let topology = this._topologyManager.getTopologyById(topologyId);
+
+        try {
+          assert.notDeepStrictEqual(topology, {});
+        } catch(err) {
+          LOGGER.error("Erreur lors de la recuperation de la topologie associee a la source");
+          LOGGER.error(err);
+          throw errorManager.createError("Topology not found");
+        }
+
         // On crée la source
-        let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId]);
+        let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId], topology);
 
         // On vérifie que le source peut bien être chargée ou connectée
         try {
