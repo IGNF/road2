@@ -4,7 +4,7 @@
 const express = require('express');
 const log4js = require('log4js');
 const cors = require('cors');
-const controler = require('./controler/controler');
+const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
 
 var LOGGER = log4js.getLogger("SIMPLE");
@@ -56,11 +56,11 @@ router.route("/route")
     try {
 
       // Vérification des paramètres de la requête
-      const routeRequest = controler.checkRouteParameters(parameters, service);
+      const routeRequest = controller.checkRouteParameters(parameters, service);
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse
-      const userResponse = controler.writeRouteResponse(routeRequest, routeResponse);
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse);
 
       res.status(200).json(userResponse);
 
@@ -71,6 +71,33 @@ router.route("/route")
 })
   .post(function(req, res) {
   res.send("/route en POST");
+});
+
+router.route("/isochrone")
+  .get(async function(req, res, next) {
+    let service = req.app.get("service");
+
+    if (!service.verifyAvailabilityOperation("isochrone")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
+    let parameters = req.query;
+
+    try {
+      // Vérification des paramètres de la requête
+      const isochroneRequest = controller.checkIsochroneParameters(parameters, service);
+      // Envoie au service et récupération de l'objet réponse
+      const isochroneResponse = await service.computeRequest(isochroneRequest);
+      // Formattage de la réponse.
+      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
+
+      res.status(200).json(userResponse);
+    } catch (error) {
+      return next(error);
+    }
+  })
+  .post(function(req, res) {
+    res.send("/isochrone en POST");
 });
 
 // Gestion des erreurs

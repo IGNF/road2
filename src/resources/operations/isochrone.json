@@ -1,0 +1,8 @@
+{
+  "id": "isochrone",
+  "name": "Génération d'isochrone",
+  "description": "Générer une carte isochrone.",
+  "parameters": [
+    "resource"
+  ]
+}

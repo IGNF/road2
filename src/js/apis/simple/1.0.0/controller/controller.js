@@ -2,6 +2,7 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
+const IsochroneRequest = require('../../../../requests/isochroneRequest');
 
 module.exports = {
 
@@ -199,6 +200,39 @@ module.exports = {
 
   },
 
+
+  /**
+  *
+  * @function
+  * @name checkIsochroneParameters
+  * @description Vérification des paramètres d'une requête sur /isochrone
+  * @param {object} parameters - ensemble des paramètres de la requête
+  * @param {object} service - Instance de la classe Service
+  * @return {object} IsochroneRequest - Instance de la classe IsochroneRequest
+  *
+  */
+  checkIsochroneParameters: function(parameters, service) {
+    const isochroneRequest = new IsochroneRequest(parameters.resource);
+
+    /* Paramètre 'resource'. */
+    if (!parameters.resource) {
+        throw errorManager.createError("Parameter 'resource' not found.", 400);
+    } else {
+      /* Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête. */
+      if (!service.verifyResourceExistenceById(parameters.resource)) {
+        throw errorManager.createError("Parameter 'resource' is invalid.", 400);
+      } else {
+        const resource = service.getResourceById(parameters.resource);
+        /* Vérification de la disponibilité de l'opération isochrone sur la ressource. */
+        if (!resource.verifyAvailabilityOperation("isochrone")){
+          throw errorManager.createError("Operation not permitted on this resource.", 400);
+        }
+      }
+    }
+
+    return isochroneRequest;
+  },
+
   /**
   *
   * @function
@@ -283,6 +317,74 @@ module.exports = {
 
     return userResponse;
 
+  },
+
+  /**
+  *
+  * @function
+  * @name writeIsochroneResponse
+  * @description Ré-écriture de la réponse d'un moteur pour une requête sur /isochrone
+  * @param {object} IsochroneRequest - Instance de la classe IsochroneRequest
+  * @param {object} IsochroneResponse - Instance de la classe IsochroneResponse
+  * @return {object} userResponse - Réponse envoyée à l'utilisateur
+  *
+  */
+  writeIsochroneResponse: function(isochroneRequest, isochroneResponse) {
+    let userResponse = {};
+    /* let route = routeResponse.routes[0];
+
+    // resource
+    userResponse.resource = routeResponse.resource;
+
+    // On ne considère que le premier itinéraire renvoyé par routeResponse
+    // Portions
+    userResponse.portions = new Array();
+
+    for (let i = 0; i < route.portions.length; i++) {
+
+      let currentPortion = {};
+
+      // start
+      currentPortion.start = route.portions[i].start;
+      // end
+      currentPortion.end = route.portions[i].end;
+
+      // Steps
+      currentPortion.steps = new Array();
+
+      if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
+
+        for (let j = 0; j < route.portions[i].steps.length; j++) {
+
+          let currentStep = {};
+
+          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
+
+          if (routeRequest.waysAttributes.length !== 0) {
+
+            currentStep.attributes = {};
+            // si c'est demandé et qu'il existe alors on met l'attribut
+            for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
+              let attribut = routeRequest.waysAttributes[i];
+              currentStep.attributes[attribut] = route.portions[i].steps[j].getAttributById(attribut);
+            }
+
+          } else {
+            // on ne fait rien 
+          }
+
+          currentPortion.steps.push(currentStep);
+
+        }
+      } else {
+        // il n'y a rien à ajouter
+      }
+
+      userResponse.portions.push(currentPortion);
+
+    } */
+
+    return userResponse;
   }
 
 }
