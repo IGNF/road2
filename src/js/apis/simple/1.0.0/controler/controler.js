@@ -233,6 +233,12 @@ module.exports = {
     // geometry
     userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
+    // distance
+    userResponse.distance = route.distance.value;
+
+    // duration
+    userResponse.duration = route.duration.value;
+
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
     userResponse.portions = new Array();
@@ -246,6 +252,12 @@ module.exports = {
       // end
       currentPortion.end = route.portions[i].end;
 
+      // distance
+      currentPortion.distance = route.portions[i].distance.value;
+
+      // duration
+      currentPortion.duration = route.portions[i].duration.value;
+
       // Steps
       currentPortion.steps = new Array();
 
@@ -257,6 +269,7 @@ module.exports = {
 
           currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
+          // attributs des voies
           if (route.portions[i].steps[j].attributes) {
 
             currentStep.attributes = route.portions[i].steps[j].attributes;
@@ -264,6 +277,12 @@ module.exports = {
           } else {
             // on ne fait rien
           }
+
+          // distance
+          currentStep.distance = route.portions[i].steps[j].distance.value;
+
+          // duration
+          currentStep.duration = route.portions[i].steps[j].duration.value;
 
           currentPortion.steps.push(currentStep);
 

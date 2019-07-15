@@ -7,6 +7,8 @@ const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Geometry = require('../geometry/geometry');
 const Step = require('../responses/step');
+const Distance = require('../geography/distance');
+const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
@@ -264,6 +266,10 @@ module.exports = class osrmSource extends Source {
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Geometry(currentOsrmRoute.geometry, "LineString", "geojson") );
 
+      // On récupère la distance et la durée
+      routes[i].distance = new Distance(currentOsrmRoute.distance,"m");
+      routes[i].duration = new Duration(currentOsrmRoute.duration,"s");
+
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
       if (currentOsrmRoute.legs.length !== osrmResponse.waypoints.length-1) {
@@ -279,6 +285,10 @@ module.exports = class osrmSource extends Source {
 
         portions[j] = new Portion(legStart, legEnd);
 
+        // On récupère la distance et la durée
+        portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"m");
+        portions[j].duration = new Duration(currentOsrmRouteLeg.duration,"s");
+
         // Steps
         let steps = new Array();
 
@@ -288,6 +298,11 @@ module.exports = class osrmSource extends Source {
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
           steps[k] = new Step( new Geometry(currentOsrmRouteStep.geometry, "LineString", "geojson") );
           steps[k].setAttributById("name", currentOsrmRouteStep.name);
+
+          // On récupère la distance et la durée
+          steps[k].distance = new Distance(currentOsrmRouteStep.distance,"m");
+          steps[k].duration = new Duration(currentOsrmRouteStep.duration,"s");
+
         }
 
         portions[j].steps = steps;
