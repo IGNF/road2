@@ -82,7 +82,7 @@ module.exports = class topologyManager {
 
     // Id de la topologie
     if (!topologyJsonDescription.id) {
-      LOGGER.error("La ressource ne contient pas d'id.");
+      LOGGER.error("La topologie ne contient pas d'id.");
       return false;
     } else {
       // On vérifie que l'id n'est pas déjà pris.
