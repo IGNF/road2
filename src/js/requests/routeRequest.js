@@ -64,6 +64,9 @@ module.exports = class routeRequest extends Request {
     // type des géométries demandé
     this._geometryFormat = "geojson"
 
+    // bbox
+    this._bbox = true;
+
   }
 
   /**
@@ -202,6 +205,29 @@ module.exports = class routeRequest extends Request {
   */
   set computeGeometry (i) {
     this._computeGeometry = i;
+  }
+
+  /**
+  *
+  * @function
+  * @name get bbox
+  * @description Récupérer le choix de l'affichage de la bbox
+  *
+  */
+  get bbox () {
+    return this._bbox;
+  }
+
+  /**
+  *
+  * @function
+  * @name set bbox
+  * @description Attribuer le choix de l'affichage de la bbox
+  * @param {boolean} i - bbox
+  *
+  */
+  set bbox (i) {
+    this._bbox = i;
   }
 
   /**

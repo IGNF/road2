@@ -12,6 +12,7 @@
     "stepsGeometry",
     "waysAttributes",
     "algorithm",
-    "geometryFormat"
+    "geometryFormat",
+    "bbox"
   ]
 }

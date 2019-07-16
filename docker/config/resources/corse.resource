@@ -97,6 +97,10 @@
             "geojson",
             "polyline"
           ]
+        },
+        {
+          "id": "bbox",
+          "defaultValueContent": "true"
         }
       ]
     }

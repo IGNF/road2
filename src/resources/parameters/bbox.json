@@ -1,0 +1,9 @@
+{
+  "id": "bbox",
+  "name": "Bbox de l'itinéraire",
+  "description": "Préciser si on souhaite avoir la bbox de l'itinéraire.",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "true",
+  "type": "boolean"
+}

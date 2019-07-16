@@ -196,6 +196,25 @@ module.exports = {
     }
     // ---
 
+    // getBbox
+    if (parameters.getBbox) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("bbox").check(parameters.getBbox)) {
+        throw errorManager.createError(" Parameter 'getBbox' is invalid ", 400);
+      } else {
+        routeRequest.bbox = routeOperation.getParameterById("bbox").specificConvertion(parameters.getBbox)
+        if (routeRequest.bbox === null) {
+          throw errorManager.createError(" Parameter 'getBbox' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.bbox = routeOperation.getParameterById("bbox").defaultValueContent;
+    }
+    // ---
+
     return routeRequest;
 
   },
@@ -235,7 +254,9 @@ module.exports = {
     userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
     // bbox
-    userResponse.bbox = Turf.bbox(userResponse.geometry);
+    if (routeRequest.bbox) {
+      userResponse.bbox = Turf.bbox(userResponse.geometry);
+    }
 
     // distance
     userResponse.distance = route.distance.value;
