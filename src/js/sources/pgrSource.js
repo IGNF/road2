@@ -12,6 +12,7 @@ const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const log4js = require('log4js');
 const simplify = require('../utils/simplify');
+const turf = require('@turf/turf');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("PGRSOURCE");
@@ -237,7 +238,7 @@ module.exports = class pgrSource extends Source {
             reject(err);
           } else {
             try {
-              resolve(this.writeRouteResponse(request, result));
+              resolve(this.writeRouteResponse(request, pgrRequest, result));
             } catch (err) {
               reject(err);
             }
@@ -263,7 +264,7 @@ module.exports = class pgrSource extends Source {
   * @param {pgrResponse} pgrResponse - Objet pgrResponse
   *
   */
-  writeRouteResponse (routeRequest, pgrResponse) {
+  writeRouteResponse (routeRequest, pgrRequest, pgrResponse) {
 
     let resource;
     let start;
@@ -337,19 +338,16 @@ module.exports = class pgrSource extends Source {
       // il n'y a aucun attribut demandé par l'utilisateur
     }
 
-    // TODO: Il n'y a qu'une route pour l'instant
+    // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
     response.routes.push( {geometry: routeGeometry, legs: [] } );
 
     let row;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
-      if (row.geom_json) {
-        let currentGeom = JSON.parse(row.geom_json);
-        routeGeometry.coordinates.push( currentGeom.coordinates );
-      }
+
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
-        // TODO: Il n'y a qu'une route pour l'instant
-        response.routes[0].legs.push( { steps: [] } );
+        // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
+        response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] } } );
       }
       if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
         response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
@@ -380,23 +378,57 @@ module.exports = class pgrSource extends Source {
         // il n'y a aucun attribut demandé
       }
 
-      // TODO: Il n'y a qu'une route pour l'instant
-      // TODO: à revoir pour la gestion des coûts : dernier step non pris en compte
+      // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
       if (row.geom_json) {
+        let currentGeom = JSON.parse(row.geom_json);
+        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
         response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json), finalAttributesObject} );
       }
       lastPathSeq = row.path_seq;
 
     }
 
-    // Conversion en LineString
-    const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(routeGeometry.coordinates);
-    // Simplification de la géométrie, tolérance à environ 5m
-    const simplifiedDissolvedCoords = simplify(dissolvedCoords, 0.00005);
-    routeGeometry.coordinates = simplifiedDissolvedCoords;
+    // Troncature des géométries sur les portions (legs)
+    let legStart;
+    let legStop;
+    let leg;
+    let legDissolvedCoords;
 
+    // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
+    for (let i = 0; i < response.routes[0].legs.length; i++){
+      leg = response.routes[0].legs[i];
+
+      legDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(leg.geometry.coordinates);
+      leg.geometry.coordinates = legDissolvedCoords;
+
+      legStart = turf.point(pgrRequest.coordinates[i]);
+      legStop = turf.point(pgrRequest.coordinates[i+1]);
+
+      // Récupération de la géométrie entre le départ et l'arrivée
+      leg.geometry.coordinates = turf.truncate(
+        turf.lineSlice(legStart, legStop, leg.geometry),
+        {precision: 6}
+      ).geometry.coordinates;
+
+      routeGeometry.coordinates.push(...leg.geometry.coordinates);
+    }
+
+    // Simplification de la géométrie, tolérance à environ 5m
+    routeGeometry.coordinates = simplify(routeGeometry.coordinates, 0.00005);
     if (response.waypoints.length < 1) {
       throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
+    }
+
+    if (response.waypoints.length != pgrRequest.coordinates.length) {
+      throw errorManager.createError(" No PGR path found: the number of waypoints is different from input waypoints ");
+    }
+
+    for (let i = 0; i < pgrRequest.coordinates.length; i++){
+      // Récupération des points projetés dans les waypoints
+      response.waypoints[i].location = turf.truncate(
+        turf.nearestPointOnLine(routeGeometry, turf.point(pgrRequest.coordinates[i])),
+        {precision: 6}
+      ).geometry.coordinates ;
     }
 
     // start
@@ -441,8 +473,34 @@ module.exports = class pgrSource extends Source {
 
           // On va associer les étapes à la portion concernée
           for (let k=0; k < currentPgrRouteLeg.steps.length; k++) {
-
             let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
+            // Troncature de la géométrie : cas de début de step
+            if (k == 0){
+              const stepStart = turf.point(response.waypoints[j].location);
+
+              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+                turf.lineSlice(
+                  stepStart,
+                  currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              ).geometry.coordinates;
+            }
+            // Troncature de la géométrie : cas de fin de step
+            if (k == currentPgrRouteLeg.steps.length - 1) {
+              const stepEnd = turf.point(response.waypoints[j+1].location);
+
+              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+                turf.lineSlice(
+                  currentPgrRouteStep.geometry.coordinates[0],
+                  stepEnd,
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              ).geometry.coordinates;
+            }
+
             steps[k] = new Step( new Geometry(currentPgrRouteStep.geometry, "LineString", "geojson") );
             // ajout des attributs
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
