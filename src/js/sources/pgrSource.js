@@ -8,6 +8,8 @@ const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Geometry = require('../geometry/geometry');
 const Step = require('../responses/step');
+const Distance = require('../geography/distance');
+const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const log4js = require('log4js');
@@ -50,6 +52,9 @@ module.exports = class pgrSource extends Source {
 
     // Coût inverse
     this._reverseCost = sourceJsonObject.storage.rcostColumn;
+
+    // Profil
+    this._profile = sourceJsonObject.cost.profile;
 
   }
 
@@ -223,9 +228,10 @@ module.exports = class pgrSource extends Source {
         // on va voir si c'est un autre type de requête
       }
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[])";
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,$4,ARRAY [" + attributes + "]::text[])";
 
       const SQLParametersTable = [
+        this._profile,
         this._cost,
         this._reverseCost,
         request.algorithm
@@ -350,7 +356,7 @@ module.exports = class pgrSource extends Source {
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] } } );
       }
       if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
-        response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
+        response.waypoints.push( { location: [] } );
       }
 
       let finalAttributesObject = {};
@@ -382,7 +388,13 @@ module.exports = class pgrSource extends Source {
       if (row.geom_json) {
         let currentGeom = JSON.parse(row.geom_json);
         response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
-        response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json), finalAttributesObject} );
+        response.routes[0].legs.slice(-1)[0].steps.push(
+          {
+            geometry: JSON.parse(row.geom_json),
+            finalAttributesObject,
+            duration: Math.round(row.duration*10)/10,
+            distance: Math.round(row.distance*10)/10}
+          );
       }
       lastPathSeq = row.path_seq;
 
@@ -504,6 +516,10 @@ module.exports = class pgrSource extends Source {
             steps[k] = new Step( new Geometry(currentPgrRouteStep.geometry, "LineString", "geojson") );
             // ajout des attributs
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
+
+            // On récupère la distance et la durée
+            steps[k].distance = new Distance(currentPgrRouteStep.distance,"m");
+            steps[k].duration = new Duration(currentPgrRouteStep.duration,"s");
 
           }
 
