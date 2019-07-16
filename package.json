@@ -17,7 +17,8 @@
     "nconf": "0.10.0",
     "osrm": "5.20.0",
     "pg": "7.8.1",
-    "@mapbox/polyline": "1.1.0"
+    "@mapbox/polyline": "1.1.0",
+    "@turf/turf": "5.1.6"
   },
   "devDependencies": {
     "sinon": "^7.2.7",

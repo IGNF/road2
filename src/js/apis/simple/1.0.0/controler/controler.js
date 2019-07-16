@@ -2,6 +2,7 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
+const Turf = require('@turf/turf');
 
 module.exports = {
 
@@ -232,6 +233,9 @@ module.exports = {
 
     // geometry
     userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
+
+    // bbox
+    userResponse.bbox = Turf.bbox(userResponse.geometry);
 
     // distance
     userResponse.distance = route.distance.value;
