@@ -345,7 +345,7 @@ module.exports = class pgrSource extends Source {
     }
 
     // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
-    response.routes.push( {geometry: routeGeometry, legs: [] } );
+    response.routes.push( {geometry: routeGeometry, duration: 0, distance: 0, legs: [] } );
 
     let row;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
@@ -353,7 +353,7 @@ module.exports = class pgrSource extends Source {
 
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
-        response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] } } );
+        response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
       }
       if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
         response.waypoints.push( { location: [] } );
@@ -387,13 +387,23 @@ module.exports = class pgrSource extends Source {
       // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
       if (row.geom_json) {
         let currentGeom = JSON.parse(row.geom_json);
+
+        let rowDuration = row.duration;
+        let rowDistance = row.distance;
+
+        response.routes[0].legs.slice(-1)[0].duration += rowDuration;
+        response.routes[0].legs.slice(-1)[0].distance += rowDistance;
+
+        response.routes[0].duration += rowDuration;
+        response.routes[0].distance += rowDistance;
+
         response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
         response.routes[0].legs.slice(-1)[0].steps.push(
           {
             geometry: JSON.parse(row.geom_json),
             finalAttributesObject,
-            duration: Math.round(row.duration*10)/10,
-            distance: Math.round(row.distance*10)/10}
+            duration: rowDuration,
+            distance: rowDistance}
           );
       }
       lastPathSeq = row.path_seq;
@@ -465,6 +475,10 @@ module.exports = class pgrSource extends Source {
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Geometry(currentPgrRoute.geometry, "LineString", "geojson") );
 
+      // On récupère la distance et la durée
+      routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"m");
+      routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"s");
+
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
       if (currentPgrRoute.legs.length !== response.waypoints.length - 1) {
@@ -479,6 +493,9 @@ module.exports = class pgrSource extends Source {
         let legEnd = response.waypoints[j+1].location[0] +","+ response.waypoints[j+1].location[1];
 
         portions[j] = new Portion(legStart, legEnd);
+        // On récupère la distance et la durée
+        portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"m");
+        portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"s");
 
         if (routeRequest.computeGeometry) {
           let steps = new Array();
@@ -518,8 +535,8 @@ module.exports = class pgrSource extends Source {
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
 
             // On récupère la distance et la durée
-            steps[k].distance = new Distance(currentPgrRouteStep.distance,"m");
-            steps[k].duration = new Duration(currentPgrRouteStep.duration,"s");
+            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"m");
+            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"s");
 
           }
 
