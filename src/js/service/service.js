@@ -11,6 +11,7 @@ const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
 const BaseManager = require('../base/baseManager');
 const TopologyManager = require('../topology/topologyManager');
+const ProjectionManager = require('../geography/projectionManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -62,6 +63,9 @@ module.exports = class Service {
 
     // Manager des apis du service
     this._apisManager = new ApisManager();
+
+    // Manager des projections
+    this._projectionManager = new ProjectionManager();
 
     // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
     this._server = {};
@@ -488,6 +492,33 @@ module.exports = class Service {
 
     if (!this._operationManager.loadOperationDirectory(this._operationCatalog, operationsDirectory, parametersDirectory)) {
       LOGGER.error("Erreur lors du chargement des operations.");
+      return false;
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadOperations
+  * @description Chargement des opérations
+  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
+  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
+  *
+  */
+
+  loadProjections(projectionsDirectory) {
+
+    LOGGER.info("Chargement des projections...");
+
+    if (!projectionsDirectory) {
+      projectionsDirectory = this._configuration.application.projections.directory;
+    }
+
+    if (!this._projectionManager.loadProjectionDirectory(projectionsDirectory)) {
+      LOGGER.error("Erreur lors du chargement des projections.");
       return false;
     }
 

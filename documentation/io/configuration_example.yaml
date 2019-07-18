@@ -19,3 +19,5 @@ application:
   network:
     host: "0.0.0.0"
     port: "8080"
+  projections:
+    directory: "/home/config/projections/"

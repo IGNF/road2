@@ -72,7 +72,7 @@
 			properties:
 				# Dossiers contenant l'ensemble des fichiers de configuration des ressources.
 				"directories":
-					type: table
+					type: array
 					required: true
           minItems: 1
           items:
@@ -90,3 +90,12 @@
 				"port":
 					type: string
 					required: false
+    # Configuration des projections disponibles
+    "projections":
+      type: object
+      required: true
+      properties:
+        # Dossier contenant les configurations
+        "directory":
+          type: string
+          required: true

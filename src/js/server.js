@@ -48,6 +48,11 @@ async function start() {
     pm.shutdown(1);
   }
 
+  // Chargement des projections
+  if (!service.loadProjections()) {
+    pm.shutdown(1);
+  }
+
   // Chargement des ressources
   if (!service.loadResources()) {
     pm.shutdown(1);
