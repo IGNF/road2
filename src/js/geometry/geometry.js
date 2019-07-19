@@ -22,15 +22,23 @@ module.exports = class Geometry {
   * @param {Object|string} srcGeom - Objet source de la géometrie
   * @param {string} type - type de la geom (Point, LineString...)
   * @param {string} format - Format de la geom (geojson, polyline)
+  * @param {string} projection - Id de la projection utilisée (EPSG:4326)
   *
   */
-  constructor(srcGeom, type, format) {
+  constructor(srcGeom, type, format, projection) {
+
     // source de la géométrie (représentation geojson, polyline)
     this._srcGeom = srcGeom;
+
     // Type de géométrie (Point, LineString, Polygon...)
     this._type = type;
+
     // Format de géométrie (geojson, polyline...)
     this._format = format;
+
+    // Id de la projection utilisée (EPSG:4326)
+    this._projection = projection;
+
   }
 
   /**
@@ -64,6 +72,17 @@ module.exports = class Geometry {
   */
   get srcGeom () {
     return this._srcGeom;
+  }
+
+  /**
+  *
+  * @function
+  * @name get projection
+  * @description Récupérer la projection de la geom
+  *
+  */
+  get projection () {
+    return this._projection;
   }
 
 
