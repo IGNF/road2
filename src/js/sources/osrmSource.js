@@ -5,7 +5,7 @@ const OSRM = require("osrm");
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
-const Geometry = require('../geometry/geometry');
+const Line = require('../geometry/line');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
@@ -264,7 +264,7 @@ module.exports = class osrmSource extends Source {
       let currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Geometry(currentOsrmRoute.geometry, "LineString", "geojson", this._topology.projection) );
+      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", this._topology.projection) );
 
       // On récupère la distance et la durée
       routes[i].distance = new Distance(currentOsrmRoute.distance,"m");
@@ -296,7 +296,7 @@ module.exports = class osrmSource extends Source {
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step( new Geometry(currentOsrmRouteStep.geometry, "LineString", "geojson", this._topology.projection) );
+          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", this._topology.projection) );
           steps[k].setAttributById("name", currentOsrmRouteStep.name);
 
           // On récupère la distance et la durée

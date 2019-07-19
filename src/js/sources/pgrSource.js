@@ -6,7 +6,7 @@ const fs = require('fs');
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
-const Geometry = require('../geometry/geometry');
+const Line = require('../geometry/line');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
@@ -473,7 +473,7 @@ module.exports = class pgrSource extends Source {
       let currentPgrRoute = response.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Geometry(currentPgrRoute.geometry, "LineString", "geojson", this._topology.projection) );
+      routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", this._topology.projection) );
 
       // On récupère la distance et la durée
       routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"m");
@@ -530,7 +530,7 @@ module.exports = class pgrSource extends Source {
               ).geometry.coordinates;
             }
 
-            steps[k] = new Step( new Geometry(currentPgrRouteStep.geometry, "LineString", "geojson", this._topology.projection) );
+            steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
             // ajout des attributs
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
 
