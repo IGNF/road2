@@ -26,7 +26,7 @@ module.exports = class topologyManager {
   * @param{BaseManager} baseManager - Manager de bases
   *
   */
-  constructor(baseManager) {
+  constructor(baseManager, projectionManager) {
 
     // Liste des descriptions de topologies vérifiées et validées par le manager
     this._listOfTopologyIds = new Array();
@@ -39,6 +39,9 @@ module.exports = class topologyManager {
 
     // Manager de bases
     this._baseManager = baseManager;
+
+    // Manager de projections
+    this._projectionManager = projectionManager;
 
   }
 
@@ -123,7 +126,12 @@ module.exports = class topologyManager {
       LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
       return false;
     } else {
-      // TODO: vérifier la projection
+      console.log(this._projectionManager);
+      // Vérification de la projection
+      if (!this._projectionManager.isAvailableById(topologyJsonDescription.projection)) {
+        LOGGER.error("La topologie indique une projection non disponible sur le service: " + topologyJsonDescription.projection);
+        return false;
+      }
     }
 
     // Bbox de la topologie

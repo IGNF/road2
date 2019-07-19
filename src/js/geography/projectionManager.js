@@ -47,6 +47,32 @@ module.exports = class ProjectionManager {
   /**
   *
   * @function
+  * @name isAvailableById
+  * @description Savoir si une projection est disponible
+  *
+  */
+  isAvailableById (id) {
+
+    if (!id) {
+      return false;
+    }
+    if (this._listOfProjectionId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._listOfProjectionId.length; i++) {
+      if (id === this._listOfProjectionId[i]) {
+        return true;
+      }
+    }
+
+    return false;
+
+  }
+
+  /**
+  *
+  * @function
   * @name loadProjectionDirectory
   * @description Charger l'ensemble des projections décrites dans un dossier
   * @param {string} directory - Dossier qui contient des fichiers de description de projections

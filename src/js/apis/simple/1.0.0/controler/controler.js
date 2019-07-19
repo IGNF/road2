@@ -255,7 +255,7 @@ module.exports = {
 
     // bbox
     if (routeRequest.bbox) {
-      userResponse.bbox = Turf.bbox(userResponse.geometry);
+      userResponse.bbox = Turf.bbox(route.geometry.getGeometryWithFormat("geojson"));
     }
 
     // distance

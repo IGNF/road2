@@ -46,8 +46,11 @@ module.exports = class Service {
     // catalogue des opérations disponibles
     this._operationCatalog = {};
 
+    // Manager des projections
+    this._projectionManager = new ProjectionManager();
+
     // Manager des topologies du service
-    this._topologyManager = new TopologyManager(this._baseManager);
+    this._topologyManager = new TopologyManager(this._baseManager, this._projectionManager);
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager();
@@ -63,9 +66,6 @@ module.exports = class Service {
 
     // Manager des apis du service
     this._apisManager = new ApisManager();
-
-    // Manager des projections
-    this._projectionManager = new ProjectionManager();
 
     // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
     this._server = {};
