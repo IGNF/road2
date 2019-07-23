@@ -1,0 +1,10 @@
+{
+  "id": "costValue",
+  "name": "Valeur du coût.",
+  "description": "Valeur du coût utilisé pour la génération d'isochrone.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "1.0",
+  "type": "float",
+  "min": 0
+}

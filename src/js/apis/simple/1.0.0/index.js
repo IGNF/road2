@@ -73,6 +73,7 @@ router.route("/route")
   res.send("/route en POST");
 });
 
+/* Génération d'isochrone. */
 router.route("/isochrone")
   .get(async function(req, res, next) {
     let service = req.app.get("service");
@@ -89,9 +90,10 @@ router.route("/isochrone")
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
       // Formattage de la réponse.
-      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
+      // const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
 
-      res.status(200).json(userResponse);
+      // res.status(200).json(userResponse);
+      res.status(200).json({});
     } catch (error) {
       return next(error);
     }

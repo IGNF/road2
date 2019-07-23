@@ -200,7 +200,6 @@ module.exports = {
 
   },
 
-
   /**
   *
   * @function
@@ -212,7 +211,13 @@ module.exports = {
   *
   */
   checkIsochroneParameters: function(parameters, service) {
-    const isochroneRequest = new IsochroneRequest(parameters.resource);
+    let resource;
+    let point = {};
+    let costType;
+    let costValue;
+    let profile;
+    let optimization;
+    let direction;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -222,7 +227,7 @@ module.exports = {
       if (!service.verifyResourceExistenceById(parameters.resource)) {
         throw errorManager.createError("Parameter 'resource' is invalid.", 400);
       } else {
-        const resource = service.getResourceById(parameters.resource);
+        resource = service.getResourceById(parameters.resource);
         /* Vérification de la disponibilité de l'opération isochrone sur la ressource. */
         if (!resource.verifyAvailabilityOperation("isochrone")){
           throw errorManager.createError("Operation not permitted on this resource.", 400);
@@ -230,7 +235,88 @@ module.exports = {
       }
     }
 
-    return isochroneRequest;
+    /* On récupère l'opération 'isochrone' pour faire des vérifications. */
+    let isochroneOperation = resource.getOperationById("isochrone");
+
+    /* Paramètre 'point'. */
+    if (!parameters.point) {
+        throw errorManager.createError("Parameter 'point' not found.", 400);
+    } else {
+      /* Vérification de la validité des coordonnées fournies. */
+      if (!isochroneOperation.getParameterById("point").check(parameters.point)) {
+        throw errorManager.createError("Parameter 'point' is invalid.", 400);
+      } else {
+        const tmpStringCoordinates = parameters.point.split(",");
+        point.lon = Number(tmpStringCoordinates[0]);
+        point.lat = Number(tmpStringCoordinates[1]);
+      }
+    }
+
+    /* Paramètre 'costType'. */
+    if (!parameters.costType) {
+      throw errorManager.createError("Parameter 'costType' not found.", 400);
+    } else {
+      /* Vérification de la validité du paramètre fourni. */
+      if (!isochroneOperation.getParameterById("costType").check(parameters.costType)) {
+        throw errorManager.createError("Parameter 'costType' is invalid.", 400);
+      } else {
+        costType = parameters.costType;
+      }
+    }
+
+    /* Paramètre 'costValue'. */
+    if (!parameters.costValue) {
+      throw errorManager.createError("Parameter 'costValue' not found.", 400);
+    } else {
+      /* Vérification de la validité du paramètre fourni. */
+      if (!isochroneOperation.getParameterById("costValue").check(parameters.costValue)) {
+        throw errorManager.createError("Parameter 'costValue' is invalid.", 400);
+      } else {
+        costValue = parameters.costValue;
+      }
+    }
+
+    /* Paramètre 'profile'. */
+    if (parameters.profile) {
+      /* Vérification de la validité du paramètre fourni. */
+      if (!isochroneOperation.getParameterById("profile").check(parameters.profile)) {
+        throw errorManager.createError("Parameter 'profile' is invalid.", 400);
+      } else {
+        profile = parameters.profile;
+      }
+    } else {
+      /* Récupération du paramètre par défaut. */
+      profile = isochroneOperation.getParameterById("profile").defaultValueContent;
+    }
+
+    /* Paramètre 'optimization'. */
+    if (!parameters.optimization) {
+      /* Récupération du paramètre par défaut. */
+      optimization = isochroneOperation.getParameterById("optimization").defaultValueContent;
+    } else {
+      /* Vérification de la validité du paramètre. */
+      if (!isochroneOperation.getParameterById("optimization").check(parameters.optimization)) {
+        throw errorManager.createError("Parameter 'optimization' is invalid.", 400);
+      } else {
+        optimization = parameters.optimization;
+      }
+    }
+    /* Vérification de la validité du profile et de sa compatibilité avec l'optimisation. */
+    if (!resource.linkedSource[profile+optimization]) {
+      throw errorManager.createError("Parameters 'profile' and 'optimization' are not compatible.", 400);
+    }
+
+    /* Paramètre 'direction'. */
+    if (parameters.direction) {
+      /* Vérification de la validité du paramètre fourni. */
+      if (!isochroneOperation.getParameterById("direction").check(parameters.direction)) {
+        throw errorManager.createError("Parameter 'direction' is invalid.", 400);
+      } else {
+        direction = parameters.direction;
+      }
+    }
+
+    return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, optimization, direction);
   },
 
   /**

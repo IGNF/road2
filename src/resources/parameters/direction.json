@@ -1,0 +1,9 @@
+{
+  "id": "direction",
+  "name": "Sens du parcours.",
+  "description": "Sens du parcours pour la génération d'isochrone.",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "departure",
+  "type": "enumeration"
+}

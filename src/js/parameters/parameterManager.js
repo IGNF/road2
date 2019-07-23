@@ -8,6 +8,7 @@ const ResourceParameter = require('../parameters/resourceParameter');
 const BoolParameter = require('../parameters/boolParameter');
 const EnumParameter = require('../parameters/enumParameter');
 const PointParameter = require('../parameters/pointParameter');
+const FloatParameter = require('../parameters/floatParameter');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("PARAMETERMANAGER");
@@ -240,7 +241,10 @@ module.exports = class parameterManager  {
       LOGGER.error("Le parametre ne contient pas d'attribut type");
       return false;
     } else {
-      if (parameterConf.type !== "boolean" && parameterConf.type !== "enumeration" && parameterConf.type !== "point") {
+      if (parameterConf.type !== "boolean"
+        && parameterConf.type !== "enumeration"
+        && parameterConf.type !== "point"
+        && parameterConf.type !== "float") {
         LOGGER.error("Le type du parametre est incorrect");
         return false;
       }
@@ -438,8 +442,10 @@ module.exports = class parameterManager  {
         }
 
       } else {
-        LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
-        return false;
+        /* Ça parait pas obligatoire non plus ici. */
+
+        /* LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
+        return false; */
       }
 
       // Gestion des valeurs par défaut
@@ -484,6 +490,22 @@ module.exports = class parameterManager  {
         LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
         return false;
       }
+
+      // Gestion des valeurs par défaut
+      if (serviceParameterConf.defaultValue === "true") {
+        // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
+        if (!resourceParameterJsonObject.defaultValueContent) {
+          LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+          return false;
+        } else {
+          // TODO: vérifier que le point est bien dans le bbox
+        }
+      } else {
+        // il n'y a rien à faire
+      }
+
+    } else if (serviceParameterConf.type === "float") {
+      /* TODO: Rajouter des contrôles sur les valeurs autorisées. */
 
       // Gestion des valeurs par défaut
       if (serviceParameterConf.defaultValue === "true") {
@@ -543,6 +565,8 @@ module.exports = class parameterManager  {
         curResParam = new EnumParameter(curSerParam);
       } else if (curSerParamConf.type === "point") {
         curResParam = new PointParameter(curSerParam);
+      } else if (curSerParamConf.type === "float") {
+        curResParam = new FloatParameter(curSerParam);
       } else {
         LOGGER.error("Type inconnu");
         return false;

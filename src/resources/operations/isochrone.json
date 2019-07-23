@@ -3,6 +3,12 @@
   "name": "Génération d'isochrone",
   "description": "Générer une carte isochrone.",
   "parameters": [
-    "resource"
+    "resource",
+    "point",
+    "costType",
+    "optimization",
+    "costValue",
+    "profile",
+    "direction"
   ]
 }

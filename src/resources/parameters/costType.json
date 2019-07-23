@@ -1,0 +1,9 @@
+{
+  "id": "costType",
+  "name": "Type du coût.",
+  "description": "Type du coût utilisé pour la génération d'isochrone.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "time",
+  "type": "enumeration"
+}

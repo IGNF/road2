@@ -1,7 +1,7 @@
 {
   "id": "profile",
   "name": "Profil",
-  "description": "Profile utilisé pour le calcul d'itinéraire.",
+  "description": "Profile utilisé pour le calcul (itinéraire ou isochrone).",
   "required": "false",
   "defaultValue": "true",
   "example": "car",

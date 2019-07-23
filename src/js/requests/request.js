@@ -16,7 +16,7 @@ module.exports = class Request {
   *
   * @function
   * @name constructor
-  * @description Constructeur de la classe routeRequest
+  * @description Constructeur de la classe Request
   * @param {string} operation - Type d'opération concernée
   * @param {string} resource - Ressource concernée
   *

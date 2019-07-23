@@ -690,7 +690,6 @@ module.exports = class Service {
   */
 
   computeRequest(request) {
-
     // Récupération de la ressource
     // ---
     // L'id est dans la requête
@@ -703,6 +702,7 @@ module.exports = class Service {
     // ---
     // L'id est donné par le ressource
     let sourceId = resource.getSourceIdFromRequest(request);
+
     // La source est dans le catalogue du service
     let source = this._sourceCatalog[sourceId];
     // ---

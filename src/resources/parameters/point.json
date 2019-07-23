@@ -1,0 +1,9 @@
+{
+  "id": "point",
+  "name": "Point de départ.",
+  "description": "Point de départ du calcul d'isochrone.",
+  "required": "true",
+  "defaultValue": "false",
+  "example": "48.849319,2.337306",
+  "type": "point"
+}
