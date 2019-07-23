@@ -20,7 +20,6 @@ module.exports = class Geometry {
   * @name constructor
   * @description Constructeur de la classe Geometry
   * @param {string} type - type de la geom (Point, LineString...)
-  * @param {string} format - Format de la geom (geojson, polyline)
   * @param {string} projection - Id de la projection utilisée (EPSG:4326)
   *
   */
@@ -28,9 +27,6 @@ module.exports = class Geometry {
 
     // Type de géométrie (Point, LineString, Polygon...)
     this._type = type;
-
-    // Format de géométrie (geojson, polyline...)
-    this._format = format;
 
     // Id de la projection utilisée (EPSG:4326)
     this._projection = projection;

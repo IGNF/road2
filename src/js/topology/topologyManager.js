@@ -126,7 +126,6 @@ module.exports = class topologyManager {
       LOGGER.error("La ressource ne contient pas d'information sur la projection de la topologie.")
       return false;
     } else {
-      console.log(this._projectionManager);
       // Vérification de la projection
       if (!this._projectionManager.isAvailableById(topologyJsonDescription.projection)) {
         LOGGER.error("La topologie indique une projection non disponible sur le service: " + topologyJsonDescription.projection);

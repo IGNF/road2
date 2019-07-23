@@ -22,13 +22,12 @@ module.exports = class Point extends Geometry {
   * @description Constructeur de la classe Point
   * @param {float} x - X
   * @param {float} y - Y
-  * @param {string} format - Format de la geom (geojson, polyline)
   * @param {string} projection - Id de la projection utilisée (EPSG:4326)
   *
   */
-  constructor(x, y, format, projection) {
+  constructor(x, y, projection) {
 
-    super("point", format, projection);
+    super("point", projection);
 
     // X
     this._x = x;

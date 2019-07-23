@@ -44,13 +44,15 @@
         {
           "id": "start",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
           "id": "end",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
@@ -70,7 +72,8 @@
         {
           "id": "intermediates",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
@@ -101,6 +104,13 @@
         {
           "id": "bbox",
           "defaultValueContent": "true"
+        },
+        {
+          "id": "projection",
+          "defaultValueContent": "EPSG:4326",
+          "values": [
+            "EPSG:4326"
+          ]
         }
       ]
     }

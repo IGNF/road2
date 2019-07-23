@@ -2,6 +2,7 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
+const Point = require('../../../../geometry/point');
 const Turf = require('@turf/turf');
 
 module.exports = {
@@ -26,6 +27,7 @@ module.exports = {
     let optimization;
     let intermediatesPoints = new Array();
     let tmpStringCoordinates;
+    let askedProjection;
 
     // Resource
     if (!parameters.resource) {
@@ -46,6 +48,19 @@ module.exports = {
     // On récupère l'opération route pour faire des vérifications
     let routeOperation = resource.getOperationById("route");
 
+    // Projection
+    if (parameters.crs) {
+      // Vérification de la validité des coordonnées fournies
+      if (!routeOperation.getParameterById("projection").check(parameters.crs)) {
+        throw errorManager.createError(" Parameter 'crs' is invalid ", 400);
+      } else {
+        askedProjection = parameters.crs;
+      }
+    } else {
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      askedProjection = routeOperation.getParameterById("projection").defaultValueContent;
+    }
+
     // Start
     if (!parameters.start) {
         throw errorManager.createError(" Parameter 'start' not found ", 400);
@@ -55,12 +70,9 @@ module.exports = {
         throw errorManager.createError(" Parameter 'start' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.start.split(",");
-        start.lon = Number(tmpStringCoordinates[0]);
-        start.lat = Number(tmpStringCoordinates[1]);
+        start = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
       }
     }
-
-
 
     // End
     if (!parameters.end) {
@@ -71,8 +83,7 @@ module.exports = {
         throw errorManager.createError(" Parameter 'end' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.end.split(",");
-        end.lon = Number(tmpStringCoordinates[0]);
-        end.lat = Number(tmpStringCoordinates[1]);
+        end = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
       }
     }
 
@@ -120,7 +131,7 @@ module.exports = {
       if (!routeOperation.getParameterById("intermediates").check(parameters.intermediates)) {
         throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
-        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates)) {
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates, askedProjection)) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
         }
       }

@@ -87,10 +87,11 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
+  * @param {object} options - Options
   * @return {boolean}
   *
   */
-  specificCheck(userValue) {
+  specificCheck(userValue, options) {
 
     if (userValue !== "true" && userValue !== "false") {
       return false;

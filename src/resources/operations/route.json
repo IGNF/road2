@@ -13,6 +13,7 @@
     "waysAttributes",
     "algorithm",
     "geometryFormat",
-    "bbox"
+    "bbox",
+    "projection"
   ]
 }

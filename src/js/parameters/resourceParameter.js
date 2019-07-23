@@ -133,10 +133,11 @@ module.exports = class ResourceParameter {
   * @description Convertir l'entrée utilisateur en tableau de points pour une request
   * @param {string} userValue - Valeur à vérifier
   * @param {table} finalTable - Tableau à remplir
+  * @param {object} options - Options
   * @return {boolean}
   *
   */
-  convertIntoTable(userValue, finalTable) {
+  convertIntoTable(userValue, finalTable, options) {
 
     let userTable = new Array();
 
@@ -154,7 +155,7 @@ module.exports = class ResourceParameter {
 
     for (let i = 0; i < userTable.length; i++) {
 
-      finalTable[i] = this.specificConvertion(userTable[i]);
+      finalTable[i] = this.specificConvertion(userTable[i], options);
       if (finalTable[i] === null) {
         return false;
       }
@@ -171,10 +172,11 @@ module.exports = class ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
+  * @param {object} options - Options
   * @return {object}
   *
   */
-  specificConvertion(userValue) {
+  specificConvertion(userValue, options) {
 
     return null;
 

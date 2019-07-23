@@ -20,8 +20,8 @@ module.exports = class routeRequest extends Request {
   * @name constructor
   * @description Constructeur de la classe routeRequest
   * @param {string} resource - Ressource concernée
-  * @param {object} start - Point de départ concerné (ex. {lon: 8.732901, lat: 41.928821})
-  * @param {object} end - Point d'arrivée concerné (ex. {lon: 8.732901, lat: 41.953932})
+  * @param {Point} start - Point de départ concerné
+  * @param {Point} end - Point d'arrivée concerné
   * @param {string} profile - Profile concerné
   * @param {string} optimization - Optimisation concernée
   *
@@ -32,11 +32,9 @@ module.exports = class routeRequest extends Request {
     super("route", resource, "routeRequest");
 
     // Point de départ
-    // (ex. {lon: 8.732901, lat: 41.928821})
     this._start = start;
 
     // Point d'arrivée
-    // (ex. {lon: 8.732901, lat: 41.953932})
     this._end = end;
 
     // Profile
@@ -46,7 +44,7 @@ module.exports = class routeRequest extends Request {
     this._optimization = optimization;
 
     // Intermediates
-    // (ex. [{lon: 8.732901, lat: 41.953932}, {lon: 8.732901, lat: 41.928821}])
+    // Tableau contenant des instances de Point
     this._intermediates = new Array();
 
     // computeGeometry
@@ -85,7 +83,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set start
   * @description Attribuer le point de départ de la requête
-  * @param {object} st - Point de départ concerné (ex. {lon: 8.732901, lat: 41.928821})
+  * @param {Point} st - Point de départ concerné
   *
   */
   set start (st) {
@@ -108,7 +106,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée de la requête
-  * @param {object} en - Point d'arrivée concerné (ex. {lon: 8.732901, lat: 41.953932})
+  * @param {Point} en - Point d'arrivée concerné
   *
   */
   set end (en) {
@@ -177,7 +175,7 @@ module.exports = class routeRequest extends Request {
   * @function
   * @name set intermediates
   * @description Attribuer les points intermédiaires de la requête
-  * @param {table} i - Tableau de points (ex. [{lon: 8.732901, lat: 41.953932},{lon: 8.732902, lat: 41.953930}])
+  * @param {table} i - Tableau de Point
   *
   */
   set intermediates (i) {
