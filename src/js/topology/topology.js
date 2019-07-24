@@ -76,7 +76,7 @@ module.exports = class Topology {
   *
   */
   get description () {
-    return this._type;
+    return this._description;
   }
 
     /**
@@ -87,7 +87,7 @@ module.exports = class Topology {
   *
   */
   get projection () {
-    return this._type;
+    return this._projection;
   }
 
   /**
@@ -98,7 +98,7 @@ module.exports = class Topology {
   *
   */
   get bbox () {
-    return this._type;
+    return this._bbox;
   }
 
 

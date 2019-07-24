@@ -156,15 +156,15 @@ module.exports = class osrmSource extends Source {
         // Coordonnées
         let coordinatesTable = new Array();
         // start
-        coordinatesTable.push([request.start.x, request.start.y]);
+        coordinatesTable.push(request.start.transform(this.topology.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push([request.intermediates[i].x, request.intermediates[i].y]);
+            coordinatesTable.push(request.intermediates[i].transform(this.topology.projection));
           }
         }
         // end
-        coordinatesTable.push([request.end.x, request.end.y]);
+        coordinatesTable.push(request.end.transform(this.topology.projection));
 
         osrmRequest.coordinates = coordinatesTable;
 
