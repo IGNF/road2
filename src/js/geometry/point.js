@@ -62,18 +62,65 @@ module.exports = class Point extends Geometry {
   /**
   *
   * @function
-  * @name transform
-  * @description Convertir des coordonnées dans une autre projection
+  * @name getCoordinatesIn
+  * @description Récupérer des coordonnées dans une autre projection
   * @param{string} projection - Projection demandée
   *
   */
-  transform (projection) {
+  getCoordinatesIn (projection) {
 
     if (this.projection !== projection) {
       return proj4(this.projection, projection, [this._x, this._y]);
     } else {
       return [this._x, this._y];
     }
+
+  }
+
+    /**
+  *
+  * @function
+  * @name transform
+  * @description Reprojeter un point
+  * @param{string} projection - Projection demandée
+  *
+  */
+  transform (projection) {
+
+    if (this.projection !== projection) {
+
+      let reprojectedPoint =  proj4(this.projection, projection, [this._x, this._y]);
+
+      if (!Array.isArray(reprojectedPoint)) {
+        return false;
+      }
+      if (reprojectedPoint.length !== 2) {
+        return false;
+      }
+
+      this._x = reprojectedPoint[0];
+      this._y = reprojectedPoint[1];
+      this.projection = projection;
+
+      return true;
+
+    } else {
+      // il n'y a rien à faire
+      return true;
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name toString
+  * @description Écrire les coordonnées dans une chaîne de caratères 
+  *
+  */
+  toString () {
+
+    return this._x.toString() + "," + this._y.toString();
 
   }
 

@@ -6,6 +6,7 @@ const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Line = require('../geometry/line');
+const Point = require('../geometry/point');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
@@ -156,15 +157,15 @@ module.exports = class osrmSource extends Source {
         // Coordonnées
         let coordinatesTable = new Array();
         // start
-        coordinatesTable.push(request.start.transform(this.topology.projection));
+        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push(request.intermediates[i].transform(this.topology.projection));
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
           }
         }
         // end
-        coordinatesTable.push(request.end.transform(this.topology.projection));
+        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
         osrmRequest.coordinates = coordinatesTable;
 
@@ -243,11 +244,20 @@ module.exports = class osrmSource extends Source {
       throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
     }
 
+    // projection demandée dans la requête
+    let askedProjection = routeRequest.start.projection;
+
     // start
-    start = osrmResponse.waypoints[0].location[0] +","+ osrmResponse.waypoints[0].location[1];
+    start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
+    if (!start.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of OSRM response. ");
+    }
 
     // end
-    end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
+    end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
+    if (!end.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of OSRM response. ");
+    }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
@@ -280,8 +290,14 @@ module.exports = class osrmSource extends Source {
       for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
-        let legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
-        let legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
+        let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
+        if (!legStart.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of OSRM response. ");
+        }
+        let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
+        if (!legEnd.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of OSRM response. ");
+        }
 
         portions[j] = new Portion(legStart, legEnd);
 

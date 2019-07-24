@@ -250,10 +250,10 @@ module.exports = {
     userResponse.resource = routeResponse.resource;
 
     // start
-    userResponse.start = routeResponse.start;
+    userResponse.start = routeResponse.start.toString();
 
     // end
-    userResponse.end = routeResponse.end;
+    userResponse.end = routeResponse.end.toString();
 
     // profile
     userResponse.profile = routeResponse.profile;
@@ -284,9 +284,9 @@ module.exports = {
       let currentPortion = {};
 
       // start
-      currentPortion.start = route.portions[i].start;
+      currentPortion.start = route.portions[i].start.toString();
       // end
-      currentPortion.end = route.portions[i].end;
+      currentPortion.end = route.portions[i].end.toString();
 
       // distance
       currentPortion.distance = route.portions[i].distance.value;
