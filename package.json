@@ -8,7 +8,8 @@
     "start": "node ./src/js/server.js",
     "test": "mocha --recursive './test/mocha/**/*.js'",
     "lint": "eslint -c eslint.json ./src/",
-    "jsdoc": "jsdoc -c jsdoc.json"
+    "jsdoc": "jsdoc -c jsdoc.json",
+    "debug": "node --inspect=0.0.0.0:9229 ./src/js/server.js"
   },
   "dependencies": {
     "cors": "2.8.5",

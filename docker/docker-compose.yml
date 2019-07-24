@@ -15,6 +15,7 @@ services:
       - pgrouting-procedures-centos
     ports:
       - 8080:8080
+      - 9229:9229
     volumes:
       - iti-data-volume:/home/docker/data
       - ${road2_src}:/home/docker/app/src
