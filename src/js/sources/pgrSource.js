@@ -167,15 +167,15 @@ module.exports = class pgrSource extends Source {
       if (request.type === "routeRequest") {
         // Coordonnées
         // start
-        coordinatesTable.push([request.start.x, request.start.y]);
+        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push([request.intermediates[i].x, request.intermediates[i].y]);
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
           }
         }
         // end
-        coordinatesTable.push([request.end.x, request.end.y]);
+        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
         pgrRequest.coordinates = coordinatesTable;
 
@@ -453,11 +453,20 @@ module.exports = class pgrSource extends Source {
       ).geometry.coordinates ;
     }
 
+    // projection demandée dans la requête
+    let askedProjection = routeRequest.start.projection;
+
     // start
-    start = response.waypoints[0].location[0] +","+ response.waypoints[0].location[1];
+    start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], this.topology.projection);
+    if (!start.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of start in PGR response. ");
+    }
 
     // end
-    end = response.waypoints[response.waypoints.length-1].location[0] +","+ response.waypoints[response.waypoints.length-1].location[1];
+    end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], this.topology.projection);
+    if (!end.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of end in PGR response. ");
+    }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
@@ -489,8 +498,16 @@ module.exports = class pgrSource extends Source {
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
 
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
-        let legStart = response.waypoints[j].location[0] +","+ response.waypoints[j].location[1];
-        let legEnd = response.waypoints[j+1].location[0] +","+ response.waypoints[j+1].location[1];
+
+        let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
+        if (!legStart.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+        }
+        
+        let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
+        if (!legEnd.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+        }
 
         portions[j] = new Portion(legStart, legEnd);
         // On récupère la distance et la durée

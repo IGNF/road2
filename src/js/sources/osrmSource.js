@@ -250,13 +250,13 @@ module.exports = class osrmSource extends Source {
     // start
     start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
     if (!start.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of OSRM response. ");
+    throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
     }
 
     // end
     end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
     if (!end.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of OSRM response. ");
+    throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
     }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
@@ -290,13 +290,15 @@ module.exports = class osrmSource extends Source {
       for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
+
         let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
         if (!legStart.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of OSRM response. ");
+        throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         }
+        
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of OSRM response. ");
+        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         }
 
         portions[j] = new Portion(legStart, legEnd);
