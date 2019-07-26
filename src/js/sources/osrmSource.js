@@ -250,13 +250,13 @@ module.exports = class osrmSource extends Source {
     // start
     start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
     if (!start.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
+      throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
     }
 
     // end
     end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
     if (!end.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
+      throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
     }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
@@ -275,6 +275,9 @@ module.exports = class osrmSource extends Source {
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", this._topology.projection) );
+      if (!routes[i].geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of geometry in OSRM response. ");
+      }
 
       // On récupère la distance et la durée
       routes[i].distance = new Distance(currentOsrmRoute.distance,"m");
@@ -293,7 +296,7 @@ module.exports = class osrmSource extends Source {
 
         let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
         if (!legStart.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+          throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         }
         
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
@@ -315,6 +318,9 @@ module.exports = class osrmSource extends Source {
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
           steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", this._topology.projection) );
+          if (!steps[k].geometry.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
+          }
           steps[k].setAttributById("name", currentOsrmRouteStep.name);
 
           // On récupère la distance et la durée

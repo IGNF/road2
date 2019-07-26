@@ -66,4 +66,16 @@ module.exports = class Geometry {
     return this._projection;
   }
 
+    /**
+  *
+  * @function
+  * @name get projection
+  * @description Attribuer la projection de la geom
+  * @param{string} projection - Projection
+  *
+  */
+ set projection (pr) {
+  return this._projection = pr;
+}
+
 }

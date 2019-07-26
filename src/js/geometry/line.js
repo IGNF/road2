@@ -3,6 +3,7 @@
 const errorManager = require('../utils/errorManager');
 const polyline = require('@mapbox/polyline');
 const Geometry = require('../geometry/geometry');
+const proj4 = require('proj4');
 
 /**
 *
@@ -104,5 +105,64 @@ module.exports = class Line extends Geometry {
       throw errorManager.createError("Unsupported geometry conversion");
     }
   }
+
+  /**
+  *
+  * @function
+  * @name transform
+  * @description Reprojeter une ligne
+  * @param{string} projection - Projection demandée
+  *
+  */
+ transform (projection) {
+
+  if (this.projection !== projection) {
+
+    let geojson = this.getGeoJSON();
+
+    // vérifications sur le geojson à reprojeter
+    if (!geojson.coordinates) {
+      return false;
+    }
+    if (!Array.isArray(geojson.coordinates)) {
+      return false;
+    }
+    if (geojson.coordinates.length === 0) {
+      return false;
+    }
+
+    // reprojection 
+    let reprojectedCoordinates = new Array();
+
+    for (let i = 0; i < geojson.coordinates.length; i++) {
+
+      let reprojectedPoint =  proj4(this.projection, projection, [geojson.coordinates[i][0], geojson.coordinates[i][1]]);
+
+      if (!Array.isArray(reprojectedPoint)) {
+        return false;
+      }
+      if (reprojectedPoint.length !== 2) {
+        return false;
+      }
+
+      reprojectedCoordinates.push([reprojectedPoint[0], reprojectedPoint[1]]);
+
+    }
+
+    let reprojectedGeoJson = {};
+    reprojectedGeoJson.coordinates = reprojectedCoordinates;
+    reprojectedGeoJson.type = "LineString";
+
+    this._geom = this._convertGeometry(reprojectedGeoJson, "geojson", this._format);
+    this.projection = projection;
+
+    return true;
+
+  } else {
+    // il n'y a rien à faire
+    return true;
+  }
+
+}
 
 }

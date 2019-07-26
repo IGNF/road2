@@ -77,7 +77,7 @@ module.exports = class Point extends Geometry {
 
   }
 
-    /**
+  /**
   *
   * @function
   * @name transform

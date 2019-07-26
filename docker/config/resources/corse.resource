@@ -109,7 +109,8 @@
           "id": "projection",
           "defaultValueContent": "EPSG:4326",
           "values": [
-            "EPSG:4326"
+            "EPSG:4326",
+            "EPSG:2154"
           ]
         }
       ]

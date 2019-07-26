@@ -17,7 +17,7 @@ module.exports = class Route {
   * @function
   * @name constructor
   * @description Constructeur de la classe Route
-  * @param {object} geometry - Instance de la classe Geometry, Géométrie de l'itinéraire
+  * @param {Line} geometry - Instance de la classe Line, Géométrie de l'itinéraire
   *
   */
   constructor(geometry) {
@@ -53,7 +53,7 @@ module.exports = class Route {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'itinéraire
-  * @param {string} st - Géométrie de l'étape
+  * @param {Line} st - Géométrie de l'itinéraire
   *
   */
   set geometry (st) {
