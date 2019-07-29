@@ -483,6 +483,9 @@ module.exports = class pgrSource extends Source {
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", this._topology.projection) );
+      if (!routes[i].geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of geometry in PGR response. ");
+      }
 
       // On récupère la distance et la durée
       routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"m");
@@ -548,6 +551,9 @@ module.exports = class pgrSource extends Source {
             }
 
             steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
+            if (!steps[k].geometry.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+            }
             // ajout des attributs
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
 
