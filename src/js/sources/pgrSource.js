@@ -7,6 +7,7 @@ const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Line = require('../geometry/line');
+const Point = require('../geometry/point');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
