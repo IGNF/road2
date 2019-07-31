@@ -23,6 +23,9 @@ services:
       - ${road2_config}:/home/docker/config
     networks:
       - iti-network
+    secrets:
+      - key
+      - cert
 
   route-graph-generator-centos:
     build:
@@ -82,3 +85,7 @@ networks:
 secrets:
   db_config:
     file: ${db_config_file}
+  key:
+    file: ${road2_key}
+  cert:
+    file: ${road2_cert}

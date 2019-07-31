@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
-  "main": "src/js/server.js",
+  "main": "src/js/road2.js",
   "scripts": {
-    "start": "node ./src/js/server.js",
+    "start": "node ./src/js/road2.js",
     "test": "mocha --recursive './test/mocha/**/*.js'",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
-    "debug": "node --inspect=0.0.0.0:9229 ./src/js/server.js"
+    "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
   },
   "dependencies": {
     "cors": "2.8.5",
