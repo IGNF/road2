@@ -178,8 +178,8 @@ module.exports = class serverManager {
 
         if (config.https === "true") {
             // on doit avoir un cert et un key 
-            options.key = fs.readFileSync(config.options.key);
-            options.cert = fs.readFileSync(config.options.cert);
+            options.key = fs.readFileSync(config.options.key, "utf-8");
+            options.cert = fs.readFileSync(config.options.cert, "utf-8");
         }
 
         if (config.https === "true") {

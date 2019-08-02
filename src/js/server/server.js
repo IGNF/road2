@@ -32,7 +32,7 @@ module.exports = class Server {
     * @param{object} options - Options pour le HTTPS
     *
     */
-    constructor(id, app, host, port, https, options) {
+    constructor(id, app, host, port, httpsOption, options) {
 
         // ID
         this._id = id;
@@ -46,18 +46,18 @@ module.exports = class Server {
         // Port 
         this._port = port;
 
+        // https
+        this._enableHttps = httpsOption;
+
+        // Options pour le HTTPS
+        this._options = options;
+
         // serveur
         if (this._enableHttps === "true") {
             this._server = https.createServer(this._options, this._app);
         } else {
             this._server = http.createServer(this._options, this._app);
         }
-
-        // https
-        this._enableHttps = https;
-
-        // Options pour le HTTPS
-        this._options = options;
 
     }
 
