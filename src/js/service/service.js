@@ -12,6 +12,7 @@ const OperationManager = require('../operations/operationManager');
 const BaseManager = require('../base/baseManager');
 const TopologyManager = require('../topology/topologyManager');
 const ProjectionManager = require('../geography/projectionManager');
+const ServerManager = require('../server/serverManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -67,14 +68,8 @@ module.exports = class Service {
     // Manager des apis du service
     this._apisManager = new ApisManager();
 
-    // Instance du serveur NodeJS (retour de app.listen d'ExpressJS)
-    this._server = {};
-
-    // Port du serveur
-    this._port = "";
-
-    // Host pour ExpressJS
-    this._host = "";
+    // Manager de serveurs du service 
+    this._serverManager = new ServerManager();
 
     // Stockage de la configuration
     this._configuration = {};
@@ -256,12 +251,10 @@ module.exports = class Service {
   * @name checkAndSaveGlobalConfiguration
   * @description Vérification de la configuration globale du serveur
   * @param {json} userConfiguration - JSON décrivant la configuration du service
-  * @param {string} userPort - Port du serveur pour ExpressJS
-  * @param {string} userHost - Host pour ExpressJS
   *
   */
 
-  checkAndSaveGlobalConfiguration(userConfiguration, userPort, userHost) {
+  checkAndSaveGlobalConfiguration(userConfiguration) {
 
     LOGGER.info("Verification de la configuration globale de l'application...");
 
@@ -405,60 +398,33 @@ module.exports = class Service {
       return false;
     }
     // Information sur le reseau
-    if (!userHost) {
-      if (userConfiguration.application.network) {
-        // Host
-        if (!userConfiguration.application.network.host) {
-          LOGGER.info("Le champ 'application:network:host' n'est pas renseigne.");
-          this._host = "0.0.0.0";
-        } else {
-          // Vérification du paramètre
-          let tmpHost = userConfiguration.application.network.host.match(/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/g);
-          if (!tmpHost) {
-            LOGGER.fatal("L'objet 'application:network:host' est mal renseigne.");
-            return false;
-          } else {
-            this._host = userConfiguration.application.network.host;
-          }
-        }
-      } else {
-        LOGGER.info("L'objet 'application:network:host' n'est pas renseigne.");
-        this._host = "0.0.0.0";
-      }
+    if (!userConfiguration.application.network) {
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:network' manquant !");
+      return false;
     } else {
-      LOGGER.info("Le parametre ROAD2_HOST n'est pas renseigne.");
-      this._host = "0.0.0.0";
-    }
-    if (!userPort) {
-      if (userConfiguration.application.network) {
-        // Port
-        if (!userConfiguration.application.network.port) {
-          LOGGER.info("Le champ 'application:network:port' n'est pas renseigne.");
-          this._port = "8080";
-        } else {
-          // Vérification du paramètre
-          let tmpPort = userConfiguration.application.network.port.match(/^\d{1,5}$/g);
-          if (!tmpPort) {
-            LOGGER.fatal("L'objet 'application:network:port' est mal renseigne.");
-            return false;
-          } else {
 
-            if (tmpPort > 65536) {
-              LOGGER.fatal("L'objet 'application:network:port' est mal renseigne: Numero de port invalide");
-              return false;
-            } else {
-              this._port = userConfiguration.application.network.port;
-            }
-
-          }
-        }
-      } else {
-        LOGGER.info("L'objet 'application:network:port' n'est pas renseigne.");
-        this._port = "8080";
+      if (!userConfiguration.application.network.servers) {
+        LOGGER.fatal("Mauvaise configuration: Objet 'application:network:servers' manquant !");
+        return false;
       }
-    } else {
-      LOGGER.info("Le parametre ROAD2_PORT n'est pas renseigne.");
-      this._port = "8080";
+
+      if (!Array.isArray(userConfiguration.application.network.servers)) {
+        LOGGER.fatal("Mauvaise configuration: Objet 'application:network' n'est pas un tableau !");
+        return false;
+      }
+
+      if (userConfiguration.application.network.servers.length === 0) {
+        LOGGER.fatal("Mauvaise configuration: Objet 'application:network' est un tableau vide !");
+        return false;
+      }
+
+      for (let i = 0; i < userConfiguration.application.network.servers.length; i++) {
+        if (!this._serverManager.checkConfiguration(userConfiguration.application.network.servers[i])) {
+          LOGGER.fatal("Mauvaise configuration d'un serveur !");
+          return false;
+        }
+      }
+
     }
 
     LOGGER.info("Verification terminee.");
@@ -732,9 +698,17 @@ module.exports = class Service {
       res.send('Road2 is running !! \n');
     });
 
-    // Prêt à écouter
-    this._server = road2.listen(this._port, this._host);
-    LOGGER.info(`Road2 est fonctionnel (http://${this._host}:${this._port})`);
+    // Création des serveurs 
+    if (!this._serverManager.createAllServer(road2)) {
+      LOGGER.fatal("Impossible de creer les serveurs.");
+      return false;
+    }
+
+    // Démarrage des serveurs 
+    if (!this._serverManager.startAllServer()) {
+      LOGGER.fatal("Impossible de demarer les serveurs.");
+      return false;
+    }
 
     return true;
 
@@ -750,7 +724,12 @@ module.exports = class Service {
 
   stopServer(callback) {
 
-    this._server.close(callback);
+    // Extinction des serveurs 
+    if (!this._serverManager.stopAllServer()) {
+      LOGGER.fatal("Impossible d'eteindre les serveurs.");
+      return false;
+    }
+    
     return true;
 
   }

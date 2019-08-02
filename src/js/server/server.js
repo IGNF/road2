@@ -3,6 +3,11 @@
 var https = require('https');
 var http = require('http');
 
+const log4js = require('log4js');
+
+// Création du LOGGER
+var LOGGER = log4js.getLogger("SERVER");
+
 /**
 *
 * @class
@@ -42,7 +47,11 @@ module.exports = class Server {
         this._port = port;
 
         // serveur
-        this._server = {};
+        if (this._enableHttps === "true") {
+            this._server = https.createServer(this._options, this._app);
+        } else {
+            this._server = http.createServer(this._options, this._app);
+        }
 
         // https
         this._enableHttps = https;
@@ -74,16 +83,22 @@ module.exports = class Server {
     start() {
 
         // si le serveur n'existe pas, on le crée
-        if (this._server === {}) {
+        try {
+            assert.deepStrictEqual(this._server, {});
+
             if (this._enableHttps === "true") {
                 this._server = https.createServer(this._options, this._app);
             } else {
                 this._server = http.createServer(this._options, this._app);
             }
+
+        } catch (err) {
+            // tout va bien
         }
 
         // on lance l'écoute du serveur 
         this._server.listen(this._port, this._host);
+        LOGGER.info(this._host + ":" + this._port);
 
         return true;
 

@@ -11,7 +11,11 @@ Pour utiliser ce `docker-compose.yml`, il suffit de :
 - installer `docker`.
 - se placer dans le dossier `/docker/` du projet Road2.
 - créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
+
+### Pour les tests avec HTTPS
 - générer un certificat auto-signé pour lancer l'application en HTTPS (ex. `openssl req -nodes -new -x509 -keyout server.key -out server.cert`).
+- s'assurer qu'aucun serveur ne fonctionne sur le port *443*.
+- lancer l'application en sudo. 
 
 ## Construction des images
 

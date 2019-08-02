@@ -1,6 +1,9 @@
 'use strict';
 
-const Server = require('./server')
+const Server = require('./server');
+const log4js = require('log4js');
+const fs = require('fs');
+const path = require('path');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("SERVERMANAGER");
@@ -107,6 +110,56 @@ module.exports = class serverManager {
             }
         }
 
+        // Options 
+        if (!config.options) {
+
+            if (config.https === "true") {
+                // on doit avoir un cert et un key dans l'objet options 
+                LOGGER.error("Serveur https sans options.");
+                return false;
+            } else {
+                // rien à faire 
+            }
+
+        } else {
+
+            if (config.https === "true") {
+                // on doit avoir un cert et un key dans l'objet options
+                if (!config.options.key) {
+                    LOGGER.error("L'objet options doit contenir un key pour le HTTPS.");
+                    return false;
+                } else {
+                    // on vérifie que le fichier est exploitable 
+                    try {
+                        let file = path.resolve(__dirname, config.options.key);
+                        fs.accessSync(file, fs.constants.R_OK);
+                    } catch (err) {
+                        LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                    }
+                }
+
+                if (!config.options.cert) {
+                    LOGGER.error("L'objet options doit contenir un cert pour le HTTPS.");
+                    return false;
+                } else {
+                    // on vérifie que le fichier est exploitable
+                    try {
+                        let file = path.resolve(__dirname, config.options.cert);
+                        fs.accessSync(file, fs.constants.R_OK);
+                    } catch (err) {
+                        LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                    } 
+                }
+
+            } else {
+                // rien à faire 
+            }
+
+        }
+
+        // Stockage de la description 
+        this._serverDescriptions.push(config);
+
         return true;
 
     }
@@ -120,10 +173,19 @@ module.exports = class serverManager {
     */
     createServer(app, config) {
 
-        if (config.https) {
-            return new Server(config.id, app, config.host, config.port, true, config.options);
+        // Reformatage des options pour le serveur 
+        let options = {};
+
+        if (config.https === "true") {
+            // on doit avoir un cert et un key 
+            options.key = fs.readFileSync(config.options.key);
+            options.cert = fs.readFileSync(config.options.cert);
+        }
+
+        if (config.https === "true") {
+            return new Server(config.id, app, config.host, config.port, "true", options);
         } else {
-            return new Server(config.id, app, config.host, config.port, false);
+            return new Server(config.id, app, config.host, config.port, "false", options);
         }
         
     }
@@ -138,8 +200,8 @@ module.exports = class serverManager {
     createAllServer(app) {
 
         if (this._serverDescriptions.length === 0) {
-            LOGGER.warn("Aucun serveur n'est disponible.");
-            return true;
+            LOGGER.error("Aucun serveur n'est disponible.");
+            return false;
         }
 
         for(let i = 0; i < this._serverDescriptions.length; i++) {
@@ -163,15 +225,16 @@ module.exports = class serverManager {
         LOGGER.info("Demarrage de l'ensemble des serveurs.");
 
         if (this._serverDescriptions.length === 0) {
-            LOGGER.warn("Aucun serveur n'est disponible.");
-            return true;
+            LOGGER.error("Aucun serveur n'est disponible.");
+            return false;
         }
 
         try {
             assert.deepStrictEqual(this._serverCatalog, {});
+            LOGGER.error("Aucun serveur n'a ete cree.");
+            return false;
         } catch (err) {
-            LOGGER.warn("Aucun serveur n'est disponible.");
-            return true;
+            // tout va bien
         }
 
         for (let serverId in this._serverCatalog) {
