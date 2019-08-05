@@ -65,6 +65,12 @@ module.exports = class routeRequest extends Request {
     // bbox
     this._bbox = true;
 
+    // timeUnit
+    this._timeUnit = "minute";
+
+    // distanceUnit
+    this._distanceUnit = "meter";
+
   }
 
   /**
@@ -284,31 +290,75 @@ module.exports = class routeRequest extends Request {
     return this._waysAttributes;
   }
 
+  /**
+  *
+  * @function
+  * @name get timeUnit
+  * @description Récupérer l'unité des durées 
+  *
+  */
+  get timeUnit () {
+    return this._timeUnit;
+  }
 
-    /**
-    *
-    * @function
-    * @name isAttributeRequested
-    * @description Permet de savoir si un attribut est demandé dans cette requête.
-    * @param {string} attr - Attribut
-    *
-    */
-    isAttributeRequested (attr) {
+  /**
+  *
+  * @function
+  * @name set timeUnit
+  * @description Attribuer l'unité des durées 
+  *
+  */
+  set timeUnit (i) {
+    this._timeUnit = i;
+  }
 
-      if (this._waysAttributes.length !== 0) {
-        for (let i=0; i < this._waysAttributes.length; i++) {
-          if (this._waysAttributes[i] === attr) {
-            return true;
-          } else {
-            // on continue
-          }
+  /**
+  *
+  * @function
+  * @name get distanceUnit
+  * @description Récupérer l'unité des distances 
+  *
+  */
+  get distanceUnit () {
+    return this._distanceUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set distanceUnit
+  * @description Attribuer l'unité des distances 
+  *
+  */
+  set distanceUnit (i) {
+    this._distanceUnit = i;
+  }
+
+
+  /**
+  *
+  * @function
+  * @name isAttributeRequested
+  * @description Permet de savoir si un attribut est demandé dans cette requête.
+  * @param {string} attr - Attribut
+  *
+  */
+  isAttributeRequested (attr) {
+
+    if (this._waysAttributes.length !== 0) {
+      for (let i=0; i < this._waysAttributes.length; i++) {
+        if (this._waysAttributes[i] === attr) {
+          return true;
+        } else {
+          // on continue
         }
-      } else {
-        return false;
       }
-
+    } else {
       return false;
     }
+
+    return false;
+  }
 
 
 }

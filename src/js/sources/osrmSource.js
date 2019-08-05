@@ -280,8 +280,8 @@ module.exports = class osrmSource extends Source {
       }
 
       // On récupère la distance et la durée
-      routes[i].distance = new Distance(currentOsrmRoute.distance,"m");
-      routes[i].duration = new Duration(currentOsrmRoute.duration,"s");
+      routes[i].distance = new Distance(currentOsrmRoute.distance,"meter");
+      routes[i].duration = new Duration(currentOsrmRoute.duration,"second");
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
@@ -307,8 +307,8 @@ module.exports = class osrmSource extends Source {
         portions[j] = new Portion(legStart, legEnd);
 
         // On récupère la distance et la durée
-        portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"m");
-        portions[j].duration = new Duration(currentOsrmRouteLeg.duration,"s");
+        portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"meter");
+        portions[j].duration = new Duration(currentOsrmRouteLeg.duration,"second");
 
         // Steps
         let steps = new Array();
@@ -324,8 +324,8 @@ module.exports = class osrmSource extends Source {
           steps[k].setAttributById("name", currentOsrmRouteStep.name);
 
           // On récupère la distance et la durée
-          steps[k].distance = new Distance(currentOsrmRouteStep.distance,"m");
-          steps[k].duration = new Duration(currentOsrmRouteStep.duration,"s");
+          steps[k].distance = new Distance(currentOsrmRouteStep.distance,"meter");
+          steps[k].duration = new Duration(currentOsrmRouteStep.duration,"second");
 
         }
 

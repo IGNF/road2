@@ -14,6 +14,8 @@
     "algorithm",
     "geometryFormat",
     "bbox",
-    "projection"
+    "projection",
+    "timeUnit",
+    "distanceUnit"
   ]
 }

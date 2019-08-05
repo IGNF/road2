@@ -489,8 +489,8 @@ module.exports = class pgrSource extends Source {
       }
 
       // On récupère la distance et la durée
-      routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"m");
-      routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"s");
+      routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"meter");
+      routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
@@ -515,8 +515,8 @@ module.exports = class pgrSource extends Source {
 
         portions[j] = new Portion(legStart, legEnd);
         // On récupère la distance et la durée
-        portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"m");
-        portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"s");
+        portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
+        portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
         if (routeRequest.computeGeometry) {
           let steps = new Array();
@@ -559,8 +559,8 @@ module.exports = class pgrSource extends Source {
             steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
 
             // On récupère la distance et la durée
-            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"m");
-            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"s");
+            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
+            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
 
           }
 

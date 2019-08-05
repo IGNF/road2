@@ -25,7 +25,6 @@ module.exports = {
     let end = {};
     let profile;
     let optimization;
-    let intermediatesPoints = new Array();
     let tmpStringCoordinates;
     let askedProjection;
 
@@ -226,6 +225,34 @@ module.exports = {
     }
     // ---
 
+    // timeUnit
+    if (parameters.timeUnit) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
+        throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+      }
+      routeRequest.timeUnit = parameters.timeUnit;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.timeUnit = routeOperation.getParameterById("timeUnit").defaultValueContent;
+    }
+    // ---
+
+    // distanceUnit
+    if (parameters.distanceUnit) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
+        throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+      }
+      routeRequest.distanceUnit = parameters.distanceUnit;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.distanceUnit = routeOperation.getParameterById("distanceUnit").defaultValueContent;
+    }
+    // ---
+
     return routeRequest;
 
   },
@@ -270,6 +297,20 @@ module.exports = {
     }
 
     // distance
+    if (!route.distance.convert(routeRequest.distanceUnit)) {
+      throw errorManager.createError(" Error during convertion of route distance in response. ", 400);
+    } else {
+      userResponse.distance = route.distance.value;
+    }
+
+    // duration
+    if (!route.duration.convert(routeRequest.timeUnit)) {
+      throw errorManager.createError(" Error during convertion of route duration in response. ", 400);
+    } else {
+      userResponse.duration = route.duration.value;
+    }
+
+    // distance
     userResponse.distance = route.distance.value;
 
     // duration
@@ -289,10 +330,18 @@ module.exports = {
       currentPortion.end = route.portions[i].end.toString();
 
       // distance
-      currentPortion.distance = route.portions[i].distance.value;
+      if (!route.portions[i].distance.convert(routeRequest.distanceUnit)) {
+        throw errorManager.createError(" Error during convertion of portion distance in response. ", 400);
+      } else {
+        currentPortion.distance = route.portions[i].distance.value;
+      }
 
       // duration
-      currentPortion.duration = route.portions[i].duration.value;
+      if (!route.portions[i].duration.convert(routeRequest.timeUnit)) {
+        throw errorManager.createError(" Error during convertion of portion duration in response. ", 400);
+      } else {
+        currentPortion.duration = route.portions[i].duration.value;
+      }
 
       // Steps
       currentPortion.steps = new Array();
@@ -315,10 +364,18 @@ module.exports = {
           }
 
           // distance
-          currentStep.distance = route.portions[i].steps[j].distance.value;
+          if (!route.portions[i].steps[j].distance.convert(routeRequest.distanceUnit)) {
+            throw errorManager.createError(" Error during convertion of step distance in response. ", 400);
+          } else {
+            currentStep.distance = route.portions[i].steps[j].distance.value;
+          }
 
           // duration
-          currentStep.duration = route.portions[i].steps[j].duration.value;
+          if (!route.portions[i].steps[j].duration.convert(routeRequest.timeUnit)) {
+            throw errorManager.createError(" Error during convertion of step duration in response. ", 400);
+          } else {
+            currentStep.duration = route.portions[i].steps[j].duration.value;
+          }
 
           currentPortion.steps.push(currentStep);
 

@@ -112,6 +112,23 @@
             "EPSG:4326",
             "EPSG:2154"
           ]
+        },
+        {
+          "id": "timeUnit",
+          "defaultValueContent": "minute",
+          "values": [
+            "hour",
+            "minute",
+            "second"
+          ]
+        },
+        {
+          "id": "distanceUnit",
+          "defaultValueContent": "meter",
+          "values": [
+            "meter",
+            "kilometer"
+          ]
         }
       ]
     }
