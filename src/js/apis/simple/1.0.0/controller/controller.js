@@ -314,6 +314,8 @@ module.exports = {
       } else {
         direction = parameters.direction;
       }
+    } else {
+      direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
     return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, optimization, direction);
