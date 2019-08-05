@@ -207,6 +207,32 @@ module.exports = {
       algorithmParameterDescription.example = "ch";
       routeDescription.parameters.push(algorithmParameterDescription);
 
+      // route.parameters.getBbox
+      let getBboxServiceParameter = serviceOpRoute.getParameterById("bbox");
+      let getBboxParameterDescription = {};
+      getBboxParameterDescription.name = "getBbox";
+      getBboxParameterDescription.in = "query";
+      getBboxParameterDescription.description = getBboxServiceParameter.description;
+      getBboxParameterDescription.required = getBboxServiceParameter.required;
+      getBboxParameterDescription.default = getBboxServiceParameter.defaultValue;
+      getBboxParameterDescription.schema = {};
+      getBboxParameterDescription.schema.type = "boolean";
+      getBboxParameterDescription.example = "true";
+      routeDescription.parameters.push(getBboxParameterDescription);
+
+      // route.parameters.crs
+      let projectionServiceParameter = serviceOpRoute.getParameterById("projection");
+      let crsParameterDescription = {};
+      crsParameterDescription.name = "crs";
+      crsParameterDescription.in = "query";
+      crsParameterDescription.description = projectionServiceParameter.description;
+      crsParameterDescription.required = projectionServiceParameter.required;
+      crsParameterDescription.default = projectionServiceParameter.defaultValue;
+      crsParameterDescription.schema = {};
+      crsParameterDescription.schema.type = "enumeration";
+      crsParameterDescription.example = "EPSG:4326";
+      routeDescription.parameters.push(crsParameterDescription);
+
       // -- end route.parameters
 
       getCapabilities.operations.push(routeDescription);
@@ -323,6 +349,20 @@ module.exports = {
         routeAlgorithm.id = "algorithm";
         routeAlgorithm.values = algorithmParameter.values;
         routeAvailableOperation.availableParameters.push(routeAlgorithm);
+
+        // route.getBbox
+        let bboxParameter = resourceOperation.getParameterById("bbox");
+        let routeGetBbox = {};
+        routeGetBbox.id = "getBbox";
+        routeGetBbox.values = bboxParameter.values;
+        routeAvailableOperation.availableParameters.push(routeGetBbox);
+
+        // route.crs
+        let projectionParameter = resourceOperation.getParameterById("projection");
+        let routeCrs = {};
+        routeCrs.id = "crs";
+        routeCrs.values = projectionParameter.values;
+        routeAvailableOperation.availableParameters.push(routeCrs);
 
         resourceDescription.availableOperations.push(routeAvailableOperation);
 
