@@ -173,19 +173,10 @@ module.exports = class serverManager {
     */
     createServer(app, config) {
 
-        // Reformatage des options pour le serveur 
-        let options = {};
-
         if (config.https === "true") {
-            // on doit avoir un cert et un key 
-            options.key = fs.readFileSync(config.options.key, "utf-8");
-            options.cert = fs.readFileSync(config.options.cert, "utf-8");
-        }
-
-        if (config.https === "true") {
-            return new Server(config.id, app, config.host, config.port, "true", options);
+            return new Server(config.id, app, config.host, config.port, "true", config.options);
         } else {
-            return new Server(config.id, app, config.host, config.port, "false", options);
+            return new Server(config.id, app, config.host, config.port, "false", config.options);
         }
         
     }

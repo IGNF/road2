@@ -2,6 +2,7 @@
 
 var https = require('https');
 var http = require('http');
+const fs = require('fs');
 
 const log4js = require('log4js');
 
@@ -54,9 +55,17 @@ module.exports = class Server {
 
         // serveur
         if (this._enableHttps === "true") {
-            this._server = https.createServer(this._options, this._app);
+
+            let optionsContent = {};
+            optionsContent.key = fs.readFileSync(this._options.key, "utf-8");
+            optionsContent.cert = fs.readFileSync(this._options.cert, "utf-8");
+
+            this._server = https.createServer(optionsContent, this._app);
+
         } else {
-            this._server = http.createServer(this._options, this._app);
+
+            this._server = http.createServer(this._app);
+
         }
 
     }
@@ -86,10 +95,19 @@ module.exports = class Server {
         try {
             assert.deepStrictEqual(this._server, {});
 
+            // serveur
             if (this._enableHttps === "true") {
-                this._server = https.createServer(this._options, this._app);
+
+                let options = {};
+                options.key = fs.readFileSync(config.options.key, "utf-8");
+                options.cert = fs.readFileSync(config.options.cert, "utf-8");
+
+                this._server = https.createServer(options, this._app);
+                
             } else {
-                this._server = http.createServer(this._options, this._app);
+
+                this._server = http.createServer(this._app);
+
             }
 
         } catch (err) {
