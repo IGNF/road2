@@ -1,6 +1,7 @@
 'use strict';
 
 const ResourceParameter = require('../parameters/resourceParameter');
+const Point = require('../geometry/point');
 
 /**
 *

@@ -114,21 +114,55 @@ module.exports = class Line extends Geometry {
   * @param{string} projection - Projection demandée
   *
   */
- transform (projection) {
+  transform (projection) {
 
-  if (this.projection !== projection) {
+    if (this.projection !== projection) {
+
+      let tmpGeom = this.getLineIn(projection, this._format);
+
+      try {
+
+        assert.deepStrictEqual(tmpGeom, {});
+        return false;
+
+      } catch (err) {
+
+        this._geom = tmpGeom;
+        this.projection = projection;
+        
+        return true;
+
+      }
+      
+    } else {
+      // il n'y a rien à faire
+      return true;
+    }
+
+  }
+
+    /**
+  *
+  * @function
+  * @name getLineIn
+  * @description Récupérer une ligne dans une autre projection sans modifier l'objet
+  * @param{string} projection - Projection demandée
+  * @param{string} format - Format demandé
+  *
+  */
+  getLineIn (projection, format) {
 
     let geojson = this.getGeoJSON();
 
     // vérifications sur le geojson à reprojeter
     if (!geojson.coordinates) {
-      return false;
+      return {};
     }
     if (!Array.isArray(geojson.coordinates)) {
-      return false;
+      return {};
     }
     if (geojson.coordinates.length === 0) {
-      return false;
+      return {};
     }
 
     // reprojection 
@@ -139,10 +173,10 @@ module.exports = class Line extends Geometry {
       let reprojectedPoint =  proj4(this.projection, projection, [geojson.coordinates[i][0], geojson.coordinates[i][1]]);
 
       if (!Array.isArray(reprojectedPoint)) {
-        return false;
+        return {};
       }
       if (reprojectedPoint.length !== 2) {
-        return false;
+        return {};
       }
 
       reprojectedCoordinates.push([reprojectedPoint[0], reprojectedPoint[1]]);
@@ -153,16 +187,8 @@ module.exports = class Line extends Geometry {
     reprojectedGeoJson.coordinates = reprojectedCoordinates;
     reprojectedGeoJson.type = "LineString";
 
-    this._geom = this._convertGeometry(reprojectedGeoJson, "geojson", this._format);
-    this.projection = projection;
+    return this._convertGeometry(reprojectedGeoJson, "geojson", format);
 
-    return true;
-
-  } else {
-    // il n'y a rien à faire
-    return true;
   }
-
-}
 
 }

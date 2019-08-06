@@ -353,6 +353,26 @@ module.exports = {
         currentPortion.duration = route.portions[i].duration.value;
       }
 
+      // Bbox de la portion 
+      if (routeRequest.bbox) {
+
+        if (route.portions.length > 1) {
+
+          // Découpage de la géométrie de l'itinéraire à partir des points intérmédiaires 
+          let portionGeometry = Turf.lineSlice([route.portions[i].start.x, route.portions[i].start.y], 
+            [route.portions[i].end.x, route.portions[i].end.y], 
+            route.geometry.getGeometryWithFormat("geojson"));
+
+          // Génération de la Bbox
+          currentPortion.bbox = Turf.bbox(portionGeometry);
+
+        } else {
+          // La bbox est donc la même que celle de l'itinéraire 
+          currentPortion.bbox = userResponse.bbox;
+        }
+
+      }
+
       // Steps
       currentPortion.steps = new Array();
 
