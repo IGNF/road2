@@ -294,6 +294,13 @@ module.exports = {
     // crs 
     userResponse.crs = route.geometry.projection;
 
+    // Units 
+    // distance 
+    userResponse.distanceUnit = routeRequest.distanceUnit;
+    
+    // duration
+    userResponse.timeUnit = routeRequest.timeUnit;
+
     // bbox
     if (routeRequest.bbox) {
       userResponse.bbox = Turf.bbox(route.geometry.getGeometryWithFormat("geojson"));
