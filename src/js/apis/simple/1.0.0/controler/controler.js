@@ -291,6 +291,9 @@ module.exports = {
     // geometry
     userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
+    // crs 
+    userResponse.crs = route.geometry.projection;
+
     // bbox
     if (routeRequest.bbox) {
       userResponse.bbox = Turf.bbox(route.geometry.getGeometryWithFormat("geojson"));
