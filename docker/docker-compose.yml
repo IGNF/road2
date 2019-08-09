@@ -66,6 +66,25 @@ services:
       - iti-network
     volumes:
       - pgr-data-volume:/var/lib/pgsql 
+  
+  road2-web-debian:
+    build:
+      context: ..
+      dockerfile: ./docker/web/Dockerfile
+      args:
+        - dnsIP=${dns_ip}
+        - dnsHost=${dns_host}
+        - proxy=${proxy}
+    image: road2-web-debian
+    container_name: road2-web-debian-server
+    depends_on:
+      - road2-centos
+    ports:
+      - 8081:80
+    volumes:
+      - ${road2_web_src}:/home/docker/web/www/road2
+    networks:
+      - iti-network
 
 
 volumes:
