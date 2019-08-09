@@ -86,6 +86,17 @@ services:
     networks:
       - iti-network
 
+  gatling-road2:
+    image: denvazh/gatling
+    container_name: gatling-road2-server
+    depends_on:
+      - road2-centos
+    volumes:
+      - ${gatling_user_files}:/opt/gatling/user-files
+      - ${gatling_results}:/opt/gatling/results
+    networks:
+      - iti-network
+    command: "-s road2LoadTest"
 
 volumes:
   iti-data-volume:

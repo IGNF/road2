@@ -15,7 +15,6 @@ Pour utiliser ce `docker-compose.yml`, il suffit de :
 ### Pour les tests avec HTTPS
 - générer un certificat auto-signé pour lancer l'application en HTTPS (ex. `openssl req -nodes -new -x509 -keyout server.key -out server.cert`).
 - s'assurer qu'aucun serveur ne fonctionne sur le port *443*.
-- lancer l'application en sudo. 
 
 ## Construction des images
 
@@ -36,7 +35,7 @@ On pourra utiliser l'option `-d` pour lancer en tâche de fond.
 
 Pour faire marcher la pipeline complète, il faut pour l'instant lancer les services dans l'ordre suivant :
 `docker-compose up -d pgrouting-procedures-centos`
-`docker-compose up route-graph-generator-centos`
+`docker-compose up route-graph-generator-centos` pour générer des données
 `docker-compose up road2-centos`
 
 ## Gestion des variables
@@ -50,3 +49,14 @@ Les paramètres du type `${var}` sont initialisés dans le fichier `.env` qui se
 ### Les secrets
 
 Les secrets permettent de transférer des données sensibles. Dans notre cas, ils sont utile pour se connecter à la base de données qui va permettre de générer un graphe. 
+
+
+## Tests de Road2
+
+### Page web 
+
+Il y a une page web qui permet de tester le service en observant le résultat sur une carte. Pour cela, il suffit de lancer le service `road2-web-debian`. Cela va instancier un serveur Road2 et un serveur NGINX. Il sera alors possible de tester Road2 sur l'url suivante: `localhost:8081/road2`. 
+
+### Gatling 
+
+Il est également possible de lancer des tests de charge. Pour cela, il suffit de lancer le service `gatling-road2`. Cela va automatiquement lancer des tests sur un serveur Road2. 
