@@ -6,7 +6,8 @@
   "main": "src/js/road2.js",
   "scripts": {
     "start": "node ./src/js/road2.js",
-    "test": "mocha --recursive './test/mocha/**/*.js'",
+    "utest": "mocha --recursive './test/mocha/**/*.js'",
+    "ftest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/cucumber/features/road2.feature",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
     "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "sinon": "^7.2.7",
-    "mock-fs": "^4.9.0"
+    "mock-fs": "^4.9.0",
+    "cucumber": "5.1.0"
   }
 }

@@ -33,7 +33,8 @@ router.all("/getcapabilities", function(req, res) {
   // récupération du getCapabilities précalculé dans init.js
   let getCapabilities = req.app.get(uid + "-getcap");
 
-  res.send(getCapabilities);
+  res.set('content-type', 'application/json');
+  res.status(200).json(getCapabilities);
 
 });
 
@@ -62,6 +63,7 @@ router.route("/route")
       // Formattage de la réponse
       const userResponse = controler.writeRouteResponse(routeRequest, routeResponse);
 
+      res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
 
     } catch (error) {
