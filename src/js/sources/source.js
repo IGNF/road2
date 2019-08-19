@@ -18,9 +18,10 @@ module.exports = class Source {
   * @description Constructeur de la classe source
   * @param {string} id - Identifiant de la source
   * @param {string} type - Type de la source
+  * @param {Topology} topology - Topologie dont dérive la source
   *
   */
-  constructor(id, type) {
+  constructor(id, type, topology) {
 
     // Id d'une source. Il doit être unique.
     this._id = id;
@@ -33,6 +34,9 @@ module.exports = class Source {
 
     // Liste d'opérations possibles sur la source
     this._availableOperations = new Array();
+
+    // Topologie dont dérive la source
+    this._topology = topology;
 
   }
 
@@ -90,6 +94,17 @@ module.exports = class Source {
   */
   get availableOperations () {
     return this._availableOperations;
+  }
+
+  /**
+  *
+  * @function
+  * @name get topology
+  * @description Récupérer la topologie de la source
+  *
+  */
+  get topology () {
+    return this._topology;
   }
 
   /**

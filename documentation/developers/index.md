@@ -154,13 +154,13 @@ Il suffit de travailler sur les fichiers JSON qui décrivent les opérations.
 
 #### Ajouter/modifier/supprimer un type de paramètre
 
-Il suffit de travailler sur les classes filles de `resourceParameter` et le `parameterManager`. 
+Il suffit de travailler sur les classes filles de `resourceParameter` et le `parameterManager`.
 
 ## Fonctionnement du code
 
 ### Au lancement de l'application
 
-Road2 est un serveur web. Son point d'entrée est donc `src/js/server.js`.
+Road2 est un serveur web. Son point d'entrée est donc `src/js/road2.js`.
 
 Ce serveur propose un service. Le service est l'objet qui permet de gérer les ressources proposées par l'instance en cours. Il contient donc un catalogue de ressources et un manager de ressources.
 
@@ -189,3 +189,13 @@ Par défaut, une API ne va pas gérer les CORS. Chaque développeur doit précis
 Pour appliquer des CORS, on utilise le module `cors` qui s'intègre bien à expressJS.
 
 Par défaut, il y a des options qui sont utilisées mais elles peuvent être remplacées. Si on souhaite surchargée les options, on veillera à les ajouter dans un fichier de configuration indépendant du reste de la configuration de l'application, comme cela est précisé dans le paragraphe traitant de l'ajout d'une API.  
+
+#### Gestion du HTTPS
+
+Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le module `https` de NodeJS. Il est donc possible de lui fournir les options disponibles dans ce module. 
+
+### Gestion des géométries dans le code
+
+#### Pour la gestion d'une requête
+
+L'objet `request`, qui est transmis au service, pourra contenir des coordonnées dans la projection de la topologie source, ou une autre. Et l'objet `response`, qui sera rendu, contiendra des géométries exprimées dans la projection des points demandés. 

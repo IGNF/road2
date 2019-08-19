@@ -106,4 +106,4 @@ RUN npm install jsdoc -g
 VOLUME ["/home/docker/data"]
 
 ### Commande de lancement de l'application
-CMD npm start -- --ROAD2_CONF_FILE=/home/docker/config/road2.json
+CMD npm run debug -- --ROAD2_CONF_FILE=/home/docker/config/road2.json

@@ -34,12 +34,12 @@ docker run --name web-road2-page --rm -it -p 8080:80 web-road2 /bin/bash
 
 ## Pour développer en gardant le code source en local
 ```
-docker run --name web-road2-page --rm -d -p 8080:80 -v $src:/home/docker/web/www web-road2
+docker run --name web-road2-page --rm -d -p 8080:80 -v $src:/home/docker/web/www/road2 web-road2
 ```
 
 ## Pour débugger le mode développement avec les sources en local
 ```
-docker run --name web-road2-page --rm -it -p 8080:80 -v $src:/home/docker/web/www web-road2 /bin/bash
+docker run --name web-road2-page --rm -it -p 8080:80 -v $src:/home/docker/web/www/road2 web-road2 /bin/bash
 ```
 
 # Tester Road2

@@ -16,14 +16,29 @@
   </head>
   <body>
 
-    <div class="container-fluid">
+    <div class="container-fluid row">
 
           <div id="map-itineraire" class="col">
 
           </div>
 
-    </div>
+          <div class="col">
+            <form id="route-form">
+              <p>Paramètres de l'itinéraire</p>
+              <p>
+                <label for="userResource">Ressource</label> : <input type="text" name="userResource" id="userResource" placeholder="Ex. corse-osm"/><br>
+                <label for="userProfile">Mode de déplacement</label> : <input type="text" name="userProfile" id="userProfile" placeholder="Ex. car"/><br>
+                <label for="userOptimization">Option de calcul </label> : <input type="text" name="userOptimization" id="userOptimization" placeholder="Ex. fastest"/><br>
+                <label for="userStart">Point de départ</label> : <input type="text" name="userStart" id="userStart" placeholder="Ex. 48.831063 , 2.354715"/><br>
+                <label for="userEnd">Point d'arrivée</label> : <input type="text" name="userEnd" id="userEnd" placeholder="Ex. 48.844848 , 2.311199"/><br>
+                <label for="userIntermediates">Points intermédiaires</label> : <input type="text" name="userIntermediates" id="userIntermediates" placeholder="Ex. 48.844848 , 2.311299 | 48.844948 , 2.311199"/><br>
+                <input type="button" value="Calculer un itinéraire" onclick="computeRoad()"/>
+                <input type="button" value="Supprimer l'itinéraire" onclick="cancelRoad()"/>
+              </p>
+            </form>
+          </div>
 
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

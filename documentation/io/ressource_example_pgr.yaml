@@ -3,25 +3,26 @@ resource:
 	type: "pgr"
 	description: "Données BDUNI v2 mise à jour quotidiennement."
 	topology:
+    id: "base-bduni"
+    type: "db"
 		description: "Données issues de la BDUNI de l'IGN."
 		projection: "EPSG:2154"
     bbox: "0,6000000,1300000,72000000"
-		base:
-			table: "bduni-pgr"
-			startColumn: "start"
-			endColumn: "end"
-			idColumn: "id"
-			attributeColumns:
-				- key: "name"
-				  column: "ways_name"
-				  default: true
-				- key: "type"
-				  column: "ways_type"
-				  default: false
-				  #le coût, la durée et la distance dépendent de la requête
-				- key: "slope"
-				  column: "ways_slope"
-				  default: false
+    storage:
+      base:
+        dbConfig: "dbconfig.json"
+        table: "bduni-pgr"
+        attributes:
+          - key: "name"
+            column: "ways_name"
+            default: true
+          - key: "type"
+            column: "ways_type"
+            default: false
+            #le coût, la durée et la distance dépendent de la requête
+          - key: "slope"
+            column: "ways_slope"
+            default: false
 	sources:
 		- id: "bduni-car-fastest"
       type: "pgr"

@@ -1,6 +1,7 @@
 'use strict';
 
 const ResourceParameter = require('../parameters/resourceParameter');
+const Point = require('../geometry/point');
 
 /**
 *
@@ -28,6 +29,9 @@ module.exports = class PointParameter extends ResourceParameter {
 
     // Bbox
     this._bbox = "";
+
+    // Projection
+    this._projection = "";
 
   }
 
@@ -66,6 +70,8 @@ module.exports = class PointParameter extends ResourceParameter {
 
     this._bbox = parameterConf.values.bbox;
 
+    this._projection = parameterConf.values.projection;
+
     return true;
 
   }
@@ -98,16 +104,16 @@ module.exports = class PointParameter extends ResourceParameter {
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
   * @param {string} userValue - Valeur à vérifier
+  * @param {string} projection - Projection dans laquelle sont exprimées les coordonnées
   * @return {object}
   *
   */
-  specificConvertion(userValue) {
+  specificConvertion(userValue, projection) {
 
     let finalValue = {};
 
     let tmpStringCoordinates = userValue.split(",");
-    finalValue.lon = Number(tmpStringCoordinates[0]);
-    finalValue.lat = Number(tmpStringCoordinates[1]);
+    finalValue = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), projection);
 
     return finalValue;
 

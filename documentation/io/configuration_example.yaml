@@ -17,5 +17,17 @@ application:
 		directories:
       - "/home/config/resources/"
   network:
-    host: "0.0.0.0"
-    port: "8080"
+    servers:
+      - id: "internalServer"
+        https: "false"
+        host: "0.0.0.0"
+        port: "8080"
+      - id: "externalServer"
+        https: "true"
+        host: "0.0.0.0"
+        port: "443"
+        options: 
+          key: "server.key"
+          cert: "server.cert"
+  projections:
+    directory: "/home/config/projections/"

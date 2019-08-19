@@ -1,0 +1,11 @@
+{
+  "id": "projection",
+  "name": "Projection",
+  "description": "Projection utilisée pour exprimer les coordonnées et récupérer les géométries.",
+  "required": "false",
+  "defaultValue": "true",
+  "example": "EPSG:4326",
+  "type": "enumeration",
+  "min": 0,
+  "max": 1
+}

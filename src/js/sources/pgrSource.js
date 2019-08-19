@@ -6,12 +6,16 @@ const fs = require('fs');
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
-const Geometry = require('../geometry/geometry');
+const Line = require('../geometry/line');
+const Point = require('../geometry/point');
 const Step = require('../responses/step');
+const Distance = require('../geography/distance');
+const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const log4js = require('log4js');
 const simplify = require('../utils/simplify');
+const turf = require('@turf/turf');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("PGRSOURCE");
@@ -29,21 +33,30 @@ module.exports = class pgrSource extends Source {
   * @function
   * @name constructor
   * @description Constructeur de la classe pgrSource
+  * @param{json} sourceJsonObject - Description de la source
+  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject) {
+  constructor(sourceJsonObject, topology) {
+
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type);
+    super(sourceJsonObject.id, "pgr", topology);
+
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
+
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
-    // Client de base de données
-    let db_config_path = this._configuration.storage.dbConfig;
-    let raw_dbconfig = fs.readFileSync(db_config_path);
-    this._dbConfig = JSON.parse(raw_dbconfig);
 
-    this._client = new Client(this._dbConfig);
+    // Coût
+    this._cost = sourceJsonObject.storage.costColumn;
+
+    // Coût inverse
+    this._reverseCost = sourceJsonObject.storage.rcostColumn;
+
+    // Profil
+    this._profile = sourceJsonObject.cost.profile;
+
   }
 
   /**
@@ -77,16 +90,28 @@ module.exports = class pgrSource extends Source {
   *
   */
   async connect() {
-    // Connection à la base de données
-    LOGGER.info("Connection à la base de données : " + this._dbConfig.database);
-    try {
-      await this._client.connect();
-      LOGGER.info("Connecté à la base de données : " + this._dbConfig.database);
-      super.connected = true;
-    } catch (err) {
-      LOGGER.error('connection error', err.stack)
-      throw errorManager.createError("Cannot connect source");
+
+    if (!this._topology.base.connected) {
+
+      // Connection à la base de données
+      try {
+
+        await this._topology.base.connect();
+        this._connected = true;
+
+      } catch (err) {
+
+        LOGGER.error('connection error', err.stack)
+        throw errorManager.createError("Cannot connect to source database");
+
+      }
+
+    } else {
+      // Road2 est déjà connecté à la base
+      this._connected = true;
     }
+
+
   }
 
   /**
@@ -97,18 +122,26 @@ module.exports = class pgrSource extends Source {
   *
   */
   async disconnect() {
-    try {
-      const err = await this._client.end();
-      if (err) {
-        LOGGER.error('deconnection error', err.stack)
-        throw errorManager.createError("Cannot disconnect source");
-      } else {
-        LOGGER.info("Déonnecté à la base : " + this._dbConfig.database);
-        super.connected = false;
+
+    if (!this._topology.base.connected) {
+
+      try {
+
+        await this._topology.base.disconnect();
+        this._connected = false;
+
+      } catch(err) {
+
+        LOGGER.error('deconnection error', err.stack);
+        throw errorManager.createError("Cannot disconnect to source database");
+
       }
-    } catch(err) {
-      throw errorManager.createError("Cannot disconnect source");
+
+    } else {
+      // Road2 est déjà déconnecté à la base
+      this._connected = false;
     }
+
   }
 
   /**
@@ -130,43 +163,89 @@ module.exports = class pgrSource extends Source {
       // Cette construction dépend du type de la requête fournie
       // ---
       const coordinatesTable = new Array();
+      let attributes = "";
 
       if (request.type === "routeRequest") {
         // Coordonnées
         // start
-        coordinatesTable.push([request.start.lon, request.start.lat]);
+        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
           }
         }
         // end
-        coordinatesTable.push([request.end.lon, request.end.lat]);
+        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
         pgrRequest.coordinates = coordinatesTable;
+
+        // --- waysAttributes
+        // attributes est déjà vide, on met les attributs par défaut
+        attributes = this._topology.defaultAttributesString;
+
+        // on complète avec les attributs demandés
+        if (request.waysAttributes.length !== 0) {
+          let requestedAttributes = new Array();
+
+          for (let i = 0; i < request.waysAttributes.length; i++) {
+            // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+            let isDefault = false;
+
+            for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
+              if (request.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+                isDefault = true;
+                break;
+              }
+            }
+
+            if (!isDefault) {
+              for (let j = 0; j < this._topology.otherAttributes.length; j++) {
+                if (request.waysAttributes[i] === this._topology.otherAttributes[j].key) {
+                  requestedAttributes.push("'" + this._topology.otherAttributes[j].column + "'");
+                  break;
+                }
+              }
+            } else {
+              // on passe au suivant
+            }
+
+          }
+
+          if (requestedAttributes.length !== 0) {
+            if (attributes !== "") {
+              attributes = attributes + ",";
+            }
+            attributes = attributes + requestedAttributes.join(",");
+          }
+
+          // --- waysAttributes
+
+        } else {
+          // on ne fait rien
+        }
 
       } else {
         // on va voir si c'est un autre type de requête
       }
-
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3)";
+      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,$4,ARRAY [" + attributes + "]::text[])";
 
       const SQLParametersTable = [
-        this._configuration.storage.costColumn,
-        this._configuration.storage.rcostColumn,
+        this._profile,
+        this._cost,
+        this._reverseCost,
         request.algorithm
       ];
 
       return new Promise( (resolve, reject) => {
-        this._client.query(queryString, SQLParametersTable, (err, result) => {
+        this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
             reject(err);
           } else {
             try {
-              resolve(this.writeRouteResponse(request, result));
+              resolve(this.writeRouteResponse(request, pgrRequest, result));
             } catch (err) {
               reject(err);
             }
@@ -220,7 +299,7 @@ module.exports = class pgrSource extends Source {
   * @param {pgrResponse} pgrResponse - Objet pgrResponse
   *
   */
-  writeRouteResponse (routeRequest, pgrResponse) {
+  writeRouteResponse (routeRequest, pgrRequest, pgrResponse) {
 
     let resource;
     let start;
@@ -253,47 +332,170 @@ module.exports = class pgrSource extends Source {
       coordinates: []
     };
 
-    // TODO: Il n'y a qu'une route pour l'instant
-    response.routes.push( {geometry: routeGeometry, legs: [] } );
+    // Gestion des attributs
+    let finalAttributesKey = new Array();
+
+    // On fait la liste des attributs par défaut
+    if (this._topology.defaultAttributesKeyTable.length !== 0) {
+      for (let i = 0; i < this._topology.defaultAttributesKeyTable.length; i++) {
+        finalAttributesKey.push(this._topology.defaultAttributesKeyTable[i]);
+      }
+    } else {
+      // il n'y a aucun attribut par défaut
+    }
+
+    // On ajoute la liste des attributs demandés
+    if (routeRequest.waysAttributes.length !== 0) {
+      for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
+        // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+        let isDefault = false;
+
+        for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
+          if (routeRequest.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+            isDefault = true;
+            break;
+          }
+        }
+
+        if (!isDefault) {
+          for (let j = 0; j < this._topology.otherAttributes.length; j++) {
+            if (routeRequest.waysAttributes[i] === this._topology.otherAttributes[j].key) {
+              finalAttributesKey.push(this._topology.otherAttributes[j].key);
+              break;
+            }
+          }
+        } else {
+          // on passe au suivant
+        }
+
+      }
+    } else {
+      // il n'y a aucun attribut demandé par l'utilisateur
+    }
+
+    // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
+    response.routes.push( {geometry: routeGeometry, duration: 0, distance: 0, legs: [] } );
 
     let row;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
-      if (row.geom_json) {
-        let currentGeom = JSON.parse(row.geom_json);
-        routeGeometry.coordinates.push( currentGeom.coordinates );
-      }
+
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
-        // TODO: Il n'y a qu'une route pour l'instant
-        response.routes[0].legs.push( { steps: [] } );
+        // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
+        response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
       }
       if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
-        response.waypoints.push( { location: [row.node_lon, row.node_lat] } );
+        response.waypoints.push( { location: [] } );
       }
 
-      // TODO: Il n'y a qu'une route pour l'instant
-      // TODO: à revoir pour la gestion des coûts : dernier step non pris en compte
+      let finalAttributesObject = {};
+      // S'il y a donc bien des attributs à renvoyer, on lit la réponse
+      if (finalAttributesKey.length !== 0) {
+
+        if (row.edge_attributes) {
+
+          // lecture des attributs
+          let attributesResults = row.edge_attributes.split("§§");
+
+          if (attributesResults.length !== finalAttributesKey.length || attributesResults.length === 0) {
+            throw errorManager.createError(" PGR internal server error: attributes number is invalid");
+          }
+
+          for (let j = 0; j < finalAttributesKey.length; j++) {
+            finalAttributesObject[finalAttributesKey[j]] = attributesResults[j];
+          }
+
+        } else {
+          // il n'y a aucun attribut à lire
+        }
+
+      } else {
+        // il n'y a aucun attribut demandé
+      }
+
+      // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
       if (row.geom_json) {
-        response.routes[0].legs.slice(-1)[0].steps.push( { geometry: JSON.parse(row.geom_json) } );
+        let currentGeom = JSON.parse(row.geom_json);
+
+        let rowDuration = row.duration;
+        let rowDistance = row.distance;
+
+        response.routes[0].legs.slice(-1)[0].duration += rowDuration;
+        response.routes[0].legs.slice(-1)[0].distance += rowDistance;
+
+        response.routes[0].duration += rowDuration;
+        response.routes[0].distance += rowDistance;
+
+        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+        response.routes[0].legs.slice(-1)[0].steps.push(
+          {
+            geometry: JSON.parse(row.geom_json),
+            finalAttributesObject,
+            duration: rowDuration,
+            distance: rowDistance}
+          );
       }
       lastPathSeq = row.path_seq;
+
     }
 
-    // Conversion en LineString
-    const dissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(routeGeometry.coordinates);
-    // Simplification de la géométrie, tolérance à environ 5m
-    const simplifiedDissolvedCoords = simplify(dissolvedCoords, 0.00005);
-    routeGeometry.coordinates = simplifiedDissolvedCoords;
+    // Troncature des géométries sur les portions (legs)
+    let legStart;
+    let legStop;
+    let leg;
+    let legDissolvedCoords;
 
+    // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
+    for (let i = 0; i < response.routes[0].legs.length; i++){
+      leg = response.routes[0].legs[i];
+
+      legDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(leg.geometry.coordinates);
+      leg.geometry.coordinates = legDissolvedCoords;
+
+      legStart = turf.point(pgrRequest.coordinates[i]);
+      legStop = turf.point(pgrRequest.coordinates[i+1]);
+
+      // Récupération de la géométrie entre le départ et l'arrivée
+      leg.geometry.coordinates = turf.truncate(
+        turf.lineSlice(legStart, legStop, leg.geometry),
+        {precision: 6}
+      ).geometry.coordinates;
+
+      routeGeometry.coordinates.push(...leg.geometry.coordinates);
+    }
+
+    // Simplification de la géométrie, tolérance à environ 5m
+    routeGeometry.coordinates = simplify(routeGeometry.coordinates, 0.00005);
     if (response.waypoints.length < 1) {
       throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
     }
 
+    if (response.waypoints.length != pgrRequest.coordinates.length) {
+      throw errorManager.createError(" No PGR path found: the number of waypoints is different from input waypoints ");
+    }
+
+    for (let i = 0; i < pgrRequest.coordinates.length; i++){
+      // Récupération des points projetés dans les waypoints
+      response.waypoints[i].location = turf.truncate(
+        turf.nearestPointOnLine(routeGeometry, turf.point(pgrRequest.coordinates[i])),
+        {precision: 6}
+      ).geometry.coordinates ;
+    }
+
+    // projection demandée dans la requête
+    let askedProjection = routeRequest.start.projection;
+
     // start
-    start = response.waypoints[0].location[0] +","+ response.waypoints[0].location[1];
+    start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], this.topology.projection);
+    if (!start.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of start in PGR response. ");
+    }
 
     // end
-    end = response.waypoints[response.waypoints.length-1].location[0] +","+ response.waypoints[response.waypoints.length-1].location[1];
+    end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], this.topology.projection);
+    if (!end.transform(askedProjection)) {
+    throw errorManager.createError(" Error during reprojection of end in PGR response. ");
+    }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
@@ -309,7 +511,14 @@ module.exports = class pgrSource extends Source {
       let currentPgrRoute = response.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Geometry(currentPgrRoute.geometry, "LineString", "geojson") );
+      routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", this._topology.projection) );
+      if (!routes[i].geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of geometry in PGR response. ");
+      }
+
+      // On récupère la distance et la durée
+      routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"meter");
+      routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
@@ -321,19 +530,66 @@ module.exports = class pgrSource extends Source {
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
 
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
-        let legStart = response.waypoints[j].location[0] +","+ response.waypoints[j].location[1];
-        let legEnd = response.waypoints[j+1].location[0] +","+ response.waypoints[j+1].location[1];
+
+        let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
+        if (!legStart.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+        }
+        
+        let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
+        if (!legEnd.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+        }
 
         portions[j] = new Portion(legStart, legEnd);
+        // On récupère la distance et la durée
+        portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
+        portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
         if (routeRequest.computeGeometry) {
           let steps = new Array();
 
           // On va associer les étapes à la portion concernée
           for (let k=0; k < currentPgrRouteLeg.steps.length; k++) {
-
             let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
-            steps[k] = new Step( new Geometry(currentPgrRouteStep.geometry, "LineString", "geojson") );
+            // Troncature de la géométrie : cas de début de step
+            if (k == 0){
+              const stepStart = turf.point(response.waypoints[j].location);
+
+              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+                turf.lineSlice(
+                  stepStart,
+                  currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              ).geometry.coordinates;
+            }
+            // Troncature de la géométrie : cas de fin de step
+            if (k == currentPgrRouteLeg.steps.length - 1) {
+              const stepEnd = turf.point(response.waypoints[j+1].location);
+
+              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+                turf.lineSlice(
+                  currentPgrRouteStep.geometry.coordinates[0],
+                  stepEnd,
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              ).geometry.coordinates;
+            }
+
+            steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
+            if (!steps[k].geometry.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+            }
+            // ajout des attributs
+            steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
+
+            // On récupère la distance et la durée
+            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
+            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
+
           }
 
           portions[j].steps = steps;

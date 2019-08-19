@@ -207,6 +207,58 @@ module.exports = {
       algorithmParameterDescription.example = "ch";
       routeDescription.parameters.push(algorithmParameterDescription);
 
+      // route.parameters.getBbox
+      let getBboxServiceParameter = serviceOpRoute.getParameterById("bbox");
+      let getBboxParameterDescription = {};
+      getBboxParameterDescription.name = "getBbox";
+      getBboxParameterDescription.in = "query";
+      getBboxParameterDescription.description = getBboxServiceParameter.description;
+      getBboxParameterDescription.required = getBboxServiceParameter.required;
+      getBboxParameterDescription.default = getBboxServiceParameter.defaultValue;
+      getBboxParameterDescription.schema = {};
+      getBboxParameterDescription.schema.type = "boolean";
+      getBboxParameterDescription.example = "true";
+      routeDescription.parameters.push(getBboxParameterDescription);
+
+      // route.parameters.crs
+      let projectionServiceParameter = serviceOpRoute.getParameterById("projection");
+      let crsParameterDescription = {};
+      crsParameterDescription.name = "crs";
+      crsParameterDescription.in = "query";
+      crsParameterDescription.description = projectionServiceParameter.description;
+      crsParameterDescription.required = projectionServiceParameter.required;
+      crsParameterDescription.default = projectionServiceParameter.defaultValue;
+      crsParameterDescription.schema = {};
+      crsParameterDescription.schema.type = "enumeration";
+      crsParameterDescription.example = "EPSG:4326";
+      routeDescription.parameters.push(crsParameterDescription);
+
+      // route.parameters.timeUnit
+      let timeUnitServiceParameter = serviceOpRoute.getParameterById("timeUnit");
+      let timeUnitParameterDescription = {};
+      timeUnitParameterDescription.name = "timeUnit";
+      timeUnitParameterDescription.in = "query";
+      timeUnitParameterDescription.description = timeUnitServiceParameter.description;
+      timeUnitParameterDescription.required = timeUnitServiceParameter.required;
+      timeUnitParameterDescription.default = timeUnitServiceParameter.defaultValue;
+      timeUnitParameterDescription.schema = {};
+      timeUnitParameterDescription.schema.type = "enumeration";
+      timeUnitParameterDescription.example = "minute";
+      routeDescription.parameters.push(timeUnitParameterDescription);
+
+      // route.parameters.distanceUnit
+      let distanceUnitServiceParameter = serviceOpRoute.getParameterById("distanceUnit");
+      let distanceUnitParameterDescription = {};
+      distanceUnitParameterDescription.name = "distanceUnit";
+      distanceUnitParameterDescription.in = "query";
+      distanceUnitParameterDescription.description = distanceUnitServiceParameter.description;
+      distanceUnitParameterDescription.required = distanceUnitServiceParameter.required;
+      distanceUnitParameterDescription.default = distanceUnitServiceParameter.defaultValue;
+      distanceUnitParameterDescription.schema = {};
+      distanceUnitParameterDescription.schema.type = "enumeration";
+      distanceUnitParameterDescription.example = "meter";
+      routeDescription.parameters.push(distanceUnitParameterDescription);
+
       // -- end route.parameters
 
       getCapabilities.operations.push(routeDescription);
@@ -323,6 +375,34 @@ module.exports = {
         routeAlgorithm.id = "algorithm";
         routeAlgorithm.values = algorithmParameter.values;
         routeAvailableOperation.availableParameters.push(routeAlgorithm);
+
+        // route.getBbox
+        let bboxParameter = resourceOperation.getParameterById("bbox");
+        let routeGetBbox = {};
+        routeGetBbox.id = "getBbox";
+        routeGetBbox.values = bboxParameter.values;
+        routeAvailableOperation.availableParameters.push(routeGetBbox);
+
+        // route.crs
+        let projectionParameter = resourceOperation.getParameterById("projection");
+        let routeCrs = {};
+        routeCrs.id = "crs";
+        routeCrs.values = projectionParameter.values;
+        routeAvailableOperation.availableParameters.push(routeCrs);
+
+        // route.timeUnit
+        let timeUnitParameter = resourceOperation.getParameterById("timeUnit");
+        let routeTimeUnit = {};
+        routeTimeUnit.id = "timeUnit";
+        routeTimeUnit.values = timeUnitParameter.values;
+        routeAvailableOperation.availableParameters.push(routeTimeUnit);
+
+        // route.distanceUnit
+        let distanceUnitParameter = resourceOperation.getParameterById("distanceUnit");
+        let routeDistanceUnit = {};
+        routeDistanceUnit.id = "distanceUnit";
+        routeDistanceUnit.values = distanceUnitParameter.values;
+        routeAvailableOperation.availableParameters.push(routeDistanceUnit);
 
         resourceDescription.availableOperations.push(routeAvailableOperation);
 

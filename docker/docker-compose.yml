@@ -15,6 +15,8 @@ services:
       - pgrouting-procedures-centos
     ports:
       - 8080:8080
+      - 9229:9229
+      - 443:443
     volumes:
       - iti-data-volume:/home/docker/data
       - ${road2_src}:/home/docker/app/src
@@ -22,6 +24,9 @@ services:
       - ${road2_config}:/home/docker/config
     networks:
       - iti-network
+    secrets:
+      - key
+      - cert
 
   route-graph-generator-centos:
     build:
@@ -61,7 +66,37 @@ services:
       - iti-network
     volumes:
       - pgr-data-volume:/var/lib/pgsql 
+  
+  road2-web-debian:
+    build:
+      context: ..
+      dockerfile: ./docker/web/Dockerfile
+      args:
+        - dnsIP=${dns_ip}
+        - dnsHost=${dns_host}
+        - proxy=${proxy}
+    image: road2-web-debian
+    container_name: road2-web-debian-server
+    depends_on:
+      - road2-centos
+    ports:
+      - 8081:80
+    volumes:
+      - ${road2_web_src}:/home/docker/web/www/road2
+    networks:
+      - iti-network
 
+  gatling-road2:
+    image: denvazh/gatling
+    container_name: gatling-road2-server
+    depends_on:
+      - road2-centos
+    volumes:
+      - ${gatling_user_files}:/opt/gatling/user-files
+      - ${gatling_results}:/opt/gatling/results
+    networks:
+      - iti-network
+    command: "-s road2LoadTest"
 
 volumes:
   iti-data-volume:
@@ -81,3 +116,7 @@ networks:
 secrets:
   db_config:
     file: ${db_config_file}
+  key:
+    file: ${road2_key}
+  cert:
+    file: ${road2_cert}

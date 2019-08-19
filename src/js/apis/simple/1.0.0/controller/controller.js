@@ -3,6 +3,8 @@
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
 const IsochroneRequest = require('../../../../requests/isochroneRequest');
+const Point = require('../../../../geometry/point');
+const Turf = require('@turf/turf');
 
 module.exports = {
 
@@ -24,8 +26,8 @@ module.exports = {
     let end = {};
     let profile;
     let optimization;
-    let intermediatesPoints = new Array();
     let tmpStringCoordinates;
+    let askedProjection;
 
     // Resource
     if (!parameters.resource) {
@@ -46,6 +48,19 @@ module.exports = {
     // On récupère l'opération route pour faire des vérifications
     let routeOperation = resource.getOperationById("route");
 
+    // Projection
+    if (parameters.crs) {
+      // Vérification de la validité des coordonnées fournies
+      if (!routeOperation.getParameterById("projection").check(parameters.crs)) {
+        throw errorManager.createError(" Parameter 'crs' is invalid ", 400);
+      } else {
+        askedProjection = parameters.crs;
+      }
+    } else {
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      askedProjection = routeOperation.getParameterById("projection").defaultValueContent;
+    }
+
     // Start
     if (!parameters.start) {
         throw errorManager.createError(" Parameter 'start' not found ", 400);
@@ -55,12 +70,9 @@ module.exports = {
         throw errorManager.createError(" Parameter 'start' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.start.split(",");
-        start.lon = Number(tmpStringCoordinates[0]);
-        start.lat = Number(tmpStringCoordinates[1]);
+        start = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
       }
     }
-
-
 
     // End
     if (!parameters.end) {
@@ -71,8 +83,7 @@ module.exports = {
         throw errorManager.createError(" Parameter 'end' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.end.split(",");
-        end.lon = Number(tmpStringCoordinates[0]);
-        end.lat = Number(tmpStringCoordinates[1]);
+        end = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
       }
     }
 
@@ -120,7 +131,7 @@ module.exports = {
       if (!routeOperation.getParameterById("intermediates").check(parameters.intermediates)) {
         throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
-        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates)) {
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates, askedProjection)) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
         }
       }
@@ -193,6 +204,53 @@ module.exports = {
       // On met la valeur par défaut issue de la configuration
       // TODO: que faire s'il n'y a pas de valeur par défaut ?
       routeRequest.geometryFormat = routeOperation.getParameterById("geometryFormat").defaultValueContent;
+    }
+    // ---
+
+    // getBbox
+    if (parameters.getBbox) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("bbox").check(parameters.getBbox)) {
+        throw errorManager.createError(" Parameter 'getBbox' is invalid ", 400);
+      } else {
+        routeRequest.bbox = routeOperation.getParameterById("bbox").specificConvertion(parameters.getBbox)
+        if (routeRequest.bbox === null) {
+          throw errorManager.createError(" Parameter 'getBbox' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.bbox = routeOperation.getParameterById("bbox").defaultValueContent;
+    }
+    // ---
+
+    // timeUnit
+    if (parameters.timeUnit) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
+        throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+      }
+      routeRequest.timeUnit = parameters.timeUnit;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.timeUnit = routeOperation.getParameterById("timeUnit").defaultValueContent;
+    }
+    // ---
+
+    // distanceUnit
+    if (parameters.distanceUnit) {
+      // Vérification de la validité du paramètre fourni
+      if (!routeOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
+        throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+      }
+      routeRequest.distanceUnit = parameters.distanceUnit;
+    } else {
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      routeRequest.distanceUnit = routeOperation.getParameterById("distanceUnit").defaultValueContent;
     }
     // ---
 
@@ -341,10 +399,10 @@ module.exports = {
     userResponse.resource = routeResponse.resource;
 
     // start
-    userResponse.start = routeResponse.start;
+    userResponse.start = routeResponse.start.toString();
 
     // end
-    userResponse.end = routeResponse.end;
+    userResponse.end = routeResponse.end.toString();
 
     // profile
     userResponse.profile = routeResponse.profile;
@@ -355,6 +413,41 @@ module.exports = {
     // geometry
     userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
+    // crs 
+    userResponse.crs = route.geometry.projection;
+
+    // Units 
+    // distance 
+    userResponse.distanceUnit = routeRequest.distanceUnit;
+    
+    // duration
+    userResponse.timeUnit = routeRequest.timeUnit;
+
+    // bbox
+    if (routeRequest.bbox) {
+      userResponse.bbox = Turf.bbox(route.geometry.getGeometryWithFormat("geojson"));
+    }
+
+    // distance
+    if (!route.distance.convert(routeRequest.distanceUnit)) {
+      throw errorManager.createError(" Error during convertion of route distance in response. ", 400);
+    } else {
+      userResponse.distance = route.distance.value;
+    }
+
+    // duration
+    if (!route.duration.convert(routeRequest.timeUnit)) {
+      throw errorManager.createError(" Error during convertion of route duration in response. ", 400);
+    } else {
+      userResponse.duration = route.duration.value;
+    }
+
+    // distance
+    userResponse.distance = route.distance.value;
+
+    // duration
+    userResponse.duration = route.duration.value;
+
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
     userResponse.portions = new Array();
@@ -364,9 +457,43 @@ module.exports = {
       let currentPortion = {};
 
       // start
-      currentPortion.start = route.portions[i].start;
+      currentPortion.start = route.portions[i].start.toString();
       // end
-      currentPortion.end = route.portions[i].end;
+      currentPortion.end = route.portions[i].end.toString();
+
+      // distance
+      if (!route.portions[i].distance.convert(routeRequest.distanceUnit)) {
+        throw errorManager.createError(" Error during convertion of portion distance in response. ", 400);
+      } else {
+        currentPortion.distance = route.portions[i].distance.value;
+      }
+
+      // duration
+      if (!route.portions[i].duration.convert(routeRequest.timeUnit)) {
+        throw errorManager.createError(" Error during convertion of portion duration in response. ", 400);
+      } else {
+        currentPortion.duration = route.portions[i].duration.value;
+      }
+
+      // Bbox de la portion 
+      if (routeRequest.bbox) {
+
+        if (route.portions.length > 1) {
+
+          // Découpage de la géométrie de l'itinéraire à partir des points intérmédiaires 
+          let portionGeometry = Turf.lineSlice([route.portions[i].start.x, route.portions[i].start.y], 
+            [route.portions[i].end.x, route.portions[i].end.y], 
+            route.geometry.getGeometryWithFormat("geojson"));
+
+          // Génération de la Bbox
+          currentPortion.bbox = Turf.bbox(portionGeometry);
+
+        } else {
+          // La bbox est donc la même que celle de l'itinéraire 
+          currentPortion.bbox = userResponse.bbox;
+        }
+
+      }
 
       // Steps
       currentPortion.steps = new Array();
@@ -379,17 +506,27 @@ module.exports = {
 
           currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
 
-          if (routeRequest.waysAttributes.length !== 0) {
+          // attributs des voies
+          if (route.portions[i].steps[j].attributes) {
 
-            currentStep.attributes = {};
-            // si c'est demandé et qu'il existe alors on met l'attribut
-            for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
-              let attribut = routeRequest.waysAttributes[i];
-              currentStep.attributes[attribut] = route.portions[i].steps[j].getAttributById(attribut);
-            }
+            currentStep.attributes = route.portions[i].steps[j].attributes;
 
           } else {
-            // on ne fait rien 
+            // on ne fait rien
+          }
+
+          // distance
+          if (!route.portions[i].steps[j].distance.convert(routeRequest.distanceUnit)) {
+            throw errorManager.createError(" Error during convertion of step distance in response. ", 400);
+          } else {
+            currentStep.distance = route.portions[i].steps[j].distance.value;
+          }
+
+          // duration
+          if (!route.portions[i].steps[j].duration.convert(routeRequest.timeUnit)) {
+            throw errorManager.createError(" Error during convertion of step duration in response. ", 400);
+          } else {
+            currentStep.duration = route.portions[i].steps[j].duration.value;
           }
 
           currentPortion.steps.push(currentStep);

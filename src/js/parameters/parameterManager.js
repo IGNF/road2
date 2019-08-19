@@ -486,6 +486,13 @@ module.exports = class parameterManager  {
           // TODO: analyse de la bbox
         }
 
+        if (!resourceParameterJsonObject.values.projection) {
+          LOGGER.error("Le parametre ne contient pas de projection alors qu'il doit en avoir une");
+          return false;
+        } else {
+          // TODO: analyse de la disponibilité de la projection pour ce service
+        }
+
       } else {
         LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
         return false;
@@ -535,7 +542,7 @@ module.exports = class parameterManager  {
   * @name createResourceParameter
   * @description Créer l'ensemble des opérations d'une ressource
   * @param {object} resourceParameterHash - Objet contenant l'ensemble des paramètres de ressource pour une ressource
-  * @param {json} currentOperationConf - Configuraton de l'opération de ressource pour une ressource 
+  * @param {json} currentOperationConf - Configuraton de l'opération de ressource pour une ressource
   * @return {boolean}
   *
   */

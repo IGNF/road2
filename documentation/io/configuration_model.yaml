@@ -72,7 +72,7 @@
 			properties:
 				# Dossiers contenant l'ensemble des fichiers de configuration des ressources.
 				"directories":
-					type: table
+					type: array
 					required: true
           minItems: 1
           items:
@@ -80,13 +80,52 @@
 		# Configuration du network
 		"network":
 			type: object
-			required: false
+			required: true
 			properties:
-				# Host
-				"host":
-					type: string
-					required: false
-				# Port
-				"port":
-					type: string
-					required: false
+				# Liste des serveurs que l'on veut instancier
+				"servers":
+					type: array
+					required: true
+					minItems: 1
+					items:
+						type: object
+						properties:
+							# Id du serveur 
+							"id":
+								type: string
+								required: true
+							# Host
+							"host":
+								type: string
+								required: true
+							# Port
+							"port":
+								type: string
+								required: true
+							# Utilisation du HTTPS
+							"https":
+								type: string 
+								enum: ["true", "false"]
+								required: true
+							# Options pour le HTTPS (nécessaire si https="true")
+							"options":
+								type: object
+								required: false
+								properties:
+									# Chemin du fichier .key
+									"key":
+										type: string
+										required: true
+									# Chemin du fichier .cert
+									"cert":
+										type: string
+										required: true
+    # Configuration des projections disponibles
+    "projections":
+      type: object
+      required: true
+      properties:
+        # Dossier contenant les configurations
+        "directory":
+          type: string
+          required: true

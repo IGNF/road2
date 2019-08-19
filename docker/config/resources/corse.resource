@@ -4,6 +4,8 @@
   "type": "osrm",
   "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
   "topology": {
+    "id": "corse-osm",
+    "type": "osm",
     "description": "Données OSM sur la Corse.",
     "storage": {
       "file": "/home/docker/internal/corse-latest.osm.pbf"
@@ -42,13 +44,15 @@
         {
           "id": "start",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
           "id": "end",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
@@ -68,7 +72,8 @@
         {
           "id": "intermediates",
           "values": {
-            "bbox": "-90,-180,90,180"
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
           }
         },
         {
@@ -94,6 +99,35 @@
           "values": [
             "geojson",
             "polyline"
+          ]
+        },
+        {
+          "id": "bbox",
+          "defaultValueContent": "true"
+        },
+        {
+          "id": "projection",
+          "defaultValueContent": "EPSG:4326",
+          "values": [
+            "EPSG:4326",
+            "EPSG:2154"
+          ]
+        },
+        {
+          "id": "timeUnit",
+          "defaultValueContent": "minute",
+          "values": [
+            "hour",
+            "minute",
+            "second"
+          ]
+        },
+        {
+          "id": "distanceUnit",
+          "defaultValueContent": "meter",
+          "values": [
+            "meter",
+            "kilometer"
           ]
         }
       ]

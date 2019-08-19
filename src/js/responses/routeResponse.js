@@ -19,8 +19,8 @@ module.exports = class routeResponse extends Response {
   * @name constructor
   * @description Constructeur de la classe routeResponse
   * @param {string} resource - Nom de la ressource
-  * @param {string} start - Point de départ
-  * @param {string} end - Point d'arrivée
+  * @param {Point} start - Point de départ
+  * @param {Point} end - Point d'arrivée
   * @param {string} profile - Profile
   * @param {string} optimization - Optimisation
   *
@@ -64,7 +64,7 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set start
   * @description Attribuer le point de départ des itinéraires
-  * @param {string} st - Point de départ
+  * @param {Point} st - Point de départ
   *
   */
   set start (st) {
@@ -87,7 +87,7 @@ module.exports = class routeResponse extends Response {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée des itinéraires
-  * @param {string} en - Point d'arrivée
+  * @param {Point} en - Point d'arrivée
   *
   */
   set end (en) {

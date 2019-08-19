@@ -19,18 +19,18 @@ module.exports = class Geometry {
   * @function
   * @name constructor
   * @description Constructeur de la classe Geometry
-  * @param {Object|string} srcGeom - Objet source de la géometrie
   * @param {string} type - type de la geom (Point, LineString...)
-  * @param {string} format - Format de la geom (geojson, polyline)
+  * @param {string} projection - Id de la projection utilisée (EPSG:4326)
   *
   */
-  constructor(srcGeom, type, format) {
-    // source de la géométrie (représentation geojson, polyline)
-    this._srcGeom = srcGeom;
+  constructor(type, projection) {
+
     // Type de géométrie (Point, LineString, Polygon...)
     this._type = type;
-    // Format de géométrie (geojson, polyline...)
-    this._format = format;
+
+    // Id de la projection utilisée (EPSG:4326)
+    this._projection = projection;
+
   }
 
   /**
@@ -58,70 +58,24 @@ module.exports = class Geometry {
   /**
   *
   * @function
-  * @name get srcGeom
-  * @description Récupérer la représentation initiale de la geom
+  * @name get projection
+  * @description Récupérer la projection de la geom
   *
   */
-  get srcGeom () {
-    return this._srcGeom;
+  get projection () {
+    return this._projection;
   }
 
-
-  /**
+    /**
   *
   * @function
-  * @name getGeoJSON
-  * @description Récupérer la représentation geoJSON de la geom
+  * @name get projection
+  * @description Attribuer la projection de la geom
+  * @param{string} projection - Projection
   *
   */
-  getGeoJSON () {
-    return this._convertGeometry(this._srcGeom, this._format, 'geojson');
-  }
-
-  /**
-  *
-  * @function
-  * @name getEncodedPolyline
-  * @description Récupérer la représentation polyline de la geom
-  *
-  */
-  getEncodedPolyline () {
-    return this._convertGeometry(this._srcGeom, this._format, 'polyline');
-  }
-
-
-  /**
-  *
-  * @function
-  * @name getGeometryWithFormat
-  * @description Récupérer la géométrie au format spécifié, pour l'instant, dans {geojson, polyline}
-  *
-  */
-  getGeometryWithFormat (format) {
-    return this._convertGeometry(this._srcGeom, this._format, format);
-  }
-
-  /**
-  *
-  * @function
-  * @name convertGeometry
-  * @description Convertit une géométrie depuis un format vers un autre
-  * @param {Object|string} geom - Géométrie source
-  * @param {string} srcFormat - type de la gémétrie source pour l'instant, dans {geojson, polyline}
-  * @param {string} outFormat - type voulu en sortie pour l'instant, dans {geojson, polyline}
-  * @return {Object|string} out_geom - géométrie convertie
-  *
-  */
-  _convertGeometry (geom, srcFormat, outFormat) {
-    if (srcFormat == outFormat) {
-      return geom;
-    } else if (srcFormat == "polyline" && outFormat == "geojson") {
-      return polyline.toGeoJSON(geom);
-    } else if (srcFormat == "geojson" && outFormat == "polyline") {
-      return polyline.fromGeoJSON(geom);
-    } else {
-      throw errorManager.createError("Unsupported geometry conversion");
-    }
-  }
+ set projection (pr) {
+  return this._projection = pr;
+}
 
 }

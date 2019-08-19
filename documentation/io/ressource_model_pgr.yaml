@@ -23,6 +23,14 @@
 			type: object
       required: true
 			properties:
+          # Id de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
+				  "id":
+					type: string
+          required: true
+          # Type de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
+				  "type":
+					type: string
+          required: true
         # Description de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
 				"description":
 					type: string
@@ -35,45 +43,42 @@
         "projection":
           type: string
           required: true
-        # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
-				"base":
-					type: object
+        # Stockage de la topologie
+        "storage":
+          type: object
           required: true
-					properties:
-            # Table contenant la topologie des tronçons navigables.
-						"table":
-							type: string
+          properties:
+            # Descriptif de la base qui contient la topologie dans PGR. Ce n'est PAS la base source (ex. BDUNI), c'est la base modifiée pour pouvoir faire des calculs d'itinéraires.
+            "base":
+              type: object
               required: true
-            # Nom de la colonne des débuts de tronçons.
-						"startColumn":
-							type: string
-              required: true
-            # Nom de la colonne des fins de tronçons.
-						"endColumn":
-							type: string
-              required: true
-            # Nom de la colonne contenant les ids des tronçons.
-						"idColumn":
-							type: string
-              required: true
-            # Descriptif des colonnes contenant les attributs de chaque tronçon.
-						"attributeColumns":
-							type: array
-              required: false
-							minItems: 1
-							items:
-                # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
-								"key":
-									type: string
+              properties:
+                # Fichier de configuration de la bdd
+                "dbConfig":
+                  type: string
                   required: true
-                # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
-								"column":
-									type: string
+                # Table contenant la topologie des tronçons navigables.
+                "table":
+                  type: string
                   required: true
-                # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
-                "default":
-                  type: boolean
-                  required: true
+                # Descriptif des colonnes contenant les attributs de chaque tronçon.
+                "attributes":
+                  type: array
+                            required: false
+                  minItems: 1
+                  items:
+                    # Mot pour interroger les attributs. C'est ce qui va apparaître dans le getcap.
+                    "key":
+                      type: string
+                      required: true
+                    # Nom de la colonne qui contient l'information. Cette colonne doit être dans la même table.
+                    "column":
+                      type: string
+                      required: true
+                    # Permet d'indiquer si l'attribut mentionner sera par défaut dans la réponse de l'utilisateur ou pas
+                    "default":
+                      type: boolean
+                      required: true
     # Liste des sources permettants de construire la ressource.
 		"sources":
 			type: array

@@ -1,0 +1,19 @@
+# Description d'un fichier de configuration de projection
+# Ce sont les définitions utiles à PROJ4
+
+# Liste des configuration de projection
+"projectionsList":
+  type: array
+  required: true
+  minItems: 1
+  items:
+    type: object
+    properties:
+      # Id de la projection
+      "id":
+        type: string
+        required: true
+      # Définition pour PROJ4
+      "parameters":
+        type: string
+        required: true

@@ -48,8 +48,18 @@ async function start() {
     pm.shutdown(1);
   }
 
+  // Chargement des projections
+  if (!service.loadProjections()) {
+    pm.shutdown(1);
+  }
+
   // Chargement des ressources
   if (!service.loadResources()) {
+    pm.shutdown(1);
+  }
+
+  // Chargement des topologies
+  if (!service.loadTopologies()) {
     pm.shutdown(1);
   }
 
@@ -85,7 +95,7 @@ function loadGlobalConfiguration() {
   let globalConfiguration;
 
   // on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
-  nconf.argv().env(['ROAD2_CONF_FILE','ROAD2_HOST','ROAD2_PORT']);
+  nconf.argv().env(['ROAD2_CONF_FILE']);
   // Cette ligne est utile si on n'utilise pas nconf.file
   // sans l'usage de nconf.use ou nconf.file, nconf.set ne marche pas.
   nconf.use('memory');

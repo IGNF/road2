@@ -18,8 +18,8 @@ module.exports = class Portion {
   * @function
   * @name constructor
   * @description Constructeur de la classe Portion
-  * @param {string} start - Point de départ
-  * @param {string} end - Point d'arrivée
+  * @param {Point} start - Point de départ
+  * @param {Point} end - Point d'arrivée
   *
   */
   constructor(start, end) {
@@ -29,6 +29,12 @@ module.exports = class Portion {
 
     // end
     this._end = end;
+
+    // Distance globale de la portion
+    this._distance = {};
+
+    // Durée globale de la portion
+    this._duration = {};
 
     // steps
     // C'est l'ensemble des étapes de la portion de l'itinéraire
@@ -52,7 +58,7 @@ module.exports = class Portion {
   * @function
   * @name set start
   * @description Attribuer le point de départ de la portion
-  * @param {string} start - Point de départ
+  * @param {Point} start - Point de départ
   *
   */
   set start (st) {
@@ -75,7 +81,7 @@ module.exports = class Portion {
   * @function
   * @name set end
   * @description Attribuer le point d'arrivée de la portion
-  * @param {string} end - Point d'arrivée
+  * @param {Point} end - Point d'arrivée
   *
   */
   set end (en) {
@@ -103,6 +109,52 @@ module.exports = class Portion {
   */
   set steps (st) {
     this._steps = st;
+  }
+
+  /**
+  *
+  * @function
+  * @name get duration
+  * @description Récupérer la durée
+  *
+  */
+  get duration () {
+    return this._duration;
+  }
+
+  /**
+  *
+  * @function
+  * @name set duration
+  * @description Attribuer la durée
+  * @param {float} du - Durée
+  *
+  */
+  set duration (du) {
+    this._duration = du;
+  }
+
+  /**
+  *
+  * @function
+  * @name get distance
+  * @description Récupérer la distance
+  *
+  */
+  get distance () {
+    return this._distance;
+  }
+
+  /**
+  *
+  * @function
+  * @name set distance
+  * @description Attribuer la distance
+  * @param {float} di - Distance
+  *
+  */
+  set distance (di) {
+    this._distance = di;
   }
 
 

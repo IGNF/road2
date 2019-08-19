@@ -1,0 +1,10 @@
+{
+    "id": "distanceUnit",
+    "name": "Unité des distances",
+    "description": "Unité demandée pour exprimer les distances",
+    "required": "false",
+    "defaultValue": "true",
+    "example": "meter",
+    "type": "enumeration"
+  }
+  

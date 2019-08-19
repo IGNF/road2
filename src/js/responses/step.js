@@ -17,13 +17,19 @@ module.exports = class Step {
   * @function
   * @name constructor
   * @description Constructeur de la classe Step
-    * @param {object} geometry - Instance de la classe Geometry, Géométrie de l'étape
+  * @param {Line} geometry - Instance de la classe Line, Géométrie de l'étape
   *
   */
   constructor(geometry) {
 
     // geometry
     this._geometry = geometry;
+
+    // Distance globale de l'étape
+    this._distance = {};
+
+    // Durée globale de l'étape
+    this._duration = {};
 
     // attributes
     this._attributes = {};
@@ -46,7 +52,7 @@ module.exports = class Step {
   * @function
   * @name set geometry
   * @description Attribuer la géométrie de l'étape
-  * @param {string} st - Géométrie de l'étape
+  * @param {Line} st - Géométrie de l'étape
   *
   */
   set geometry (st) {
@@ -104,6 +110,52 @@ module.exports = class Step {
   */
   set attributes (at) {
     this._attributes = at;
+  }
+
+  /**
+  *
+  * @function
+  * @name get duration
+  * @description Récupérer la durée
+  *
+  */
+  get duration () {
+    return this._duration;
+  }
+
+  /**
+  *
+  * @function
+  * @name set duration
+  * @description Attribuer la durée
+  * @param {float} du - Durée
+  *
+  */
+  set duration (du) {
+    this._duration = du;
+  }
+
+  /**
+  *
+  * @function
+  * @name get distance
+  * @description Récupérer la distance
+  *
+  */
+  get distance () {
+    return this._distance;
+  }
+
+  /**
+  *
+  * @function
+  * @name set distance
+  * @description Attribuer la distance
+  * @param {float} di - Distance
+  *
+  */
+  set distance (di) {
+    this._distance = di;
   }
 
 

@@ -38,14 +38,6 @@ module.exports = {
         return false;
       }
 
-    } else if (jsonStorage.dbConfig) {
-      try {
-        fs.accessSync(jsonStorage.dbConfig, fs.constants.R_OK);
-      } catch (err) {
-        LOGGER.error("Le fichier " + jsonStorage.dbConfig + " ne peut etre lu.");
-        return false;
-      }
-      storageFound = true;
     } else if (jsonStorage.costColumn) {
       // TODO: Pas trop possible de vérifier sans requête
       storageFound = true;

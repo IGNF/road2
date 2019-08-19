@@ -5,8 +5,11 @@ const OSRM = require("osrm");
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
-const Geometry = require('../geometry/geometry');
+const Line = require('../geometry/line');
+const Point = require('../geometry/point');
 const Step = require('../responses/step');
+const Distance = require('../geography/distance');
+const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
@@ -30,12 +33,13 @@ module.exports = class osrmSource extends Source {
   * @name constructor
   * @description Constructeur de la classe osrmSource
   * @param {json} sourceJsonObject - Description de la source en json
+  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject) {
+  constructor(sourceJsonObject, topology) {
 
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type);
+    super(sourceJsonObject.id,sourceJsonObject.type, topology);
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
@@ -153,15 +157,15 @@ module.exports = class osrmSource extends Source {
         // Coordonnées
         let coordinatesTable = new Array();
         // start
-        coordinatesTable.push([request.start.lon, request.start.lat]);
+        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push([request.intermediates[i].lon, request.intermediates[i].lat]);
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
           }
         }
         // end
-        coordinatesTable.push([request.end.lon, request.end.lat]);
+        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
         osrmRequest.coordinates = coordinatesTable;
 
@@ -240,11 +244,20 @@ module.exports = class osrmSource extends Source {
       throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
     }
 
+    // projection demandée dans la requête
+    let askedProjection = routeRequest.start.projection;
+
     // start
-    start = osrmResponse.waypoints[0].location[0] +","+ osrmResponse.waypoints[0].location[1];
+    start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
+    if (!start.transform(askedProjection)) {
+      throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
+    }
 
     // end
-    end = osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0] +","+ osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1];
+    end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
+    if (!end.transform(askedProjection)) {
+      throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
+    }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
@@ -261,7 +274,14 @@ module.exports = class osrmSource extends Source {
       let currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Geometry(currentOsrmRoute.geometry, "LineString", "geojson") );
+      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", this._topology.projection) );
+      if (!routes[i].geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of geometry in OSRM response. ");
+      }
+
+      // On récupère la distance et la durée
+      routes[i].distance = new Distance(currentOsrmRoute.distance,"meter");
+      routes[i].duration = new Duration(currentOsrmRoute.duration,"second");
 
       // On doit avoir une égalité entre ces deux valeurs pour la suite
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
@@ -273,10 +293,22 @@ module.exports = class osrmSource extends Source {
       for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
-        let legStart = osrmResponse.waypoints[j].location[0] +","+ osrmResponse.waypoints[j].location[1];
-        let legEnd = osrmResponse.waypoints[j+1].location[0] +","+ osrmResponse.waypoints[j+1].location[1];
+
+        let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
+        if (!legStart.transform(askedProjection)) {
+          throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+        }
+        
+        let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
+        if (!legEnd.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+        }
 
         portions[j] = new Portion(legStart, legEnd);
+
+        // On récupère la distance et la durée
+        portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"meter");
+        portions[j].duration = new Duration(currentOsrmRouteLeg.duration,"second");
 
         // Steps
         let steps = new Array();
@@ -285,8 +317,16 @@ module.exports = class osrmSource extends Source {
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step( new Geometry(currentOsrmRouteStep.geometry, "LineString", "geojson") );
+          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", this._topology.projection) );
+          if (!steps[k].geometry.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
+          }
           steps[k].setAttributById("name", currentOsrmRouteStep.name);
+
+          // On récupère la distance et la durée
+          steps[k].distance = new Distance(currentOsrmRouteStep.distance,"meter");
+          steps[k].duration = new Duration(currentOsrmRouteStep.duration,"second");
+
         }
 
         portions[j].steps = steps;
