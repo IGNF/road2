@@ -39,9 +39,9 @@ docker run --name road2-centos-server --rm -it -p 8080:8080 -v $src:/home/docker
 ```
 # Lancer les tests
 
-Les tests ont été écrits avec Mocha. Pour les lancer, on utilisera la commande suivante:
+Les tests unitaires ont été écrits avec Mocha. Pour les lancer, on utilisera la commande suivante:
 ```
-docker run --name road2-centos-server --rm -v $src:/home/docker/app/src -v $test:/home/docker/app/test road2-centos npm test
+docker run --name road2-centos-server --rm -v $src:/home/docker/app/src -v $test:/home/docker/app/test road2-centos npm run utest
 ```
 
 # Lancer eslint

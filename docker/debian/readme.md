@@ -40,9 +40,9 @@ docker run --name road2-debian-server --rm -it -p 8080:8080 -v $src:/home/docker
 
 # Lancer les tests
 
-Les tests ont été écrits avec Mocha. Pour les lancer, on utilisera la commande suivante:
+Les tests unitaires ont été écrits avec Mocha. Pour les lancer, on utilisera la commande suivante:
 ```
-docker run --name road2-debian-server --rm -v $src:/home/docker/app/src -v $test:/home/docker/app/test road2-debian npm test
+docker run --name road2-debian-server --rm -v $src:/home/docker/app/src -v $test:/home/docker/app/test road2-debian npm run utest
 ```
 
 # Lancer eslint
