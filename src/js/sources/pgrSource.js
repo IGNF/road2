@@ -123,12 +123,12 @@ module.exports = class pgrSource extends Source {
   */
   computeRequest (request) {
 
+    let pgrRequest = {};
     if (request.operation === "route") {
 
       // Construction de l'objet pour la requête pgr
       // Cette construction dépend du type de la requête fournie
       // ---
-      let pgrRequest = {};
       const coordinatesTable = new Array();
 
       if (request.type === "routeRequest") {
@@ -174,8 +174,36 @@ module.exports = class pgrSource extends Source {
         });
       });
 
-    } else {
-      // on va voir si c'est une autre opération
+    } else if (request.operation === "isochrone") {
+      if (request.type === "isochroneRequest") {
+        const startingPoint = [request.point.lon, request.point.lat];
+
+        LOGGER.info(request);
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(startingPoint) + ", $1, $2, $3)";
+
+        const SQLParametersTable = [
+          request.costValue,
+          this._configuration.storage.costColumn,
+          this._configuration.storage.rcostColumn
+        ];
+
+        /* return new Promise( (resolve, reject) => {
+          this._client.query(queryString, SQLParametersTable, (err, result) => {
+            if (err) {
+              LOGGER.error(err);
+              reject(err);
+            } else {
+              try {
+                LOGGER.info('### success!');
+                LOGGER.info(result);
+                // resolve(this.writeRouteResponse(request, result));
+              } catch (err) {
+                reject(err);
+              }
+            }
+          });
+        }); */
+      }
     }
 
   }
