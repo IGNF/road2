@@ -8,6 +8,19 @@ Given("I have loaded all my test configuration", function() {
 Given("an {string} {string} request on {string}", function(protocol, method, path) {
     this.createRequest(protocol, method, path);
 });
+
+Given("with default parameters for {string}", function(operation) {
+    assert.equal(this.useDefaultQueryParameters(operation), true);
+});
+
+Given('without query parameters:', function (table) {
+    this.unsetQueryParameters(table.hashes());
+});
+
+Given('with query parameters:', function (table) {
+    this.setQueryParameters(table.hashes());
+});
+
   
 When("I send the request", function(done) {
     this.sendRequest()
@@ -34,4 +47,12 @@ Then("the response should have an header {string} with value {string}", function
 
 Then("the response should contain an attribute {string} with value {string}", function(key, value) {
     assert.equal(this.checkResponseContent(key, value), true);
+});
+
+Then("the response should contain an attribute {string}", function(key) {
+    assert.equal(this.checkResponseAttribut(key), true);
+});
+
+Then("the response should not contain an attribute {string}", function(key) {
+    assert.equal(this.checkResponseAttribut(key), false);
 });
