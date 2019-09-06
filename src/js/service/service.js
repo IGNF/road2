@@ -16,7 +16,7 @@ const ServerManager = require('../server/serverManager');
 const log4js = require('log4js');
 
 // Création du LOGGER
-var LOGGER = log4js.getLogger("SERVICE");
+const LOGGER = log4js.getLogger("SERVICE");
 
 /**
 *
@@ -68,7 +68,7 @@ module.exports = class Service {
     // Manager des apis du service
     this._apisManager = new ApisManager();
 
-    // Manager de serveurs du service 
+    // Manager de serveurs du service
     this._serverManager = new ServerManager();
 
     // Stockage de la configuration
@@ -698,13 +698,13 @@ module.exports = class Service {
       res.send('Road2 is running !! \n');
     });
 
-    // Création des serveurs 
+    // Création des serveurs
     if (!this._serverManager.createAllServer(road2)) {
       LOGGER.fatal("Impossible de creer les serveurs.");
       return false;
     }
 
-    // Démarrage des serveurs 
+    // Démarrage des serveurs
     if (!this._serverManager.startAllServer()) {
       LOGGER.fatal("Impossible de demarer les serveurs.");
       return false;
@@ -724,12 +724,12 @@ module.exports = class Service {
 
   stopServer(callback) {
 
-    // Extinction des serveurs 
+    // Extinction des serveurs
     if (!this._serverManager.stopAllServer()) {
       LOGGER.fatal("Impossible d'eteindre les serveurs.");
       return false;
     }
-    
+
     return true;
 
   }
