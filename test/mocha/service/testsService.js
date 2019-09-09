@@ -1,7 +1,11 @@
 const assert = require('assert');
 const Service = require('../../../src/js/service/service');
 const RouteRequest = require('../../../src/js/requests/routeRequest');
+const ApisManager = require('../../../src/js/apis/apisManager');
+const ResourceManager = require('../../../src/js/resources/resourceManager');
 const SourceManager = require('../../../src/js/sources/sourceManager');
+const TopologyManager = require('../../../src/js/topology/topologyManager');
+const ServerManager = require('../../../src/js/server/serverManager');
 const Resource = require('../../../src/js/resources/resource');
 const Source = require('../../../src/js/sources/source');
 const logManager = require('../logManager');
@@ -40,6 +44,13 @@ describe('Test de la classe Service', function() {
 
   describe('Test de loadResources()', function() {
 
+    const resourceManager = sinon.mock(ResourceManager);
+    const resource = sinon.mock(Resource);
+    // Mocking the source manager
+    resourceManager.checkResource = sinon.stub().returns(true);
+    resourceManager.createResource = sinon.stub().returns(resource);
+    service._resourceManager = resourceManager;
+
     it('loadResources() return true avec une configuration correcte', function() {
       assert.equal(service.loadResources(), true);
     });
@@ -56,7 +67,12 @@ describe('Test de la classe Service', function() {
       sourceManager.createSource = sinon.stub().returns(sinon.mock(Source));
       sourceManager.connectSource = sinon.stub().returns(true);
       sourceManager.disconnectSource = sinon.stub().returns(true);
+      sourceManager.getSourceTopology = sinon.stub().returns("toto");
       service._sourceManager = sourceManager;
+
+      const topologyManager = sinon.mock(TopologyManager);
+      topologyManager.getTopologyById = sinon.stub().returns("toto");
+      service._topologyManager = topologyManager;
 
       await service.loadSources();
       await service.disconnectAllSources();
@@ -65,13 +81,23 @@ describe('Test de la classe Service', function() {
   });
 
   describe('Test de createServer() et stopServer()', function() {
+    const apisManager = sinon.mock(ApisManager);
+    apisManager.loadAPISDirectory = sinon.stub().returns(true);
+    service._apisManager = apisManager;
+
+    const serverManager = sinon.mock(ServerManager);
+    serverManager.createAllServer = sinon.stub().returns(true);
+    serverManager.startAllServer = sinon.stub().returns(true);
+    serverManager.stopAllServer = sinon.stub().returns(true);
+    serverManager.checkConfiguration = sinon.stub().returns(true);
+    service._serverManager = serverManager;
 
     it('createServer() return true avec une configuration correcte', function() {
       assert.equal(service.createServer("../apis/", ""), true);
     });
 
-    after(function(done) {
-      service.stopServer(done);
+    after(function() {
+      service.stopServer();
     });
 
   });
@@ -103,8 +129,8 @@ describe('Test de la classe Service', function() {
       assert.equal(response.resource, "corse-osm");
     });
 
-    after(function(done) {
-      service.stopServer(done);
+    after(function() {
+      service.stopServer();
     });
 
   });
