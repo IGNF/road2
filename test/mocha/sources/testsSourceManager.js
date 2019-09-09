@@ -221,37 +221,40 @@ describe('Test de la classe SourceManager', function() {
   });
 
   describe('Test de la fonction checkSourceOsrm()', function() {
+    let opMgr = sinon.mock(OperationManager);
+    opMgr.isOperationAvailable = sinon.stub().returns(true);
+    opMgr.isAvailableInTable = sinon.stub().returns(true);
 
     it('checkSourceOsrm() avec une bonne description', function() {
-      assert.equal(sourceManager.checkSourceOsrm(description), true);
+      assert.equal(sourceManager.checkSourceOsrm(description, opMgr, resourceOperationTable), true);
     });
 
     it('checkSourceOsrm() avec un mauvais cost', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-3";
       wrongDescription.cost = "";
-      assert.equal(sourceManager.checkSource(wrongDescription), false);
+      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.profile', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-4";
       wrongDescription.cost.profile = "";
-      assert.equal(sourceManager.checkSource(wrongDescription), false);
+      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.optimization', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-5";
       wrongDescription.cost.optimization = "";
-      assert.equal(sourceManager.checkSource(wrongDescription), false);
+      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.compute', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-6";
       wrongDescription.cost.compute = "";
-      assert.equal(sourceManager.checkSource(wrongDescription), false);
+      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
     });
 
   });
