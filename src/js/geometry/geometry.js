@@ -47,17 +47,6 @@ module.exports = class Geometry {
   /**
   *
   * @function
-  * @name get format
-  * @description Récupérer le format de la geom
-  *
-  */
-  get format () {
-    return this._format;
-  }
-
-  /**
-  *
-  * @function
   * @name get projection
   * @description Récupérer la projection de la geom
   *
