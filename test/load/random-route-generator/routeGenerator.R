@@ -84,9 +84,9 @@ randomData <- expand.grid(profile = possibleProfiles, optimization = possibleOpt
 ### Nombre de points à générer: obligatoire pour la suite du programme 
 nbCoordinates <- nbLines * 2
 ### Génération des latitudes 
-randomLatitudes <- runif(nbCoordinates, min=xmin, max=xmax)
+randomLatitudes <- runif(nbCoordinates, min=ymin, max=ymax)
 ### Génération des longitudes
-randomLongitudes <- runif(nbCoordinates, min=ymin, max=ymax)
+randomLongitudes <- runif(nbCoordinates, min=xmin, max=xmax)
 ### Génération des points 
 ### Vecteur contenant les points: il y en a deux fois plus que de lignes demandées 
 ### pour avoir un point de départ et d'arrivée à chaque ligne

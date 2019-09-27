@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  load-road2-generation:
+    build:
+      context: ../..
+      dockerfile: ./docker/load/Dockerfile
+      args:
+        - dnsIP=${dns_ip}
+        - dnsHost=${dns_host}
+        - proxy=${proxy}
+    image: load-road2-generation
+    container_name: load-road2-generation-launch
+    command: ["R", "-f", "/home/docker/routeGenerator.R", "--args", "/home/docker/data/road2_parameters.ssv", "${nb_line}", "${resource}", "${xmin}", "${ymin}", "${xmax}", "${ymax}"]
+    volumes:
+      - iti-load-data-volume:/home/docker/data
+
+  load-road2:
+    image: denvazh/gatling
+    container_name: load-road2-launch
+    volumes:
+      - iti-load-data-volume:/opt/gatling/user-files
+      - ${gatling_results}:/opt/gatling/results
+    command: "-s road2LoadTest"
+
+volumes:
+  iti-load-data-volume:
+    name: iti-load-data-volume

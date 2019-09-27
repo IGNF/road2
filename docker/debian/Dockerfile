@@ -1,6 +1,6 @@
 FROM debian:buster-20181112
 
-LABEL maintainer="IGN <idev@ign.fr>"
+LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.0"
 
 ### Arguments pour le build de l'image

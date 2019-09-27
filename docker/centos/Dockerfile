@@ -1,6 +1,6 @@
 FROM centos:7.5.1804
 
-LABEL maintainer="IGN <idev@ign.fr>"
+LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.0"
 
 ### Arguments pour le build de l'image
