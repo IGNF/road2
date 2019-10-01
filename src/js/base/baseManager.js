@@ -116,7 +116,7 @@ module.exports = class baseManager {
 
     // on vérifie d'abord que la base n'a pas déjà été créée
     if (this._baseCatalog[fullPath]) {
-      return baseCatalog[fullPath];
+      return this._baseCatalog[fullPath];
     } else {
       // la base n'existe pas, on continue
     }
