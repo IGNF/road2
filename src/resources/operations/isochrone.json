@@ -6,8 +6,8 @@
     "resource",
     "point",
     "costType",
-    "optimization",
     "costValue",
+    "optimization",
     "profile",
     "direction"
   ]

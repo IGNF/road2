@@ -4,10 +4,12 @@ const Source = require('./source');
 const { Client } = require('pg');
 const fs = require('fs');
 const RouteResponse = require('../responses/routeResponse');
+const IsochroneResponse = require('../responses/isochroneResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Line = require('../geometry/line');
 const Point = require('../geometry/point');
+const Geometry = require('../geometry/geometry');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
@@ -255,33 +257,30 @@ module.exports = class pgrSource extends Source {
 
     } else if (request.operation === "isochrone") {
       if (request.type === "isochroneRequest") {
-        const startingPoint = [request.point.lon, request.point.lat];
+        const location = [request.point.lon, request.point.lat];
 
-        LOGGER.info(request);
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(startingPoint) + ", $1, $2, $3)";
+        const queryString = "SELECT * FROM generateIso(ARRAY " + JSON.stringify(location) + ", $1, $2, $3, $4)";
 
         const SQLParametersTable = [
           request.costValue,
+          request.direction,
           this._configuration.storage.costColumn,
           this._configuration.storage.rcostColumn
         ];
 
-        /* return new Promise( (resolve, reject) => {
-          this._client.query(queryString, SQLParametersTable, (err, result) => {
+        return new Promise( (resolve, reject) => {
+          this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
             if (err) {
-              LOGGER.error(err);
               reject(err);
             } else {
               try {
-                LOGGER.info('### success!');
-                LOGGER.info(result);
-                // resolve(this.writeRouteResponse(request, result));
+                resolve(this.writeIsochroneResponse(request, pgrRequest, result));
               } catch (err) {
                 reject(err);
               }
             }
           });
-        }); */
+        }); 
       }
     }
 
@@ -610,5 +609,36 @@ module.exports = class pgrSource extends Source {
 
   }
 
+  /**
+  *
+  * @function
+  * @name writeIsochroneResponse
+  * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
+  * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
+  * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
+  * au proxy, on considère qu'elle est correcte.
+  * @param {Request} request - Objet Request ou dérivant de la classe Request
+  * @param {pgrResponse} pgrResponse - Objet pgrResponse
+  *
+  */
+  writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
+    // LOGGER.info(pgrResponse);
+    // LOGGER.info(isochroneRequest);
 
+    /* Initialization des paramètres que l'on veut transmettre au proxy.*/
+    let resource = isochroneRequest.resource;
+    let location = {};
+    let geometry = {};
+    let profile = isochroneRequest.profile;
+    let optimization = isochroneRequest.optimization;
+
+    /* Préparation de certains paramètres avant envoi.*/
+    if (pgrResponse.rows[0] && pgrResponse.rows[0].geojson) { /* Le moteur a bel et bien retourné une géométrie. */
+      geometry = new Line(pgrResponse.rows[0].geojson, "geojson", this._topology.projection)
+    }
+    location = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
+
+    /* Envoi de la réponse au proxy. */
+    return new IsochroneResponse(resource, location, geometry, profile, optimization);
+  }
 }

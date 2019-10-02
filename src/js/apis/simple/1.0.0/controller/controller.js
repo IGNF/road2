@@ -554,62 +554,28 @@ module.exports = {
   * @return {object} userResponse - Réponse envoyée à l'utilisateur
   *
   */
+
   writeIsochroneResponse: function(isochroneRequest, isochroneResponse) {
+
     let userResponse = {};
-    /* let route = routeResponse.routes[0];
 
     // resource
-    userResponse.resource = routeResponse.resource;
+    userResponse.resource = isochroneResponse.resource;
 
-    // On ne considère que le premier itinéraire renvoyé par routeResponse
-    // Portions
-    userResponse.portions = new Array();
+    // location
+    userResponse.location = isochroneResponse.location.toString();
 
-    for (let i = 0; i < route.portions.length; i++) {
+    // geometry
+    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat('geojson');
 
-      let currentPortion = {};
+    // profile
+    userResponse.profile = isochroneResponse.profile;
 
-      // start
-      currentPortion.start = route.portions[i].start;
-      // end
-      currentPortion.end = route.portions[i].end;
-
-      // Steps
-      currentPortion.steps = new Array();
-
-      if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
-
-        for (let j = 0; j < route.portions[i].steps.length; j++) {
-
-          let currentStep = {};
-
-          currentStep.geometry = route.portions[i].steps[j].geometry.getGeometryWithFormat(routeRequest.geometryFormat);
-
-          if (routeRequest.waysAttributes.length !== 0) {
-
-            currentStep.attributes = {};
-            // si c'est demandé et qu'il existe alors on met l'attribut
-            for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
-              let attribut = routeRequest.waysAttributes[i];
-              currentStep.attributes[attribut] = route.portions[i].steps[j].getAttributById(attribut);
-            }
-
-          } else {
-            // on ne fait rien 
-          }
-
-          currentPortion.steps.push(currentStep);
-
-        }
-      } else {
-        // il n'y a rien à ajouter
-      }
-
-      userResponse.portions.push(currentPortion);
-
-    } */
+    // optimiszation
+    userResponse.optimization = isochroneResponse.optimization;
 
     return userResponse;
+
   }
 
 }
