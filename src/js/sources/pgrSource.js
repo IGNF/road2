@@ -257,9 +257,9 @@ module.exports = class pgrSource extends Source {
 
     } else if (request.operation === "isochrone") {
       if (request.type === "isochroneRequest") {
-        const location = [request.point.lon, request.point.lat];
+        const point = [request.point.lon, request.point.lat];
 
-        const queryString = "SELECT * FROM generateIso(ARRAY " + JSON.stringify(location) + ", $1, $2, $3, $4)";
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4)";
 
         const SQLParametersTable = [
           request.costValue,
@@ -626,19 +626,22 @@ module.exports = class pgrSource extends Source {
     // LOGGER.info(isochroneRequest);
 
     /* Initialization des paramètres que l'on veut transmettre au proxy.*/
+    let point = {};
     let resource = isochroneRequest.resource;
-    let location = {};
+    let costType = isochroneRequest.costType;
+    let costValue = isochroneRequest.costValue;
     let geometry = {};
     let profile = isochroneRequest.profile;
+    let direction = isochroneRequest.direction;
     let optimization = isochroneRequest.optimization;
 
     /* Préparation de certains paramètres avant envoi.*/
+    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
     if (pgrResponse.rows[0] && pgrResponse.rows[0].geojson) { /* Le moteur a bel et bien retourné une géométrie. */
       geometry = new Line(pgrResponse.rows[0].geojson, "geojson", this._topology.projection)
     }
-    location = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
 
     /* Envoi de la réponse au proxy. */
-    return new IsochroneResponse(resource, location, geometry, profile, optimization);
+    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction, optimization);
   }
 }

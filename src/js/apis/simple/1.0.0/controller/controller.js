@@ -559,17 +559,26 @@ module.exports = {
 
     let userResponse = {};
 
+    // point
+    userResponse.point = isochroneResponse.point.toString();
+
     // resource
     userResponse.resource = isochroneResponse.resource;
 
-    // location
-    userResponse.location = isochroneResponse.location.toString();
+    // costType
+    userResponse.costType = isochroneResponse.costType;
 
-    // geometry
-    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat('geojson');
+    // costValue
+    userResponse.costValue = isochroneResponse.costValue;
 
     // profile
     userResponse.profile = isochroneResponse.profile;
+
+    // direction
+    userResponse.direction = isochroneResponse.direction;
+
+    // geometry
+    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat('geojson');
 
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;

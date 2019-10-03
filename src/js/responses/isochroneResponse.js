@@ -17,53 +17,111 @@ module.exports = class isochroneResponse extends Response {
   * @function
   * @name constructor
   * @description Constructeur de la classe isochroneResponse
+  * @param {Point} point - Point de départ/arrivée du calcul.
   * @param {string} resource - Nom de la ressource.
-  * @param {Point} location - Point de départ/arrivée du calcul.
-  * @param {Geometry} - Représentation de la géométrie.
+  * @param {string} costType - Type du coût.
+  * @param {string} costValue - Valeur du coût.
+  * @param {Geometry} geometry - Représentation de la géométrie.
   * @param {string} profile - Profile.
+  * @param {string} direction - Sens du parcours.
   * @param {string} optimization - Optimisation.
   *
   */
-  constructor(resource, location, geometry, profile, optimization) {
+  constructor(point, resource, costType, costValue, geometry, profile, direction, optimization) {
 
     // Constructeur parent
     super(resource);
 
-    // location
-    this._location = location;
+    // point
+    this._point = point;
 
-    // profile
-    this._profile = profile;
+    // costType
+    this._costType = costType;
 
-    // optmization
-    this._optimization = optimization;
+    // costValue
+    this._costValue = costValue;
 
     // Objet contenant la géométrie retrounée par le moteur.
     this._geometry = geometry;
 
+    // profile
+    this._profile = profile;
+
+    // direction
+    this._direction = direction;
+
+    // optmization
+    this._optimization = optimization;
+
   }
 
   /**
   *
   * @function
-  * @name get location
+  * @name get point
   * @description Récupérer le point de départ/arrivée du calcul.
   *
   */
-  get location () {
-    return this._location;
+  get point () {
+    return this._point;
   }
 
   /**
   *
   * @function
-  * @name set location
+  * @name set point
   * @description Attribuer le point de départ/arrivée du calcul.
-  * @param {Point} lct - Point de départ/arrivée du calcul.
+  * @param {Point} pt - Point de départ/arrivée du calcul.
   *
   */
-  set location (lct) {
-    this._location = lct;
+  set point (pt) {
+    this._point = pt;
+  }
+
+  /**
+  *
+  * @function
+  * @name get costType
+  * @description Récupérer le type du coût.
+  *
+  */
+  get costType () {
+    return this._costType;
+  }
+
+  /**
+  *
+  * @function
+  * @name set costType
+  * @description Attribuer le type du coût.
+  * @param {string} ct - Type du coût.
+  *
+  */
+  set costType (ct) {
+    this._costType = ct;
+  }
+
+  /**
+  *
+  * @function
+  * @name get costValue
+  * @description Récupérer la valeur du coût.
+  *
+  */
+  get costValue () {
+    return this._costValue;
+  }
+
+  /**
+  *
+  * @function
+  * @name set costValue
+  * @description Attribuer la valeur du coût.
+  * @param {string} ct - Valeur du coût.
+  *
+  */
+  set costValue (cv) {
+    this._costValue = cv;
   }
 
   /**
@@ -110,6 +168,29 @@ module.exports = class isochroneResponse extends Response {
   */
   set profile (pr) {
     this._profile = pr;
+  }
+
+  /**
+  *
+  * @function
+  * @name get direction
+  * @description Récupérer le sens du parcours.
+  *
+  */
+  get direction () {
+    return this._direction;
+  }
+
+  /**
+  *
+  * @function
+  * @name set direction
+  * @description Attribuer le sens du parcours.
+  * @param {string} drct - Sens du parcours
+  *
+  */
+  set direction (drct) {
+    this._direction = drct;
   }
 
   /**

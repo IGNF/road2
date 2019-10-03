@@ -1,7 +1,7 @@
 {
   "id": "isochrone",
   "name": "Génération d'isochrone",
-  "description": "Générer une carte isochrone.",
+  "description": "Générer une zone de chalandise isochrone.",
   "parameters": [
     "resource",
     "point",
