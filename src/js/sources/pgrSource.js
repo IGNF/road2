@@ -282,6 +282,9 @@ module.exports = class pgrSource extends Source {
           });
         }); 
       }
+    } else {
+      /* TODO: Y a peut-être un truc à améliorer ici (bien que ce cas n'est pas censé arriver). */
+      throw errorManager.createError("Unknow request operation.");
     }
 
   }
