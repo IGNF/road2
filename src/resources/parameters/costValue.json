@@ -5,6 +5,5 @@
   "required": "true",
   "defaultValue": "false",
   "example": "1.0",
-  "type": "float",
-  "min": 0
+  "type": "float"
 }

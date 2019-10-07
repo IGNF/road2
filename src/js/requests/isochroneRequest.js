@@ -22,11 +22,10 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} costType - Type du coût.
   * @param {string} costValue - Valeur du coût.
   * @param {string} profile - Profil utilisé pour le calcul.
-  * @param {string} optimization - Optimisation utilisée pour le calcul.
   * @param {string} direction - Sens du parcours.
   *
   */
-  constructor(resource, point, costType, costValue, profile, optimization, direction) {
+  constructor(resource, point, costType, costValue, profile, direction) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
@@ -36,7 +35,6 @@ module.exports = class isochroneRequest extends Request {
     this._costType = costType;
     this._costValue = costValue;
     this._profile = profile;
-    this._optimization = optimization;
     this._direction = direction;
   }
 
@@ -132,30 +130,7 @@ module.exports = class isochroneRequest extends Request {
     this._profile = pf;
   }
 
-    /**
-  *
-  * @function
-  * @name get optimization
-  * @description Récupérer l'optimisation utilisée pour le calcul de la requête.
-  *
-  */
-  get optimization() {
-    return this._optimization;
-  }
-
   /**
-  *
-  * @function
-  * @name set optimization
-  * @description Attribuer l'optimisation utilisée pour le calcul de la requête.
-  * @param {object} op - Optimisation utilisée pour le calcul.
-  *
-  */
-  set optimization(op) {
-    this._optimization = op;
-  }
-
-    /**
   *
   * @function
   * @name get direction
@@ -176,29 +151,5 @@ module.exports = class isochroneRequest extends Request {
   */
   set direction(dr) {
     this._direction = dr;
-  }
-
-  /**
-  *
-  * @function
-  * @name isAttributeRequested
-  * @description Permet de savoir si un attribut est demandé dans cette requête.
-  * @param {string} attr - Attribut
-  *
-  */
-  isAttributeRequested (attr) {
-    if (this._waysAttributes.length !== 0) {
-      for (let i=0; i < this._waysAttributes.length; i++) {
-        if (this._waysAttributes[i] === attr) {
-          return true;
-        } else {
-          // on continue
-        }
-      }
-    } else {
-      return false;
-    }
-
-    return false;
   }
 }

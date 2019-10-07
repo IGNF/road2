@@ -27,10 +27,14 @@ module.exports = class FloatParameter extends ResourceParameter {
     super(parameter);
 
     // defaultValueContent
+    /* TODO: À revoir. Pour le moment, c'est une initialisation toute bête.  */
     this._defaultValueContent = 0;
 
-    // values
-    this._values = new Array();
+    /* Valeur min. */
+    this._min = null;
+
+    /* Valeur max. */
+    this._max = null;
 
   }
 
@@ -48,17 +52,6 @@ module.exports = class FloatParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name get values
-  * @description Récupérer l'ensemble des valeurs par défaut
-  *
-  */
-  get values () {
-    return this._values;
-  }
-
-  /**
-  *
-  * @function
   * @name load
   * @description Charger la configuration
   * @param {string} parameterConf - Configuration d'un paramètre
@@ -71,8 +64,12 @@ module.exports = class FloatParameter extends ResourceParameter {
       this._defaultValueContent = parameterConf.defaultValueContent;
     }
 
-    if (parameterConf.values) {
-      this._values = parameterConf.values;
+    if (parameterConf.min) {
+      this._min = parameterConf.min;
+    }
+
+    if (parameterConf.max) {
+      this._max = parameterConf.max;
     }
 
     return true;
@@ -90,13 +87,16 @@ module.exports = class FloatParameter extends ResourceParameter {
   */
   specificCheck(userValue) {
 
-    if (this._values.length > 0) {
-      for (let j = 0; j < this._values.length; j++) {
-        if (userValue === this._values[j]) {
-          return true;
-        }
-      }
+    /* Vérifier que la valeur introduite est de type float. */
+    if (isNaN(parseFloat(userValue))) {
+      return false;
+    }
 
+    if (this._min && (userValue < this._min)) {
+      return false;
+    }
+
+    if (this._max && (userValue > this._max)) {
       return false;
     }
 
@@ -115,7 +115,7 @@ module.exports = class FloatParameter extends ResourceParameter {
   */
   specificConvertion(userValue) {
 
-    return userValue;
+    return parseFloat(userValue);
 
   }
 

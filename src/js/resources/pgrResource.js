@@ -41,8 +41,27 @@ module.exports = class pgrResource extends Resource {
     // et instanciation du profile et de l'optimisation par défaut
     for (let i=0; i < this._configuration.sources.length; i++) {
 
-      const linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
-      this._linkedSource[linkedId] = this._configuration.sources[i].id;
+      /* TODO: Il serait mieux, dans le futur, d'avoir un nouveau type de ressource, dédiée à l'isochrone. */
+      const currentSourceOptimization = this._configuration.sources[i].cost.optimization;
+
+      let linkedId = '';
+      if (operations["isochrone"]) {
+        if (currentSourceOptimization === "fastest") {
+          linkedId = this._configuration.sources[i].cost.profile + "time";
+        } else if (currentSourceOptimization === "shortest") {
+          linkedId = this._configuration.sources[i].cost.profile + "distance";
+        } else {
+          /* TODO: À repenser. */
+        }
+
+        this._linkedSource[linkedId] = this._configuration.sources[i].id;
+      } else if (operations["route"]) {
+        linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
+
+        this._linkedSource[linkedId] = this._configuration.sources[i].id;
+      } else {
+        /* TODO: À repenser. */
+      }
 
     }
 
@@ -93,8 +112,18 @@ module.exports = class pgrResource extends Resource {
   */
   getSourceIdFromRequest (request) {
 
-    if (this._linkedSource[request.profile+request.optimization]) {
-      return this._linkedSource[request.profile+request.optimization];
+    const currentOperation = request.operation;
+    let source = "";
+
+    /* TODO: Pour le moment, c'est un contrôle en dur sur le type de l'opération. Il serait mieux de revoir cette façon de voir (avoir peut-être un catalogue de correspondance ? Maybe..). */
+    if (currentOperation === "isochrone") {
+      source = request.profile + request.costType;
+    } else {
+      source = request.profile + request.optimization;
+    }
+
+    if (this._linkedSource[source]) {
+      return this._linkedSource[source];
     } else {
       return null;
     }

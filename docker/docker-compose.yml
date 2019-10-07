@@ -65,7 +65,8 @@ services:
     networks:
       - iti-network
     volumes:
-      - pgr-data-volume:/var/lib/pgsql 
+      - pgr-data-volume:/var/lib/pgsql
+      - /home/moez/Repos/IGN/ITI/pgrouting-procedures/sql:/home/docker/pgrouting-procedures/sql
   
   road2-web-debian:
     build:
