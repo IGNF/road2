@@ -21,7 +21,6 @@ module.exports = class Geometry {
   * @description Constructeur de la classe Geometry
   * @param {string} type - type de la geom (Point, LineString...)
   * @param {string} projection - Id de la projection utilisée (EPSG:4326)
-  * @param {object} coordinates - Coordonnées de la géométrie.
   *
   */
   constructor(type, projection, coordinates) {
@@ -31,9 +30,6 @@ module.exports = class Geometry {
 
     // Id de la projection utilisée (EPSG:4326)
     this._projection = projection;
-
-    // Coordonnées de la géométrie.
-    this._coordinates = coordinates;
   }
 
   /**
@@ -79,29 +75,6 @@ module.exports = class Geometry {
   */
    set projection (pr) {
     return this._projection = pr;
-  }
-
-  /**
-  *
-  * @function
-  * @name get projection
-  * @description Récupérer les coordonnées de la géométrie.
-  *
-  */
-  get coordinates () {
-    return this._coordinates;
-  }
-
-    /**
-  *
-  * @function
-  * @name set coordinates
-  * @description Attribuer les coordonnées de la géométrie.
-  * @param{string} crd - Coordonnées de la géométrie.
-  *
-  */
-   set coordinates (crd) {
-    return this._coordinates = crd;
   }
 
 }
