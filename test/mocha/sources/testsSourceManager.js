@@ -96,7 +96,7 @@ describe('Test de la classe SourceManager', function() {
             }
           },
           {
-            "id": "stepsGeometry",
+            "id": "getSteps",
             "defaultValueContent": "true"
           },
           {

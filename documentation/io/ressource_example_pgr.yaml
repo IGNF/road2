@@ -108,7 +108,7 @@ resource:
         - id: "intermediates"
           values:
             bbox: "-90,-180,90,180"
-        - id: "stepsGeometry"
+        - id: "getSteps"
           defaultValueContent: "true"
         - id: "waysAttributes"
           values:

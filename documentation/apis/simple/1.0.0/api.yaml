@@ -110,9 +110,9 @@ paths:
         schema:
           type: "string"
         example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}"
-      - name: "getGeometry"
+      - name: "getSteps"
         in: "query"
-        description: "Présence de la géométrie dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        description: "Présence des étapes dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
         required: false
         schema:
           type: "boolean"
@@ -448,7 +448,7 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/constraint"
-        getGeometry:
+        getSteps:
           type: "boolean"
         geometryFormat:
           type: "string"

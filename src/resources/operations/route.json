@@ -9,7 +9,7 @@
     "profile",
     "optimization",
     "intermediates",
-    "stepsGeometry",
+    "getSteps",
     "waysAttributes",
     "algorithm",
     "geometryFormat",

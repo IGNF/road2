@@ -62,8 +62,8 @@ possibleOptimizations <- c("fastest", "")
 ## Format des géométries
 possibleGeometryFormat <- c("polyline", "", "geojson")
 
-## Calcul de la géométrie des étapes 
-possibleGetGeometry <- c("true", "", "false")
+## Calcul de les étapes 
+possibleGetSteps <- c("true", "", "false")
 
 ## Calcul de la bbox de l'itinéraire
 possibleGetbbox <- c("true", "", "false")
@@ -77,7 +77,7 @@ possibleGetbbox <- c("true", "", "false")
 ## La fonction expand.grid génère l'ensemble des combinaisons possibles avec les données fournies.
 ## Cela peut donc être très long si on met beaucoup d'éléments. 
 ## On va donc générer l'ensemble des possibilités pour les paramètres sauf les coordonnées
-randomData <- expand.grid(profile = possibleProfiles, optimization = possibleOptimizations, geometryFormat = possibleGeometryFormat, getGeometry = possibleGetGeometry, getBbox = possibleGetbbox)
+randomData <- expand.grid(profile = possibleProfiles, optimization = possibleOptimizations, geometryFormat = possibleGeometryFormat, getSteps = possibleGetSteps, getBbox = possibleGetbbox)
 
 ## On génére les coordonnées à part 
 ### Points possibles
@@ -152,14 +152,14 @@ for ( i in seq(1, nbLines) ) {
     ### On prend une ligne aléatoirement dans randomData 
     randomLine <- as.integer(runif(1, 1, nbData))
     #print(randomData$profile[randomLine])
-    lines[i] <- paste(resource, ";", randomStart[i], ";", randomEnd[i], ";", randomIntermediates[i], ";", randomData$profile[randomLine], ";", randomData$optimization[randomLine], ";", randomData$geometryFormat[randomLine], ";", randomData$getGeometry[randomLine], ";", randomData$getBbox[randomLine], sep="")
+    lines[i] <- paste(resource, ";", randomStart[i], ";", randomEnd[i], ";", randomIntermediates[i], ";", randomData$profile[randomLine], ";", randomData$optimization[randomLine], ";", randomData$geometryFormat[randomLine], ";", randomData$getSteps[randomLine], ";", randomData$getBbox[randomLine], sep="")
 
 }
 
 ## Écriture des données dans le fichier 
 
 ### En-tête du ssv 
-headFile <- "resource;start;end;intermediates;profile;optimization;geometryFormat;getGeometry;getBbox"
+headFile <- "resource;start;end;intermediates;profile;optimization;geometryFormat;getSteps;getBbox"
 
 fileCon <- file(pathFile, "w")
 writeLines(headFile, fileCon)

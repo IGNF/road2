@@ -108,7 +108,7 @@ describe('Test de la classe ResourceManager', function() {
             }
           },
           {
-            "id": "stepsGeometry",
+            "id": "getSteps",
             "defaultValueContent": "true"
           },
           {

@@ -141,38 +141,38 @@ Feature: Road2
     And the response should contain an attribute "timeUnit" with value "minute"
     And the response should contain an attribute "crs" with value "EPSG:4326"
 
-  Scenario: Route sur l'API simple 1.0.0 avec getGeometry=true
+  Scenario: Route sur l'API simple 1.0.0 avec getSteps=true
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"
     And with default parameters for "route"
     And with query parameters:
       | key          | value    |
-      | getGeometry  | true     |
+      | getSteps  | true     |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain an attribute "portions.[0].steps.[0].geometry"
 
-  Scenario: Route sur l'API simple 1.0.0 avec getGeometry=false
+  Scenario: Route sur l'API simple 1.0.0 avec getSteps=false
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"
     And with default parameters for "route"
     And with query parameters:
       | key          | value    |
-      | getGeometry  | false    |
+      | getSteps  | false    |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should not contain an attribute "portions.[0].steps.[0].geometry"
 
-  Scenario: Route sur l'API simple 1.0.0 avec mauvais getGeometry
+  Scenario: Route sur l'API simple 1.0.0 avec mauvais getSteps
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"
     And with default parameters for "route"
     And with query parameters:
       | key            | value      |
-      | getGeometry    | test       |
+      | getSteps    | test       |
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "error.message" with value "Parameter 'getGeometry' is invalid"
+    And the response should contain an attribute "error.message" with value "Parameter 'getSteps' is invalid"
 
   Scenario: Route sur l'API simple 1.0.0 avec mauvais waysAttributes
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"

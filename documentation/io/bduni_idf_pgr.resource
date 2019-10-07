@@ -137,7 +137,7 @@
             }
           },
           {
-            "id": "stepsGeometry",
+            "id": "getSteps",
             "defaultValueContent": "true"
           },
           {

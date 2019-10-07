@@ -92,9 +92,9 @@ getCapabilities:
 	          items:
 	          	type: "string"
 	        example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','thresholds':{'key':'delta_time','operator':'<','value':'10'}}"
-	      - name: "getGeometry"
+	      - name: "getSteps"
 	        in: "query"
-	        description: "Présence de la géométrie détaillée dans la réponse."
+	        description: "Présence des étapes dans la réponse."
 	        required: false
 	        default: true
 	        schema:
@@ -358,7 +358,7 @@ getCapabilities:
 		  	  	- id: "format"
 		  	  	  default: "application/json"
 		  	  	  values: {"application/json","application/xml"}
-		  	  	- id: "getGeometry"
+		  	  	- id: "getSteps"
 		  	  	  default: true
 		  	  	  values: {"true","false"}
 		  	  	- id: "getBbox"
@@ -482,7 +482,7 @@ getCapabilities:
 		  	  	  	  	values:
 		  	  	  	  		min: 1
 		  	  	  	  		max: 1000
-		  	  	- id: "getGeometry"
+		  	  	- id: "getSteps"
 		  	  	  default: true
 		  	  	  values: {"true","false"}
 		  	  	- id: "getBbox"

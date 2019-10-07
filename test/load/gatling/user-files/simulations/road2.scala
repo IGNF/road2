@@ -11,7 +11,7 @@ class road2LoadTest extends Simulation {
     val scn = scenario("road2")
     .feed(urls).repeat(1){
         exec(
-        http("compute").get("resource=${resource}&profile=${profile}&optimization=${optimization}&start=${start}&end=${end}&intermediates=${intermediates}&geometryFormat=${geometryFormat}&getGeometry=${getGeometry}&getBbox=${getBbox}")
+        http("compute").get("resource=${resource}&profile=${profile}&optimization=${optimization}&start=${start}&end=${end}&intermediates=${intermediates}&geometryFormat=${geometryFormat}&getSteps=${getSteps}&getBbox=${getBbox}")
         )
     }
 

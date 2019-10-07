@@ -140,22 +140,22 @@ module.exports = {
     }
     // ---
 
-    // getGeometry
+    // getSteps
     // ---
-    if (parameters.getGeometry) {
+    if (parameters.getSteps) {
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("stepsGeometry").check(parameters.getGeometry)) {
-        throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
+      if (!routeOperation.getParameterById("getSteps").check(parameters.getSteps)) {
+        throw errorManager.createError(" Parameter 'getSteps' is invalid ", 400);
       } else {
-        routeRequest.computeGeometry = routeOperation.getParameterById("stepsGeometry").specificConvertion(parameters.getGeometry)
-        if (routeRequest.computeGeometry === null) {
-          throw errorManager.createError(" Parameter 'getGeometry' is invalid ", 400);
+        routeRequest.computeSteps = routeOperation.getParameterById("getSteps").specificConvertion(parameters.getSteps)
+        if (routeRequest.computeSteps === null) {
+          throw errorManager.createError(" Parameter 'getSteps' is invalid ", 400);
         }
       }
     } else {
       // On met la valeur par défaut issue de la configuration
       // TODO: que faire s'il n'y a pas de valeur par défaut ?
-      routeRequest.computeGeometry = routeOperation.getParameterById("stepsGeometry").defaultValueContent;
+      routeRequest.computeSteps = routeOperation.getParameterById("getSteps").defaultValueContent;
     }
     // ---
 
@@ -376,7 +376,7 @@ module.exports = {
       // Steps
       currentPortion.steps = new Array();
 
-      if (routeRequest.computeGeometry && route.portions[i].steps.length !== 0) {
+      if (routeRequest.computeSteps && route.portions[i].steps.length !== 0) {
 
         for (let j = 0; j < route.portions[i].steps.length; j++) {
 

@@ -1,4 +1,4 @@
-resource;start;end;intermediates;profile;optimization;geometryFormat;getGeometry;getBbox
+resource;start;end;intermediates;profile;optimization;geometryFormat;getSteps;getBbox
 corse-osm;41.8390713617206,9.43703397945734;42.334460593434,8.81305585236754;;;;polyline;true;true
 corse-osm;42.334460593434,8.81305585236754;42.0576301801484,8.92986093250336;;car;fastest;polyline;true;true
 corse-osm;42.5176797365304,9.29212701178389;41.6038459739462,9.08565157287987;42.3690578503627,9.04352678218158|42.5137092300737,9.30879551293794;;;polyline;true;true

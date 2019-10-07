@@ -192,7 +192,7 @@ function computeRoad() {
     "&start=" + finalStart + 
     "&end="  + finalEnd + 
     "&intermediates=" + finalIntermediates + 
-    "&geometryFormat=polyline&getGeometry=true&getBbox=true")
+    "&geometryFormat=polyline&getSteps=true&getBbox=true")
   .then(function(r) {
     return r.json();
   })
