@@ -10,6 +10,7 @@ const Portion = require('../responses/portion');
 const Line = require('../geometry/line');
 const Point = require('../geometry/point');
 const Geometry = require('../geometry/geometry');
+const Polygon = require('../geometry/polygon');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
@@ -625,9 +626,6 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
-    // LOGGER.info(pgrResponse);
-    // LOGGER.info(isochroneRequest);
-
     /* Initialization des paramètres que l'on veut transmettre au proxy.*/
     let point = {};
     let resource = isochroneRequest.resource;
@@ -636,15 +634,20 @@ module.exports = class pgrSource extends Source {
     let geometry = {};
     let profile = isochroneRequest.profile;
     let direction = isochroneRequest.direction;
-    let optimization = isochroneRequest.optimization;
 
     /* Préparation de certains paramètres avant envoi.*/
     point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
-    if (pgrResponse.rows[0] && pgrResponse.rows[0].geojson) { /* Le moteur a bel et bien retourné une géométrie. */
-      geometry = new Line(pgrResponse.rows[0].geojson, "geojson", this._topology.projection)
+    if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
+      /* TODO: Faire un meilleur contrôle sur la géométrie retournée par le moteur ? */
+      if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
+        const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+        if ((rawGeometry.type === "Polygon") && rawGeometry.coordinates) {
+          geometry = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
+        }
+      }
     }
 
     /* Envoi de la réponse au proxy. */
-    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction, optimization);
+    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction);
   }
 }

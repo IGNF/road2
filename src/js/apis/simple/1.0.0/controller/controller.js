@@ -274,7 +274,6 @@ module.exports = {
     let costType;
     let costValue;
     let profile;
-    let optimization;
     let direction;
 
     /* Paramètre 'resource'. */
@@ -347,21 +346,9 @@ module.exports = {
       profile = isochroneOperation.getParameterById("profile").defaultValueContent;
     }
 
-    /* Paramètre 'optimization'. */
-    if (!parameters.optimization) {
-      /* Récupération du paramètre par défaut. */
-      optimization = isochroneOperation.getParameterById("optimization").defaultValueContent;
-    } else {
-      /* Vérification de la validité du paramètre. */
-      if (!isochroneOperation.getParameterById("optimization").check(parameters.optimization)) {
-        throw errorManager.createError("Parameter 'optimization' is invalid.", 400);
-      } else {
-        optimization = parameters.optimization;
-      }
-    }
-    /* Vérification de la validité du profile et de sa compatibilité avec l'optimisation. */
-    if (!resource.linkedSource[profile+optimization]) {
-      throw errorManager.createError("Parameters 'profile' and 'optimization' are not compatible.", 400);
+    /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
+    if (!resource.linkedSource[profile+costType]) {
+      throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
     }
 
     /* Paramètre 'direction'. */
@@ -376,7 +363,7 @@ module.exports = {
       direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
-    return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, optimization, direction);
+    return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
   },
 
   /**
@@ -578,7 +565,9 @@ module.exports = {
     userResponse.direction = isochroneResponse.direction;
 
     // geometry
-    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat('geojson');
+    userResponse.geometry = {};
+    userResponse.geometry.type = "Polygon";
+    userResponse.geometry.coordinates = isochroneResponse.geometry.getGeomInFormat("geojson");
 
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;

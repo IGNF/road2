@@ -24,10 +24,9 @@ module.exports = class isochroneResponse extends Response {
   * @param {Geometry} geometry - Représentation de la géométrie.
   * @param {string} profile - Profile.
   * @param {string} direction - Sens du parcours.
-  * @param {string} optimization - Optimisation.
   *
   */
-  constructor(point, resource, costType, costValue, geometry, profile, direction, optimization) {
+  constructor(point, resource, costType, costValue, geometry, profile, direction) {
 
     // Constructeur parent
     super(resource);
@@ -49,9 +48,6 @@ module.exports = class isochroneResponse extends Response {
 
     // direction
     this._direction = direction;
-
-    // optmization
-    this._optimization = optimization;
 
   }
 
@@ -191,29 +187,6 @@ module.exports = class isochroneResponse extends Response {
   */
   set direction (drct) {
     this._direction = drct;
-  }
-
-  /**
-  *
-  * @function
-  * @name get optimization
-  * @description Récupérer l'optimisation.
-  *
-  */
-  get optimization () {
-    return this._optimization;
-  }
-
-  /**
-  *
-  * @function
-  * @name set optimization
-  * @description Attribuer l'optimisation.
-  * @param {string} op - Optimisation
-  *
-  */
-  set optimization (op) {
-    this._optimization = op;
   }
 
 }
