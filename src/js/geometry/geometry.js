@@ -23,7 +23,7 @@ module.exports = class Geometry {
   * @param {string} projection - Id de la projection utilisée (EPSG:4326)
   *
   */
-  constructor(type, projection, coordinates) {
+  constructor(type, projection) {
 
     // Type de géométrie (Point, LineString, Polygon...)
     this._type = type;
