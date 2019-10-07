@@ -95,7 +95,6 @@ router.route("/isochrone")
       const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
 
       res.status(200).json(userResponse);
-      res.status(200).json({});
     } catch (error) {
       return next(error);
     }
