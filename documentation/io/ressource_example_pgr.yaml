@@ -113,3 +113,29 @@ resource:
         - id: "waysAttributes"
           values:
             - "name"
+    - id: "isochrone"
+      parameters:
+        - id: "resource"
+          values:
+            - "bduni-idf-pgr"
+        - id: "point"
+          values:
+            bbox: "-90,-180,90,180"
+            projection: "EPSG:4326"
+        - id: "costType"
+          defaultValueContent: "time"
+          values:
+            - "time"
+            - "distance"
+        - id: "costValue"
+          min: 10
+        - id: "profile"
+          defaultValueContent: "car"
+          values:
+            - "car",
+            - "pedestrian"
+        - id: "direction"
+          defaultValueContent: "departure"
+          values:
+            - "departure"
+            - "arrival"
