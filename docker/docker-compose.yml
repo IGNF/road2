@@ -66,7 +66,8 @@ services:
       - iti-network
     volumes:
       - pgr-data-volume:/var/lib/pgsql
-  
+      - ${procedures_path}:/home/docker/pgrouting-procedures/sql
+
   road2-web-debian:
     build:
       context: ..
