@@ -170,7 +170,7 @@ module.exports = class osrmSource extends Source {
         osrmRequest.coordinates = coordinatesTable;
 
         // steps
-        if (request.computeGeometry) {
+        if (request.computeSteps) {
           osrmRequest.steps = true;
         } else {
           osrmRequest.steps = false;

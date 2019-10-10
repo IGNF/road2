@@ -3,6 +3,8 @@ const PgrResource = require('../../../src/js/resources/pgrResource');
 const RouteRequest = require('../../../src/js/requests/routeRequest');
 const logManager = require('../logManager');
 
+const sinon = require('sinon');
+
 describe('Test de la classe PgrResource', function() {
 
   before(function() {
@@ -68,18 +70,6 @@ describe('Test de la classe PgrResource', function() {
       assert.deepEqual(resource.configuration, resourceConfiguration.resource);
     });
 
-    it('Get DefaultProfile', function() {
-      assert.equal(resource.defaultProfile, "car");
-    });
-
-    it('Get DefaultOptimization', function() {
-      assert.equal(resource.defaultOptimization, "fastest");
-    });
-
-    it('Get DefaultSourceId', function() {
-      assert.equal(resource.defaultSourceId, "test-car-fastest");
-    });
-
     it('Get LinkedSource', function() {
       let reference = {};
       reference["carfastest"] = "test-car-fastest";
@@ -90,7 +80,10 @@ describe('Test de la classe PgrResource', function() {
 
   describe('Test du constructeur et des getters', function() {
 
-    let request = new RouteRequest("resource-id", {lon: 8.732901, lat: 41.928821}, {lon: 8.732901, lat: 41.953932}, "car", "fastest");
+    // Pour ne pas dépendre de la classe RouteRequest
+    let request = sinon.mock(RouteRequest);
+    request.profile = "car";
+    request.optimization = "fastest";
 
     it('getSourceIdFromRequest()', function() {
       assert.equal(resource.getSourceIdFromRequest(request), "test-car-fastest");

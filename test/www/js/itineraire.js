@@ -151,14 +151,16 @@ function computeRoad() {
   var finalEnd = "";
   var finalIntermediates = "";
 
+  finalStart = document.getElementById('userStart').value;
+  finalEnd = document.getElementById('userEnd').value;
+  finalIntermediates = document.getElementById('userIntermediates').value;
+
   // Gestion des points utilisateur
-  if (clickedPoints.length < 2) {
+  if ( finalStart === "" || finalEnd === "" ) {
     // il n'y a pas assez de points pour faire un itinéraire 
     return false; 
   } else  {
-    finalStart = document.getElementById('userStart').value;
-    finalEnd = document.getElementById('userEnd').value;
-    finalIntermediates = document.getElementById('userIntermediates').value;
+    // on continue
   }
 
 
@@ -190,7 +192,7 @@ function computeRoad() {
     "&start=" + finalStart + 
     "&end="  + finalEnd + 
     "&intermediates=" + finalIntermediates + 
-    "&geometryFormat=polyline&getGeometry=true&getBbox=true")
+    "&geometryFormat=polyline&getSteps=true&getBbox=true")
   .then(function(r) {
     return r.json();
   })

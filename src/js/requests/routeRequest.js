@@ -47,8 +47,8 @@ module.exports = class routeRequest extends Request {
     // Tableau contenant des instances de Point
     this._intermediates = new Array();
 
-    // computeGeometry
-    this._computeGeometry = true;
+    // computeSteps
+    this._computeSteps = true;
 
     // waysAttributes
     // tableau de string
@@ -191,24 +191,24 @@ module.exports = class routeRequest extends Request {
   /**
   *
   * @function
-  * @name get computeGeometry
-  * @description Récupérer le choix de l'affichage de la géoémtrie
+  * @name get computeSteps
+  * @description Récupérer le choix de l'affichage des étapes
   *
   */
-  get computeGeometry () {
-    return this._computeGeometry;
+  get computeSteps () {
+    return this._computeSteps;
   }
 
   /**
   *
   * @function
-  * @name set computeGeometry
-  * @description Attribuer le choix de l'affichage de la géoémtrie
-  * @param {boolean} i - computeGeometry
+  * @name set computeSteps
+  * @description Attribuer le choix de l'affichage des étapes
+  * @param {boolean} i - computeSteps
   *
   */
-  set computeGeometry (i) {
-    this._computeGeometry = i;
+  set computeSteps (i) {
+    this._computeSteps = i;
   }
 
   /**

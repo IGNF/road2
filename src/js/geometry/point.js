@@ -1,6 +1,5 @@
 'use strict';
 
-const errorManager = require('../utils/errorManager');
 const Geometry = require('../geometry/geometry');
 const proj4 = require('proj4');
 

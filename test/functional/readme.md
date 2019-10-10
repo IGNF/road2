@@ -4,6 +4,10 @@ Cucumber sera utilisé afin de tester les APIs de Road2, et cela, dans leurs asp
 
 ## Cucumber pour les APIs
 
+Afin de lancer les tests Cucumber, on suivra la procédure suivante:
+- lancer le serveur Road2 via docker-compose 
+- exécuter la commande `npm run ftest` via docker-compose
+
 ## Ansible pour la gestion du service
 
 ## Cahier des tests fonctionnels 

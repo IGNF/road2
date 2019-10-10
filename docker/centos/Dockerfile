@@ -1,6 +1,6 @@
 FROM centos:7.5.1804
 
-LABEL maintainer="IGN <idev@ign.fr>"
+LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.0"
 
 ### Arguments pour le build de l'image
@@ -34,7 +34,7 @@ RUN yum -y install wget vim
 RUN yum install -y python-2.7.5
 
 ### Installation du compilateur c++
-RUN yum -y install devtoolset-6 gcc gcc-c++
+RUN yum -y install devtoolset-8 gcc gcc-c++
 
 
 
@@ -48,7 +48,7 @@ RUN cd node-v10.13.0  && ./configure && make -j4 && make install
 
 ### Installation des dépendances de OSRM
 # https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM
-RUN scl enable devtoolset-6 bash && yum -y install cmake3 zlib-devel
+RUN scl enable devtoolset-8 bash && yum -y install cmake3 zlib-devel
 
 ### Installation de OSRM pour utiliser la libosrm dans Road2
 # https://github.com/Project-OSRM/osrm-backend
@@ -59,7 +59,7 @@ WORKDIR /home/docker/osrm
 RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.20.0.zip
 RUN unzip v5.20.0.zip -d ./osrm-backend
 WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.20.0/build
-RUN scl enable devtoolset-6 bash && export CC=/opt/rh/devtoolset-6/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-6/root/usr/bin/g++ && make && make install
+RUN scl enable devtoolset-8 bash && export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ && make && make install
 
 ### Dossier des données
 WORKDIR /home/docker/internal

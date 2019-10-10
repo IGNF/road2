@@ -338,6 +338,8 @@ module.exports = class pgrSource extends Source {
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
+    // TODO: que faire si pgrResponse est vide ? 
+
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
       for (let i = 0; i < this._topology.defaultAttributesKeyTable.length; i++) {
@@ -549,7 +551,7 @@ module.exports = class pgrSource extends Source {
         portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
         portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
-        if (routeRequest.computeGeometry) {
+        if (routeRequest.computeSteps) {
           let steps = new Array();
 
           // On va associer les étapes à la portion concernée
@@ -598,7 +600,7 @@ module.exports = class pgrSource extends Source {
           portions[j].steps = steps;
 
         } else {
-          // Comme la géométrie des steps n'est pas demandée, on ne la donne pas
+          // Comme les steps ne sont pas demandées, on ne les donne pas
         }
 
       }

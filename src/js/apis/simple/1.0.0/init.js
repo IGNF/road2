@@ -151,18 +151,18 @@ module.exports = {
       optimizationParameterDescription.example = "fastest";
       routeDescription.parameters.push(optimizationParameterDescription);
 
-      // route.parameters.getGeometry
-      let getGeometryServiceParameter = serviceOpRoute.getParameterById("stepsGeometry");
-      let getGeometryParameterDescription = {};
-      getGeometryParameterDescription.name = "getGeometry";
-      getGeometryParameterDescription.in = "query";
-      getGeometryParameterDescription.description = getGeometryServiceParameter.description;
-      getGeometryParameterDescription.required = getGeometryServiceParameter.required;
-      getGeometryParameterDescription.default = getGeometryServiceParameter.defaultValue;
-      getGeometryParameterDescription.schema = {};
-      getGeometryParameterDescription.schema.type = "boolean";
-      getGeometryParameterDescription.example = "true";
-      routeDescription.parameters.push(getGeometryParameterDescription);
+      // route.parameters.getSteps
+      let getStepsServiceParameter = serviceOpRoute.getParameterById("stepsSteps");
+      let getStepsParameterDescription = {};
+      getStepsParameterDescription.name = "getSteps";
+      getStepsParameterDescription.in = "query";
+      getStepsParameterDescription.description = getStepsServiceParameter.description;
+      getStepsParameterDescription.required = getStepsServiceParameter.required;
+      getStepsParameterDescription.default = getStepsServiceParameter.defaultValue;
+      getStepsParameterDescription.schema = {};
+      getStepsParameterDescription.schema.type = "boolean";
+      getStepsParameterDescription.example = "true";
+      routeDescription.parameters.push(getStepsParameterDescription);
 
       // route.parameters.waysAttributes
       let waysAttributesServiceParameter = serviceOpRoute.getParameterById("waysAttributes");
@@ -348,12 +348,12 @@ module.exports = {
         routeOptimization.values = optmizationParameter.values;
         routeAvailableOperation.availableParameters.push(routeOptimization);
 
-        // route.getGeometry
-        let getGeometryParameter = resourceOperation.getParameterById("stepsGeometry");
-        let routeGetGeometry = {};
-        routeGetGeometry.id = "getGeometry";
-        routeGetGeometry.values = getGeometryParameter.values;
-        routeAvailableOperation.availableParameters.push(routeGetGeometry);
+        // route.getSteps
+        let getStepsParameter = resourceOperation.getParameterById("getSteps");
+        let routeGetSteps = {};
+        routeGetSteps.id = "getSteps";
+        routeGetSteps.values = getStepsParameter.values;
+        routeAvailableOperation.availableParameters.push(routeGetSteps);
 
         // route.waysAttributes
         let waysAttributesParameter = resourceOperation.getParameterById("waysAttributes");

@@ -1,7 +1,7 @@
 {
-  "id": "stepsGeometry",
-  "name": "Géométrie des étapes",
-  "description": "Préciser si on souhaite avoir la géométrie de chaque étape de l'itinéraire.",
+  "id": "getSteps",
+  "name": "Présence des étapes",
+  "description": "Préciser si on souhaite avoir les étapes de l'itinéraire.",
   "required": "false",
   "defaultValue": "true",
   "example": "true",

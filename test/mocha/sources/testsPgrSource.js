@@ -32,6 +32,20 @@ describe('Test de la classe pgrSource', function() {
     }
   };
 
+  let topology = {
+    "id": "corse-osm",
+    "type": "osm",
+    "description": "Données OSM sur la Corse.",
+    "storage": {
+      "file": "/home/docker/internal/corse-latest.osm.pbf"
+    },
+    "projection": "EPSG:4326",
+    "bbox": "-90,-180,90,180",
+    "base": {connected: false, connect(){this.connected = true;}},
+    "defaultAttributesKeyTable": {length: 0}
+
+  };
+
   let otherSourceDescription = {
     "id": "test-car-shortest",
     "type": "pgr",
@@ -50,7 +64,7 @@ describe('Test de la classe pgrSource', function() {
     }
   };
 
-  let source = new pgrSource(sourceDescription);
+  let source = new pgrSource(sourceDescription, topology);
   const fakeClient = sinon.mock(Client);
   fakeClient.connect = sinon.stub();
   fakeClient.end = sinon.stub();
@@ -105,8 +119,8 @@ describe('Test de la classe pgrSource', function() {
   describe('Test de computeRequest() et writeRouteResponse()', function() {
 
     let resource = "resource-test";
-    let start = {lon: 8.732901, lat: 41.928821};
-    let end = {lon: 8.76385, lat: 41.953932};
+    let start = {lon: 8.732901, lat: 41.928821,  getCoordinatesIn(toto) { return [8.732901, 41.928821];}};
+    let end = {lon: 8.76385, lat: 41.953932,  getCoordinatesIn(toto) { return [8.76385, 41.953932];}};
     let profile = "car-test";
     let optimization = "fastest-test";
     let routeRequest = new RouteRequest(resource, start, end, profile, optimization);
@@ -115,7 +129,7 @@ describe('Test de la classe pgrSource', function() {
     const fakePgrResponse = {command:'SELECT',rowCount:2,oid:null,rows:[{seq:1,path_seq:1,node:1,edge:1,cost:10,agg_cost:0,geom_json:'{"type":"LineString","coordinates":[[8.732901,41.928821],[8.76385,41.953932]]}',node_lon:'8.732901',node_lat:'41.928821',},{seq:2,path_seq:2,node:2,edge:-1,cost:'0',agg_cost:'10',geom_json:null,node_lon:'8.76385',node_lat:'41.953932',}],fields:[{name:'seq',tableID:0,columnID:0,dataTypeID:23,dataTypeSize:4,dataTypeModifier:-1,format:'text'},{name:'path_seq',tableID:0,columnID:0,dataTypeID:23,dataTypeSize:4,dataTypeModifier:-1,format:'text'},{name:'node',tableID:0,columnID:0,dataTypeID:20,dataTypeSize:8,dataTypeModifier:-1,format:'text'},{name:'edge',tableID:0,columnID:0,dataTypeID:20,dataTypeSize:8,dataTypeModifier:-1,format:'text'},{name:'cost',tableID:0,columnID:0,dataTypeID:701,dataTypeSize:8,dataTypeModifier:-1,format:'text'},{name:'agg_cost',tableID:0,columnID:0,dataTypeID:701,dataTypeSize:8,dataTypeModifier:-1,format:'text'},{name:'geom_json',tableID:0,columnID:0,dataTypeID:25,dataTypeSize:-1,dataTypeModifier:-1,format:'text'},{name:'node_lon',tableID:0,columnID:0,dataTypeID:701,dataTypeSize:8,dataTypeModifier:-1,format:'text'},{name:'node_lat',tableID:0,columnID:0,dataTypeID:701,dataTypeSize:8,dataTypeModifier:-1,format:'text'}],RowCtor:null,rowAsArray:!1,_getTypeParser:[]}
 
     fakeClient.query = sinon.stub().callsArgOnWith(2, source, null, fakePgrResponse);
-    source._client = fakeClient;
+    topology.base.pool = fakeClient;
 
     it('computeRequest() should return a routeResponse', async function() {
       await source.connect();

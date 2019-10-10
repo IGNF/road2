@@ -41,8 +41,8 @@ describe('Test de la classe RouteRequest', function() {
       assert.equal(request.optimization, "fastest");
     });
 
-    it('Get Computegeometry', function() {
-      assert.equal(request.computeGeometry, true);
+    it('Get computeSteps', function() {
+      assert.equal(request.computeSteps, true);
     });
 
     it('Get Intermediates', function() {
@@ -88,9 +88,9 @@ describe('Test de la classe RouteRequest', function() {
       assert.equal(request.optimization, "shortest");
     });
 
-    it('Set Computegeometry', function() {
-      request.computeGeometry = false;
-      assert.equal(request.computeGeometry, false);
+    it('Set computeSteps', function() {
+      request.computeSteps = false;
+      assert.equal(request.computeSteps, false);
     });
 
     it('Set Intermediates', function() {

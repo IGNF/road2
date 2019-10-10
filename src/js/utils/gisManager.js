@@ -70,6 +70,10 @@ module.exports = {
       return [];
     }
 
+    if (srcCoords.length === 1) {
+      return srcCoords[0];
+    }
+
     // Transformation des coordonnées en mode MultiLineString vers LineString
     const dissolvedCoords = [];
     const firstLine = srcCoords[0];

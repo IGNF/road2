@@ -69,6 +69,18 @@ describe('Test de la classe osrmSource', function() {
     }
   };
 
+  let topology = {
+    "id": "corse-osm",
+    "type": "osm",
+    "description": "Données OSM sur la Corse.",
+    "storage": {
+      "file": "/home/docker/internal/corse-latest.osm.pbf"
+    },
+    "projection": "EPSG:4326",
+    "bbox": "-90,-180,90,180",
+
+  };
+
   let otherSourceDescription = {
     "id": "corse-car-fastest-2",
     "type": "osrm",
@@ -86,7 +98,7 @@ describe('Test de la classe osrmSource', function() {
     }
   };
 
-  let source = new osrmSource(sourceDescription);
+  let source = new osrmSource(sourceDescription, topology);
 
   describe('Test du constructeur et des getters', function() {
 
@@ -139,8 +151,8 @@ describe('Test de la classe osrmSource', function() {
   describe('Test de computeRequest() et writeRouteResponse()', function() {
 
     let resource = "resource-test";
-    let start = {lon: 8.732901, lat: 41.928821};
-    let end = {lon: 8.76385, lat: 41.953932};
+    let start = {lon: 8.732901, lat: 41.928821, getCoordinatesIn(toto) { return [8.732901, 41.928821];} };
+    let end = {lon: 8.76385, lat: 41.953932, getCoordinatesIn(toto) { return [8.76385, 41.953932];}};
     let profile = "car-test";
     let optimization = "fastest-test";
     let routeRequest = new RouteRequest(resource, start, end, profile, optimization);
