@@ -1,3 +1,13 @@
 {
-    "url": "localhost:8080"
+    "url": "localhost:8080",
+    "defaultParameters": [
+        {
+            "id": "route",
+            "parameters": {
+                "resource": "corse-osm",
+                "start": "8.732901,41.928821",
+                "end": "8.76385,41.953932"
+            }
+        }
+    ]
 }

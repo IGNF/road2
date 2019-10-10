@@ -34,6 +34,12 @@ class road2World {
         // Méthode de la requête 
         this._method = "";
 
+        // Paramètres par défaut disponibles 
+        this._defaultParameters = new Array();
+
+        // Paramètres utilisés
+        this._parameters = {};
+
         // Réponse
         this._response = {};
 
@@ -53,6 +59,8 @@ class road2World {
 
         this._url = configuration.url;
 
+        this._defaultParameters = configuration.defaultParameters; 
+
     }
 
     createRequest(protocol, method, path) {
@@ -63,10 +71,59 @@ class road2World {
 
     }
 
+    useDefaultQueryParameters(operation) {
+
+        if (this._defaultParameters.length === 0) {
+            return false;
+        }
+
+        for(let i = 0; i < this._defaultParameters.length; i++) {
+
+            if (this._defaultParameters[i].id === operation) {
+
+                for(let param in this._defaultParameters[i].parameters) {
+                    this._parameters[param] = this._defaultParameters[i].parameters[param];
+                }
+
+                return true;
+
+            } else {
+                // on continue
+            }
+        }
+        
+        return false;
+
+    }
+
+    unsetQueryParameters(parametersToDelete) {
+
+        for(let i = 0; i < parametersToDelete.length; i++) {
+            if (this._parameters[parametersToDelete[i].key]) {
+                this._parameters[parametersToDelete[i].key] = "";
+            } else {
+                // le parametre n'existe pas
+            }
+        }
+
+    }
+
+    setQueryParameters(parametersToAdd) {
+
+        for(let i = 0; i < parametersToAdd.length; i++) {
+            this._parameters[parametersToAdd[i].key] = parametersToAdd[i].value;
+        }
+
+    }
+
     sendRequest() {
 
         // Url finale 
-        let finalUrl = this._protocol + "://" + this._url + this._path;
+        let finalUrl = this._protocol + "://" + this._url + this._path + "?";
+
+        for(let param in this._parameters) {
+            finalUrl = finalUrl + "&" + param + "=" + this._parameters[param];
+        }
 
         // Retour d'une promesse pour gérer l'asynchronisme du http.get
         return new Promise ( (resolve, reject) => {
@@ -139,6 +196,31 @@ class road2World {
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
 
                 if (jsonValue.includes(value)) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } catch(error) {
+                return false;
+            }
+            
+        }
+        
+        return false;
+
+    }
+
+    checkResponseAttribut(key) {
+
+        if (this.checkHeaderContent("content-type","application/json")) {
+            try {
+
+                let responseJSON = JSON.parse(this._response);
+
+                let jsonValue = this.getJsonContentByKey(responseJSON, key);
+                
+                if (jsonValue) {
                     return true;
                 } else {
                     return false;

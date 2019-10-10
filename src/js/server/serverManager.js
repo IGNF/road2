@@ -174,9 +174,9 @@ module.exports = class serverManager {
     createServer(app, config) {
 
         if (config.https === "true") {
-            return new Server(config.id, app, config.host, config.port, true, config.options);
+            return new Server(config.id, app, config.host, config.port, "true", config.options);
         } else {
-            return new Server(config.id, app, config.host, config.port, false, config.options);
+            return new Server(config.id, app, config.host, config.port, "false", config.options);
         }
         
     }
