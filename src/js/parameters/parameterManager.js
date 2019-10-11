@@ -442,10 +442,10 @@ module.exports = class parameterManager  {
         }
 
       } else {
-        /* Ça parait pas obligatoire non plus ici. */
+        /* TODO: À revoir. */
 
-        /* LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
-        return false; */
+        LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
+        return false; 
       }
 
       // Gestion des valeurs par défaut

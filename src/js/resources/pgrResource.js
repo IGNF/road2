@@ -55,14 +55,12 @@ module.exports = class pgrResource extends Resource {
         }
 
         this._linkedSource[linkedId] = this._configuration.sources[i].id;
-      } else if (operations["route"]) {
+      }
+      if (operations["route"]) {
         linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
 
         this._linkedSource[linkedId] = this._configuration.sources[i].id;
-      } else {
-        /* TODO: À repenser. */
       }
-
     }
 
   }
