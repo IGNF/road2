@@ -6,7 +6,7 @@
   "main": "src/js/road2.js",
   "scripts": {
     "start": "node ./src/js/road2.js",
-    "utest": "mocha --recursive './test/mocha/**/*.js'",
+    "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "ftest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/cucumber/features/road2.feature",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
