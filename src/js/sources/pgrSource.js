@@ -280,7 +280,7 @@ module.exports = class pgrSource extends Source {
               }
             }
           });
-        }); 
+        });
       }
     } else {
       /* TODO: Y a peut-être un truc à améliorer ici (bien que ce cas n'est pas censé arriver). */
@@ -333,11 +333,10 @@ module.exports = class pgrSource extends Source {
       type: "LineString",
       coordinates: []
     };
-
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
-    // TODO: que faire si pgrResponse est vide ? 
+    // TODO: que faire si pgrResponse est vide ?
 
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
@@ -475,6 +474,7 @@ module.exports = class pgrSource extends Source {
     }
 
     if (response.waypoints.length != pgrRequest.coordinates.length) {
+      // Arrive si aucun chemin n'est trouvé et qu'une fraction de tronçon (origine ou départ) est à 0 ou 1
       throw errorManager.createError(" No PGR path found: the number of waypoints is different from input waypoints ");
     }
 
@@ -539,7 +539,7 @@ module.exports = class pgrSource extends Source {
         if (!legStart.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         }
-        
+
         let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");

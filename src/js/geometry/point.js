@@ -114,7 +114,7 @@ module.exports = class Point extends Geometry {
   *
   * @function
   * @name toString
-  * @description Écrire les coordonnées dans une chaîne de caratères 
+  * @description Écrire les coordonnées dans une chaîne de caratères
   *
   */
   toString () {
