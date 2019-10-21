@@ -5,6 +5,7 @@ const errorManager = require('../utils/errorManager');
 const storageManager = require('../utils/storageManager');
 const DbTopology = require('./dbTopology');
 const OsmTopology = require('./osmTopology');
+const assert = require('assert');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("TOPOLOGYMANAGER");
@@ -345,7 +346,7 @@ module.exports = class topologyManager {
       assert.deepStrictEqual(topologyJsonDescription, referenceTopology);
     } catch (err) {
       LOGGER.error("Les deux topologies ne sont pas identiques.");
-      LOGGER.debug(err);
+      LOGGER.error(err);
       return false;
     }
 
