@@ -554,11 +554,25 @@ module.exports = class pgrSource extends Source {
           let steps = new Array();
 
           // On va associer les étapes à la portion concernée
-          for (let k=0; k < currentPgrRouteLeg.steps.length; k++) {
+          for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
             let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
-            // Troncature de la géométrie : cas de début de step
-            if (k == 0){
-              const stepStart = turf.point(response.waypoints[j].location);
+            // Troncature de la géométrie : cas où il n'y a qu'un step
+            if (k == 0 && currentPgrRouteLeg.steps.length == 1){
+              let stepStart = turf.point(response.waypoints[j].location);
+              let stepEnd = turf.point(response.waypoints[j + 1].location);
+
+              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+                turf.lineSlice(
+                  stepStart,
+                  stepEnd,
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              ).geometry.coordinates;
+            }
+            // Troncature de la géométrie : cas de début de leg
+            else if (k == 0){
+              let stepStart = turf.point(response.waypoints[j].location);
 
               currentPgrRouteStep.geometry.coordinates = turf.truncate(
                 turf.lineSlice(
@@ -569,9 +583,9 @@ module.exports = class pgrSource extends Source {
                 {precision: 6}
               ).geometry.coordinates;
             }
-            // Troncature de la géométrie : cas de fin de step
-            if (k == currentPgrRouteLeg.steps.length - 1) {
-              const stepEnd = turf.point(response.waypoints[j+1].location);
+            // Troncature de la géométrie : cas de fin de leg
+            else if (k == currentPgrRouteLeg.steps.length - 1) {
+              let stepEnd = turf.point(response.waypoints[j+1].location);
 
               currentPgrRouteStep.geometry.coordinates = turf.truncate(
                 turf.lineSlice(
