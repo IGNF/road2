@@ -40,6 +40,7 @@ services:
       - pgrouting-procedures-centos
     volumes:
       - iti-data-volume:/home/docker/data
+      - ${r2gg_src}:/usr/lib/python3.6/site-packages/r2gg/r2gg
     networks:
       - iti-network
     command: "./r2gg_pipeline.sh"
