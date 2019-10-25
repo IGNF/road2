@@ -16,6 +16,7 @@
     "bbox",
     "projection",
     "timeUnit",
-    "distanceUnit"
+    "distanceUnit",
+    "constraints"
   ]
 }

@@ -1,14 +1,13 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const log4js = require('log4js');
 const Parameter = require('../parameters/parameter');
-const ResourceParameter = require('../parameters/resourceParameter');
 const BoolParameter = require('../parameters/boolParameter');
 const EnumParameter = require('../parameters/enumParameter');
 const PointParameter = require('../parameters/pointParameter');
 const FloatParameter = require('../parameters/floatParameter');
+const ConstraintParameter = require('../parameters/constraintParameter');
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("PARAMETERMANAGER");
@@ -244,7 +243,8 @@ module.exports = class parameterManager  {
       if (parameterConf.type !== "boolean"
         && parameterConf.type !== "enumeration"
         && parameterConf.type !== "point"
-        && parameterConf.type !== "float") {
+        && parameterConf.type !== "float"
+        && parameterConf.type !== "constraint") {
         LOGGER.error("Le type du parametre est incorrect");
         return false;
       }
@@ -521,11 +521,137 @@ module.exports = class parameterManager  {
           LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
           return false;
         } else {
-          // TODO: vérifier que le point est bien dans le bbox
+          // TODO: vérification
         }
       } else {
         // il n'y a rien à faire
       }
+
+    } else if (serviceParameterConf.type === "constraint") {
+        /* TODO: Rajouter des contrôles sur les valeurs autorisées. */
+  
+        // Gestion des valeurs par défaut
+        if (serviceParameterConf.defaultValue === "true") {
+          // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
+          if (!resourceParameterJsonObject.defaultValueContent) {
+            LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+            return false;
+          } else {
+            // TODO: vérification
+          }
+        } else {
+          // il n'y a rien à faire
+        }
+
+        // Vérification du contenu de value 
+        if (!Array.isArray(resourceParameterJsonObject.values)) {
+          LOGGER.error("Les valeur du parametre constrainte n'est pas un tableau");
+          return false;
+        } 
+
+        if (resourceParameterJsonObject.values.length === 0) {
+          LOGGER.error("Les valeur du parametre constrainte est un tableau vide");
+          return false;
+        }
+
+        for(let i = 0; i < resourceParameterJsonObject.values.length; i++) {
+          let constraint = resourceParameterJsonObject.values[i];
+
+          if (!constraint.constraintType) {
+            LOGGER.error("Le type de la contrainte n'est pas defini");
+            return false;
+          } else {
+            if (constraint.constraintType !== "banned") {
+              LOGGER.error("Le type de la contrainte n'est pas correct");
+              return false;
+            } else {
+              // tout va bien
+            }
+          }
+
+          if (!Array.isArray(constraint.availableKeys)) {
+            LOGGER.error("Les cles de la contrainte ne sont pas dans un tableau");
+            return false;
+          }
+
+          if (constraint.availableKeys.length === 0) {
+            LOGGER.error("Les cles de la contrainte sont un tableau vide");
+            return false;
+          }
+
+          for(let j = 0; j < constraint.availableKeys.length; j++) {
+            let key = constraint.availableKeys[j];
+
+            if (!key.keyType) {
+              LOGGER.error("Le type de la cle contrainte n'est pas precise");
+              return false;
+            } else {
+              if (key.keyType !== "kvp") {
+                LOGGER.error("Le type de la cle contrainte est invalide");
+                return false;
+              } else {
+                // tout va bien
+              }
+            }
+
+            if (!key.key) {
+              LOGGER.error("Le nom de la cle contrainte n'est pas precise");
+              return false;
+            } else {
+              // TODO: verification ? 
+            }
+
+            if (!key.id) {
+              LOGGER.error("L'id de la cle contrainte n'est pas precise");
+              return false;
+            } else {
+              // TODO: verification ? 
+            }
+
+            if (!key.availableValues) {
+              LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
+              return false;
+            } 
+
+            if (!Array.isArray(key.availableValues)) {
+              LOGGER.error("Les valeurs de la cle contrainte ne sont pas dans un tableau");
+              return false;
+            }
+
+            if (key.availableValues.length === 0) {
+              LOGGER.error("Les valeurs de la cle contrainte sont dans un tableau vide");
+              return false;
+            }
+
+            for(let l = 0; l < key.availableValues.length; l++) {
+              let value = key.availableValues[l];
+
+              if (key.keyType === "kvp") {
+
+                if (!value.value) {
+                  LOGGER.error("Les valeurs de la cle contrainte n'ont pas de nom defini");
+                  return false;
+                } else {
+                  // rien à faire 
+                }
+
+                if (!value.id) {
+                  LOGGER.error("Les valeurs de la cle contrainte n'ont pas d'id defini");
+                  return false;
+                } else {
+                  // TODO: vérification ? 
+                }
+
+              } else {
+                LOGGER.error("Le type de cle est inconnu donc il est impossible d'analyser les resultats");
+                return false;
+              }
+
+            }
+
+          }
+
+        }
 
     } else {
       LOGGER.fatal("La configuration du parametre de service est incorrecte !");
@@ -574,7 +700,9 @@ module.exports = class parameterManager  {
         curResParam = new PointParameter(curSerParam);
       } else if (curSerParamConf.type === "float") {
         curResParam = new FloatParameter(curSerParam);
-      } else {
+      } else if (curSerParamConf.type === "constraint") {
+        curResParam = new ConstraintParameter(curSerParam);
+      } else{
         LOGGER.error("Type inconnu");
         return false;
       }

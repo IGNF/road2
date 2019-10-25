@@ -8,6 +8,7 @@
     "costType",
     "costValue",
     "profile",
-    "direction"
+    "direction",
+    "constraints"
   ]
 }

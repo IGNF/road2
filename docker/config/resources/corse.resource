@@ -129,6 +129,35 @@
             "meter",
             "kilometer"
           ]
+        },
+        {
+          "id": "constraints",
+          "values": [
+            {
+              "constraintType": "banned",
+              "availableKeys": [
+                {
+                  "keyType": "kvp",
+                  "key": "wayType",
+                  "id": "way_type",
+                  "availableValues": [
+                    {
+                      "value": "autoroute",
+                      "id": "autoroute"
+                    },
+                    {
+                      "value": "tunnel",
+                      "id": "tunnel"
+                    },
+                    {
+                      "value": "pont",
+                      "id": "pont"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
