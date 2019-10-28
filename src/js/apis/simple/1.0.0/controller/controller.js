@@ -254,6 +254,23 @@ module.exports = {
     }
     // ---
 
+    // Contraintes
+    // ---
+    if (parameters.constraints) {
+
+      // Vérification de la validité des contraintes fournies
+      if (!routeOperation.getParameterById("constraints").check(parameters.constraints)) {
+        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      } else {
+        if (!routeOperation.getParameterById("constraints").convertIntoTable(parameters.constraints, routeRequest.constraints)) {
+          throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // il n'y a rien à faire
+    }
+
     return routeRequest;
 
   },

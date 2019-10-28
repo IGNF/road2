@@ -7,6 +7,8 @@
     "example": "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}",
     "type": "constraint",
     "min": 0,
-    "max": 3
+    "max": 3,
+    "explode": "false",
+    "style": "pipeDelimited"
   }
   

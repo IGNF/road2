@@ -1,6 +1,7 @@
 'use strict';
 
 const ResourceParameter = require('../parameters/resourceParameter');
+const Constraint = require('./constraint');
 
 /**
 *
@@ -17,7 +18,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   *
   * @function
   * @name constructor
-  * @description Constructeur de la classe EnumParameter
+  * @description Constructeur de la classe ConstraintParameter
   * @param {object} parameter - Référence au paramètre de service
   *
   */
@@ -31,6 +32,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     // values
     this._values = new Array();
+
+    // verificationHash
+    // hash pour faciliter les vérifications et faire les correspondances entre les apis et les valeurs du moteur
+    this._verification = {};
 
   }
 
@@ -69,9 +74,36 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     if (super.serviceParameter.defaultValue === "true") {
       this._defaultValueContent = parameterConf.defaultValueContent;
+      // TODO: Vérifier que cette valeur par défaut est comprise dans les valeurs disponibles
     }
 
     this._values = parameterConf.values;
+
+    // Remplissage du verificationHash
+    for(let i = 0; i < this._values.length; i++) {
+      // pour chaque type de contrainte 
+      this._verification[this._values[i].constraintType] = {};
+
+      for(let j = 0; j < this._values[i].availableKeys.length; j++) {
+        // pour chaque clé disponible 
+        this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key] = {};
+        this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key].keyId = this._values[i].availableKeys[j].id;
+
+        if (this._values[i].availableKeys[j].keyType === "kvp") {
+          this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key].keyType = "kvp";
+
+          for(let l = 0; l < this._values[i].availableKeys[j].availableValues.length; l++) {
+
+            this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key][this._values[i].availableKeys[j].availableValues[l].value] = this._values[i].availableKeys[j].availableValues[l].id;
+
+          }
+
+        } else {
+          return false;
+        }
+      }
+
+    }
 
     return true;
 
@@ -89,6 +121,72 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   */
   specificCheck(userValue, options) {
 
+    let userJson = {};
+
+    // peut-on bien convertir l'entrée de l'utilisateur en JSON
+    try {
+      userJson = JSON.parse(userValue);
+    } catch (err) {
+      return false;
+    }
+    
+    // Vérification du type de la contrainte
+    if (!userJson.constraintType) {
+      return false;
+    } else {
+      if (typeof userJson.constraintType !== "string") {
+        return false;
+      }
+      if (!this._verification[userJson.constraintType]) {
+        return false;
+      }
+    }
+
+    // Vérification de la clé 
+    if (!userJson.key) {
+      return false;
+    } else {
+      if (typeof userJson.key !== "string") {
+        return false;
+      }
+      if (!this._verification[userJson.constraintType][userJson.key]) {
+        return false;
+      }
+    }
+
+    if (this._verification[userJson.constraintType][userJson.key].keyType = "kvp") {
+
+      // Vérification de l'opérateur 
+      if (!userJson.operator) {
+        return false;
+      } else {
+        if (typeof userJson.operator !== "string") {
+          return false;
+        }
+        if (userJson.operator !== "=" && userJson.operator !== "!") {
+          return false;
+        }
+      }
+
+      // Vérification de la valeur 
+      if (!userJson.value) {
+        return false;
+      } else {
+        if (typeof userJson.value !== "string") {
+          return false;
+        }
+        if (!this._verification[userJson.constraintType][userJson.key][userJson.value]) {
+          return false;
+        } else {
+          // la contrainte est bien formulée et est disponible 
+          return true;
+        }
+      }
+
+    } else {
+      return false;
+    }
+
     return false;
 
   }
@@ -104,7 +202,20 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   */
   specificConvertion(userValue) {
 
+    let userJson = {};
+    
+    try {
+      userJson = JSON.parse(userValue);
+    } catch (err) {
+      return false;
+    }
 
+    let keyId = this._verification[userJson.constraintType][userJson.key].keyId;
+    let valueId = this._verification[userJson.constraintType][userJson.key][userJson.value];
+
+    let constraint = new Constraint(userJson.key, keyId, userJson.operator, userJson.value, valueId);
+
+    return constraint;
 
   }
 
