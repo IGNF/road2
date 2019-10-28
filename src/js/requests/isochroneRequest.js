@@ -36,6 +36,10 @@ module.exports = class isochroneRequest extends Request {
     this._costValue = costValue;
     this._profile = profile;
     this._direction = direction;
+
+    // Gestion des contraintes 
+    this._constraints = new Array();
+
   }
 
   /**
@@ -152,4 +156,28 @@ module.exports = class isochroneRequest extends Request {
   set direction(dr) {
     this._direction = dr;
   }
+
+  /**
+  *
+  * @function
+  * @name get constraints
+  * @description Récupérer les contraintes
+  *
+  */
+  get constraints () {
+    return this._constraints;
+  }
+
+  /**
+  *
+  * @function
+  * @name set constraints
+  * @description Attribuer les contraintes
+  *
+  */
+  set constraints (i) {
+    this._constraints = i;
+  }
+
+
 }

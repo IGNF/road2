@@ -263,7 +263,7 @@ module.exports = {
         throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
       } else {
         if (!routeOperation.getParameterById("constraints").convertIntoTable(parameters.constraints, routeRequest.constraints)) {
-          throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
+          throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
         }
       }
 
@@ -380,7 +380,27 @@ module.exports = {
       direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
-    return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+
+    // Contraintes
+    // ---
+    if (parameters.constraints) {
+
+      // Vérification de la validité des contraintes fournies
+      if (!isochroneOperation.getParameterById("constraints").check(parameters.constraints)) {
+        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      } else {
+        if (!isochroneOperation.getParameterById("constraints").convertIntoTable(parameters.constraints, isochroneRequest.constraints)) {
+          throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // il n'y a rien à faire
+    }
+
+    return isochroneRequest;
+    
   },
 
   /**
