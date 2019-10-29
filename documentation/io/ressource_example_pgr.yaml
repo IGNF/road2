@@ -113,6 +113,16 @@ resource:
         - id: "waysAttributes"
           values:
             - "name"
+        - id: "constraints"
+          values:
+            - keyType: "kvp"
+              key: "wayType"
+              id: "way_type"
+              availableConstraintType:
+                - "banned"
+              availableValues:
+                - value: "autoroute"
+                  id: "autoroute"
     - id: "isochrone"
       parameters:
         - id: "resource"
@@ -139,3 +149,13 @@ resource:
           values:
             - "departure"
             - "arrival"
+        - id: "constraints"
+          values:
+            - keyType: "kvp"
+              key: "wayType"
+              id: "way_type"
+              availableConstraintType:
+                - "banned"
+              availableValues:
+                - value: "autoroute"
+                  id: "autoroute"
