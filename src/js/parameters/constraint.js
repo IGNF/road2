@@ -16,6 +16,7 @@ module.exports = class Constraint {
     * @function
     * @name constructor
     * @description Constructeur de la classe Constraint
+    * @param {string} type - Type de la contrainte
     * @param {object} key - Clé demandée pour la contrainte
     * @param {object} keyId - Correspondance de la clé avec le moteur 
     * @param {string} operator - Opérateur demandé pour la contrainte
@@ -23,7 +24,10 @@ module.exports = class Constraint {
     * @param {object} valueId - Correspondance de la valeur avec le moteur
     *
     */
-    constructor(key, keyId, operator, value, valueId) {
+    constructor(type, key, keyId, operator, value, valueId) {
+
+        // Type
+        this._type = type;
 
         // clé
         this._key = key;
@@ -41,6 +45,17 @@ module.exports = class Constraint {
         this._valueId = valueId;
 
 
+    }
+
+    /**
+     *
+     * @function
+     * @name get type
+     * @description Récupérer le type de la contrainte
+     *
+     */
+    get type () {
+        return this._type;
     }
 
     /**

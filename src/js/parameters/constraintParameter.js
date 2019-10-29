@@ -37,6 +37,9 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     // hash pour faciliter les vérifications et faire les correspondances entre les apis et les valeurs du moteur
     this._verification = {};
 
+    // getcapabilities
+    this._getcapabilities = {};
+
   }
 
   /**
@@ -61,6 +64,17 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     return this._values;
   }
 
+    /**
+  *
+  * @function
+  * @name get getcapabilities
+  * @description Récupérer le getcapabilities 
+  *
+  */
+  get getcapabilities () {
+    return this._getcapabilities;
+  }
+
   /**
   *
   * @function
@@ -79,29 +93,45 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     this._values = parameterConf.values;
 
+    this._getcapabilities.keys = new Array(); 
+
     // Remplissage du verificationHash
     for(let i = 0; i < this._values.length; i++) {
-      // pour chaque type de contrainte 
-      this._verification[this._values[i].constraintType] = {};
+      // pour chaque clé disponible 
+      let currentKeyDescription = {};
+      currentKeyDescription.key = this._values[i].key;
 
-      for(let j = 0; j < this._values[i].availableKeys.length; j++) {
-        // pour chaque clé disponible 
-        this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key] = {};
-        this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key].keyId = this._values[i].availableKeys[j].id;
+      this._verification[this._values[i].key] = {};
+      this._verification[this._values[i].key].KeyId = this._values[i].id;
 
-        if (this._values[i].availableKeys[j].keyType === "kvp") {
-          this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key].keyType = "kvp";
+      this._verification[this._values[i].key].constraintType = new Array();
+      currentKeyDescription.availableConstraintType = new Array();
 
-          for(let l = 0; l < this._values[i].availableKeys[j].availableValues.length; l++) {
-
-            this._verification[this._values[i].constraintType][this._values[i].availableKeys[j].key][this._values[i].availableKeys[j].availableValues[l].value] = this._values[i].availableKeys[j].availableValues[l].id;
-
-          }
-
-        } else {
-          return false;
-        }
+      for (let j = 0; j < this._values[i].availableConstraintType.length; j++) {
+        this._verification[this._values[i].key].constraintType.push(this._values[i].availableConstraintType[j]);
+        currentKeyDescription.availableConstraintType.push(this._values[i].availableConstraintType[j]);
       }
+
+      if (this._values[i].keyType === "kvp") {
+
+        this._verification[this._values[i].key].keyType = "kvp";
+        
+        currentKeyDescription.availableOperators = new Array();
+        currentKeyDescription.availableOperators.push("=","!");
+        currentKeyDescription.values = new Array();
+
+        for(let l = 0; l < this._values[i].availableValues.length; l++) {
+
+          this._verification[this._values[i].key][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].id;
+          currentKeyDescription.values.push(this._values[i].availableValues[l].value);
+
+        }
+
+      } else {
+        return false;
+      }
+
+      this._getcapabilities.keys.push(currentKeyDescription);
 
     }
 
@@ -129,18 +159,6 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     } catch (err) {
       return false;
     }
-    
-    // Vérification du type de la contrainte
-    if (!userJson.constraintType) {
-      return false;
-    } else {
-      if (typeof userJson.constraintType !== "string") {
-        return false;
-      }
-      if (!this._verification[userJson.constraintType]) {
-        return false;
-      }
-    }
 
     // Vérification de la clé 
     if (!userJson.key) {
@@ -149,12 +167,30 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       if (typeof userJson.key !== "string") {
         return false;
       }
-      if (!this._verification[userJson.constraintType][userJson.key]) {
+      if (!this._verification[userJson.key]) {
         return false;
       }
     }
 
-    if (this._verification[userJson.constraintType][userJson.key].keyType = "kvp") {
+    // Vérification du type de la contrainte
+    if (!userJson.constraintType) {
+      return false;
+    } else {
+      if (typeof userJson.constraintType !== "string") {
+        return false;
+      }
+      let found = false;
+      for (let i = 0; i < this._verification[userJson.key].constraintType.length; i++) {
+        if (userJson.constraintType === this._verification[userJson.key].constraintType[i]) {
+          found = true;
+        }
+      }
+      if (!found) {
+        return false;
+      }
+    }
+
+    if (this._verification[userJson.key].keyType = "kvp") {
 
       // Vérification de l'opérateur 
       if (!userJson.operator) {
@@ -175,7 +211,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         if (typeof userJson.value !== "string") {
           return false;
         }
-        if (!this._verification[userJson.constraintType][userJson.key][userJson.value]) {
+        if (!this._verification[userJson.key][userJson.value]) {
           return false;
         } else {
           // la contrainte est bien formulée et est disponible 
@@ -210,10 +246,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    let keyId = this._verification[userJson.constraintType][userJson.key].keyId;
-    let valueId = this._verification[userJson.constraintType][userJson.key][userJson.value];
+    let keyId = this._verification[userJson.key].keyId;
+    let valueId = this._verification[userJson.key][userJson.value];
 
-    let constraint = new Constraint(userJson.key, keyId, userJson.operator, userJson.value, valueId);
+    let constraint = new Constraint(userJson.constraintType, userJson.key, keyId, userJson.operator, userJson.value, valueId);
 
     return constraint;
 

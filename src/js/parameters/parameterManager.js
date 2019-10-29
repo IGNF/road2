@@ -555,98 +555,91 @@ module.exports = class parameterManager  {
         }
 
         for(let i = 0; i < resourceParameterJsonObject.values.length; i++) {
-          let constraint = resourceParameterJsonObject.values[i];
+          let key = resourceParameterJsonObject.values[i];
 
-          if (!constraint.constraintType) {
-            LOGGER.error("Le type de la contrainte n'est pas defini");
+          if (!key.keyType) {
+            LOGGER.error("Le type de la cle contrainte n'est pas precise");
             return false;
           } else {
-            if (constraint.constraintType !== "banned") {
-              LOGGER.error("Le type de la contrainte n'est pas correct");
+            if (key.keyType !== "kvp") {
+              LOGGER.error("Le type de la cle contrainte est invalide");
               return false;
             } else {
               // tout va bien
             }
           }
 
-          if (!Array.isArray(constraint.availableKeys)) {
-            LOGGER.error("Les cles de la contrainte ne sont pas dans un tableau");
+          if (!key.availableConstraintType) {
+            LOGGER.error("Les types de contrainte pour cette cle ne sont pas precises");
             return false;
-          }
-
-          if (constraint.availableKeys.length === 0) {
-            LOGGER.error("Les cles de la contrainte sont un tableau vide");
-            return false;
-          }
-
-          for(let j = 0; j < constraint.availableKeys.length; j++) {
-            let key = constraint.availableKeys[j];
-
-            if (!key.keyType) {
-              LOGGER.error("Le type de la cle contrainte n'est pas precise");
-              return false;
-            } else {
-              if (key.keyType !== "kvp") {
-                LOGGER.error("Le type de la cle contrainte est invalide");
-                return false;
-              } else {
-                // tout va bien
-              }
-            }
-
-            if (!key.key) {
-              LOGGER.error("Le nom de la cle contrainte n'est pas precise");
-              return false;
-            } else {
-              // TODO: verification ? 
-            }
-
-            if (!key.id) {
-              LOGGER.error("L'id de la cle contrainte n'est pas precise");
-              return false;
-            } else {
-              // TODO: verification ? 
-            }
-
-            if (!key.availableValues) {
-              LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
+          } else {
+            if (!Array.isArray(key.availableConstraintType)) {
+              LOGGER.error("Les types de contrainte pour cette cle ne sont pas un tableau");
               return false;
             } 
-
-            if (!Array.isArray(key.availableValues)) {
-              LOGGER.error("Les valeurs de la cle contrainte ne sont pas dans un tableau");
+            if (key.availableConstraintType.length === 0) {
+              LOGGER.error("Les types de contrainte pour cette cle sont un tableau vide");
               return false;
             }
-
-            if (key.availableValues.length === 0) {
-              LOGGER.error("Les valeurs de la cle contrainte sont dans un tableau vide");
-              return false;
-            }
-
-            for(let l = 0; l < key.availableValues.length; l++) {
-              let value = key.availableValues[l];
-
-              if (key.keyType === "kvp") {
-
-                if (!value.value) {
-                  LOGGER.error("Les valeurs de la cle contrainte n'ont pas de nom defini");
-                  return false;
-                } else {
-                  // rien à faire 
-                }
-
-                if (!value.id) {
-                  LOGGER.error("Les valeurs de la cle contrainte n'ont pas d'id defini");
-                  return false;
-                } else {
-                  // TODO: vérification ? 
-                }
-
-              } else {
-                LOGGER.error("Le type de cle est inconnu donc il est impossible d'analyser les resultats");
+            for(let c = 0; c < key.availableConstraintType.length; c++) {
+              if (key.availableConstraintType[c] !== "banned") {
+                LOGGER.error("Les types de contrainte pour cette cle sont invalides");
                 return false;
               }
+            }
+          }
 
+          if (!key.key) {
+            LOGGER.error("Le nom de la cle contrainte n'est pas precise");
+            return false;
+          } else {
+            // TODO: verification ? 
+          }
+
+          if (!key.id) {
+            LOGGER.error("L'id de la cle contrainte n'est pas precise");
+            return false;
+          } else {
+            // TODO: verification ? 
+          }
+
+          if (!key.availableValues) {
+            LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
+            return false;
+          } 
+
+          if (!Array.isArray(key.availableValues)) {
+            LOGGER.error("Les valeurs de la cle contrainte ne sont pas dans un tableau");
+            return false;
+          }
+
+          if (key.availableValues.length === 0) {
+            LOGGER.error("Les valeurs de la cle contrainte sont dans un tableau vide");
+            return false;
+          }
+
+          for(let l = 0; l < key.availableValues.length; l++) {
+            let value = key.availableValues[l];
+
+            if (key.keyType === "kvp") {
+
+              if (!value.value) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas de nom defini");
+                return false;
+              } else {
+                // rien à faire 
+              }
+
+              if (!value.id) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas d'id defini");
+                return false;
+              } else {
+                // TODO: vérification ? 
+              }
+
+            } else {
+              LOGGER.error("Le type de cle est inconnu donc il est impossible d'analyser les resultats");
+              return false;
             }
 
           }
