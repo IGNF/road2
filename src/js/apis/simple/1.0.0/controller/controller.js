@@ -466,11 +466,19 @@ module.exports = {
       userResponse.duration = route.duration.value;
     }
 
-    // distance
-    userResponse.distance = route.distance.value;
+    // constraints
+    userResponse.constraints = new Array();
 
-    // duration
-    userResponse.duration = route.duration.value;
+    if (routeRequest.constraints.length !== 0) {
+      
+      for (let i = 0; i < routeRequest.constraints.length; i++) {
+        userResponse.constraints[i] = {};
+        userResponse.constraints[i].type = routeRequest.constraints[i].type;
+        userResponse.constraints[i].key = routeRequest.constraints[i].key;
+        userResponse.constraints[i].operator = routeRequest.constraints[i].operator;
+        userResponse.constraints[i].value = routeRequest.constraints[i].value;
+      }
+    }
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -608,6 +616,20 @@ module.exports = {
 
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;
+
+    // constraints
+    userResponse.constraints = new Array();
+
+    if (routeRequest.constraints.length !== 0) {
+      
+      for (let i = 0; i < routeRequest.constraints.length; i++) {
+        userResponse.constraints[i] = {};
+        userResponse.constraints[i].type = routeRequest.constraints[i].type;
+        userResponse.constraints[i].key = routeRequest.constraints[i].key;
+        userResponse.constraints[i].operator = routeRequest.constraints[i].operator;
+        userResponse.constraints[i].value = routeRequest.constraints[i].value;
+      }
+    }
 
     return userResponse;
 

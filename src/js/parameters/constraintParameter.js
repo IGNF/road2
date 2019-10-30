@@ -102,7 +102,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       currentKeyDescription.key = this._values[i].key;
 
       this._verification[this._values[i].key] = {};
-      this._verification[this._values[i].key].KeyId = this._values[i].id;
+      this._verification[this._values[i].key].keyId = this._values[i].id;
 
       this._verification[this._values[i].key].constraintType = new Array();
       currentKeyDescription.availableConstraintType = new Array();
