@@ -445,7 +445,7 @@ module.exports = class parameterManager  {
         /* TODO: À revoir. */
 
         LOGGER.error("Le parametre ne contient pas de valeurs alors qu'il doit en avoir");
-        return false; 
+        return false;
       }
 
       // Gestion des valeurs par défaut
@@ -529,7 +529,7 @@ module.exports = class parameterManager  {
 
     } else if (serviceParameterConf.type === "constraint") {
         /* TODO: Rajouter des contrôles sur les valeurs autorisées. */
-  
+
         // Gestion des valeurs par défaut
         if (serviceParameterConf.defaultValue === "true") {
           // on doit avoir une valeur indiquée qui sera celle utilisée par défaut
@@ -543,11 +543,11 @@ module.exports = class parameterManager  {
           // il n'y a rien à faire
         }
 
-        // Vérification du contenu de value 
+        // Vérification du contenu de value
         if (!Array.isArray(resourceParameterJsonObject.values)) {
           LOGGER.error("Les valeur du parametre constrainte n'est pas un tableau");
           return false;
-        } 
+        }
 
         if (resourceParameterJsonObject.values.length === 0) {
           LOGGER.error("Les valeur du parametre constrainte est un tableau vide");
@@ -561,7 +561,7 @@ module.exports = class parameterManager  {
             LOGGER.error("Le type de la cle contrainte n'est pas precise");
             return false;
           } else {
-            if (key.keyType !== "kvp") {
+            if (key.keyType !== "name") {
               LOGGER.error("Le type de la cle contrainte est invalide");
               return false;
             } else {
@@ -576,7 +576,7 @@ module.exports = class parameterManager  {
             if (!Array.isArray(key.availableConstraintType)) {
               LOGGER.error("Les types de contrainte pour cette cle ne sont pas un tableau");
               return false;
-            } 
+            }
             if (key.availableConstraintType.length === 0) {
               LOGGER.error("Les types de contrainte pour cette cle sont un tableau vide");
               return false;
@@ -593,20 +593,13 @@ module.exports = class parameterManager  {
             LOGGER.error("Le nom de la cle contrainte n'est pas precise");
             return false;
           } else {
-            // TODO: verification ? 
-          }
-
-          if (!key.id) {
-            LOGGER.error("L'id de la cle contrainte n'est pas precise");
-            return false;
-          } else {
-            // TODO: verification ? 
+            // TODO: verification ?
           }
 
           if (!key.availableValues) {
             LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
             return false;
-          } 
+          }
 
           if (!Array.isArray(key.availableValues)) {
             LOGGER.error("Les valeurs de la cle contrainte ne sont pas dans un tableau");
@@ -621,20 +614,27 @@ module.exports = class parameterManager  {
           for(let l = 0; l < key.availableValues.length; l++) {
             let value = key.availableValues[l];
 
-            if (key.keyType === "kvp") {
+            if (key.keyType === "name") {
 
               if (!value.value) {
                 LOGGER.error("Les valeurs de la cle contrainte n'ont pas de nom defini");
                 return false;
               } else {
-                // rien à faire 
+                // rien à faire
               }
 
-              if (!value.id) {
-                LOGGER.error("Les valeurs de la cle contrainte n'ont pas d'id defini");
+              if (!value.field) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas de field defini");
                 return false;
               } else {
-                // TODO: vérification ? 
+                // TODO: vérification ?
+              }
+
+              if (!value.condition) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas de condition defini");
+                return false;
+              } else {
+                // TODO: vérification ?
               }
 
             } else {
