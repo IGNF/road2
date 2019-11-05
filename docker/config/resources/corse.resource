@@ -134,22 +134,33 @@
           "id": "constraints",
           "values": [
             {
-              "keyType": "kvp",
+              "keyType": "name",
               "key": "wayType",
-              "id": "way_type",
               "availableConstraintType": ["banned"],
               "availableValues": [
                 {
                   "value": "autoroute",
-                  "id": "autoroute"
+                  "field": "acces_vehicule_leger",
+                  "condition": {
+                    "type": "equal",
+                    "value": "A péage"
+                  }
                 },
                 {
                   "value": "tunnel",
-                  "id": "tunnel"
+                  "field": "position_par_rappport_au_sol",
+                  "condition": {
+                    "type": "less",
+                    "value": "0"
+                  }
                 },
                 {
                   "value": "pont",
-                  "id": "pont"
+                  "field": "position_par_rappport_au_sol",
+                  "condition": {
+                    "type": "greater",
+                    "value": "0"
+                  }
                 }
               ]
             }

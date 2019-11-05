@@ -68,7 +68,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   *
   * @function
   * @name get getcapabilities
-  * @description Récupérer le getcapabilities 
+  * @description Récupérer le getcapabilities
   *
   */
   get getcapabilities () {
@@ -93,16 +93,15 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     this._values = parameterConf.values;
 
-    this._getcapabilities.keys = new Array(); 
+    this._getcapabilities.keys = new Array();
 
     // Remplissage du verificationHash
     for(let i = 0; i < this._values.length; i++) {
-      // pour chaque clé disponible 
+      // pour chaque clé disponible
       let currentKeyDescription = {};
       currentKeyDescription.key = this._values[i].key;
 
       this._verification[this._values[i].key] = {};
-      this._verification[this._values[i].key].keyId = this._values[i].id;
 
       this._verification[this._values[i].key].constraintType = new Array();
       currentKeyDescription.availableConstraintType = new Array();
@@ -112,17 +111,20 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         currentKeyDescription.availableConstraintType.push(this._values[i].availableConstraintType[j]);
       }
 
-      if (this._values[i].keyType === "kvp") {
+      if (this._values[i].keyType === "name") {
 
-        this._verification[this._values[i].key].keyType = "kvp";
-        
+        this._verification[this._values[i].key].keyType = "name";
+
         currentKeyDescription.availableOperators = new Array();
-        currentKeyDescription.availableOperators.push("=","!");
+        currentKeyDescription.availableOperators.push("=","!=");
         currentKeyDescription.values = new Array();
 
         for(let l = 0; l < this._values[i].availableValues.length; l++) {
 
-          this._verification[this._values[i].key][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].id;
+          this._verification[this._values[i].key][this._values[i].availableValues[l].value] = [
+            this._values[i].availableValues[l].field,
+            this._values[i].availableValues[l].condition
+          ];
           currentKeyDescription.values.push(this._values[i].availableValues[l].value);
 
         }
@@ -160,7 +162,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    // Vérification de la clé 
+    // Vérification de la clé
     if (!userJson.key) {
       return false;
     } else {
@@ -190,21 +192,21 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
     }
 
-    if (this._verification[userJson.key].keyType = "kvp") {
+    if (this._verification[userJson.key].keyType = "name") {
 
-      // Vérification de l'opérateur 
+      // Vérification de l'opérateur
       if (!userJson.operator) {
         return false;
       } else {
         if (typeof userJson.operator !== "string") {
           return false;
         }
-        if (userJson.operator !== "=" && userJson.operator !== "!") {
+        if (userJson.operator !== "=" && userJson.operator !== "!=") {
           return false;
         }
       }
 
-      // Vérification de la valeur 
+      // Vérification de la valeur
       if (!userJson.value) {
         return false;
       } else {
@@ -214,7 +216,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         if (!this._verification[userJson.key][userJson.value]) {
           return false;
         } else {
-          // la contrainte est bien formulée et est disponible 
+          // la contrainte est bien formulée et est disponible
           return true;
         }
       }
@@ -239,17 +241,25 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   specificConvertion(userValue) {
 
     let userJson = {};
-    
+
     try {
       userJson = JSON.parse(userValue);
     } catch (err) {
       return false;
     }
 
-    let keyId = this._verification[userJson.key].keyId;
-    let valueId = this._verification[userJson.key][userJson.value];
+    if (this._verification[userJson.key].keyType = "name") {
 
-    let constraint = new Constraint(userJson.constraintType, userJson.key, keyId, userJson.operator, userJson.value, valueId);
+      let field = this._verification[userJson.key][userJson.value][0];
+      let condition = this._verification[userJson.key][userJson.value][1];
+
+      let constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
+
+    } else if (this._verification[userJson.key].keyType = "geometry") {
+      // TODO: gérer ccontraintes geom
+    } else {
+      //
+    }
 
     return constraint;
 

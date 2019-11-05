@@ -18,13 +18,13 @@ module.exports = class Constraint {
     * @description Constructeur de la classe Constraint
     * @param {string} type - Type de la contrainte
     * @param {object} key - Clé demandée pour la contrainte
-    * @param {object} keyId - Correspondance de la clé avec le moteur 
+    * @param {object} field - Correspondance de la clé avec le moteur
     * @param {string} operator - Opérateur demandé pour la contrainte
     * @param {object} value - Valeur demandée pour la contrainte
-    * @param {object} valueId - Correspondance de la valeur avec le moteur
+    * @param {object} condition - Correspondance de la valeur avec le moteur
     *
     */
-    constructor(type, key, keyId, operator, value, valueId) {
+    constructor(type, key, field, operator, value, condition) {
 
         // Type
         this._type = type;
@@ -32,17 +32,17 @@ module.exports = class Constraint {
         // clé
         this._key = key;
 
-        // Correspondance de la clé avec le moteur 
-        this._keyId = keyId;
+        // Correspondance de la clé avec le moteur
+        this._field = field;
 
-        // operateur 
+        // operateur
         this._operator = operator;
 
-        // valeur 
+        // valeur
         this._value = value;
 
         // Correspondance de la valeur avec le moteur
-        this._valueId = valueId;
+        this._condition = condition;
 
 
     }
@@ -72,12 +72,12 @@ module.exports = class Constraint {
     /**
      *
      * @function
-     * @name get keyId
+     * @name get field
      * @description Récupérer la clé réelle de la contrainte
      *
      */
-    get keyId () {
-        return this._keyId;
+    get field () {
+        return this._field;
     }
 
     /**
@@ -105,12 +105,12 @@ module.exports = class Constraint {
     /**
      *
      * @function
-     * @name get valueId
+     * @name get condition
      * @description Récupérer la valeur réelle de la contrainte
      *
      */
-    get valueId () {
-        return this._valueId;
+    get condition () {
+        return this._condition;
     }
 
 
