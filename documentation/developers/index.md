@@ -199,3 +199,29 @@ Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le modul
 #### Pour la gestion d'une requête
 
 L'objet `request`, qui est transmis au service, pourra contenir des coordonnées dans la projection de la topologie source, ou une autre. Et l'objet `response`, qui sera rendu, contiendra des géométries exprimées dans la projection des points demandés. 
+
+## Optimisations pour une mise en production 
+
+### Utilisation de la RAM 
+
+#### Dans le cas d'OSRM 
+
+Le binaire d'OSRM  `osrm-routed` met en RAM les graphes chargés, par défaut. Mais le binding NodeJS ne le fait pas. Il peut donc être intéressant de mettre en RAM les graphes mannuellement. Et ensuite, on peut faire pointer le binding sur les fichiers déjà en RAM. 
+
+Pour cela, il suffit d'utiliser `tmpfs`. Tout d'abord en créant le dossier qui contiendra ce qui sera chargé en RAM:
+
+```
+sudo mkdir /media/virtuelram
+sudo chmod 777 /media/virtuelram
+sudo chmod 1777 /media/virtuelram
+```
+
+Puis de charger ce nouveau volume temporrairement:
+``` 
+sudo mount -t tmpfs -o size=512M tmpfs /media/virtuelram
+```
+
+Ou de manière définitive en éditant le fichier `/etc/fstab` avec le contenu suivant:
+```
+tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
+```
