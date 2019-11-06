@@ -113,6 +113,71 @@ module.exports = class Constraint {
         return this._condition;
     }
 
+    /**
+    *
+    * @function
+    * @name toSqlString
+    * @description Convertir la contrainte en condition SQL
+    * @return {string} condition sql
+    *
+    */
+    toSqlString () {
 
+      let resultingString = this.field;
+
+      if (this.operator == '=') {
+        // Opération en fonction du type de condition (dans une liste connue)
+        switch( this.condition.type ) {
+          case "equal":
+            resultingString += '=';
+          case "inequal":
+            resultingString += '!=';
+          case "greater":
+            resultingString += '>';
+          case "greatereq":
+            resultingString += '>=';
+          case "less":
+            resultingString += '<';
+          case "lesseq":
+            resultingString += '<=';
+          case "like":
+            resultingString += ' LIKE ';
+          case "intersection":
+            resultingString += ' && ';
+        }
+
+        resultingString += this.condition.value;
+
+      } else if (this.operator == '!=') {
+        resultingString += ' NOT (';
+        // Opération en fonction du type de condition (dans une liste connue)
+        switch( this.condition.type ) {
+          case "equal":
+            resultingString += '=';
+          case "inequal":
+            resultingString += '!=';
+          case "greater":
+            resultingString += '>';
+          case "greatereq":
+            resultingString += '>=';
+          case "less":
+            resultingString += '<';
+          case "lesseq":
+            resultingString += '<=';
+          case "like":
+            resultingString += ' LIKE ';
+          case "intersection":
+            resultingString += ' && ';
+        }
+
+        resultingString += this.condition.value;
+        resultingString += ')';
+
+      } else {
+        // voir s'il y a d'autres cas
+      }
+
+      return resultingString
+    }
 
 }

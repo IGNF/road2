@@ -227,6 +227,12 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
+        if (request.constaints.length !== 0) {
+
+        } else {
+          // on ne fait rien
+        }
+
       } else {
         // on va voir si c'est un autre type de requête
       }

@@ -143,7 +143,7 @@
                   "field": "acces_vehicule_leger",
                   "condition": {
                     "type": "equal",
-                    "value": "A péage"
+                    "value": "'A péage'"
                   }
                 },
                 {

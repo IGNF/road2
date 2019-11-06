@@ -256,7 +256,9 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       let constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
     } else if (this._verification[userJson.key].keyType = "geometry") {
-      // TODO: gérer ccontraintes geom
+      // TODO: gérer contraintes geom
+      // field = the_geom
+      // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }
     } else {
       //
     }

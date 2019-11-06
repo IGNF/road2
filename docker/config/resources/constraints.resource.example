@@ -13,7 +13,7 @@
           "condition": {
             # One of ["equal", "inequal", "greater", "greatereq", "less", "lesseq", "like"]
             "type": "equal",
-            "value": "A péage"
+            "value": "'A péage'"
           }
         },
         {
