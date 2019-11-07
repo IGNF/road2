@@ -261,13 +261,6 @@ paths:
         schema:
           type: "string"
         example: "car"
-      - name: "optimization"
-        in: "query"
-        description: "Mode de calcul utilisé pour déterminer l'itinéraire. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
-        required: false
-        schema:
-          type: "string"
-        example: "fastest"
       - name: "direction"
         in: "query"
         description: "Sens du parcours. Cela permet de définir le sens du parcours. Soit on définit un point de départ et on obtient les points d'arrivé potentiels. Soit on définit un point d'arrivé et on otient les points de départ potentiels. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."

@@ -98,7 +98,7 @@ services:
       - ${gatling_results}:/opt/gatling/results
     networks:
       - iti-network
-    command: "-s road2LoadTest"
+    command: "-s ${gatling_test_name}"
 
 volumes:
   iti-data-volume:
