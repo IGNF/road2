@@ -619,14 +619,14 @@ module.exports = {
     // constraints
     userResponse.constraints = new Array();
 
-    if (routeRequest.constraints.length !== 0) {
+    if (isochroneRequest.constraints.length !== 0) {
 
-      for (let i = 0; i < routeRequest.constraints.length; i++) {
+      for (let i = 0; i < isochroneRequest.constraints.length; i++) {
         userResponse.constraints[i] = {};
-        userResponse.constraints[i].type = routeRequest.constraints[i].type;
-        userResponse.constraints[i].key = routeRequest.constraints[i].key;
-        userResponse.constraints[i].operator = routeRequest.constraints[i].operator;
-        userResponse.constraints[i].value = routeRequest.constraints[i].value;
+        userResponse.constraints[i].type = isochroneRequest.constraints[i].type;
+        userResponse.constraints[i].key = isochroneRequest.constraints[i].key;
+        userResponse.constraints[i].operator = isochroneRequest.constraints[i].operator;
+        userResponse.constraints[i].value = isochroneRequest.constraints[i].value;
       }
     }
 

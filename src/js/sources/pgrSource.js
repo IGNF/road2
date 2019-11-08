@@ -274,14 +274,26 @@ module.exports = class pgrSource extends Source {
     } else if (request.operation === "isochrone") {
       if (request.type === "isochroneRequest") {
         const point = [request.point.lon, request.point.lat];
+        let constraints = "";
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4)";
+        if (request.constraints.length !== 0) {
+          let requestedConstraints = new Array();
+          for (let i = 0; i < request.constraints.length; i++) {
+            requestedConstraints.push( request.constraints[i].toSqlString() );
+          }
+          constraints = constraints + requestedConstraints.join(' AND ');
+        } else {
+          // on ne fait rien
+        }
+
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5)";
 
         const SQLParametersTable = [
           request.costValue,
           request.direction,
           this._configuration.storage.costColumn,
-          this._configuration.storage.rcostColumn
+          this._configuration.storage.rcostColumn,
+          constraints
         ];
 
         return new Promise( (resolve, reject) => {
