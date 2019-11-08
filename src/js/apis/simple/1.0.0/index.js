@@ -58,6 +58,7 @@ router.route("/route")
 
       // Vérification des paramètres de la requête
       const routeRequest = controller.checkRouteParameters(parameters, service);
+
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse

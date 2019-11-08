@@ -124,9 +124,9 @@ function createMap() {
         return false;
       }
 
-      
 
-      
+
+
       // on affiche ce point sur la carte
       utils.createFeature(clickedCoordinate);
 
@@ -138,33 +138,35 @@ function createMap() {
 }
 
 
-// Calculer un itinéraire 
+// Calculer un itinéraire
 function computeRoad() {
 
   // console.log("Calcul d'un itinéraire");
 
-  // Déclarations 
+  // Déclarations
   var finalResource = "";
   var finalOptimization = "";
   var finalProfile = "";
   var finalStart = "";
   var finalEnd = "";
   var finalIntermediates = "";
+  var finalConstraint = "";
 
   finalStart = document.getElementById('userStart').value;
   finalEnd = document.getElementById('userEnd').value;
   finalIntermediates = document.getElementById('userIntermediates').value;
+  finalConstraint = document.getElementById('userConstraint').value;
 
   // Gestion des points utilisateur
   if ( finalStart === "" || finalEnd === "" ) {
-    // il n'y a pas assez de points pour faire un itinéraire 
-    return false; 
+    // il n'y a pas assez de points pour faire un itinéraire
+    return false;
   } else  {
     // on continue
   }
 
 
-  // Gestion des paramètres de l'utilisateur 
+  // Gestion des paramètres de l'utilisateur
 
   if (document.forms["route-form"].elements["userResource"].value !== "") {
     finalResource = document.forms["route-form"].elements["userResource"].value;
@@ -185,13 +187,14 @@ function computeRoad() {
   }
 
   // on calcule l'itinéraire
-  fetch(road2Url + 
-    "resource=" + finalResource + 
-    "&profile=" + finalProfile + 
+  fetch(road2Url +
+    "resource=" + finalResource +
+    "&profile=" + finalProfile +
     "&optimization=" + finalOptimization +
-    "&start=" + finalStart + 
-    "&end="  + finalEnd + 
-    "&intermediates=" + finalIntermediates + 
+    "&start=" + finalStart +
+    "&end="  + finalEnd +
+    "&intermediates=" + finalIntermediates +
+    "&constraints=" + finalConstraint +
     "&geometryFormat=polyline&getSteps=true&getBbox=true")
   .then(function(r) {
     return r.json();
@@ -204,23 +207,23 @@ function computeRoad() {
 
 }
 
-// Supprimer l'itinéraire afficher sur la carte 
+// Supprimer l'itinéraire afficher sur la carte
 function cancelRoad() {
 
-  // Nettoyage du vecteur qui contient les données sur la map 
+  // Nettoyage du vecteur qui contient les données sur la map
   vectorSource.clear();
 
-  // Nettoyage du tableau qui contient les points 
+  // Nettoyage du tableau qui contient les points
   clickedPoints = new Array();
 
-  // Nettoyage du formulaire 
-  document.forms["route-form"].elements["userResource"].value = "";
+  // Nettoyage du formulaire
+  // document.forms["route-form"].elements["userResource"].value = "";
   document.forms["route-form"].elements["userProfile"].value = "";
   document.forms["route-form"].elements["userOptimization"].value = "";
   document.forms["route-form"].elements["userStart"].value = "";
   document.forms["route-form"].elements["userEnd"].value = "";
   document.forms["route-form"].elements["userIntermediates"].value = "";
-  
+
 }
 
 var utils = {

@@ -241,6 +241,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   specificConvertion(userValue) {
 
     let userJson = {};
+    let constraint;
 
     try {
       userJson = JSON.parse(userValue);
@@ -253,7 +254,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       let field = this._verification[userJson.key][userJson.value][0];
       let condition = this._verification[userJson.key][userJson.value][1];
 
-      let constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
+      constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
     } else if (this._verification[userJson.key].keyType = "geometry") {
       // TODO: gérer contraintes geom

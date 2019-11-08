@@ -270,7 +270,6 @@ module.exports = {
     } else {
       // il n'y a rien à faire
     }
-
     return routeRequest;
 
   },
@@ -400,7 +399,7 @@ module.exports = {
     }
 
     return isochroneRequest;
-    
+
   },
 
   /**
@@ -470,7 +469,7 @@ module.exports = {
     userResponse.constraints = new Array();
 
     if (routeRequest.constraints.length !== 0) {
-      
+
       for (let i = 0; i < routeRequest.constraints.length; i++) {
         userResponse.constraints[i] = {};
         userResponse.constraints[i].type = routeRequest.constraints[i].type;
@@ -621,7 +620,7 @@ module.exports = {
     userResponse.constraints = new Array();
 
     if (routeRequest.constraints.length !== 0) {
-      
+
       for (let i = 0; i < routeRequest.constraints.length; i++) {
         userResponse.constraints[i] = {};
         userResponse.constraints[i].type = routeRequest.constraints[i].type;

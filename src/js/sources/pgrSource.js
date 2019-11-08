@@ -157,8 +157,8 @@ module.exports = class pgrSource extends Source {
   *
   */
   computeRequest (request) {
-
     let pgrRequest = {};
+
     if (request.operation === "route") {
 
       // Construction de l'objet pour la requête pgr
@@ -166,6 +166,7 @@ module.exports = class pgrSource extends Source {
       // ---
       const coordinatesTable = new Array();
       let attributes = "";
+      let constraints = "";
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -227,24 +228,33 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
-        if (request.constaints.length !== 0) {
+        if (request.constraints.length !== 0) {
 
+          let requestedConstraints = new Array();
+          for (let i = 0; i < request.constraints.length; i++) {
+            requestedConstraints.push( request.constraints[i].toSqlString() );
+          }
+
+          constraints = constraints + requestedConstraints.join(' AND ');
         } else {
           // on ne fait rien
         }
+
 
       } else {
         // on va voir si c'est un autre type de requête
       }
       // ---
-      const queryString = "SELECT * FROM shortest_path_with_algorithm(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,$4,ARRAY [" + attributes + "]::text[])";
+
+      const queryString = "SELECT * FROM shortest_path_pgrouting(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[],$4)";
 
       const SQLParametersTable = [
         this._profile,
         this._cost,
         this._reverseCost,
-        request.algorithm
+        constraints
       ];
+
 
       return new Promise( (resolve, reject) => {
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
