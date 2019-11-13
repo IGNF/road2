@@ -162,8 +162,6 @@ module.exports = class Constraint {
           resultingString += ' NOT (';
           resultingString += this.field;
           // Opération en fonction du type de condition (dans une liste connue)
-          console.log(this.condition.type);
-
           switch( this.condition.type ) {
             case "equal":
               resultingString += '=';

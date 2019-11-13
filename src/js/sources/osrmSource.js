@@ -180,8 +180,6 @@ module.exports = class osrmSource extends Source {
         // on va voir si c'est un autre type de requête
       }
 
-      // ---
-
       return new Promise ( (resolve, reject) => {
         this.osrm.route(osrmRequest, (err, result) => {
           if (err) {
@@ -298,7 +296,7 @@ module.exports = class osrmSource extends Source {
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         }
-        
+
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");

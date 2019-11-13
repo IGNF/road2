@@ -2,7 +2,7 @@
   "id": "constraints",
   "values": [
     {
-      # One of: ["name", "geometry"]
+      # One of: ["name", "numerical", "geometry"]
       "keyType": "name",
       "key": "wayType",
       "availableConstraintType": ["banned"],
@@ -37,11 +37,18 @@
       ]
     },
     {
-      # One of: ["name", "geometry"]
+      # One of: ["name", "numerical", "geometry"]
       "keyType": "geometry",
       "key": "exclusionArea",
       "availableConstraintType": ["banned"]
       # No need for availableValues when geometry
+    },
+    {
+      # One of: ["name", "numerical", "geometry"]
+      "keyType": "numerical",
+      "key": "roadWidth",
+      "availableConstraintType": ["banned"]
+      "field": "largeur_de_chaussee"
     }
   ]
 }

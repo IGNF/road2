@@ -21,7 +21,7 @@
     "pg": "7.8.1",
     "@mapbox/polyline": "1.1.0",
     "@turf/turf": "5.1.6",
-    "proj4": "2.5.0", 
+    "proj4": "2.5.0",
     "assert": "2.0.0"
   },
   "devDependencies": {
