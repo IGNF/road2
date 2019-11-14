@@ -47,7 +47,7 @@
       # One of: ["name", "numerical", "geometry"]
       "keyType": "numerical",
       "key": "roadWidth",
-      "availableConstraintType": ["banned"]
+      "availableConstraintType": ["banned"],
       "field": "largeur_de_chaussee"
     }
   ]

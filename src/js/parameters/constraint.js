@@ -154,6 +154,9 @@ module.exports = class Constraint {
             case "intersection":
               resultingString += ' && ';
               break;
+            case "!=":
+              resultingString += '!=';
+              break;
           }
 
           resultingString += this.condition.value;
@@ -162,6 +165,7 @@ module.exports = class Constraint {
           resultingString += ' NOT (';
           resultingString += this.field;
           // Opération en fonction du type de condition (dans une liste connue)
+
           switch( this.condition.type ) {
             case "equal":
               resultingString += '=';
@@ -187,8 +191,19 @@ module.exports = class Constraint {
             case "intersection":
               resultingString += ' && ';
               break;
+            case "=":
+              resultingString += '=';
+              break;
           }
 
+          resultingString += this.condition.value;
+          resultingString += ')';
+
+        } else if ( [ ">", "<", ">=", "<=" ].includes(this.operator) ){
+          // on est on mode numerical
+          resultingString += ' NOT (';
+          resultingString += this.field;
+          resultingString += this.operator;
           resultingString += this.condition.value;
           resultingString += ')';
 
