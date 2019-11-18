@@ -381,28 +381,6 @@ getCapabilities:
 		  	  	  default: {"name","cost","duration","distance"}
 		  	  	  #éléments présents par défaut dans osrm
 		  	  	  values: {"name","cost","duration","distance"}
-		  	- id: "nearest"
-		  	  availableParameters:
-		  	  	- id: "resource"
-		  	  	  values: {"bduni"}
-		  	  	- id: "point"
-		  	  	  values:
-		  	  	  	bbox: "-90,-180,90,180"
-		  	  	  	projection: "EPSG:4326"
-		  	  	- id: "format"
-		  	  	  default: "application/json"
-		  	  	  values: {"application/json","application/xml"}
-		  	  	- id: "number"
-		  	  	  default: 1
-		  	  	  values:
-		  	  	  	min: 1
-		  	  	  	max: 100
-		  	  	- id: "getId"
-		  	  	  default: false
-		  	  	  values: {"true","false"}
-		  	  	- id: "type"
-		  	  	  default: "all"
-		  	  	  values: {"all","nodes","arcs"}
 		- id: "bduni_j+1"
 		  description: "Données BDUNI v2 mise à jour quotidiennement."
 		  availableOperations:
@@ -504,28 +482,6 @@ getCapabilities:
 		  	  	  # cost, duration et distance sont toujours calculés par défaut
 		  	  	  default: {"name","cost","duration","distance"}
 		  	  	  values: {"name","type","cost","duration","distance","slope"}
-		  	- id: "nearest"
-		  	  availableParameters:
-		  	  	- id: "resource"
-		  	  	  values: {"bduni_j+1"}
-		  	  	- id: "point"
-		  	  	  values:
-		  	  	  	bbox: "0,6000000,1300000,7200000"
-		  	  	  	projection: "EPSG:2154"
-		  	  	- id: "format"
-		  	  	  default: "application/json"
-		  	  	  values: {"application/json","application/xml"}
-		  	  	- id: "number"
-		  	  	  default: 1
-		  	  	  values:
-		  	  	  	min: 1
-		  	  	  	max: 100
-		  	  	- id: "getId"
-		  	  	  default: false
-		  	  	  values: {"true","false"}
-		  	  	- id: "type"
-		  	  	  default: "all"
-		  	  	  values: {"all","nodes","arcs"}
 		  	- id: "isochrone" #seules les ressources pgr proposent de l'isochrone
 		  	  availableParameters:
 		  	  	- id: "resource"

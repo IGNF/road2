@@ -25,6 +25,9 @@ class road2World {
         // Url du service 
         this._url  = "";
 
+        // Port 
+        this._port = 8080;
+
         // Chemin du service 
         this._path = "";
 
@@ -37,8 +40,9 @@ class road2World {
         // Paramètres par défaut disponibles 
         this._defaultParameters = new Array();
 
-        // Paramètres utilisés
-        this._parameters = {};
+        // Body contenant l'ensemble des paramètres
+        // Au moment de la requête, ce body sera envoyé si c'est du POST et traduit dans l'url si c'est du GET
+        this._body = {};
 
         // Réponse
         this._response = {};
@@ -58,6 +62,8 @@ class road2World {
         let configuration = JSON.parse(fs.readFileSync(configurationPath));
 
         this._url = configuration.url;
+
+        this._port = configuration.port;
 
         this._defaultParameters = configuration.defaultParameters; 
 
@@ -81,10 +87,8 @@ class road2World {
 
             if (this._defaultParameters[i].id === operation) {
 
-                for(let param in this._defaultParameters[i].parameters) {
-                    this._parameters[param] = this._defaultParameters[i].parameters[param];
-                }
-
+                this._body = this._defaultParameters[i].parameters;
+                
                 return true;
 
             } else {
@@ -99,8 +103,8 @@ class road2World {
     unsetQueryParameters(parametersToDelete) {
 
         for(let i = 0; i < parametersToDelete.length; i++) {
-            if (this._parameters[parametersToDelete[i].key]) {
-                this._parameters[parametersToDelete[i].key] = "";
+            if (this._body[parametersToDelete[i].key]) {
+                this._body[parametersToDelete[i].key] = "";
             } else {
                 // le parametre n'existe pas
             }
@@ -111,48 +115,114 @@ class road2World {
     setQueryParameters(parametersToAdd) {
 
         for(let i = 0; i < parametersToAdd.length; i++) {
-            this._parameters[parametersToAdd[i].key] = parametersToAdd[i].value;
+            this._body[parametersToAdd[i].key] = parametersToAdd[i].value;
         }
 
     }
 
+    setTableParameters(key, valuesToAdd) {
+        
+        let arrayParameters = new Array();
+        for(let i = 0; i < valuesToAdd.length; i++) {
+            arrayParameters.push(valuesToAdd[i].value)
+        }
+        this._body[key] = arrayParameters;
+        
+    }
+
     sendRequest() {
 
-        // Url finale 
-        let finalUrl = this._protocol + "://" + this._url + this._path + "?";
+        let finalOptions = {};
 
-        for(let param in this._parameters) {
-            finalUrl = finalUrl + "&" + param + "=" + this._parameters[param];
-        }
+        if (this._method === "GET") {
 
-        // Retour d'une promesse pour gérer l'asynchronisme du http.get
-        return new Promise ( (resolve, reject) => {
+            // Traduction du body dans l'url 
+            let finalUrl = this._protocol.toLowerCase() + "://" + this._url + ":" + this._port + this._path + "?";
+            for(let param in this._body) {
+                finalUrl +=  "&" + param + "=" + this._body[param].toString();
+            }
 
-            http.get(finalUrl, (response) => {
+            // Retour d'une promesse pour gérer l'asynchronisme du http.get
+            return new Promise ( (resolve, reject) => {
 
-                this._status = response.statusCode;
-                this._header = response.headers;
+                http.get(finalUrl, (response) => {
 
-                // il faut passer par cet objet intermédiaire
-                let rawResponse = "";
+                    this._status = response.statusCode;
+                    this._header = response.headers;
 
-                // Stockage progressif 
-                response.on('data', (data) => {
-                    rawResponse += data;
+                    // il faut passer par cet objet intermédiaire
+                    let rawResponse = "";
+
+                    // Stockage progressif 
+                    response.on('data', (data) => {
+                        rawResponse += data;
+                    });
+
+                    // Stockage final
+                    response.on('end', () => {
+                        this._response = rawResponse;
+                        resolve();
+                    });
+
+                // Si erreur lors de la requête 
+                }).on('error', (err) => {
+                    reject(err);
                 });
-
-                // Stockage final
-                response.on('end', () => {
-                    this._response = rawResponse;
-                    resolve();
-                });
-
-            // Si erreur lors de la requête 
-            }).on('error', (err) => {
-                reject(err);
-            });
 
         });
+
+        } else if (this._method === "POST") {
+
+            finalOptions = {
+                protocol: this._protocol.toLowerCase()+":",
+                host: this._url,
+                port: this._port,
+                path: this._path,
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            };
+
+            // Retour d'une promesse pour gérer l'asynchronisme du http.get
+            return new Promise ( (resolve, reject) => {
+
+                let request = http.request(finalOptions, (response) => {
+
+                    this._status = response.statusCode;
+                    this._header = response.headers;
+
+                    // il faut passer par cet objet intermédiaire
+                    let rawResponse = "";
+
+                    // Stockage progressif 
+                    response.on('data', (data) => {
+                        rawResponse += data;
+                    });
+
+                    // Stockage final
+                    response.on('end', () => {
+                        this._response = rawResponse;
+                        resolve();
+                    });
+
+                // Si erreur lors de la requête 
+                }).on('error', (err) => {
+                    reject(err);
+                });
+
+                // Envoie de la requête
+                request.write(JSON.stringify(this._body));
+                request.end();
+                
+
+            });
+            
+        } else {
+            
+        }
+
+        
 
     }
 

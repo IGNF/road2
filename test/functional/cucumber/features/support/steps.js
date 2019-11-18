@@ -21,7 +21,10 @@ Given('with query parameters:', function (table) {
     this.setQueryParameters(table.hashes());
 });
 
-  
+Given('with table parameters for {string}:', function (key, table) {
+    this.setTableParameters(key, table.hashes());
+});
+
 When("I send the request", function(done) {
     this.sendRequest()
     .then(() => {
