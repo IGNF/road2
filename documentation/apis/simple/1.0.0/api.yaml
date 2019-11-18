@@ -8,7 +8,7 @@ info:
 servers:
   - url: "https://itineraire.ign.fr/simple/1.0.0/"
     description: "Serveur de test IGN"
-  - url: "https://localhost:8080/simple/1.0.0/"
+  - url: "http://localhost:8080/simple/1.0.0/"
     description: "Serveur de test local"
 tags:
 - name: "Découverte"
@@ -63,13 +63,13 @@ paths:
         example: "48.852891,2.367776"
       - name: "intermediates"
         in: "query"
-        description: "Points intermédiaires. Ils devront être exprimés dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities). S'il y a plusieurs points, ils devront être séparé par un pipe et l'ordre considéré sera celui donné."
+        description: "Points intermédiaires. Ils devront être exprimés dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
         required: false
         schema:
           $ref: "#/components/schemas/coordinates"
         explode: false
         style: "pipeDelimited"
-        example: "48.852890,2.368776|48.842891,2.367976"
+        example: "48.852890,2.368776"
       - name: "profile"
         in: "query"
         description: "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
@@ -108,8 +108,12 @@ paths:
         description: "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities."
         required: false
         schema:
-          type: "string"
-        example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}"
+          type: "array"
+          items:
+            type: "string"
+        example: ["{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}"]
+        explode: false
+        style: "pipeDelimited"
       - name: "getSteps"
         in: "query"
         description: "Présence des étapes dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
@@ -160,6 +164,7 @@ paths:
           type: "array"
           items:
             type: "string"
+        example: "name"
         explode: false
         style: "pipeDelimited"
       responses:
@@ -274,8 +279,10 @@ paths:
         description: "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities."
         required: false
         schema:
-          type: "string"
-        example: "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}"
+          type: "array"
+          items:
+            type: "string"
+        example: ["{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}"]
       - name: "format"
         in: "query"
         description: "Format de la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."

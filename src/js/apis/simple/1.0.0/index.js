@@ -12,8 +12,14 @@ var router = express.Router();
 
 // CORS
 // ---
-// Pour cette API, on va applicer les CORS sur l'ensemble du router
+// Pour cette API, on va appliquer les CORS sur l'ensemble du router
 router.use(cors());
+// ---
+
+// POST
+// ---
+// Pour cette API, on va permettre la lecture des requêtes POST
+router.use(express.json()) // for parsing application/json
 // ---
 
 // Accueil de l'API
@@ -41,6 +47,7 @@ router.all("/getcapabilities", function(req, res) {
 // Route
 // Pour effectuer un calcul d'itinéraire
 router.route("/route")
+
   .get(async function(req, res, next) {
 
     // On récupère l'instance de Service pour faire les calculs
@@ -57,7 +64,7 @@ router.route("/route")
     try {
 
       // Vérification des paramètres de la requête
-      const routeRequest = controller.checkRouteParameters(parameters, service);
+      const routeRequest = controller.checkRouteParameters(parameters, service, "GET");
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse
@@ -70,13 +77,42 @@ router.route("/route")
       return next(error);
     }
 
-})
-  .post(function(req, res) {
-  res.send("/route en POST");
-});
+  })
+
+  .post(async function(req, res, next) {
+
+    // On récupère l'instance de Service pour faire les calculs
+    let service = req.app.get("service");
+
+    // on vérifie que l'on peut faire cette opération sur l'instance du service
+    if (!service.verifyAvailabilityOperation("route")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.body;
+
+    try {
+
+      // Vérification des paramètres de la requête
+      const routeRequest = controller.checkRouteParameters(parameters, service, "POST");
+      // Envoie au service et récupération de l'objet réponse
+      const routeResponse = await service.computeRequest(routeRequest);
+      // Formattage de la réponse
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse);
+
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
 
 /* Génération d'isochrone. */
 router.route("/isochrone")
+
   .get(async function(req, res, next) {
     let service = req.app.get("service");
 
@@ -88,7 +124,7 @@ router.route("/isochrone")
 
     try {
       // Vérification des paramètres de la requête
-      const isochroneRequest = controller.checkIsochroneParameters(parameters, service);
+      const isochroneRequest = controller.checkIsochroneParameters(parameters, service, "GET");
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
       // Formattage de la réponse.
@@ -99,8 +135,28 @@ router.route("/isochrone")
       return next(error);
     }
   })
-  .post(function(req, res) {
-    res.send("/isochrone en POST");
+
+  .post(async function(req, res, next) {
+    let service = req.app.get("service");
+
+    if (!service.verifyAvailabilityOperation("isochrone")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
+    let parameters = req.body;
+
+    try {
+      // Vérification des paramètres de la requête
+      const isochroneRequest = controller.checkIsochroneParameters(parameters, service, "POST");
+      // Envoie au service et récupération de l'objet réponse
+      const isochroneResponse = await service.computeRequest(isochroneRequest);
+      // Formattage de la réponse.
+      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
+
+      res.status(200).json(userResponse);
+    } catch (error) {
+      return next(error);
+    }
 });
 
 // Gestion des erreurs

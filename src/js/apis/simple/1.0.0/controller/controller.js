@@ -15,11 +15,12 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /route
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
+  * @param {string} method - Méthode de la requête 
   * @return {object} RouteRequest - Instance de la classe RouteRequest
   *
   */
 
-  checkRouteParameters: function(parameters, service) {
+  checkRouteParameters: function(parameters, service, method) {
 
     let resource;
     let start = {};
@@ -127,11 +128,21 @@ module.exports = {
     // ---
     if (parameters.intermediates) {
 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
+      // Cette vérification se fera donc dans le check du paramètre 
+      let finalIntermediates = "";
+      if (method === "POST") {
+        finalIntermediates = this.convertPostArrayToGetParameters(parameters.intermediates, routeOperation.getParameterById("intermediates").serviceParameter);
+      } else {
+        finalIntermediates = parameters.intermediates;
+      }
+      // -- 
+
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("intermediates").check(parameters.intermediates)) {
+      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates)) {
         throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
-        if (!routeOperation.getParameterById("intermediates").convertIntoTable(parameters.intermediates, routeRequest.intermediates, askedProjection)) {
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, askedProjection)) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
         }
       }
@@ -165,11 +176,21 @@ module.exports = {
     // ---
     if (parameters.waysAttributes) {
 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
+      // Cette vérification se fera donc dans le check du paramètre 
+      let finalWaysAttributes = "";
+      if (method === "POST") {
+        finalWaysAttributes = this.convertPostArrayToGetParameters(parameters.waysAttributes, routeOperation.getParameterById("waysAttributes").serviceParameter);
+      } else {
+        finalWaysAttributes = parameters.waysAttributes;
+      }
+      // -- 
+
       // Vérification de la validité des attributs demandés
-      if (!routeOperation.getParameterById("waysAttributes").check(parameters.waysAttributes)) {
+      if (!routeOperation.getParameterById("waysAttributes").check(finalWaysAttributes)) {
         throw errorManager.createError(" Parameter 'waysAttributes' is invalid ", 400);
       } else {
-        if (!routeOperation.getParameterById("waysAttributes").convertIntoTable(parameters.waysAttributes, routeRequest.waysAttributes)) {
+        if (!routeOperation.getParameterById("waysAttributes").convertIntoTable(finalWaysAttributes, routeRequest.waysAttributes)) {
           throw errorManager.createError(" Parameter 'waysAttributes' is invalid ", 400);
         }
       }
@@ -265,10 +286,11 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /isochrone
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
+  * @param {string} method - Méthode de la requête 
   * @return {object} IsochroneRequest - Instance de la classe IsochroneRequest
   *
   */
-  checkIsochroneParameters: function(parameters, service) {
+  checkIsochroneParameters: function(parameters, service, method) {
     let resource;
     let point = {};
     let costType;
@@ -573,6 +595,59 @@ module.exports = {
     userResponse.optimization = isochroneResponse.optimization;
 
     return userResponse;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name writeIsochroneResponse
+  * @description Transformation d'un paramètre POST en chaîne de caractères pour avoir l'équivalent d'un paramètre GET. 
+  * @param {object} userParameter - Paramètre POST donné par l'utilisateur
+  * @param {Parameter} serviceParameter - Instance de la classe Parameter
+  * @return {string|array} Paramètre en GET
+  *
+  */
+
+  convertPostArrayToGetParameters: function(userParameter, serviceParameter) {
+
+    let finalParameter = "";
+    let separator = "";
+
+    if (serviceParameter.explode === "false") {
+      if (serviceParameter.style === "pipeDelimited") {
+        separator = "|";
+      } else {
+        // ne doit pas arriver
+        throw errorManager.createError(" Error in parameter configuration. ", 500);
+      }
+    } else {
+      // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET
+      return userParameter;
+    } 
+
+    if (!Array.isArray(userParameter)) {
+      throw errorManager.createError(" The parameter is not an array. ", 400);
+    }
+    if (userParameter.length === 0) {
+      throw errorManager.createError(" The parameter is an empty array. ", 400);
+    }
+
+    try {
+      finalParameter = userParameter[0].toString();
+    } catch(err) {
+      throw errorManager.createError(" The parameter can't be converted to a string. ", 400);
+    }
+
+    for (let i = 1; i < userParameter.length; i++) {
+      try {
+        finalParameter = finalParameter + separator + userParameter[i].toString();
+      } catch(err) {
+        throw errorManager.createError(" The parameter can't be converted to a string. ", 400);
+      }
+    }
+
+    return finalParameter;
 
   }
 

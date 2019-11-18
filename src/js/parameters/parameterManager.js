@@ -303,6 +303,33 @@ module.exports = class parameterManager  {
       }
     }
 
+    // explode et style 
+    if (parameterConf.explode) {
+
+      if (parameterConf.explode !== "true" && parameterConf.explode !== "false") {
+        LOGGER.error("Le parametre explode est incorrect");
+        return false;
+      } else {
+
+        // Si explode=false alors on doit avoir une valeur pour style
+        if (parameterConf.explode === "false") {
+          if (parameterConf.style) {
+            if (parameterConf.style !== "pipeDelimited") {
+              LOGGER.error("Le parametre style est incorrect");
+              return false;
+            } 
+          } else {
+            LOGGER.error("Le parametre style n'est pas present alors que explode=false");
+            return false;
+          }
+
+        } else {
+          // rien à vérifier
+        }
+        
+      }
+    }
+
     LOGGER.info("Parametre ok");
     return true;
 
