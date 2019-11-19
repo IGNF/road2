@@ -74,14 +74,6 @@ getCapabilities:
 	        schema:
 	          type: "enumeration"
 	        example: "application/json"
-	      - name: "algorithm"
-	        in: "query"
-	        description: "Algorithme utilisé pour le calcul."
-	        required: false
-	        default: true
-	        schema:
-	          type: "enumeration"
-	        example: "contraction-hierarchies"
 	      - name: "constraints"
 	        in: "query"
 	        description: "Contraintes pour le calcul."
@@ -330,9 +322,6 @@ getCapabilities:
 		  	  	- id: "optimization"
 		  	  	  default: "fastest"
 		  	  	  values: {"fastest","shortest"}
-		  	  	- id: "algorithm"
-		  	  	  default: "contraction-hierarchies"
-		  	  	  values: {"contraction-hierarchies","multi-level-dijkstra"}
 		  	  	- id: "constraints"
 		  	  	  maxItems: 2
 		  	  	  values:
@@ -409,9 +398,6 @@ getCapabilities:
 		  	  	- id: "format"
 		  	  	  default: "application/json"
 		  	  	  values: {"application/json","application/xml"}
-		  	  	- id: "algorithm"
-		  	  	  default: "dijkstra"
-		  	  	  values: {"dijkstra","a-star","k"}
 		  	  	- id: "constraints"
 		  	  	  maxItems: 2
 		  	  	  values:

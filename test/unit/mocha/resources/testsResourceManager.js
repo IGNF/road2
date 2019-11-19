@@ -118,13 +118,6 @@ describe('Test de la classe ResourceManager', function() {
             ]
           },
           {
-            "id": "algorithm",
-            "defaultValueContent": "ch",
-            "values": [
-              "ch"
-            ]
-          },
-          {
             "id": "geometryFormat",
             "defaultValueContent": "geojson",
             "values": [

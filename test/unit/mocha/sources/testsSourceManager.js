@@ -106,13 +106,6 @@ describe('Test de la classe SourceManager', function() {
             ]
           },
           {
-            "id": "algorithm",
-            "defaultValueContent": "ch",
-            "values": [
-              "ch"
-            ]
-          },
-          {
             "id": "geometryFormat",
             "defaultValueContent": "geojson",
             "values": [

@@ -147,15 +147,6 @@
             ]
           },
           {
-            "id": "algorithm",
-            "defaultValueContent": "trsp",
-            "values": [
-              "dijkstra",
-              "astar",
-              "trsp"
-            ]
-          },
-          {
             "id": "geometryFormat",
             "defaultValueContent": "geojson",
             "values": [

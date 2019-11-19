@@ -200,20 +200,6 @@ module.exports = {
     }
     // ---
 
-    // algoritm
-    if (parameters.algorithm) {
-      // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("algorithm").check(parameters.algorithm)) {
-        throw errorManager.createError(" Parameter 'algorithm' is invalid ", 400);
-      }
-      routeRequest.algorithm = parameters.algorithm;
-    } else {
-      // On met la valeur par défaut issue de la configuration
-      // TODO: que faire s'il n'y a pas de valeur par défaut ?
-      routeRequest.algorithm = routeOperation.getParameterById("algorithm").defaultValueContent;
-    }
-    // ---
-
     // geometryFormat
     if (parameters.geometryFormat) {
       // Vérification de la validité du paramètre fourni

@@ -237,7 +237,7 @@ module.exports = class pgrSource extends Source {
         this._profile,
         this._cost,
         this._reverseCost,
-        request.algorithm
+        "trsp"
       ];
 
       return new Promise( (resolve, reject) => {
