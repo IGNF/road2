@@ -246,6 +246,32 @@ module.exports = {
       distanceUnitParameterDescription.example = "meter";
       routeDescription.parameters.push(distanceUnitParameterDescription);
 
+      // route.parameters.constraints
+      let constraintsServiceParameter = serviceOpRoute.getParameterById("constraints");
+      let constraintsParameterDescription = {};
+      constraintsParameterDescription.name = "constraints";
+      constraintsParameterDescription.in = "query";
+      constraintsParameterDescription.description = constraintsServiceParameter.description;
+      constraintsParameterDescription.required = constraintsServiceParameter.required;
+      constraintsParameterDescription.default = constraintsServiceParameter.defaultValue;
+      constraintsParameterDescription.schema = {};
+      constraintsParameterDescription.schema.type = "array";
+      constraintsParameterDescription.schema.items = {};
+      constraintsParameterDescription.schema.items.type = "object";
+      constraintsParameterDescription.schema.items.properties = {};
+      constraintsParameterDescription.schema.items.properties.constraintType = {};
+      constraintsParameterDescription.schema.items.properties.constraintType.type = "string";
+      constraintsParameterDescription.schema.items.properties.key = {};
+      constraintsParameterDescription.schema.items.properties.key.type = "string";
+      constraintsParameterDescription.schema.items.properties.operator = {};
+      constraintsParameterDescription.schema.items.properties.operator.type = "string";
+      constraintsParameterDescription.schema.items.properties.value = {};
+      constraintsParameterDescription.schema.items.properties.value.type = "string";
+      constraintsParameterDescription.explode = "false";
+      constraintsParameterDescription.style = "pipeDelimited";
+      constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
+      routeDescription.parameters.push(constraintsParameterDescription);
+
       // -- end route.parameters
 
       getCapabilities.operations.push(routeDescription);
@@ -383,6 +409,13 @@ module.exports = {
         routeDistanceUnit.id = "distanceUnit";
         routeDistanceUnit.values = distanceUnitParameter.values;
         routeAvailableOperation.availableParameters.push(routeDistanceUnit);
+
+        // route.constraints
+        let constraintsParameter = resourceOperation.getParameterById("constraints");
+        let routeConstraints = {};
+        routeConstraints.id = "constraints";
+        routeConstraints.values = constraintsParameter.getcapabilities;
+        routeAvailableOperation.availableParameters.push(routeConstraints);
 
         resourceDescription.availableOperations.push(routeAvailableOperation);
 

@@ -122,6 +122,42 @@
             "meter",
             "kilometer"
           ]
+        },
+        {
+          "id": "constraints",
+          "values": [
+            {
+              "keyType": "name",
+              "key": "wayType",
+              "availableConstraintType": ["banned"],
+              "availableValues": [
+                {
+                  "value": "autoroute",
+                  "field": "acces_vehicule_leger",
+                  "condition": {
+                    "type": "equal",
+                    "value": "'A péage'"
+                  }
+                },
+                {
+                  "value": "tunnel",
+                  "field": "position_par_rapport_au_sol",
+                  "condition": {
+                    "type": "less",
+                    "value": "0"
+                  }
+                },
+                {
+                  "value": "pont",
+                  "field": "position_par_rapport_au_sol",
+                  "condition": {
+                    "type": "greater",
+                    "value": "0"
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     }

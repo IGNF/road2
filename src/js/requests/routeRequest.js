@@ -67,6 +67,10 @@ module.exports = class routeRequest extends Request {
     // distanceUnit
     this._distanceUnit = "meter";
 
+    // Constraints
+    // Tableau contenant des instances de Constraint
+    this._constraints = new Array();
+
   }
 
   /**
@@ -306,6 +310,28 @@ module.exports = class routeRequest extends Request {
   */
   set distanceUnit (i) {
     this._distanceUnit = i;
+  }
+
+  /**
+  *
+  * @function
+  * @name get constraints
+  * @description Récupérer les contraintes
+  *
+  */
+  get constraints () {
+    return this._constraints;
+  }
+
+  /**
+  *
+  * @function
+  * @name set constraints
+  * @description Attribuer les contraintes
+  *
+  */
+  set constraints (i) {
+    this._constraints = i;
   }
 
 

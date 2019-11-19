@@ -1,0 +1,54 @@
+{
+  "id": "constraints",
+  "values": [
+    {
+      # One of: ["name", "numerical", "geometry"]
+      "keyType": "name",
+      "key": "wayType",
+      "availableConstraintType": ["banned"],
+      "availableValues": [
+        {
+          "value": "autoroute",
+          "field": "acces_vehicule_leger",
+          "condition": {
+            # One of ["equal", "inequal", "greater", "greatereq", "less", "lesseq", "like"]
+            "type": "equal",
+            "value": "'A péage'"
+          }
+        },
+        {
+          "value": "tunnel",
+          "field": "position_par_rappport_au_sol",
+          "condition": {
+            # One of ["equal", "inequal", "greater", "greatereq", "less", "lesseq", "like"]
+            "type": "less",
+            "value": "0"
+          }
+        },
+        {
+          "value": "pont",
+          "field": "position_par_rappport_au_sol",
+          "condition": {
+            # One of ["equal", "inequal", "greater", "greatereq", "less", "lesseq", "like"]
+            "type": "greater",
+            "value": "0"
+          }
+        }
+      ]
+    },
+    {
+      # One of: ["name", "numerical", "geometry"]
+      "keyType": "geometry",
+      "key": "exclusionArea",
+      "availableConstraintType": ["banned"]
+      # No need for availableValues when geometry
+    },
+    {
+      # One of: ["name", "numerical", "geometry"]
+      "keyType": "numerical",
+      "key": "roadWidth",
+      "availableConstraintType": ["banned"],
+      "field": "largeur_de_chaussee"
+    }
+  ]
+}

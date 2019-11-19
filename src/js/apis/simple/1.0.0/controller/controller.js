@@ -261,6 +261,32 @@ module.exports = {
     }
     // ---
 
+    // Contraintes
+    // ---
+    if (parameters.constraints) {
+
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
+      // Cette vérification se fera donc dans le check du paramètre 
+      let finalConstraints = "";
+      if (method === "POST") {
+        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
+      } else {
+        finalConstraints = parameters.constraints;
+      }
+      // -- 
+
+      // Vérification de la validité des contraintes fournies
+      if (!routeOperation.getParameterById("constraints").check(finalConstraints)) {
+        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      } else {
+        if (!routeOperation.getParameterById("constraints").convertIntoTable(finalConstraints, routeRequest.constraints)) {
+          throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // il n'y a rien à faire
+    }
     return routeRequest;
 
   },
@@ -371,7 +397,37 @@ module.exports = {
       direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
-    return new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+
+    // Contraintes
+    // ---
+    if (parameters.constraints) {
+
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
+      // Cette vérification se fera donc dans le check du paramètre 
+      let finalConstraints = "";
+      if (method === "POST") {
+        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
+      } else {
+        finalConstraints = parameters.constraints;
+      }
+      // -- 
+
+      // Vérification de la validité des contraintes fournies
+      if (!isochroneOperation.getParameterById("constraints").check(finalConstraints)) {
+        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      } else {
+        if (!isochroneOperation.getParameterById("constraints").convertIntoTable(finalConstraints, isochroneRequest.constraints)) {
+          throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+        }
+      }
+
+    } else {
+      // il n'y a rien à faire
+    }
+
+    return isochroneRequest;
+
   },
 
   /**
@@ -437,11 +493,19 @@ module.exports = {
       userResponse.duration = route.duration.value;
     }
 
-    // distance
-    userResponse.distance = route.distance.value;
+    // constraints
+    userResponse.constraints = new Array();
 
-    // duration
-    userResponse.duration = route.duration.value;
+    if (routeRequest.constraints.length !== 0) {
+
+      for (let i = 0; i < routeRequest.constraints.length; i++) {
+        userResponse.constraints[i] = {};
+        userResponse.constraints[i].type = routeRequest.constraints[i].type;
+        userResponse.constraints[i].key = routeRequest.constraints[i].key;
+        userResponse.constraints[i].operator = routeRequest.constraints[i].operator;
+        userResponse.constraints[i].value = routeRequest.constraints[i].value;
+      }
+    }
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse
     // Portions
@@ -580,6 +644,20 @@ module.exports = {
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;
 
+    // constraints
+    userResponse.constraints = new Array();
+
+    if (isochroneRequest.constraints.length !== 0) {
+
+      for (let i = 0; i < isochroneRequest.constraints.length; i++) {
+        userResponse.constraints[i] = {};
+        userResponse.constraints[i].type = isochroneRequest.constraints[i].type;
+        userResponse.constraints[i].key = isochroneRequest.constraints[i].key;
+        userResponse.constraints[i].operator = isochroneRequest.constraints[i].operator;
+        userResponse.constraints[i].value = isochroneRequest.constraints[i].value;
+      }
+    }
+
     return userResponse;
 
   },
@@ -620,14 +698,22 @@ module.exports = {
     }
 
     try {
-      finalParameter = userParameter[0].toString();
+      if (typeof userParameter[0] !== "object") {
+        finalParameter = userParameter[0];
+      } else {
+        finalParameter = JSON.stringify(userParameter[0]);
+      }
     } catch(err) {
       throw errorManager.createError(" The parameter can't be converted to a string. ", 400);
     }
 
     for (let i = 1; i < userParameter.length; i++) {
       try {
-        finalParameter = finalParameter + separator + userParameter[i].toString();
+        if (typeof userParameter[0] !== "object") {
+          finalParameter = finalParameter + separator + userParameter[i];
+        } else {
+          finalParameter = finalParameter + separator + JSON.stringify(userParameter[i]);
+        }
       } catch(err) {
         throw errorManager.createError(" The parameter can't be converted to a string. ", 400);
       }
