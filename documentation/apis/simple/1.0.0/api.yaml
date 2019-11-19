@@ -97,12 +97,6 @@ paths:
         schema:
           type: "string"
           enum: ["geojson","polyline"]
-      - name: "algorithm"
-        in: "query"
-        description: "Algorithme utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. L'algorithme est la méthode informatitque employée par le service pour calculer un itinéraire."
-        required: false
-        schema:
-          type: "string"
       - name: "constraints"
         in: "query"
         description: "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities."
@@ -442,8 +436,6 @@ components:
           type: "string"
         format:
           $ref: "#/components/schemas/response-type"
-        algorithm:
-          type: "string"
         constraints:
           type: "array"
           items:
@@ -518,8 +510,6 @@ components:
         end:
           $ref: "#/components/schemas/point"
         geometry:
-          type: "string"
-        algorithm:
           type: "string"
         duration:
           type: "number"

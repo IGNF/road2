@@ -194,19 +194,6 @@ module.exports = {
       geometryFormatParameterDescription.example = "geojson";
       routeDescription.parameters.push(geometryFormatParameterDescription);
 
-      // route.parameters.algorithm
-      let algorithmServiceParameter = serviceOpRoute.getParameterById("algorithm");
-      let algorithmParameterDescription = {};
-      algorithmParameterDescription.name = "algorithm";
-      algorithmParameterDescription.in = "query";
-      algorithmParameterDescription.description = algorithmServiceParameter.description;
-      algorithmParameterDescription.required = algorithmServiceParameter.required;
-      algorithmParameterDescription.default = algorithmServiceParameter.defaultValue;
-      algorithmParameterDescription.schema = {};
-      algorithmParameterDescription.schema.type = "enumeration";
-      algorithmParameterDescription.example = "ch";
-      routeDescription.parameters.push(algorithmParameterDescription);
-
       // route.parameters.getBbox
       let getBboxServiceParameter = serviceOpRoute.getParameterById("bbox");
       let getBboxParameterDescription = {};
@@ -394,13 +381,6 @@ module.exports = {
         routeGeometriesFormat.id = "geometryFormat";
         routeGeometriesFormat.values = geometryFormatParameter.values;
         routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
-
-        // route.algorithm
-        let algorithmParameter = resourceOperation.getParameterById("algorithm");
-        let routeAlgorithm = {};
-        routeAlgorithm.id = "algorithm";
-        routeAlgorithm.values = algorithmParameter.values;
-        routeAvailableOperation.availableParameters.push(routeAlgorithm);
 
         // route.getBbox
         let bboxParameter = resourceOperation.getParameterById("bbox");

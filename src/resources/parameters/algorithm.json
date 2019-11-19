@@ -1,9 +1,0 @@
-{
-  "id": "algorithm",
-  "name": "Algorithme",
-  "description": "Algorithme utilisé",
-  "required": "false",
-  "defaultValue": "true",
-  "example": "trsp",
-  "type": "enumeration"
-}
