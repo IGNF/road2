@@ -148,7 +148,7 @@
                 },
                 {
                   "value": "tunnel",
-                  "field": "position_par_rapport_au_sol::integer",
+                  "field": "position_par_rapport_au_sol",
                   "condition": {
                     "type": "less",
                     "value": "0"
@@ -156,7 +156,7 @@
                 },
                 {
                   "value": "pont",
-                  "field": "position_par_rapport_au_sol::integer",
+                  "field": "position_par_rapport_au_sol",
                   "condition": {
                     "type": "greater",
                     "value": "0"
