@@ -90,16 +90,11 @@ module.exports = class Base {
   async disconnect() {
 
     try {
-
-      const err = await this._pool.end();
-      if (err) {
-        LOGGER.error("deconnection error", err.stack)
-        throw errorManager.createError("Cannot disconnect to database");
-      } else {
-        LOGGER.info("Deconnecte a la base");
-        this._connected = false;
-      }
-
+      LOGGER.info("Deconnection de la base...");
+      await this._pool.end(() => {
+        LOGGER.info("Deconnection du pool effectuee");
+      });
+      this._connected = false;
     } catch(err) {
       throw errorManager.createError("Cannot disconnect to database");
     }

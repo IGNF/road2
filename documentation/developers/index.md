@@ -202,6 +202,10 @@ L'objet `request`, qui est transmis au service, pourra contenir des coordonnées
 
 ## Optimisations pour une mise en production 
 
+### Affichage des erreurs
+
+Par défaut, si Road2 rencontre une erreur, il va renvoyer au client le contenu de cette erreur. C'est un comportement adapté lors des développements. Mais en production, il est préférable de renvoyer une erreur générique. Pour cela, il suffit de lancer Road2 avec la variable `NODE_ENV` à `production`.  
+
 ### Utilisation de la RAM 
 
 #### Dans le cas d'OSRM 
