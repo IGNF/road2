@@ -683,7 +683,7 @@ module.exports = {
         separator = "|";
       } else {
         // ne doit pas arriver
-        throw errorManager.createError(" Error in parameter configuration. ", 500);
+        throw errorManager.createError(" Error in parameter configuration. ");
       }
     } else {
       // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET

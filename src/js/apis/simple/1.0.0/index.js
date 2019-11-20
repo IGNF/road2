@@ -177,7 +177,7 @@ router.use(notFoundError);
 */
 
 function logError(err, req, res, next) {
-  LOGGER.info({
+  LOGGER.error({
     request: req.originalUrl,
     error: {
       errorType: err.code,
@@ -197,8 +197,23 @@ function logError(err, req, res, next) {
 */
 
 function sendError(err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: {errorType: err.code, message: err.message}});
+  // On ne veut pas le même comportement en prod et en dev 
+  if (process.env.NODE_ENV === "production") {
+    if (err.status) {
+      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client 
+      res.status(err.status);
+      res.json({ error: {errorType: err.code, message: err.message}});
+    } else {
+      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur 
+      res.status(500);
+      res.json({ error: {errorType: "internal", message: "Internal Server Error"}});
+    }
+  } else {
+    // En dev, on veut faire remonter n'importe quelle erreur 
+    res.status(err.status || 500);
+    res.json({ error: {errorType: err.code, message: err.message}});
+  }
+
 }
 
 /**
