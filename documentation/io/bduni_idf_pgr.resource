@@ -49,7 +49,6 @@
         "id": "bduni-idf-car-fastest-pgr",
         "type": "pgr",
         "storage": {
-          "dbConfig": "/home/geoevolution/road2-config/db_config_output.json",
           "costColumn": "cost_s_car",
           "rcostColumn": "reverse_cost_s_car"
         },
@@ -73,7 +72,6 @@
         "id": "bduni-idf-car-shortest-pgr",
         "type": "pgr",
         "storage": {
-          "dbConfig": "/home/geoevolution/road2-config/db_config_output.json",
           "costColumn": "cost_m_car",
           "rcostColumn": "reverse_cost_m_car"
         },
