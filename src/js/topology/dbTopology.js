@@ -26,12 +26,12 @@ module.exports = class dbTopology extends Topology {
   * @param{string} projection - Projection de la topologie
   * @param{string} bbox - Bbox de la topologie
   * @param{object} base - Instance de la classe Base
-  * @param{string} table - Nom de la table contenant la topologie
+  * @param{string} schema - Nom de la schema contenant la topologie
   * @param{table} defaultAttributes - Tableau d'objets {key: 'test', column:'test_column', default: 'true'}
   * @param{table} otherAttributes - Tableau d'objets {key: 'test', column:'test_column', default: 'false'}
   *
   */
-  constructor(id, description, projection, bbox, base, table, defaultAttributes, otherAttributes) {
+  constructor(id, description, projection, bbox, base, schema, defaultAttributes, otherAttributes) {
 
     // ID de la topologie
     super(id, "db", description, projection, bbox);
@@ -39,8 +39,8 @@ module.exports = class dbTopology extends Topology {
     // Référence à la base de données
     this._base = base;
 
-    // Table contenant la topologie
-    this._table = table;
+    // Schema contenant la topologie
+    this._schema = schema;
 
     // stockage des attributs par défaut
     this._defaultAttributes = defaultAttributes;
@@ -75,12 +75,12 @@ module.exports = class dbTopology extends Topology {
   /**
   *
   * @function
-  * @name get table
-  * @description Récupérer la table
+  * @name get schema
+  * @description Récupérer le schema
   *
   */
-  get table () {
-    return this._table;
+  get schema () {
+    return this._schema;
   }
 
   /**

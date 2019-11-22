@@ -38,7 +38,7 @@
         # Permet de savoir où est stocké la topologie utilisée. Cela est utile uniquement pour l'administrateur.
         "storage":
 					$ref: "#/components/schemas/storage"
-          required: true
+          required: false
         # Projection d'origine des données
         "projection":
           type: string
@@ -79,7 +79,7 @@
               # Indique où se trouve le fichier .lua qui a permis de générer le .osrm
 							"compute":
 								type: object
-                required: true
+                required: false
 								properties:
 									"storage":
 										$ref: "#/components/schemas/storage"

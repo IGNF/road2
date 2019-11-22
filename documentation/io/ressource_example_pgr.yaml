@@ -11,7 +11,7 @@ resource:
     storage:
       base:
         dbConfig: "dbconfig.json"
-        table: "bduni-pgr"
+        schema: "public"
         attributes:
           - key: "name"
             column: "ways_name"

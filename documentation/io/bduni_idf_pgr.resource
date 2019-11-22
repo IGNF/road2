@@ -10,7 +10,7 @@
       "storage": {
         "base": {
           "dbConfig": "/home/geoevolution/road2-config/db_config_output.json",
-          "table": "ways",
+          "schema": "public",
           "attributes": [
             {
               "key": "name",

@@ -184,17 +184,14 @@ module.exports = class topologyManager {
 
     // Stockage de la topologie
     if (!topologyJsonDescription.storage) {
-      LOGGER.error("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
-      return false;
+      LOGGER.info("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
     } else {
-      // on continue
-    }
-
-    if (!storageManager.checkJsonStorage(topologyJsonDescription.storage)) {
-      LOGGER.error("Stockage de la topologie incorrect.");
-      return false;
-    } else {
-      // rien à faire
+      if (!storageManager.checkJsonStorage(topologyJsonDescription.storage)) {
+        LOGGER.error("Stockage de la topologie incorrect.");
+        return false;
+      } else {
+        // rien à faire
+      }
     }
 
     return true;
@@ -235,9 +232,9 @@ module.exports = class topologyManager {
       }
     }
 
-    // table
-    if (!topologyJsonDescription.storage.base.table) {
-      LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.base.table'.");
+    // schema
+    if (!topologyJsonDescription.storage.base.schema) {
+      LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.base.schema'.");
       return false;
     } else {
       // TODO: vérification que ce n'est pas du code injecté
@@ -380,8 +377,15 @@ module.exports = class topologyManager {
 
     if (topologyJsonObject.type === "osm") {
 
+      let osmFile = "";
+      if (topologyJsonObject.storage) {
+        osmFile = topologyJsonObject.storage.file;
+      } else {
+
+      }
+
       topology = new OsmTopology(topologyJsonObject.id, topologyJsonObject.description,
-        topologyJsonObject.projection, topologyJsonObject.bbox, topologyJsonObject.storage.file);
+        topologyJsonObject.projection, topologyJsonObject.bbox, osmFile);
 
     } else if (topologyJsonObject.type === "db") {
 
@@ -402,7 +406,7 @@ module.exports = class topologyManager {
       }
       // création de la topologie
       topology = new DbTopology(topologyJsonObject.id, topologyJsonObject.description,
-        topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.table,
+        topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.schema,
         defaultAttributes, otherAttributes);
 
     } else {

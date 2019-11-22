@@ -46,6 +46,7 @@ module.exports = class pgrSource extends Source {
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
+    this.availableOperations.push("isochrone");
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
