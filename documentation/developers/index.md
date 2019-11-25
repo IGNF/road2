@@ -229,3 +229,16 @@ Ou de manière définitive en éditant le fichier `/etc/fstab` avec le contenu s
 ```
 tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
 ```
+
+## Outils pour le développement
+
+### Sonakube 
+
+Il est possible d'analyser régulièrement le code avec Sonarkube. On pourra utiliser un container pour le serveur: 
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+Cela demande d'installer le binaire `sonar-scanner` sur la machine. 
+
+Pour une analyse continue lors des développements, il est possible d'installer l'extension Sonarlint dans certains IDE. 

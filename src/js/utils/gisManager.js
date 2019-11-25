@@ -11,9 +11,15 @@
 *
 */
 function arraysEquals(arr1, arr2) {
-  if (arr1 === arr2) return true;
-  if (arr1 == null || arr2 == null) return false;
-  if (arr1.length != arr2.length) return false;
+  if (arr1 === arr2) {
+    return true;
+  }
+  if (arr1 === null || arr2 === null) {
+    return false;
+  }
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
 
   // If you don't care about the order of the elements inside
   // the array, you should sort both arrays here.
@@ -21,7 +27,9 @@ function arraysEquals(arr1, arr2) {
   // you might want to clone your array first.
 
   for (var i = 0; i < arr1.length; ++i) {
-    if (arr1[i] !== arr2[i]) return false;
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
   }
   return true;
 }
@@ -81,7 +89,7 @@ module.exports = {
 
     const common_point = arrays_intersection(firstLine, secondLine)[0];
 
-    if (firstLine.indexOf(common_point) == 0) {
+    if (firstLine.indexOf(common_point) === 0) {
       firstLine.reverse();
     }
     dissolvedCoords.push(...firstLine);

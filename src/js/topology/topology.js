@@ -1,11 +1,5 @@
 'use strict';
 
-const log4js = require('log4js');
-const errorManager = require('../utils/errorManager');
-
-// Création du LOGGER
-const LOGGER = log4js.getLogger("TOPOLOGY");
-
 /**
 *
 * @class

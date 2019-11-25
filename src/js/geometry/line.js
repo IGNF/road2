@@ -4,6 +4,7 @@ const errorManager = require('../utils/errorManager');
 const polyline = require('@mapbox/polyline');
 const Geometry = require('../geometry/geometry');
 const proj4 = require('proj4');
+const assert = require('assert');
 
 /**
 *
@@ -95,11 +96,11 @@ module.exports = class Line extends Geometry {
   *
   */
   _convertGeometry (geom, srcFormat, outFormat) {
-    if (srcFormat == outFormat) {
+    if (srcFormat === outFormat) {
       return geom;
-    } else if (srcFormat == "polyline" && outFormat == "geojson") {
+    } else if (srcFormat === "polyline" && outFormat === "geojson") {
       return polyline.toGeoJSON(geom);
-    } else if (srcFormat == "geojson" && outFormat == "polyline") {
+    } else if (srcFormat === "geojson" && outFormat === "polyline") {
       return polyline.fromGeoJSON(geom);
     } else {
       throw errorManager.createError("Unsupported geometry conversion");

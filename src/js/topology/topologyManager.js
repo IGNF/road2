@@ -1,7 +1,6 @@
 'use strict';
 
 const log4js = require('log4js');
-const errorManager = require('../utils/errorManager');
 const storageManager = require('../utils/storageManager');
 const DbTopology = require('./dbTopology');
 const OsmTopology = require('./osmTopology');
@@ -381,7 +380,7 @@ module.exports = class topologyManager {
       if (topologyJsonObject.storage) {
         osmFile = topologyJsonObject.storage.file;
       } else {
-
+        // ce n'est pas obligatoire 
       }
 
       topology = new OsmTopology(topologyJsonObject.id, topologyJsonObject.description,

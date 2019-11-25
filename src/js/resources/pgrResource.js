@@ -4,7 +4,6 @@ const Resource = require('./resource');
 
 // Création du LOGGER
 const log4js = require('log4js');
-var LOGGER = log4js.getLogger("SERVICE");
 
 /**
 *

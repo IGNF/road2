@@ -119,9 +119,7 @@ module.exports = class BoolParameter extends ResourceParameter {
     } else {
       return null;
     }
-
-    return null;
-
+    
   }
 
 

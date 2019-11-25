@@ -96,16 +96,12 @@ module.exports = class ProjectionManager {
     if (!Array.isArray(contentDir)) {
       LOGGER.error("Erreur lors de la lecture du dossier " + pathDir);
       return false;
-    } else {
+    } 
 
-    }
-
-    if (contentDir === 0) {
+    if (contentDir.length === 0) {
       LOGGER.error("Le dossier " + pathDir + " ne contient aucun fichier.");
       return false;
-    } else {
-
-    }
+    } 
 
     for (let i = 0; i < contentDir.length; i++) {
       let pathFile = pathDir + "/" + contentDir[i];
@@ -188,9 +184,7 @@ module.exports = class ProjectionManager {
     if (!configuration) {
       LOGGER.error("Pas de configuration");
       return false;
-    } else {
-
-    }
+    } 
 
     // id de la projection
     if (!configuration.id) {

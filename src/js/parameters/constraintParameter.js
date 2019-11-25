@@ -200,7 +200,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
     }
 
-    if (this._verification[userJson.key].keyType == "name") {
+    if (this._verification[userJson.key].keyType === "name") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -229,7 +229,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         }
       }
 
-    } else if (this._verification[userJson.key].keyType == "numerical") {
+    } else if (this._verification[userJson.key].keyType === "numerical") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -259,8 +259,6 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    return false;
-
   }
 
   /**
@@ -283,14 +281,14 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    if (this._verification[userJson.key].keyType == "name") {
+    if (this._verification[userJson.key].keyType === "name") {
 
       let field = this._verification[userJson.key][userJson.value][0];
       let condition = this._verification[userJson.key][userJson.value][1];
 
       constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType == "numerical") {
+    } else if (this._verification[userJson.key].keyType === "numerical") {
 
       let field = this._verification[userJson.key].field;
 
@@ -300,7 +298,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
       constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType == "geometry") {
+    } else if (this._verification[userJson.key].keyType === "geometry") {
       // TODO: gérer contraintes geom
       // field = the_geom
       // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }

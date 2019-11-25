@@ -311,14 +311,6 @@ module.exports = {
         routeAvailableOperation.id = "route";
         routeAvailableOperation.availableParameters = new Array();
 
-        // récupération de la description
-        let routeDescriptionFromResource = {};
-        for (let i = 0; i < localResource.configuration.availableOperations.length; i++) {
-          if (localResource.configuration.availableOperations[i].id === "route") {
-            routeDescriptionFromResource = localResource.configuration.availableOperations[i];
-          }
-        }
-
         // route.resource
         let resourceParameter = resourceOperation.getParameterById("resource");
         let routeResource = {};

@@ -264,7 +264,7 @@ module.exports = class parameterManager  {
         LOGGER.error("Le parametre min est incorrect: valeur non entiere");
         return false;
       }
-      if (parameter.required === "true") {
+      if (parameterConf.required === "true") {
         if (tmpMin < 1) {
           LOGGER.error("Le parametre min est incorrect: valeur inferieure a 1");
           return false;

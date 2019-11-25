@@ -125,8 +125,8 @@ module.exports = class Constraint {
 
       let resultingString = '';
 
-      if (this.type == 'banned') {
-        if (this.operator == '!=') {
+      if (this.type === 'banned') {
+        if (this.operator === '!=') {
           resultingString += this.field;
           // Opération en fonction du type de condition (dans une liste connue)
           switch( this.condition.type ) {
@@ -161,7 +161,7 @@ module.exports = class Constraint {
 
           resultingString += this.condition.value;
 
-        } else if (this.operator == '=') {
+        } else if (this.operator === '=') {
           resultingString += ' NOT (';
           resultingString += this.field;
           // Opération en fonction du type de condition (dans une liste connue)

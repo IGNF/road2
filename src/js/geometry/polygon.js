@@ -3,7 +3,6 @@
 const errorManager = require('../utils/errorManager');
 const polygon = require('@turf/helpers');
 const Geometry = require('../geometry/geometry');
-const proj4 = require('proj4');
 
 /**
 *
@@ -56,7 +55,7 @@ module.exports = class Polygon extends Geometry {
 
     if (srcFormat === dstFormat) {
       return geom;
-    } else if (outFormat == "geojson") {
+    } else if (dstFormat === "geojson") {
       return polygon(this._geom);
     } else {
       throw errorManager.createError("Conversion failed (unsupported format).");

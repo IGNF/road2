@@ -407,7 +407,7 @@ module.exports = {
       // Cette vérification se fera donc dans le check du paramètre 
       let finalConstraints = "";
       if (method === "POST") {
-        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
+        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, isochroneOperation.getParameterById("constraints").serviceParameter);
       } else {
         finalConstraints = parameters.constraints;
       }

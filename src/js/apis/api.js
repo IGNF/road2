@@ -153,7 +153,7 @@ module.exports = class Api {
   initialize (route, app) {
 
     // on execute la fonction d'initialisation de l'api
-    if (this._initFile != "") {
+    if (this._initFile !== "") {
 
       if (!this._init.run(app, this._uid)) {
         LOGGER.error("Erreur lors de l'initialisation de l'api.");
@@ -183,7 +183,7 @@ module.exports = class Api {
   */
   update (app) {
 
-    if (this._updateFile != "") {
+    if (this._updateFile !== "") {
 
       if (!this._update.run(app, this._uid)) {
         LOGGER.error("Erreur lors de la MAJ de l'api.");
