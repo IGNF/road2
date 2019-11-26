@@ -4,6 +4,7 @@
 const express = require('express');
 const log4js = require('log4js');
 const cors = require('cors');
+const helmet = require('helmet');
 const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
 
@@ -14,6 +15,12 @@ var router = express.Router();
 // ---
 // Pour cette API, on va appliquer les CORS sur l'ensemble du router
 router.use(cors());
+// ---
+
+// Sécurisation de l'API
+// --- 
+// Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
+router.use(helmet());
 // ---
 
 // POST

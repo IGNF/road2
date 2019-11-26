@@ -87,6 +87,10 @@ module.exports = class PointParameter extends ResourceParameter {
   */
   specificCheck(userValue) {
 
+    if (typeof userValue !== "string") {
+      return false;
+    }
+
     let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
 
     if (!tmpStringCoordinates) {

@@ -89,6 +89,10 @@ module.exports = class EnumParameter extends ResourceParameter {
   */
   specificCheck(userValue, options) {
 
+    if (typeof userValue !== "string") {
+      return false;
+    }
+
     for (let j = 0; j < this._values.length; j++) {
       if (userValue === this._values[j]) {
         return true;

@@ -163,6 +163,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     let userJson = {};
 
+    if (typeof userValue !== "string") {
+      return false;
+    }
+
     // peut-on bien convertir l'entrée de l'utilisateur en JSON
     try {
       userJson = JSON.parse(userValue);
