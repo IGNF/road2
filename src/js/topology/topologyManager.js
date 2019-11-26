@@ -367,7 +367,7 @@ module.exports = class topologyManager {
 
     let topology;
 
-    // on vérifie d'abord que la base n'a pas déjà été créée
+    // on vérifie d'abord que la topologie n'a pas déjà été créée
     if (this._topologiesCatalog[topologyJsonObject.id]) {
       return this._topologiesCatalog[topologyJsonObject.id];
     } else {

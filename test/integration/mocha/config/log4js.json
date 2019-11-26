@@ -1,0 +1,14 @@
+{ "mainConf":
+  {
+   "appenders": {
+     "console": { "type": "console", "layout": {"type": "pattern", "pattern": "%[[%d] [%p] %c %z -%] %m"} }
+   },
+   "categories": {
+     "default": { "appenders": ["console"], "level": "info" }
+   }
+ },
+ "httpConf": {
+     "level": "info",
+     "format": ":remote-addr - :method :url HTTP/:http-version :status :content-length :referrer :user-agent"
+ }
+}

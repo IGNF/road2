@@ -9,7 +9,7 @@
       "description": "Donn\u00e9es issues de la BDUNI de l'IGN.",
       "storage": {
         "base": {
-          "dbConfig": "/home/geoevolution/road2-config/db_config_output.json",
+          "dbConfig": "/home/docker/data/output_base.json",
           "schema": "public",
           "attributes": [
             {
@@ -18,31 +18,15 @@
               "default": "false"
             },
             {
-              "key": "vitesse",
-              "column": "vitesse_moyenne_vl",
-              "default": "false"
-            },
-            {
-              "key": "nature",
-              "column": "nature",
+              "key": "id",
+              "column": "id",
               "default": "false"
             }
           ]
         }
       },
       "projection": "EPSG:4326",
-      "bbox": "1.7,48.4,3.3,49.1",
-      "mapping": {
-        "source": {
-          "baseId": "base_bduni"
-        },
-        "storage": {
-          "file": "sql/bduni_convert.sql"
-        }
-      },
-      "defaultAttributes": [
-        "name"
-      ]
+      "bbox": "1.7,48.4,3.3,49.1"
     },
     "sources": [
       {
@@ -57,12 +41,12 @@
           "optimization": "fastest",
           "compute": {
             "storage": {
-              "file": "/home/geoevolution/road2-config/costs_calculation_sample.json"
+              "file": "/home/docker/data/costs_calculation_sample.json"
             },
             "configuration": {
               "name": "cost_s_car",
               "storage": {
-                "file": "/home/geoevolution/road2-config/costs_calculation_sample.json"
+                "file": "/home/docker/data/costs_calculation_sample.json"
               }
             }
           }
@@ -80,12 +64,12 @@
           "optimization": "shortest",
           "compute": {
             "storage": {
-              "file": "/home/geoevolution/road2-config/costs_calculation_sample.json"
+              "file": "/home/docker/data/costs_calculation_sample.json"
             },
             "configuration": {
               "name": "cost_m_car",
               "storage": {
-                "file": "/home/geoevolution/road2-config/costs_calculation_sample.json"
+                "file": "/home/docker/data/costs_calculation_sample.json"
               }
             }
           }
@@ -99,19 +83,21 @@
           {
             "id": "resource",
             "values": [
-              "corse-osm"
+              "bduni-idf-pgr"
             ]
           },
           {
             "id": "start",
             "values": {
-              "bbox": "-90,-180,90,180"
+              "bbox": "1.7,48.4,3.3,49.1",
+              "projection": "EPSG:4326"
             }
           },
           {
             "id": "end",
             "values": {
-              "bbox": "-90,-180,90,180"
+              "bbox": "1.7,48.4,3.3,49.1",
+              "projection": "EPSG:4326"
             }
           },
           {
@@ -131,7 +117,8 @@
           {
             "id": "intermediates",
             "values": {
-              "bbox": "-90,-180,90,180"
+              "bbox": "1.7,48.4,3.3,49.1",
+              "projection": "EPSG:4326"
             }
           },
           {
@@ -153,11 +140,170 @@
             ]
           },
           {
+            "id": "bbox",
+            "defaultValueContent": "true"
+          },
+          {
             "id": "projection",
             "defaultValueContent": "EPSG:4326",
             "values": [
               "EPSG:4326",
               "EPSG:2154"
+            ]
+          },
+          {
+            "id": "timeUnit",
+            "defaultValueContent": "minute",
+            "values": [
+              "hour",
+              "minute",
+              "second"
+            ]
+          },
+          {
+            "id": "distanceUnit",
+            "defaultValueContent": "meter",
+            "values": [
+              "meter",
+              "kilometer"
+            ]
+          },
+          {
+            "id": "constraints",
+            "values": [
+              {
+                "keyType": "name",
+                "key": "wayType",
+                "availableConstraintType": [
+                  "banned"
+                ],
+                "availableValues": [
+                  {
+                    "value": "autoroute",
+                    "field": "acces_vehicule_leger",
+                    "condition": {
+                      "type": "equal",
+                      "value": "'A p\u00e9age'"
+                    }
+                  },
+                  {
+                    "value": "tunnel",
+                    "field": "position_par_rapport_au_sol",
+                    "condition": {
+                      "type": "less",
+                      "value": "0"
+                    }
+                  },
+                  {
+                    "value": "pont",
+                    "field": "position_par_rapport_au_sol",
+                    "condition": {
+                      "type": "greater",
+                      "value": "0"
+                    }
+                  }
+                ]
+              },
+              {
+                "keyType": "numerical",
+                "key": "roadWidth",
+                "availableConstraintType": [
+                  "banned"
+                ],
+                "field": "largeur_de_chaussee"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "isochrone",
+        "parameters": [
+          {
+            "id": "resource",
+            "values": [
+              "bduni-idf-pgr"
+            ]
+          },
+          {
+            "id": "point",
+            "values": {
+              "bbox": "-90,-180,90,180",
+              "projection": "EPSG:4326"
+            }
+          },
+          {
+            "id": "costType",
+            "defaultValueContent": "time",
+            "values": [
+              "time",
+              "distance"
+            ]
+          },
+          {
+            "id": "costValue",
+            "min": 10
+          },
+          {
+            "id": "profile",
+            "defaultValueContent": "car",
+            "values": [
+              "car",
+              "pedestrian"
+            ]
+          },
+          {
+            "id": "direction",
+            "defaultValueContent": "departure",
+            "values": [
+              "departure",
+              "arrival"
+            ]
+          },
+          {
+            "id": "constraints",
+            "values": [
+              {
+                "keyType": "name",
+                "key": "wayType",
+                "availableConstraintType": [
+                  "banned"
+                ],
+                "availableValues": [
+                  {
+                    "value": "autoroute",
+                    "field": "acces_vehicule_leger",
+                    "condition": {
+                      "type": "equal",
+                      "value": "'A p\u00e9age'"
+                    }
+                  },
+                  {
+                    "value": "tunnel",
+                    "field": "position_par_rapport_au_sol",
+                    "condition": {
+                      "type": "less",
+                      "value": "0"
+                    }
+                  },
+                  {
+                    "value": "pont",
+                    "field": "position_par_rapport_au_sol",
+                    "condition": {
+                      "type": "greater",
+                      "value": "0"
+                    }
+                  }
+                ]
+              },
+              {
+                "keyType": "numerical",
+                "key": "roadWidth",
+                "availableConstraintType": [
+                  "banned"
+                ],
+                "field": "largeur_de_chaussee"
+              }
             ]
           }
         ]
