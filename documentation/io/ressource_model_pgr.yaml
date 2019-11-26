@@ -57,8 +57,8 @@
                 "dbConfig":
                   type: string
                   required: true
-                # Table contenant la topologie des tronçons navigables.
-                "table":
+                # Schéma contenant la topologie des tronçons navigables. Dans ce schéma, les noms de tables utilisées sont normalisés: 'ways' pour les tronçons.  
+                "schema":
                   type: string
                   required: true
                 # Descriptif des colonnes contenant les attributs de chaque tronçon.
@@ -124,7 +124,7 @@
               # Indique où se trouve le fichier .lua qui a permis de générer les colonnes de coût
 							"compute":
 								type: object
-                required: true
+                required: false
 								properties:
 									"storage":
 										$ref: "#/components/schemas/storage"

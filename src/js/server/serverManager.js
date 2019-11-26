@@ -4,6 +4,7 @@ const Server = require('./server');
 const log4js = require('log4js');
 const fs = require('fs');
 const path = require('path');
+const assert = require('assert');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVERMANAGER");
@@ -199,7 +200,7 @@ module.exports = class serverManager {
       let configuration = this._serverDescriptions[i];
       try {
         this._serverCatalog[configuration.id] = this.createServer(app, configuration);
-      } catch {
+      } catch (err) {
         return false;
       }
     }

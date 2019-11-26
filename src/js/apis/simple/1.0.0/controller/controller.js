@@ -407,7 +407,7 @@ module.exports = {
       // Cette vérification se fera donc dans le check du paramètre 
       let finalConstraints = "";
       if (method === "POST") {
-        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
+        finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, isochroneOperation.getParameterById("constraints").serviceParameter);
       } else {
         finalConstraints = parameters.constraints;
       }
@@ -683,7 +683,7 @@ module.exports = {
         separator = "|";
       } else {
         // ne doit pas arriver
-        throw errorManager.createError(" Error in parameter configuration. ", 500);
+        throw errorManager.createError(" Error in parameter configuration. ");
       }
     } else {
       // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET

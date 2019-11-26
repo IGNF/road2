@@ -3,7 +3,6 @@
 const log4js = require('log4js');
 const path = require('path');
 const fs = require('fs');
-const errorManager = require('../utils/errorManager');
 const Base = require('./base');
 
 // Création du LOGGER

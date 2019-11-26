@@ -18,8 +18,6 @@ module.exports = {
 
   updateGetCapabilities: function(app) {
 
-    let service = app.get("service");
-
     return true;
 
   },
@@ -38,7 +36,7 @@ module.exports = {
   run: function(app, uid) {
 
     // Création du GetCapabilities
-    if (!updateGetCapabilities(app)) {
+    if (!this.updateGetCapabilities(app)) {
       LOGGER.error("Erreur lors de la creation du GetCapabilities.");
       return false;
     }

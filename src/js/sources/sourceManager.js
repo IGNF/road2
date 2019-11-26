@@ -303,8 +303,7 @@ module.exports = class sourceManager {
       }
       // Compute
       if (!sourceJsonObject.cost.compute) {
-        LOGGER.error("La ressource contient une source sans compute.");
-        return false;
+        LOGGER.info("La ressource contient une source sans compute.");
       } else {
         if (!sourceJsonObject.cost.compute.storage) {
           LOGGER.error("La ressource contient une source ayant un cout sans stockage.");
@@ -372,8 +371,7 @@ module.exports = class sourceManager {
     }
     // Compute
     if (!sourceJsonObject.cost.compute) {
-      LOGGER.error("La ressource contient une source sans compute.");
-      return false;
+      LOGGER.info("La ressource contient une source sans compute.");
     } else {
       if (!sourceJsonObject.cost.compute.storage) {
         LOGGER.error("La ressource contient une source ayant un cout sans stockage.");

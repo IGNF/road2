@@ -1,10 +1,7 @@
 'use strict';
 
-const storageManager = require('../utils/storageManager');
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
-const topologyManager = require('../topology/topologyManager');
-const fs = require('fs');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -200,7 +197,7 @@ module.exports = class resourceManager {
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
-  checkResourceOsrm(resourceJsonObject, topologyManager) {
+  checkResourceOsrm(resourceJsonObject) {
 
     LOGGER.info("Verification de la ressource osrm...");
 
@@ -227,7 +224,7 @@ module.exports = class resourceManager {
   * TODO: c'est une copie conforme de checkResourceOsrm, c'est pas terrible (à factoriser ou spécialiser)
   */
 
-  checkResourcePgr(resourceJsonObject, topologyManager) {
+  checkResourcePgr(resourceJsonObject) {
 
     LOGGER.info("Verification de la ressource pgr...");
 

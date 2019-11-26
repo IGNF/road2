@@ -202,6 +202,10 @@ L'objet `request`, qui est transmis au service, pourra contenir des coordonnées
 
 ## Optimisations pour une mise en production 
 
+### Affichage des erreurs
+
+Par défaut, si Road2 rencontre une erreur, il va renvoyer au client le contenu de cette erreur. C'est un comportement adapté lors des développements. Mais en production, il est préférable de renvoyer une erreur générique. Pour cela, il suffit de lancer Road2 avec la variable `NODE_ENV` à `production`.  
+
 ### Utilisation de la RAM 
 
 #### Dans le cas d'OSRM 
@@ -225,3 +229,16 @@ Ou de manière définitive en éditant le fichier `/etc/fstab` avec le contenu s
 ```
 tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
 ```
+
+## Outils pour le développement
+
+### Sonakube 
+
+Il est possible d'analyser régulièrement le code avec Sonarkube. On pourra utiliser un container pour le serveur: 
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+Cela demande d'installer le binaire `sonar-scanner` sur la machine. 
+
+Pour une analyse continue lors des développements, il est possible d'installer l'extension Sonarlint dans certains IDE. 

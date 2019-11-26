@@ -4,6 +4,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const errorManager = require('../utils/errorManager');
+const assert = require('assert');
 
 const log4js = require('log4js');
 
@@ -105,8 +106,8 @@ module.exports = class Server {
       if (this._enableHttps === "true") {
 
         let options = {};
-        options.key = fs.readFileSync(config.options.key, "utf-8");
-        options.cert = fs.readFileSync(config.options.cert, "utf-8");
+        options.key = fs.readFileSync(this._options.key, "utf-8");
+        options.cert = fs.readFileSync(this._options.cert, "utf-8");
 
         this._server = https.createServer(options, this._app);
 

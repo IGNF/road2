@@ -27,7 +27,7 @@ module.exports = class BoolParameter extends ResourceParameter {
     super(parameter);
 
     // defaultValueContent
-    this._defaultValueContent = new Boolean();
+    this._defaultValueContent;
 
     // values
     this._values = [true, false];
@@ -93,6 +93,10 @@ module.exports = class BoolParameter extends ResourceParameter {
   */
   specificCheck(userValue, options) {
 
+    if (typeof userValue !== "string") {
+      return false;
+    }
+
     if (userValue !== "true" && userValue !== "false") {
       return false;
     } else {
@@ -119,9 +123,7 @@ module.exports = class BoolParameter extends ResourceParameter {
     } else {
       return null;
     }
-
-    return null;
-
+    
   }
 
 

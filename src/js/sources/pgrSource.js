@@ -46,6 +46,7 @@ module.exports = class pgrSource extends Source {
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
+    this.availableOperations.push("isochrone");
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
@@ -125,11 +126,14 @@ module.exports = class pgrSource extends Source {
   */
   async disconnect() {
 
-    if (!this._topology.base.connected) {
+    LOGGER.info("Tentative de deconnection de la base...");
+
+    if (this._topology.base.connected) {
 
       try {
 
         await this._topology.base.disconnect();
+        LOGGER.info("Deconnection de la base effectuee");
         this._connected = false;
 
       } catch(err) {
@@ -140,7 +144,8 @@ module.exports = class pgrSource extends Source {
       }
 
     } else {
-      // Road2 est déjà déconnecté à la base
+      // Road2 est déjà déconnecté de la base
+      LOGGER.info("Deja deconnectee");
       this._connected = false;
     }
 

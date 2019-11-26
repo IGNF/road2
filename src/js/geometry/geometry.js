@@ -1,8 +1,5 @@
 'use strict';
 
-const errorManager = require('../utils/errorManager');
-const polyline = require('@mapbox/polyline');
-
 /**
 *
 * @class
@@ -63,7 +60,7 @@ module.exports = class Geometry {
   *
   */
    set projection (pr) {
-    return this._projection = pr;
+    this._projection = pr;
   }
 
 }
