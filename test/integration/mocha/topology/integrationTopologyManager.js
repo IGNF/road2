@@ -2,6 +2,7 @@ const assert = require('assert');
 const TopologyManager = require('../../../../src/js/topology/topologyManager');
 const BaseManager = require('../../../../src/js/base/baseManager');
 const ProjectionManager = require('../../../../src/js/geography/projectionManager');
+const OsmTopology = require('../../../../src/js/topology/osmTopology');
 const logManager = require('../logManager');
 const fs = require('fs');
 
@@ -39,6 +40,47 @@ describe('Test de la classe TopologyManager', function() {
       let incorrectDBTopology = JSON.parse(fs.readFileSync("/home/docker/app/test/integration/resources/topology/incorrectDBTopology.json"));
       assert.equal(topologyManager.checkTopology(incorrectDBTopology), false);
     });
+
+  });
+
+  describe('Test du checkDuplicationTopology()', function() {
+
+    let correctOSMTopology = JSON.parse(fs.readFileSync("/home/docker/app/test/integration/resources/topology/correctOSMTopology.json"));
+
+    it('checkDuplicationTopology() avec une topologie deja verifiee et identique', function() {
+      assert.equal(topologyManager.checkDuplicationTopology(correctOSMTopology), true);
+    });
+
+    it('checkDuplicationTopology() avec une topologie deja verifiee mais non identique', function() {
+      correctOSMTopology.description = "test";
+      assert.equal(topologyManager.checkDuplicationTopology(correctOSMTopology), false);
+    });
+
+  });
+
+  describe('Test du createTopology()', function() {
+
+    let correctOSMTopology = JSON.parse(fs.readFileSync("/home/docker/app/test/integration/resources/topology/correctOSMTopology.json"));
+    let referenceTopology = new OsmTopology(correctOSMTopology.id, correctOSMTopology.description,
+      correctOSMTopology.projection, correctOSMTopology.bbox, correctOSMTopology.storage.file);
+    
+    it('createTopology() avec une topologie deja verifiee', function() {
+      assert.deepEqual(topologyManager.createTopology(correctOSMTopology), referenceTopology);
+    });
+
+  });
+
+  describe('Test du loadAllTopologies()', function() {
+
+    it('loadAllTopologies()', function() {
+      assert.deepEqual(topologyManager.loadAllTopologies(), true);
+    });
+
+    it('loadAllTopologies() pour un manager vide', function() {
+      let emptyTopologyManager = new TopologyManager(baseManager, projectionManager);
+      assert.deepEqual(emptyTopologyManager.loadAllTopologies(), false);
+    });
+
 
   });
 
