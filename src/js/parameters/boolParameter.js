@@ -68,13 +68,7 @@ module.exports = class BoolParameter extends ResourceParameter {
   load(parameterConf) {
 
     if (super.serviceParameter.defaultValue === "true") {
-
-      if (this.specificConvertion(parameterConf.defaultValueContent, this._defaultValueContent)) {
-        return true;
-      } else {
-        return false;
-      }
-
+      this._defaultValueContent = this.specificConvertion(parameterConf.defaultValueContent);
     }
 
     return true;
