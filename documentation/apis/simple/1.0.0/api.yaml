@@ -122,13 +122,6 @@ paths:
         schema:
           type: "boolean"
         example: true
-      - name: "getInstructions"
-        in: "query"
-        description: "Présence des instructions de navigation dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
-        required: false
-        schema:
-          type: "boolean"
-        example: false
       - name: "distanceUnit"
         in: "query"
         description: "Unité des distances renvoyées. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
@@ -446,8 +439,6 @@ components:
           type: "string"
           enum: ["geojson","polyline"]
         getBbox:
-          type: "boolean"
-        getInstructions:
           type: "boolean"
         distanceUnit:
           type: "string"
