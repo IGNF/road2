@@ -319,7 +319,7 @@ module.exports = class osrmSource extends Source {
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
           }
-          steps[k].setAttributById("name", currentOsrmRouteStep.name);
+          steps[k].setAttributById("name", JSON.parse(currentOsrmRouteStep.name));
 
           // On récupère la distance et la durée
           steps[k].distance = new Distance(currentOsrmRouteStep.distance,"meter");
