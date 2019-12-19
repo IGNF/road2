@@ -475,6 +475,10 @@ module.exports = class pgrSource extends Source {
 
     }
 
+    if (pgrResponse.rows.length == 1){
+      response.waypoints.push( { location: [] } );
+    }
+
     // Troncature des géométries sur les portions (legs)
     let legStart;
     let legStop;
