@@ -33,6 +33,18 @@ module.exports = class PointParameter extends ResourceParameter {
     // Projection
     this._projection = "";
 
+    // Xmin de la bbox 
+    this._xmin;
+
+    // Ymin de la bbox 
+    this._ymin;
+
+    // Xmax de la bbox 
+    this._xmax;
+
+    // Ymax de la bbox 
+    this._ymax;
+
   }
 
   /**
@@ -69,9 +81,30 @@ module.exports = class PointParameter extends ResourceParameter {
   load(parameterConf) {
 
     this._bbox = parameterConf.values.bbox;
-
     this._projection = parameterConf.values.projection;
 
+    try {
+      let splitBbox = this._bbox.split(",");
+      this._xmin = Number(splitBbox[0]);
+      this._ymin = Number(splitBbox[1]);
+      this._xmax = Number(splitBbox[2]);
+      this._ymax = Number(splitBbox[3]);
+    } catch(err) {
+      LOGGER.error("Erreur durant la lecture de la bbox:");
+      LOGGER.error(err);
+      return false;
+    }
+
+    if (this._xmin >= this._xmax) {
+      LOGGER.error("BBox incorrecte en X");
+      return false;
+    }
+
+    if (this._ymin >= this._ymax) {
+      LOGGER.error("BBox incorrecte en Y");
+      return false;
+    }
+    
     return true;
 
   }
@@ -82,10 +115,11 @@ module.exports = class PointParameter extends ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
+  * @param {string} userProjection - Projection dans laquelle sont exprimées les coordonnées de l'utilisateur
   * @return {boolean}
   *
   */
-  specificCheck(userValue) {
+  specificCheck(userValue, userProjection) {
 
     if (typeof userValue !== "string") {
       return false;
@@ -96,7 +130,22 @@ module.exports = class PointParameter extends ResourceParameter {
     if (!tmpStringCoordinates) {
       return false;
     } else {
-      // TODO: vérification de l'inclusion des coordonnées dans la bbox de la ressource
+      // Vérification de l'inclusion des coordonnées dans la bbox de la ressource
+      // let userPoint = this.specificConvertion(userValue, userProjection);
+
+      // if (this._projection !== userProjection) {
+      //   if (!userPoint.transforme(this._projection)) {
+      //     return false;
+      //   }
+      // } 
+
+      // if (userPoint.x < this._xmin || userPoint.x > this._xmax) {
+      //   return false;
+      // }
+      // if (userPoint.y < this._ymin || userPoint.y > this._ymax) {
+      //   return false;
+      // }
+
     }
 
     return true;

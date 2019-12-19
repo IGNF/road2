@@ -67,7 +67,7 @@ module.exports = {
         throw errorManager.createError(" Parameter 'start' not found ", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("start").check(parameters.start)) {
+      if (!routeOperation.getParameterById("start").check(parameters.start, askedProjection)) {
         throw errorManager.createError(" Parameter 'start' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.start.split(",");
@@ -80,7 +80,7 @@ module.exports = {
         throw errorManager.createError(" Parameter 'end' not found ", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("end").check(parameters.end)) {
+      if (!routeOperation.getParameterById("end").check(parameters.end, askedProjection)) {
         throw errorManager.createError(" Parameter 'end' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.end.split(",");
@@ -139,7 +139,7 @@ module.exports = {
       // -- 
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates)) {
+      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection)) {
         throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
       } else {
         if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, askedProjection)) {
