@@ -1,18 +1,18 @@
 // ---- Variables Globales
 
-var road2Url = "https://localhost:8080/simple/1.0.0/route?";
-var oldUrl = "https://wxs.ign.fr/jhyvi0fgmnuxvfv0zjzorvdn/itineraire/rest/route.json?"
+var road2Url = "https://localhost:8080/simple/1.0.0/isochrone?";
+var oldUrl = "https://wxs.ign.fr/jhyvi0fgmnuxvfv0zjzorvdn/isochrone/isochrone.json?"
 var map;
-var clickedStartPoint = new Array();
-var clickedEndPoint = new Array();
-var clickedIntPoint = new Array();
+var clickedPoint = new Array();
 
 // -- Variables par défaut que l'utilisateur peut modifier
-var defaultResource="bduni-idf-osrm";
-var defaultProfile="car";
-var defaultOptimization="fastest";
+var defaultResource = "bduni-idf-pgr";
+var defaultProfile = "car";
+var defaultCostType = "time";
+var defaultDirection = "departure";
 var defaultGraphName = "Voiture";
 var defaultMethod = "time";
+var defaultReverse = "false"
 // -- 
 
 // -- Variables pour la carte 
@@ -20,9 +20,7 @@ var defaultMethod = "time";
 // Vecteurs qui vont contenir les éléments de l'itineraire sur la carte
 var vectorRoad = new ol.source.Vector();
 var vectorRoadOther = new ol.source.Vector();
-var vectorStartPoint = new ol.source.Vector();
-var vectorEndPoint = new ol.source.Vector();
-var vectorIntPoint = new ol.source.Vector();
+var vectorPoint = new ol.source.Vector();
 
 // Couches de la carte qui vont afficher l'itinéraire 
 var vectorRoadLayer = new ol.layer.Vector({
@@ -33,16 +31,8 @@ var vectorRoadOtherLayer = new ol.layer.Vector({
   source: vectorRoadOther
 });
 
-var vectorStartPointLayer = new ol.layer.Vector({
-  source: vectorStartPoint
-});
-
-var vectorEndPointLayer = new ol.layer.Vector({
-  source: vectorEndPoint
-});
-
-var vectorIntPointLayer = new ol.layer.Vector({
-  source: vectorIntPoint
+var vectorPointLayer = new ol.layer.Vector({
+  source: vectorPoint
 });
 
 // Styles pour les marqueurs 
@@ -80,19 +70,7 @@ Gp.Services.getConfig({
 var contextMenuItems = [
   {
     text: "Définir point de départ",
-    callback: defineStartPoint
-  },
-  {
-    text: "Définir point d'arrivée",
-    callback: defineEndPoint
-  },
-  {
-    text: "Ajouter point intermédiaire",
-    callback: addIntPoint
-  },
-  {
-    text: "Supprimer point intermédiaire",
-    callback: deleteIntPoint
+    callback: definePoint
   }
 ];
 
@@ -103,7 +81,7 @@ var contextMenuItems = [
 function createMap() {
 
     map = new ol.Map({
-        target: 'map-itineraire',
+        target: 'map-isochrone',
         layers: [
             new ol.layer.GeoportalWMTS({
                 layer: "ORTHOIMAGERY.ORTHOPHOTOS"
@@ -116,9 +94,7 @@ function createMap() {
             }),
             vectorRoadLayer,
             vectorRoadOtherLayer,
-            vectorStartPointLayer,
-            vectorEndPointLayer,
-            vectorIntPointLayer
+            vectorPointLayer
         ],
         view: new ol.View({
             center: [261223, 6250240],
@@ -132,31 +108,19 @@ function createMap() {
         {
           layer: vectorRoadLayer,
           config: {
-            title: 'Iineraires via Road2'
+            title: 'Isochrones via Road2'
           }
         },
         {
           layer: vectorRoadOtherLayer,
           config: {
-            title: 'Iineraires via autre service'
+            title: 'Isochrones via autre service'
           }
         },
         {
-          layer: vectorStartPointLayer,
+          layer: vectorPointLayer,
           config: {
-            title: 'Point de départ'
-          }
-        },
-        {
-          layer: vectorEndPointLayer,
-          config: {
-            title: 'Point d\'arrivée'
-          }
-        },
-        {
-          layer: vectorIntPointLayer,
-          config: {
-            title: 'Points intermédiaires'
+            title: 'Point de l\'isochrone'
           }
         }
       ]
@@ -203,165 +167,48 @@ function createMap() {
 // ---- Ajouter un point sur la carte 
 // Fonction utilisée lors d'un clique droit sur la carte 
 // Il s'agit d'afficher un marqueur et de stocker les coordonnées de ce point
-// Et tout cela en intéragissant avec le formulaire des paramètres de l'itinéraire 
-function defineStartPoint(evt) {
+// Et tout cela en intéragissant avec le formulaire des paramètres de l'isochrone
+function definePoint(evt) {
 
   // on récupère les coordonnées du point cliqué
   let clickedCoordinate = utils.to4326(evt.coordinate);
 
-  if (clickedStartPoint.length !== 0) {
-    clickedStartPoint = new Array();
-    vectorStartPoint.clear();
+  if (clickedPoint.length !== 0) {
+    clickedPoint = new Array();
+    vectorPoint.clear();
   } 
 
-  // on stocke les coordonnées pour pouvoir lancer un itinéraire
-  clickedStartPoint.push(clickedCoordinate);
+  // on stocke les coordonnées pour pouvoir lancer un isochrone
+  clickedPoint.push(clickedCoordinate);
 
-  // on met les coordonnées dans le formulaire (start)
-  let input = document.getElementById('userStart');
+  // on met les coordonnées dans le formulaire (point)
+  let input = document.getElementById('userPoint');
   input.value = clickedCoordinate;
 
   // on affiche ce point sur la carte
-  utils.createFeature(clickedCoordinate, vectorStartPoint);
+  utils.createFeature(clickedCoordinate, vectorPoint);
 
   return true;
 
 }
-
-// ---- Ajouter un point sur la carte 
-// Fonction utilisée lors d'un clique droit sur la carte 
-// Il s'agit d'afficher un marqueur et de stocker les coordonnées de ce point
-// Et tout cela en intéragissant avec le formulaire des paramètres de l'itinéraire 
-function defineEndPoint(evt) {
-
-  // on récupère les coordonnées du point cliqué
-  let clickedCoordinate = utils.to4326(evt.coordinate);
-
-  if (clickedEndPoint.length !== 0) {
-    clickedEndPoint = new Array();
-    vectorEndPoint.clear();
-  } 
-
-  // on stocke les coordonnées pour pouvoir lancer un itinéraire
-  clickedEndPoint.push(clickedCoordinate);
-
-  // on met les coordonnées dans le formulaire (end)
-  let input = document.getElementById('userEnd');
-  input.value = clickedCoordinate;
-
-  // on affiche ce point sur la carte
-  utils.createFeature(clickedCoordinate, vectorEndPoint);
-
-  return true;
-
-}
-
-function addIntPoint(evt) {
-
-  // on récupère les coordonnées du point cliqué
-  let clickedCoordinate = utils.to4326(evt.coordinate);
-
-  // on stocke les coordonnées pour pouvoir lancer un itinéraire
-  clickedIntPoint.push(clickedCoordinate);
-
-  let currentInputInt = document.getElementById('userIntermediates');
-
-  if (clickedIntPoint.length === 1) {
-    currentInputInt.value = clickedCoordinate;
-  } else if (clickedIntPoint.length > 1) {
-    // on ajoute un pipe 
-    currentInputInt.value = currentInputInt.value + "|" + clickedCoordinate;
-  } else {
-    return false;
-  }
-  // on affiche ce point sur la carte quand on n'est certain que le formulaire est bien mis à jour 
-  utils.createFeature(clickedCoordinate, vectorIntPoint);
-
-  return true;
-
-}
-
-function deleteIntPoint(evt) {
-
-  // on récupère les coordonnées du point cliqué
-  let clickedCoordinate = utils.to4326(evt.coordinate);
-
-  let currentInputInt = document.getElementById('userIntermediates');
-
-  let numberOfIntPoint = clickedIntPoint.length;
-
-  if (numberOfIntPoint === 1) {
-    currentInputInt.value = "";
-    clickedIntPoint = new Array();
-  } else if (numberOfIntPoint > 1) {
-
-    // on récupère les coordonnées de la feature concernée 
-    let feature = vectorIntPoint.getClosestFeatureToCoordinate(evt.coordinate);
-    let featureCoord = utils.to4326(feature.getGeometry().getCoordinates());
-    let featureCoordStr = featureCoord[0]+","+featureCoord[1];
-
-    // -- on l'enlève du formulaire 
-    let currentInputIntValue = currentInputInt.value.split("|");
-    if (currentInputIntValue.length === 0) {
-      return false;
-    }
-
-    let newIntArray = new Array();
-    for (let i = 0; i < currentInputIntValue.length; i++) {
-      if (currentInputIntValue[i] !== featureCoordStr) {
-        newIntArray.push(currentInputIntValue[i]);
-      }
-    }
-
-    let newIntValue = "";
-    if (newIntArray.length === 0) {
-      return false;
-    } else {
-      newIntValue = newIntArray[0];
-      for (let j = 1; j < newIntArray.length; j++) {
-        newIntValue = newIntValue + "|" + newIntArray[j];
-      }
-    }
-
-    currentInputInt.value = newIntValue;
-      
-    // -- 
-
-    // on le supprime du tableau des points intermédiaires cliqués 
-    let pointIndice = clickedIntPoint.indexOf(clickedCoordinate);
-    clickedIntPoint.splice(pointIndice, 1);
-
-    
-  } else {
-    return false;
-  }
-
-  // on enlève ce point de la carte quand on n'est certain que le formulaire est bien mis à jour 
-  utils.deleteFeature(evt.coordinate, vectorIntPoint);
-
-  return true;
-
-
-} 
 
 // ---- 
 
 
-// ---- Calculer un itinéraire
+// ---- Calculer un isochrone
 // Cette fonction est appelée lorsque l'on clique sur un des boutons du formulaire 
-function computeRoad() {
+function computeIso() {
 
   // Déclarations
   let request = {};
 
   // on récupère les valeurs du formulaire
-  request.finalStart = document.getElementById('userStart').value;
-  request.finalEnd = document.getElementById('userEnd').value;
-  request.finalIntermediates = document.getElementById('userIntermediates').value;
+  request.finalPoint = document.getElementById('userPoint').value;
+  request.finalCostValue = document.getElementById('userCostValue').value;
 
   // Gestion des points de l'utilisateur
-  if ( request.finalStart === "" || request.finalEnd === "" ) {
-    // il n'y a pas assez de points pour faire un itinéraire
+  if ( request.finalPoint === "" || request.finalCostValue === "") {
+    // il n'y a pas de points ou de valeur pour l'isochrone
     return false;
   } 
 
@@ -376,12 +223,12 @@ function computeRoad() {
   let requestStr = road2Url +
     "resource=" + request.finalResource +
     "&profile=" + request.finalProfile +
-    "&optimization=" + request.finalOptimization +
-    "&start=" + request.finalStart +
-    "&end="  + request.finalEnd +
-    "&intermediates=" + request.finalIntermediates +
+    "&costType=" + request.finalCostType +
+    "&costValue=" + request.finalCostValue +
+    "&direction=" + request.finalDirection +
+    "&point=" + request.finalPoint +
     "&constraints=" + request.finalConstraint +
-    "&geometryFormat=polyline&getSteps=true&getBbox=true";
+    "&geometryFormat=polyline";
 
   // On affiche la requete sur la page 
   let requestDiv = document.getElementById('request');
@@ -394,7 +241,7 @@ function computeRoad() {
   })
   .then(function(responseJSON) {
 
-    utils.createRoute(responseJSON.geometry, "polyline", vectorRoad);
+    utils.createIso(responseJSON.geometry, "geojson", vectorRoad);
 
     // On affiche la réponse sur la page 
     let responseDiv = document.getElementById('response');
@@ -432,11 +279,18 @@ function computeOtherRoad(request) {
   let requestStr = oldUrl +
   "graphName=" + otherRequest.finalGraphName +
   "&method=" + otherRequest.finalMethod +
-  "&origin=" + request.finalStart +
-  "&destination="  + request.finalEnd +
-  "&waypoints=" + otherRequest.finalIntermediates +
+  "&location=" + request.finalPoint +
+  "&reverse=" + otherRequest.finalReverse +
   "&exclusions=" + otherRequest.finalConstraint +
-  "&srs=EPSG:4326";
+  "&srs=EPSG:4326&smoothing=true&holes=true";
+
+  if (otherRequest.finalMethod === "time") {
+    requestStr = requestStr + "&time=" + request.finalCostValue;
+  } else if (otherRequest.finalMethod === "distance") {
+    requestStr = requestStr + "&distance=" + request.finalCostValue;
+  } else {
+    return false;
+  }
 
   // On affiche la requete sur la page 
   let requestDiv = document.getElementById('request-other');
@@ -457,7 +311,7 @@ function computeOtherRoad(request) {
     responseDiv.innerHTML = "<div class='card card-body'><pre>"+ JSON.stringify(responseJSON, undefined, 2) +"</pre></div>";
 
     // On affiche l'itinéraire sur la carte 
-    utils.createRoute(responseJSON.geometryWkt, "wkt", vectorRoadOther);
+    utils.createIso(responseJSON.wktGeometry, "wkt", vectorRoadOther);
 
 
   });
@@ -473,27 +327,33 @@ function loadUserParameter(request) {
   let constraintObject = {};
 
 // Resource 
-  if (document.forms["route-form"].elements["userResource"].value !== "") {
-    request.finalResource = document.forms["route-form"].elements["userResource"].value;
+  if (document.forms["iso-form"].elements["userResource"].value !== "") {
+    request.finalResource = document.forms["iso-form"].elements["userResource"].value;
   } else {
     request.finalResource = defaultResource;
   }
   // Profile
-  if (document.forms["route-form"].elements["userProfile"].value !== "") {
-    request.finalProfile = document.forms["route-form"].elements["userProfile"].value;
+  if (document.forms["iso-form"].elements["userProfile"].value !== "") {
+    request.finalProfile = document.forms["iso-form"].elements["userProfile"].value;
   } else {
     request.finalProfile = defaultProfile;
   }
-  // Optimization
-  if (document.forms["route-form"].elements["userOptimization"].value !== "") {
-    request.finalOptimization = document.forms["route-form"].elements["userOptimization"].value;
+  // CostType
+  if (document.forms["iso-form"].elements["userCostType"].value !== "") {
+    request.finalCostType = document.forms["iso-form"].elements["userCostType"].value;
   } else {
-    request.finalOptimization = defaultOptimization;
+    request.finalCostType = defaultCostType;
+  }
+  // Direction
+  if (document.forms["iso-form"].elements["userDirection"].value !== "") {
+    request.finalDirection = document.forms["iso-form"].elements["userDirection"].value;
+  } else {
+    request.finalDirection = defaultDirection;
   }
   // Constraint
   let  plural = false;
   request.finalConstraint = "";
-  if (document.forms["route-form"].elements["banned-highway"].checked) {
+  if (document.forms["iso-form"].elements["banned-highway"].checked) {
     constraintObject.constraintType = "banned";
     constraintObject.key = "wayType";
     constraintObject.operator = "=";
@@ -501,7 +361,7 @@ function loadUserParameter(request) {
     request.finalConstraint = JSON.stringify(constraintObject);
     plural = true;
   }
-  if (document.forms["route-form"].elements["banned-tunnel"].checked) {
+  if (document.forms["iso-form"].elements["banned-tunnel"].checked) {
     if (plural) {
       request.finalConstraint = request.finalConstraint + "|";
     } else {
@@ -513,7 +373,7 @@ function loadUserParameter(request) {
     constraintObject.value = "tunnel";
     request.finalConstraint = request.finalConstraint + JSON.stringify(constraintObject);
   }
-  if (document.forms["route-form"].elements["banned-bridge"].checked) {
+  if (document.forms["iso-form"].elements["banned-bridge"].checked) {
     if (plural) {
       request.finalConstraint = request.finalConstraint + "|";
     }
@@ -532,14 +392,8 @@ function loadUserParameter(request) {
 // ---- Faire le lien avec l'autre service 
 function mapOtherParameter(request, otherRequest) {
 
-  // Ré-écriture des points intermédiaires 
-  otherRequest.finalIntermediates = ""
-  if (request.finalIntermediates !== "") {
-    otherRequest.finalIntermediates = request.finalIntermediates.replace(/\|/gi,";");
-  }
-
   // Profile
-  if (document.forms["route-form"].elements["userProfile"].value !== "") {
+  if (document.forms["iso-form"].elements["userProfile"].value !== "") {
     if (request.finalProfile === "car") {
       otherRequest.finalGraphName = "Voiture";
     } else if (request.finalProfile === "pedestrian") {
@@ -550,11 +404,11 @@ function mapOtherParameter(request, otherRequest) {
   } else {
     otherRequest.finalGraphName = defaultGraphName;
   }
-  // Optimization
-  if (document.forms["route-form"].elements["userOptimization"].value !== "") {
-    if (request.finalOptimization === "fastest") {
+  // CostType
+  if (document.forms["iso-form"].elements["userCostType"].value !== "") {
+    if (request.finalCostType === "time") {
       otherRequest.finalMethod = "time";
-    } else if (request.finalOptimization === "shortest") {
+    } else if (request.finalCostType === "distance") {
       otherRequest.finalMethod = "distance";
     } else {
       otherRequest.finalMethod = defaultMethod;
@@ -562,14 +416,26 @@ function mapOtherParameter(request, otherRequest) {
   } else {
     otherRequest.finalMethod = defaultMethod;
   }
+  // Direction
+  if (document.forms["iso-form"].elements["userDirection"].value !== "") {
+    if (request.finalDirection === "departure") {
+      otherRequest.finalReverse = "false";
+    } else if (request.finalDirection === "arrival") {
+      otherRequest.finalReverse = "true";
+    } else {
+      otherRequest.finalReverse = defaultReverse;
+    }
+  } else {
+    otherRequest.finalReverse = defaultReverse;
+  }
   // Constraints
   let other = false;
   otherRequest.finalConstraint = "";
-  if (document.forms["route-form"].elements["banned-highway"].checked) {
+  if (document.forms["iso-form"].elements["banned-highway"].checked) {
     otherRequest.finalConstraint = "Toll";
     other = true;
   } 
-  if (document.forms["route-form"].elements["banned-tunnel"].checked) {
+  if (document.forms["iso-form"].elements["banned-tunnel"].checked) {
     if (other) {
       otherRequest.finalConstraint = otherRequest.finalConstraint + ";";
     } else {
@@ -577,7 +443,7 @@ function mapOtherParameter(request, otherRequest) {
     }
     otherRequest.finalConstraint = otherRequest.finalConstraint + "Tunnel";
   }
-  if (document.forms["route-form"].elements["banned-bridge"].checked) {
+  if (document.forms["iso-form"].elements["banned-bridge"].checked) {
     if (other) {
       otherRequest.finalConstraint = otherRequest.finalConstraint + ";";
     } 
@@ -595,7 +461,7 @@ function cancelMap() {
   // Nettoyage des vecteurs qui contiennent les données sur la map
   vectorRoad.clear();
   vectorRoadOther.clear();
-  // Nettoyage des div qui concernent les itinéraires supprimés 
+  // Nettoyage des div qui concernent les isochrones supprimés 
   let currentDiv = document.getElementById('request');
   currentDiv.innerHTML = "";
   currentDiv = document.getElementById('request-other');
@@ -613,17 +479,14 @@ function cancelMap() {
 function cancelForm() {
 
   // Nettoyage du formulaire
-  document.getElementById("route-form").reset(); 
+  document.getElementById("iso-form").reset(); 
 
   // Nettoyage des tableaux qui contiennent les points
-  clickedStartPoint = new Array();
-  clickedEndPoint = new Array();
-  clickedIntPoint = new Array();
+  clickedPoint = new Array();
 
   // Nettoyage du vecteur qui contient les données sur la map
-  vectorStartPoint.clear();
-  vectorEndPoint.clear();
-  vectorIntPoint.clear();
+  vectorPoint.clear();
+
 
 }
 // ---- 
@@ -650,7 +513,7 @@ var utils = {
     vector.removeFeature(feature);
   },
 
-  createRoute: function(geom, format, vector) {
+  createIso: function(geom, format, vector) {
 
     let route = {};
 
@@ -668,6 +531,11 @@ var utils = {
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857'
     });
+    } else if (format === "geojson") {
+      route = new ol.format.GeoJSON().readGeometry(geom, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      });
     } else {
       return false;
     }
@@ -682,6 +550,8 @@ var utils = {
       feature.setStyle(styles.routePolyline);
     } else if (format === "wkt") {
       feature.setStyle(styles.routeWkt);
+    } else if (format === "geojson") {
+      feature.setStyle(styles.routePolyline);
     } else {
 
     }

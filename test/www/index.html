@@ -15,44 +15,11 @@
     <title>Road2</title>
   </head>
   <body>
-
-    <div class="container-fluid row">
-
-          <div id="map-itineraire" class="col">
-
-          </div>
-
-          <div class="col">
-            <form id="route-form">
-              <p>Paramètres de l'itinéraire</p>
-              <p>
-                <label for="userResource">Ressource</label> : <input type="text" name="userResource" id="userResource" placeholder="Ex. corse-osm"/><br>
-                <label for="userProfile">Mode de déplacement</label> : <input type="text" name="userProfile" id="userProfile" placeholder="Ex. car"/><br>
-                <label for="userOptimization">Option de calcul </label> : <input type="text" name="userOptimization" id="userOptimization" placeholder="Ex. fastest"/><br>
-                <label for="userStart">Point de départ</label> : <input type="text" name="userStart" id="userStart" placeholder="Ex. 2.354715 , 48.831063 "/><br>
-                <label for="userEnd">Point d'arrivée</label> : <input type="text" name="userEnd" id="userEnd" placeholder="Ex. 2.311199 , 48.844848 "/><br>
-                <label for="userIntermediates">Points intermédiaires</label> : <input type="text" name="userIntermediates" id="userIntermediates" placeholder="Ex. 2.311299 , 48.844848 | 2.311199 , 48.844948 "/><br>
-                <label for="userConstraint">Contrainte</label> : <input type="text" name="userConstraint" id="userConstraint" placeholder=""/><br>
-                <input type="button" value="Calculer un itinéraire" onclick="computeRoad()"/>
-                <input type="button" value="Supprimer l'itinéraire" onclick="cancelRoad()"/>
-              </p>
-            </form>
-          </div>
-
-    </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
-    <!-- SDK Géoportail -->
-    <script src="js/ol-debug.js"></script>
-    <script src="js/GpPluginOl3.js"></script>
-    <script src="js/GpServices.js"></script>
-    <!-- Script pour le chargement de la carte et l'utilisation du service -->
-    <script src="js/itineraire.js"></script>
-
+    <p>
+        <ul>
+            <li><a href="./itineraire.html">Itineraire</a></li>
+            <li><a href="./isochrone.html">Isochrone</a></li>
+        </ul>
+    </p>
   </body>
 </html>

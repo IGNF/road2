@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!-- SDK Géoportail -->
+    <link rel="stylesheet" href="css/ol.css" />
+    <link rel="stylesheet" href="css/GpPluginOl3.css" />
+    <!-- CSS pour le menu contextuel personnalisé -->
+    <link href="https://cdn.jsdelivr.net/npm/ol-contextmenu@latest/dist/ol-contextmenu.min.css" rel="stylesheet">
+
+    <title>Démonstrateur</title>
+  </head>
+
+  <body onload="cancelForm()">
+    <div class="container-fluid row">
+      <p><strong>Testez le nouveau calcul d'itinéraire</strong><br>
+        Cliquez sur la carte pour définir les points de l'itinéraire
+      </p>
+    </div>
+
+    <div class="container-fluid row">
+
+          <div id="map-itineraire" class="col">
+
+          </div>
+
+          <div class="col">
+            
+            <form id="route-form">
+              <p><strong>Paramètres de l'itinéraire</strong></p>
+              
+                <p>Ressource : </p>
+                <input type="radio" id="bduni-idf-osrm" name="userResource" value="bduni-idf-osrm" checked>
+                <label for="bduni-idf-osrm">BDUni sur l'Île-de-France via OSRM</label>
+                <br>
+                <input type="radio" id="bduni-idf-pgr" name="userResource" value="bduni-idf-pgr">
+                <label for="bduni-idf-pgr">BDUni sur l'Île-de-France via PGR</label>
+                <br>
+                <p>Mode de déplacement : </p>
+                <input type="radio" id="car" name="userProfile" value="car" checked>
+                <label for="car">Voiture</label>
+                <input type="radio" id="pedestrian" name="userProfile" value="pedestrian">
+                <label for="pedestrian">Piéton</label>
+                <br>
+                <p>Option de calcul : </p>
+                <input type="radio" id="fastest" name="userOptimization" value="fastest" checked>
+                <label for="fastest">Plus rapide</label>
+                <input type="radio" id="shortest" name="userOptimization" value="shortest">
+                <label for="shortest">Plus court</label>
+                <br>
+                <label for="userStart">Point de départ</label> : <input type="text" name="userStart" id="userStart" placeholder="Ex. 2.354715 , 48.831063 "/><br>
+                <label for="userEnd">Point d'arrivée</label> : <input type="text" name="userEnd" id="userEnd" placeholder="Ex. 2.311199 , 48.844848 "/><br>
+                <label for="userIntermediates">Points intermédiaires</label> : <input type="text" name="userIntermediates" id="userIntermediates" placeholder="Ex. 2.311299 , 48.844848 | 2.311199 , 48.844948 "/><br>
+                <p>Contraintes (éviter les routes) : </p>
+                <input type="checkbox" id="banned-highway" name="Autoroutes">
+                <label for="Autoroutes">Péages</label>
+                <input type="checkbox" id="banned-tunnel" name="Tunnels">
+                <label for="Tunnels">Tunnels</label>
+                <input type="checkbox" id="banned-bridge" name="Ponts">
+                <label for="Ponts">Ponts</label>
+                <br>
+                <input class="btn btn-outline-primary" type="button" value="Calculer un itinéraire" onclick="computeRoad()"/>
+                <input class="btn btn-outline-primary" type="button" value="Supprimer les itinéraires" onclick="cancelMap()"/>
+                <input class="btn btn-outline-primary" type="button" value="Réinitialiser les paramètres" onclick="cancelForm()"/>
+
+            </form>
+
+            <form id="comparison-form">
+              <p><strong>Comparaison avec un autre service d'itinéraire</strong></p>
+              <p>
+                <input type="checkbox" id="compare-to-old" name="Ancien service" checked>
+                <label for="Ancien service">Comparer à l'ancienne version du service</label>
+              </p>
+            </form>
+
+          </div>
+
+    </div>
+
+    <div class="container-fluid row">
+      <div class="col-6">
+        <div class="container-fluid row">
+          <p>
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#request" aria-expanded="false" aria-controls="collapseExample">
+              Requête envoyée au nouveau service d'itinéraire
+            </button>
+          </p>
+        </div>
+        <div class="container-fluid row collapse" id="request">
+            
+        </div>
+        <div class="container-fluid row">
+          <p>
+            <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#response" aria-expanded="false" aria-controls="collapseExample">
+              Réponse envoyée au nouveau service d'itinéraire
+            </button>
+          </p>
+        </div>
+        <div class="container-fluid row collapse" id="response">
+            
+        </div>
+
+      </div>
+
+      <div class="col-6">
+        <div class="container-fluid row">
+          <p>
+            <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#request-other" aria-expanded="false" aria-controls="collapseExample">
+              Requête envoyée à un autre service d'itinéraire
+            </button>
+          </p>
+        </div>
+        <div class="container-fluid row collapse" id="request-other">
+            
+        </div>
+
+        <div class="container-fluid row">
+          <p>
+            <button class="btn btn-outline-danger" type="button" data-toggle="collapse" data-target="#response-other" aria-expanded="false" aria-controls="collapseExample">
+              Réponse d'un autre service d'itinéraire
+            </button>
+          </p>
+        </div>
+        <div class="container-fluid row collapse" id="response-other">
+            
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <!-- SDK Géoportail -->
+    <script src="js/ol-debug.js"></script>
+    <script src="js/GpPluginOl3.js"></script>
+    <script src="js/GpServices.js"></script>
+    <!-- Script pour le chargement de la carte et l'utilisation du service -->
+    <script src="js/itineraire.js"></script>
+    <!-- Script pour le menu contextuel personnalisé -->
+    <script src="https://cdn.jsdelivr.net/npm/ol-contextmenu"></script>
+
+  </body>
+</html>

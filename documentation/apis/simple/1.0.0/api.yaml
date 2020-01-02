@@ -246,6 +246,13 @@ paths:
           type: "number"
           format: "float"
         example: "1.0"
+      - name: "costType"
+        in: "query"
+        description: "Type du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. On pourra, par exemple, préciser une distance ou un temps, selon l'optimisation choisie. L'unité dépendra aussi des paramètres distanceUnit et timeUnit."
+        required: true
+        schema:
+          type: "string"
+        example: "time"
       - name: "profile"
         in: "query"
         description: "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
