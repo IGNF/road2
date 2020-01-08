@@ -475,6 +475,7 @@ module.exports = class pgrSource extends Source {
 
     }
 
+    // Pour la gestion des itinéraires sur un seul tronçon
     if (pgrResponse.rows.length == 1){
       response.waypoints.push( { location: [] } );
     }
