@@ -262,7 +262,7 @@ function addIntPoint(evt) {
   let clickedCoordinate = utils.to4326(evt.coordinate);
 
   // on stocke les coordonnées pour pouvoir lancer un itinéraire
-  clickedIntPoint.push(clickedCoordinate);
+  clickedIntPoint.push(clickedCoordinate[0]+","+clickedCoordinate[1]);
 
   let currentInputInt = document.getElementById('userIntermediates');
 
@@ -282,9 +282,6 @@ function addIntPoint(evt) {
 }
 
 function deleteIntPoint(evt) {
-
-  // on récupère les coordonnées du point cliqué
-  let clickedCoordinate = utils.to4326(evt.coordinate);
 
   let currentInputInt = document.getElementById('userIntermediates');
 
@@ -328,7 +325,7 @@ function deleteIntPoint(evt) {
     // -- 
 
     // on le supprime du tableau des points intermédiaires cliqués 
-    let pointIndice = clickedIntPoint.indexOf(clickedCoordinate);
+    let pointIndice = clickedIntPoint.indexOf(featureCoordStr);
     clickedIntPoint.splice(pointIndice, 1);
 
     
