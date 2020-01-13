@@ -102,7 +102,7 @@ module.exports = class ResourceParameter {
     }
 
     for (let i = 0; i < userTable.length; i++) {
-      if (!this.specificCheck(userTable[i])) {
+      if (!this.specificCheck(userTable[i], options)) {
         return false;
       }
     }

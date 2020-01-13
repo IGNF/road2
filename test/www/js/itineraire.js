@@ -1,6 +1,6 @@
 //Variables Globales
 
-var road2Url = "http://localhost:8080/simple/1.0.0/route?";
+var road2Url = "http://road2-centos:8080/simple/1.0.0/route?";
 var map;
 var clickedPoints = new Array();
 

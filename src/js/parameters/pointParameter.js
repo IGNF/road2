@@ -131,20 +131,20 @@ module.exports = class PointParameter extends ResourceParameter {
       return false;
     } else {
       // Vérification de l'inclusion des coordonnées dans la bbox de la ressource
-      // let userPoint = this.specificConvertion(userValue, userProjection);
+      let userPoint = this.specificConvertion(userValue, userProjection);
 
-      // if (this._projection !== userProjection) {
-      //   if (!userPoint.transforme(this._projection)) {
-      //     return false;
-      //   }
-      // } 
+      if (this._projection !== userProjection) {
+        if (!userPoint.transform(this._projection)) {
+          return false;
+        }
+      } 
 
-      // if (userPoint.x < this._xmin || userPoint.x > this._xmax) {
-      //   return false;
-      // }
-      // if (userPoint.y < this._ymin || userPoint.y > this._ymax) {
-      //   return false;
-      // }
+      if (userPoint.x < this._xmin || userPoint.x > this._xmax) {
+        return false;
+      }
+      if (userPoint.y < this._ymin || userPoint.y > this._ymax) {
+        return false;
+      }
 
     }
 
