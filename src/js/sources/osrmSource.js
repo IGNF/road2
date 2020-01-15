@@ -152,6 +152,7 @@ module.exports = class osrmSource extends Source {
 
       // Types de géométries : GeoJSON
       osrmRequest.geometries = "geojson";
+      osrmRequest.overview = "full";
 
       if (request.type === "routeRequest") {
         // Coordonnées

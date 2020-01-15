@@ -17,8 +17,7 @@
 
   <body onload="cancelForm()">
     <div class="container-fluid row">
-      <p><strong>Testez le nouveau calcul d'itinéraire</strong><br>
-        Cliquez sur la carte pour définir les points de l'itinéraire
+      <p><strong>Testez le nouveau calcul d'itinéraire</strong>
       </p>
     </div>
 
@@ -31,31 +30,30 @@
           <div class="col">
             
             <form id="route-form">
-              <p><strong>Paramètres de l'itinéraire</strong></p>
-              
-                <p>Ressource : </p>
+                <label for="userUrl"><strong>Url du service : </strong></label><input type="text" name="userUrl" id="userUrl" placeholder="http://localhost:8080/simple/1.0.0/route?"/><br>
+                <p><strong>Ressource : </strong></p>
                 <input type="radio" id="bduni-idf-osrm" name="userResource" value="bduni-idf-osrm" checked>
                 <label for="bduni-idf-osrm">BDUni sur l'Île-de-France via OSRM</label>
                 <br>
                 <input type="radio" id="bduni-idf-pgr" name="userResource" value="bduni-idf-pgr">
                 <label for="bduni-idf-pgr">BDUni sur l'Île-de-France via PGR</label>
                 <br>
-                <p>Mode de déplacement : </p>
+                <p><strong>Mode de déplacement : </strong></p>
                 <input type="radio" id="car" name="userProfile" value="car" checked>
                 <label for="car">Voiture</label>
                 <input type="radio" id="pedestrian" name="userProfile" value="pedestrian">
                 <label for="pedestrian">Piéton</label>
                 <br>
-                <p>Option de calcul : </p>
+                <p><strong>Option de calcul : </strong></p>
                 <input type="radio" id="fastest" name="userOptimization" value="fastest" checked>
                 <label for="fastest">Plus rapide</label>
                 <input type="radio" id="shortest" name="userOptimization" value="shortest">
                 <label for="shortest">Plus court</label>
                 <br>
-                <label for="userStart">Point de départ</label> : <input type="text" name="userStart" id="userStart" placeholder="Ex. 2.354715 , 48.831063 "/><br>
-                <label for="userEnd">Point d'arrivée</label> : <input type="text" name="userEnd" id="userEnd" placeholder="Ex. 2.311199 , 48.844848 "/><br>
-                <label for="userIntermediates">Points intermédiaires</label> : <input type="text" name="userIntermediates" id="userIntermediates" placeholder="Ex. 2.311299 , 48.844848 | 2.311199 , 48.844948 "/><br>
-                <p>Contraintes (éviter les routes) : </p>
+                <label for="userStart"><strong>Point de départ : </strong></label><input type="text" name="userStart" id="userStart" placeholder="Ex. 2.354715 , 48.831063 "/><br>
+                <label for="userEnd"><strong>Point d'arrivée : </strong></label><input type="text" name="userEnd" id="userEnd" placeholder="Ex. 2.311199 , 48.844848 "/><br>
+                <label for="userIntermediates"><strong>Points intermédiaires : </strong></label><input type="text" name="userIntermediates" id="userIntermediates" placeholder="Ex. 2.311299 , 48.844848 | 2.311199 , 48.844948 "/><br>
+                <p><strong>Contraintes (éviter les routes) : </strong></p>
                 <input type="checkbox" id="banned-highway" name="Autoroutes">
                 <label for="Autoroutes">Péages</label>
                 <input type="checkbox" id="banned-tunnel" name="Tunnels">

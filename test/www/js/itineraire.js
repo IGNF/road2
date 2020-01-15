@@ -1,6 +1,6 @@
 // ---- Variables Globales
 
-var road2Url = "https://localhost:8080/simple/1.0.0/route?";
+var road2Url = "http://localhost:8080/simple/1.0.0/route?";
 var oldUrl = "https://wxs.ign.fr/jhyvi0fgmnuxvfv0zjzorvdn/itineraire/rest/route.json?"
 var map;
 var clickedStartPoint = new Array();
@@ -370,7 +370,7 @@ function computeRoad() {
   // --
 
   // ---- Requete envoyée au nouveau service 
-  let requestStr = road2Url +
+  let requestStr = request.finalUrl +
     "resource=" + request.finalResource +
     "&profile=" + request.finalProfile +
     "&optimization=" + request.finalOptimization +
@@ -469,7 +469,14 @@ function loadUserParameter(request) {
 
   let constraintObject = {};
 
-// Resource 
+  // Url 
+  if (document.forms["route-form"].elements["userUrl"].value !== "") {
+    request.finalUrl = document.forms["route-form"].elements["userUrl"].value;
+  } else {
+    request.finalUrl = road2Url;
+  }
+
+  // Resource 
   if (document.forms["route-form"].elements["userResource"].value !== "") {
     request.finalResource = document.forms["route-form"].elements["userResource"].value;
   } else {
