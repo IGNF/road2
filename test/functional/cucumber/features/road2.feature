@@ -137,6 +137,8 @@ Feature: Road2
     And with query parameters:
       | key            | value           |
       | crs            | EPSG:2154       |
+      | start          | 1231119,6124145 |
+      | end            | 1231019,6124045 |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"

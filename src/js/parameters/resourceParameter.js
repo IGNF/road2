@@ -58,10 +58,11 @@ module.exports = class ResourceParameter {
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
+  * @param {object} options - Options
   * @return {boolean}
   *
   */
-  check(userValue) {
+  check(userValue, options) {
 
     let userTable = new Array();
 
@@ -101,7 +102,7 @@ module.exports = class ResourceParameter {
     }
 
     for (let i = 0; i < userTable.length; i++) {
-      if (!this.specificCheck(userTable[i])) {
+      if (!this.specificCheck(userTable[i], options)) {
         return false;
       }
     }
@@ -117,10 +118,11 @@ module.exports = class ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
+  * @param {object} options - Options
   * @return {boolean}
   *
   */
-  specificCheck(userValue) {
+  specificCheck(userValue, options) {
 
     return false;
 

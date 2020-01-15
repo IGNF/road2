@@ -67,8 +67,8 @@ module.exports = {
         throw errorManager.createError(" Parameter 'start' not found ", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("start").check(parameters.start)) {
-        throw errorManager.createError(" Parameter 'start' is invalid ", 400);
+      if (!routeOperation.getParameterById("start").check(parameters.start, askedProjection)) {
+        throw errorManager.createError(" Parameter 'start' is invalid. Wrong format or out of the bbox.", 400);
       } else {
         tmpStringCoordinates = parameters.start.split(",");
         start = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
@@ -77,10 +77,10 @@ module.exports = {
 
     // End
     if (!parameters.end) {
-        throw errorManager.createError(" Parameter 'end' not found ", 400);
+        throw errorManager.createError(" Parameter 'end' not found. Wrong format or out of the bbox.", 400);
     } else {
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("end").check(parameters.end)) {
+      if (!routeOperation.getParameterById("end").check(parameters.end, askedProjection)) {
         throw errorManager.createError(" Parameter 'end' is invalid ", 400);
       } else {
         tmpStringCoordinates = parameters.end.split(",");
@@ -139,11 +139,11 @@ module.exports = {
       // -- 
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates)) {
-        throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
+      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection)) {
+        throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
       } else {
         if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, askedProjection)) {
-          throw errorManager.createError(" Parameter 'intermediates' is invalid ", 400);
+          throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
         }
       }
 
