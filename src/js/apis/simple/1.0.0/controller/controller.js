@@ -15,7 +15,7 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /route
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
-  * @param {string} method - Méthode de la requête 
+  * @param {string} method - Méthode de la requête
   * @return {object} RouteRequest - Instance de la classe RouteRequest
   *
   */
@@ -128,15 +128,15 @@ module.exports = {
     // ---
     if (parameters.intermediates) {
 
-      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
-      // Cette vérification se fera donc dans le check du paramètre 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres
+      // Cette vérification se fera donc dans le check du paramètre
       let finalIntermediates = "";
       if (method === "POST") {
         finalIntermediates = this.convertPostArrayToGetParameters(parameters.intermediates, routeOperation.getParameterById("intermediates").serviceParameter);
       } else {
         finalIntermediates = parameters.intermediates;
       }
-      // -- 
+      // --
 
       // Vérification de la validité des coordonnées fournies
       if (!routeOperation.getParameterById("intermediates").check(finalIntermediates)) {
@@ -176,15 +176,15 @@ module.exports = {
     // ---
     if (parameters.waysAttributes) {
 
-      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
-      // Cette vérification se fera donc dans le check du paramètre 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres
+      // Cette vérification se fera donc dans le check du paramètre
       let finalWaysAttributes = "";
       if (method === "POST") {
         finalWaysAttributes = this.convertPostArrayToGetParameters(parameters.waysAttributes, routeOperation.getParameterById("waysAttributes").serviceParameter);
       } else {
         finalWaysAttributes = parameters.waysAttributes;
       }
-      // -- 
+      // --
 
       // Vérification de la validité des attributs demandés
       if (!routeOperation.getParameterById("waysAttributes").check(finalWaysAttributes)) {
@@ -265,15 +265,15 @@ module.exports = {
     // ---
     if (parameters.constraints) {
 
-      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
-      // Cette vérification se fera donc dans le check du paramètre 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres
+      // Cette vérification se fera donc dans le check du paramètre
       let finalConstraints = "";
       if (method === "POST") {
         finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
       } else {
         finalConstraints = parameters.constraints;
       }
-      // -- 
+      // --
 
       // Vérification de la validité des contraintes fournies
       if (!routeOperation.getParameterById("constraints").check(finalConstraints)) {
@@ -298,7 +298,7 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /isochrone
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
-  * @param {string} method - Méthode de la requête 
+  * @param {string} method - Méthode de la requête
   * @return {object} IsochroneRequest - Instance de la classe IsochroneRequest
   *
   */
@@ -403,15 +403,15 @@ module.exports = {
     // ---
     if (parameters.constraints) {
 
-      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres 
-      // Cette vérification se fera donc dans le check du paramètre 
+      // -- TODO: enlever cette partie, en passant par l'ajout de la notion de méthodes HTTP dans les paramètres
+      // Cette vérification se fera donc dans le check du paramètre
       let finalConstraints = "";
       if (method === "POST") {
         finalConstraints = this.convertPostArrayToGetParameters(parameters.constraints, routeOperation.getParameterById("constraints").serviceParameter);
       } else {
         finalConstraints = parameters.constraints;
       }
-      // -- 
+      // --
 
       // Vérification de la validité des contraintes fournies
       if (!isochroneOperation.getParameterById("constraints").check(finalConstraints)) {
@@ -665,8 +665,8 @@ module.exports = {
   /**
   *
   * @function
-  * @name writeIsochroneResponse
-  * @description Transformation d'un paramètre POST en chaîne de caractères pour avoir l'équivalent d'un paramètre GET. 
+  * @name convertPostArrayToGetParameters
+  * @description Transformation d'un paramètre POST en chaîne de caractères pour avoir l'équivalent d'un paramètre GET.
   * @param {object} userParameter - Paramètre POST donné par l'utilisateur
   * @param {Parameter} serviceParameter - Instance de la classe Parameter
   * @return {string|array} Paramètre en GET
@@ -688,7 +688,7 @@ module.exports = {
     } else {
       // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET
       return userParameter;
-    } 
+    }
 
     if (!Array.isArray(userParameter)) {
       throw errorManager.createError(" The parameter is not an array. ", 400);

@@ -176,6 +176,37 @@ module.exports = class osrmSource extends Source {
           osrmRequest.steps = false;
         }
 
+        // Gestion des contraintes d'exclusion.
+        // -- TODO: Le contrôle ci-dessous pourrait être plus intelligent. À améliorer.
+        if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
+          osrmRequest.exclude = [];
+          for (let i = 0; i < request.constraints.length; i++) {
+            const constraint = request.constraints[i];
+
+            if (constraint.type === "banned") {
+              switch (constraint.value) {
+                case "autoroute":
+                  if (osrmRequest.exclude.indexOf("toll") === -1) {
+                    osrmRequest.exclude.push("toll");
+                  }
+                  break;
+                case "tunnel":
+                  if (osrmRequest.exclude.indexOf("tunnel") === -1) {
+                    osrmRequest.exclude.push("tunnel");
+                  }
+                  break;
+                case "pont":
+                  if (osrmRequest.exclude.indexOf("bridge") === -1) {
+                    osrmRequest.exclude.push("bridge");
+                  }
+                  break;
+                default:
+                  // RÀS.
+              }
+            }
+          }
+        }
+
       } else {
         // on va voir si c'est un autre type de requête
       }
