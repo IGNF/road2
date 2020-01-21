@@ -127,33 +127,21 @@
           "id": "constraints",
           "values": [
             {
-              "keyType": "name",
+              "keyType": "name-osrm",
               "key": "wayType",
               "availableConstraintType": ["banned"],
               "availableValues": [
                 {
                   "value": "autoroute",
-                  "field": "acces_vehicule_leger",
-                  "condition": {
-                    "type": "equal",
-                    "value": "'A péage'"
-                  }
+                  "field": "toll"
                 },
                 {
                   "value": "tunnel",
-                  "field": "position_par_rapport_au_sol",
-                  "condition": {
-                    "type": "less",
-                    "value": "0"
-                  }
+                  "field": "tunnel"
                 },
                 {
                   "value": "pont",
-                  "field": "position_par_rapport_au_sol",
-                  "condition": {
-                    "type": "greater",
-                    "value": "0"
-                  }
+                  "field": "bridge"
                 }
               ]
             }

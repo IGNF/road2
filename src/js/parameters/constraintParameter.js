@@ -111,9 +111,9 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         currentKeyDescription.availableConstraintType.push(this._values[i].availableConstraintType[j]);
       }
 
-      if (this._values[i].keyType === "name") {
+      if (this._values[i].keyType === "name-pgr") {
 
-        this._verification[this._values[i].key].keyType = "name";
+        this._verification[this._values[i].key].keyType = "name-pgr";
 
         currentKeyDescription.availableOperators = new Array();
         currentKeyDescription.availableOperators.push("=","!=");
@@ -129,13 +129,29 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
         }
 
-      } else if (this._values[i].keyType === "numerical") {
+      } else if (this._values[i].keyType === "numerical-pgr") {
 
-        this._verification[this._values[i].key].keyType = "numerical";
+        this._verification[this._values[i].key].keyType = "numerical-pgr";
         this._verification[this._values[i].key].field = this._values[i].field;
 
         currentKeyDescription.availableOperators = new Array();
         currentKeyDescription.availableOperators.push("=", "!=", ">", ">=", "<", "<=");
+
+
+      } else if (this._values[i].keyType === "name-osrm") {
+
+          this._verification[this._values[i].key].keyType = "name-osrm";
+  
+          currentKeyDescription.availableOperators = new Array();
+          currentKeyDescription.availableOperators.push("=");
+          currentKeyDescription.values = new Array();
+  
+          for(let l = 0; l < this._values[i].availableValues.length; l++) {
+  
+            this._verification[this._values[i].key][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].field;
+            currentKeyDescription.values.push(this._values[i].availableValues[l].value);
+  
+          }
 
       } else {
         return false;
@@ -204,7 +220,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
     }
 
-    if (this._verification[userJson.key].keyType === "name") {
+    if (this._verification[userJson.key].keyType === "name-pgr" || this._verification[userJson.key].keyType === "name-osrm") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -233,7 +249,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         }
       }
 
-    } else if (this._verification[userJson.key].keyType === "numerical") {
+    } else if (this._verification[userJson.key].keyType === "numerical-pgr") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -285,14 +301,14 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    if (this._verification[userJson.key].keyType === "name") {
+    if (this._verification[userJson.key].keyType === "name-pgr") {
 
       let field = this._verification[userJson.key][userJson.value][0];
       let condition = this._verification[userJson.key][userJson.value][1];
 
       constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType === "numerical") {
+    } else if (this._verification[userJson.key].keyType === "numerical-pgr") {
 
       let field = this._verification[userJson.key].field;
 
@@ -302,12 +318,16 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
       constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType === "geometry") {
+    } else if (this._verification[userJson.key].keyType === "geometry-pgr") {
       // TODO: gérer contraintes geom
       // field = the_geom
       // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }
+    } else if (this._verification[userJson.key].keyType === "name-osrm") {
+      let field = this._verification[userJson.key][userJson.value];
+
+      constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value);
     } else {
-      //
+      // 
     }
 
     return constraint;

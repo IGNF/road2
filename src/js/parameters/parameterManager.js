@@ -588,7 +588,7 @@ module.exports = class parameterManager  {
             LOGGER.error("Le type de la cle contrainte n'est pas precise");
             return false;
           } else {
-            if ( !(["name", "numerical"].includes(key.keyType)) ) {
+            if ( !(["name-pgr", "numerical-pgr", "name-osrm"].includes(key.keyType)) ) {
               LOGGER.error("Le type de la cle contrainte est invalide");
               return false;
             } else {
@@ -623,7 +623,7 @@ module.exports = class parameterManager  {
             // TODO: verification ?
           }
 
-          if (key.keyType === "name") {
+          if (key.keyType === "name-pgr") {
             if (!key.availableValues) {
               LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
               return false;
@@ -664,6 +664,53 @@ module.exports = class parameterManager  {
               }
 
             }
+          } else if (key.keyType === "name-osrm") {
+
+            if (!key.availableValues) {
+              LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
+              return false;
+            }
+
+            if (!Array.isArray(key.availableValues)) {
+              LOGGER.error("Les valeurs de la cle contrainte ne sont pas dans un tableau");
+              return false;
+            }
+
+            if (key.availableValues.length === 0) {
+              LOGGER.error("Les valeurs de la cle contrainte sont dans un tableau vide");
+              return false;
+            }
+
+            for(let l = 0; l < key.availableValues.length; l++) {
+              let value = key.availableValues[l];
+
+              if (!value.value) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas de nom defini");
+                return false;
+              } else {
+                // rien à faire
+              }
+
+              if (!value.field) {
+                LOGGER.error("Les valeurs de la cle contrainte n'ont pas de field defini");
+                return false;
+              } else {
+                // TODO: vérification ?
+              }
+
+            }
+
+          } else if (key.keyType === "numerical-pgr") {
+
+            if (!key.field) {
+              LOGGER.error("Les valeurs de la cle contrainte n'ont pas de field defini");
+              return false;
+            } else {
+              // TODO: vérification ?
+            }
+
+          } else {
+            return false;
           }
 
         }
