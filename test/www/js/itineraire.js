@@ -479,6 +479,13 @@ function loadUserParameter(request) {
   // Resource 
   if (document.forms["route-form"].elements["userResource"].value !== "") {
     request.finalResource = document.forms["route-form"].elements["userResource"].value;
+    if (request.finalResource === "otherResource") {
+      if (document.forms["route-form"].elements["userResourceValue"].value !== "") {
+        request.finalResource = document.forms["route-form"].elements["userResourceValue"].value;
+      } else {
+        request.finalResource = defaultResource;
+      }
+    }
   } else {
     request.finalResource = defaultResource;
   }

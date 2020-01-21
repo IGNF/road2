@@ -17,7 +17,7 @@
 
   <body onload="cancelForm()">
     <div class="container-fluid row">
-      <p><strong>Testez le nouveau calcul d'itinéraire</strong>
+      <p><strong>Testez le calcul d'itinéraire</strong>
       </p>
     </div>
 
@@ -38,6 +38,9 @@
                 <input type="radio" id="bduni-idf-pgr" name="userResource" value="bduni-idf-pgr">
                 <label for="bduni-idf-pgr">BDUni sur l'Île-de-France via PGR</label>
                 <br>
+                <input type="radio" id="otherResource" name="userResource" value="otherResource">
+                <label for="otherResource">Autre ressource</label>
+                <input type="text" name="userResourceValue" id="otherResourceValue" placeholder="Autre ressource"/><br>
                 <p><strong>Mode de déplacement : </strong></p>
                 <input type="radio" id="car" name="userProfile" value="car" checked>
                 <label for="car">Voiture</label>
