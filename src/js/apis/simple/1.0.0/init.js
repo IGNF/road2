@@ -70,6 +70,7 @@ module.exports = {
       // -- route.parameters
       routeDescription.parameters = new Array();
 
+      // TODO: refactorer tout ce code. Une fonction qui prend en argument un paramètre et créer l'objet getCap 
       // route.parameters.resource
       let resourceServiceParameter = serviceOpRoute.getParameterById("resource");
       let resourceParameterDescription = {};
@@ -121,6 +122,8 @@ module.exports = {
       intermediatesParameterDescription.schema.type = "array";
       intermediatesParameterDescription.schema.items = {};
       intermediatesParameterDescription.schema.items.type = "string";
+      intermediatesParameterDescription.min = intermediatesServiceParameter.min;
+      intermediatesParameterDescription.max = intermediatesServiceParameter.max;
       intermediatesParameterDescription.explode = "false";
       intermediatesParameterDescription.style = "pipeDelimited";
       intermediatesParameterDescription.example = "2.368776,48.852890|2.367976,48.842891";
@@ -177,6 +180,8 @@ module.exports = {
       waysAttributesParameterDescription.schema.type = "array";
       waysAttributesParameterDescription.schema.items = {};
       waysAttributesParameterDescription.schema.items.type = "string";
+      waysAttributesParameterDescription.min = waysAttributesServiceParameter.min;
+      waysAttributesParameterDescription.max = waysAttributesServiceParameter.max;
       waysAttributesParameterDescription.explode = "false";
       waysAttributesParameterDescription.style = "pipeDelimited";
       waysAttributesParameterDescription.example = "name|type";
@@ -268,6 +273,8 @@ module.exports = {
       constraintsParameterDescription.schema.items.properties.operator.type = "string";
       constraintsParameterDescription.schema.items.properties.value = {};
       constraintsParameterDescription.schema.items.properties.value.type = "string";
+      constraintsParameterDescription.min = constraintsServiceParameter.min;
+      constraintsParameterDescription.max = constraintsServiceParameter.max;
       constraintsParameterDescription.explode = "false";
       constraintsParameterDescription.style = "pipeDelimited";
       constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
@@ -402,6 +409,8 @@ module.exports = {
       constraintsParameterDescription.schema.items.properties.operator.type = "string";
       constraintsParameterDescription.schema.items.properties.value = {};
       constraintsParameterDescription.schema.items.properties.value.type = "string";
+      constraintsParameterDescription.min = constraintsServiceParameter.min;
+      constraintsParameterDescription.max = constraintsServiceParameter.max;
       constraintsParameterDescription.explode = "false";
       constraintsParameterDescription.style = "pipeDelimited";
       constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
