@@ -455,6 +455,9 @@ module.exports = {
           let routeResource = {};
           routeResource.id = "resource";
           routeResource.values = resourceParameter.values;
+          if (resourceParameter.serviceParameter.defaultValue === "true") {
+            routeResource.defaultValue = resourceParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeResource);
 
           // route.start
@@ -462,6 +465,9 @@ module.exports = {
           let routeStart = {};
           routeStart.id = "start";
           routeStart.values = startParameter.values;
+          if (startParameter.serviceParameter.defaultValue === "true") {
+            routeStart.defaultValue = startParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeStart);
 
           // route.end
@@ -469,6 +475,9 @@ module.exports = {
           let routeEnd = {};
           routeEnd.id = "end";
           routeEnd.values = endParameter.values;
+          if (endParameter.serviceParameter.defaultValue === "true") {
+            routeEnd.defaultValue = endParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeEnd);
 
           // route.intermediates
@@ -476,6 +485,9 @@ module.exports = {
           let routeIntermediates = {};
           routeIntermediates.id = "intermediates";
           routeIntermediates.values = intermediatesParameter.values;
+          if (intermediatesParameter.serviceParameter.defaultValue === "true") {
+            routeIntermediates.defaultValue = intermediatesParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeIntermediates);
 
           // route.profile
@@ -483,13 +495,19 @@ module.exports = {
           let routeProfile = {};
           routeProfile.id = "profile";
           routeProfile.values = profileParameter.values;
+          if (profileParameter.serviceParameter.defaultValue === "true") {
+            routeProfile.defaultValue = profileParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeProfile);
 
           // route.optimization
-          let optmizationParameter = resourceOperation.getParameterById("optimization");
+          let optimizationParameter = resourceOperation.getParameterById("optimization");
           let routeOptimization = {};
           routeOptimization.id = "optimization";
-          routeOptimization.values = optmizationParameter.values;
+          routeOptimization.values = optimizationParameter.values;
+          if (optimizationParameter.serviceParameter.defaultValue === "true") {
+            routeOptimization.defaultValue = optimizationParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeOptimization);
 
           // route.getSteps
@@ -497,6 +515,9 @@ module.exports = {
           let routeGetSteps = {};
           routeGetSteps.id = "getSteps";
           routeGetSteps.values = getStepsParameter.values;
+          if (getStepsParameter.serviceParameter.defaultValue === "true") {
+            routeGetSteps.defaultValue = getStepsParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeGetSteps);
 
           // route.waysAttributes
@@ -504,6 +525,9 @@ module.exports = {
           let routeWaysAttributes = {};
           routeWaysAttributes.id = "waysAttributes";
           routeWaysAttributes.values = waysAttributesParameter.values;
+          if (waysAttributesParameter.serviceParameter.defaultValue === "true") {
+            routeWaysAttributes.defaultValue = waysAttributesParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
           // route.geometryFormat
@@ -511,6 +535,9 @@ module.exports = {
           let routeGeometriesFormat = {};
           routeGeometriesFormat.id = "geometryFormat";
           routeGeometriesFormat.values = geometryFormatParameter.values;
+          if (geometryFormatParameter.serviceParameter.defaultValue === "true") {
+            routeGeometriesFormat.defaultValue = geometryFormatParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
 
           // route.getBbox
@@ -518,6 +545,9 @@ module.exports = {
           let routeGetBbox = {};
           routeGetBbox.id = "getBbox";
           routeGetBbox.values = bboxParameter.values;
+          if (bboxParameter.serviceParameter.defaultValue === "true") {
+            routeGetBbox.defaultValue = bboxParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeGetBbox);
 
           // route.crs
@@ -525,6 +555,9 @@ module.exports = {
           let routeCrs = {};
           routeCrs.id = "crs";
           routeCrs.values = projectionParameter.values;
+          if (projectionParameter.serviceParameter.defaultValue === "true") {
+            routeCrs.defaultValue = projectionParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeCrs);
 
           // route.timeUnit
@@ -532,6 +565,9 @@ module.exports = {
           let routeTimeUnit = {};
           routeTimeUnit.id = "timeUnit";
           routeTimeUnit.values = timeUnitParameter.values;
+          if (timeUnitParameter.serviceParameter.defaultValue === "true") {
+            routeTimeUnit.defaultValue = timeUnitParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeTimeUnit);
 
           // route.distanceUnit
@@ -539,6 +575,9 @@ module.exports = {
           let routeDistanceUnit = {};
           routeDistanceUnit.id = "distanceUnit";
           routeDistanceUnit.values = distanceUnitParameter.values;
+          if (distanceUnitParameter.serviceParameter.defaultValue === "true") {
+            routeDistanceUnit.defaultValue = distanceUnitParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeDistanceUnit);
 
           // route.constraints
@@ -546,6 +585,9 @@ module.exports = {
           let routeConstraints = {};
           routeConstraints.id = "constraints";
           routeConstraints.values = constraintsParameter.getcapabilities;
+          if (constraintsParameter.serviceParameter.defaultValue === "true") {
+            routeConstraints.defaultValue = constraintsParameter.defaultValueContent;
+          }
           routeAvailableOperation.availableParameters.push(routeConstraints);
 
           resourceDescription.availableOperations.push(routeAvailableOperation);
@@ -576,6 +618,9 @@ module.exports = {
           let isochroneResource = {};
           isochroneResource.id = "resource";
           isochroneResource.values = resourceParameter.values;
+          if (resourceParameter.serviceParameter.defaultValue === "true") {
+            isochroneResource.defaultValue = resourceParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneResource);
 
           // isochrone.point
@@ -583,6 +628,9 @@ module.exports = {
           let isochronePoint = {};
           isochronePoint.id = "point";
           isochronePoint.values = pointParameter.values;
+          if (pointParameter.serviceParameter.defaultValue === "true") {
+            isochronePoint.defaultValue = pointParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochronePoint);
 
           // isochrone.costType
@@ -590,6 +638,9 @@ module.exports = {
           let isochroneCostType = {};
           isochroneCostType.id = "costType";
           isochroneCostType.values = costTypeParameter.values;
+          if (costTypeParameter.serviceParameter.defaultValue === "true") {
+            isochroneCostType.defaultValue = costTypeParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneCostType);
 
           // isochrone.costValue
@@ -597,6 +648,9 @@ module.exports = {
           let isochroneCostValue = {};
           isochroneCostValue.id = "costValue";
           isochroneCostValue.values = costValueParameter.values;
+          if (costValueParameter.serviceParameter.defaultValue === "true") {
+            isochroneCostValue.defaultValue = costValueParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneCostValue);
 
           // isochrone.profile
@@ -604,6 +658,9 @@ module.exports = {
           let isochroneProfile = {};
           isochroneProfile.id = "profile";
           isochroneProfile.values = profileParameter.values;
+          if (profileParameter.serviceParameter.defaultValue === "true") {
+            isochroneProfile.defaultValue = profileParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneProfile);
 
           // isochrone.direction
@@ -611,6 +668,9 @@ module.exports = {
           let isochroneDirection = {};
           isochroneDirection.id = "direction";
           isochroneDirection.values = directionParameter.values;
+          if (directionParameter.serviceParameter.defaultValue === "true") {
+            isochroneDirection.defaultValue = directionParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneDirection);
 
           // isochrone.constraints
@@ -618,6 +678,9 @@ module.exports = {
           let isochroneConstraints = {};
           isochroneConstraints.id = "constraints";
           isochroneConstraints.values = constraintsParameter.getcapabilities;
+          if (constraintsParameter.serviceParameter.defaultValue === "true") {
+            isochroneConstraints.defaultValue = constraintsParameter.defaultValueContent;
+          }
           isochroneAvailableOperation.availableParameters.push(isochroneConstraints);
 
           resourceDescription.availableOperations.push(isochroneAvailableOperation);
