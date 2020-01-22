@@ -65,6 +65,7 @@ module.exports = {
       // route.methods
       routeDescription.methods = new Array();
       routeDescription.methods.push("GET");
+      routeDescription.methods.push("POST");
 
       // -- route.parameters
       routeDescription.parameters = new Array();
@@ -92,7 +93,7 @@ module.exports = {
       startParameterDescription.default = startServiceParameter.defaultValue;
       startParameterDescription.schema = {};
       startParameterDescription.schema.type = "string";
-      startParameterDescription.example = "48.849319,2.337306";
+      startParameterDescription.example = "2.337306,48.849319";
       routeDescription.parameters.push(startParameterDescription);
 
       // route.parameters.end
@@ -105,7 +106,7 @@ module.exports = {
       endParameterDescription.default = endServiceParameter.defaultValue;
       endParameterDescription.schema = {};
       endParameterDescription.schema.type = "string";
-      endParameterDescription.example = "48.852891,2.367776";
+      endParameterDescription.example = "2.367776,48.852891";
       routeDescription.parameters.push(endParameterDescription);
 
       // route.parameters.intermediates
@@ -122,7 +123,7 @@ module.exports = {
       intermediatesParameterDescription.schema.items.type = "string";
       intermediatesParameterDescription.explode = "false";
       intermediatesParameterDescription.style = "pipeDelimited";
-      intermediatesParameterDescription.example = "48.852890,2.368776|48.842891,2.367976";
+      intermediatesParameterDescription.example = "2.368776,48.852890|2.367976,48.842891";
       routeDescription.parameters.push(intermediatesParameterDescription);
 
       // route.parameters.profile
@@ -279,6 +280,140 @@ module.exports = {
     }
     // --- end route
 
+    // isochrone 
+
+    // On vérifie que l'opération isochrone est disponible et on l'intégre seulement si elle est
+    if (service.verifyAvailabilityOperation("isochrone")) {
+
+      // récupération de l'opération isochrone du service
+      let serviceOpIsochrone = service.getOperationById("isochrone");
+
+      let isochroneDescription = {};
+      // isochrone.id
+      isochroneDescription.id = "isochrone";
+      // isochrone.description
+      isochroneDescription.description = serviceOpIsochrone.description;
+      // isochrone.url
+      isochroneDescription.url = "/isochrone?";
+      // isochrone.methods
+      isochroneDescription.methods = new Array();
+      isochroneDescription.methods.push("GET");
+      isochroneDescription.methods.push("POST");
+
+      // -- isochrone.parameters
+      isochroneDescription.parameters = new Array();
+
+      // isochrone.parameters.resource
+      let resourceServiceParameter = serviceOpIsochrone.getParameterById("resource");
+      let resourceParameterDescription = {};
+      resourceParameterDescription.name = "resource";
+      resourceParameterDescription.in = "query";
+      resourceParameterDescription.description = resourceServiceParameter.description;
+      resourceParameterDescription.required = resourceServiceParameter.required;
+      resourceParameterDescription.default = resourceServiceParameter.defaultValue;
+      resourceParameterDescription.schema = {};
+      resourceParameterDescription.schema.type = "string";
+      resourceParameterDescription.example = "bduni";
+      isochroneDescription.parameters.push(resourceParameterDescription);
+
+      // isochrone.parameters.point
+      let pointServiceParameter = serviceOpIsochrone.getParameterById("point");
+      let pointParameterDescription = {};
+      pointParameterDescription.name = "point";
+      pointParameterDescription.in = "query";
+      pointParameterDescription.description = pointServiceParameter.description;
+      pointParameterDescription.required = pointServiceParameter.required;
+      pointParameterDescription.default = pointServiceParameter.defaultValue;
+      pointParameterDescription.schema = {};
+      pointParameterDescription.schema.type = "string";
+      pointParameterDescription.example = "2.337306,48.849319";
+      isochroneDescription.parameters.push(pointParameterDescription);
+
+      // isochrone.parameters.costType
+      let costTypeServiceParameter = serviceOpIsochrone.getParameterById("costType");
+      let costTypeParameterDescription = {};
+      costTypeParameterDescription.name = "costType";
+      costTypeParameterDescription.in = "query";
+      costTypeParameterDescription.description = costTypeServiceParameter.description;
+      costTypeParameterDescription.required = costTypeServiceParameter.required;
+      costTypeParameterDescription.default = costTypeServiceParameter.defaultValue;
+      costTypeParameterDescription.schema = {};
+      costTypeParameterDescription.schema.type = "string";
+      costTypeParameterDescription.example = "time";
+      isochroneDescription.parameters.push(costTypeParameterDescription);
+
+      // isochrone.parameters.costValue
+      let costValueServiceParameter = serviceOpIsochrone.getParameterById("costValue");
+      let costValueParameterDescription = {};
+      costValueParameterDescription.name = "costValue";
+      costValueParameterDescription.in = "query";
+      costValueParameterDescription.description = costValueServiceParameter.description;
+      costValueParameterDescription.required = costValueServiceParameter.required;
+      costValueParameterDescription.default = costValueServiceParameter.defaultValue;
+      costValueParameterDescription.schema = {};
+      costValueParameterDescription.schema.type = "float";
+      costValueParameterDescription.example = "100";
+      isochroneDescription.parameters.push(costValueParameterDescription);
+
+      // isochrone.parameters.profile
+      let profileServiceParameter = serviceOpIsochrone.getParameterById("profile");
+      let profileParameterDescription = {};
+      profileParameterDescription.name = "profile";
+      profileParameterDescription.in = "query";
+      profileParameterDescription.description = profileServiceParameter.description;
+      profileParameterDescription.required = profileServiceParameter.required;
+      profileParameterDescription.default = profileServiceParameter.defaultValue;
+      profileParameterDescription.schema = {};
+      profileParameterDescription.schema.type = "string";
+      profileParameterDescription.example = "2.337306,48.849319";
+      isochroneDescription.parameters.push(profileParameterDescription);
+
+      // isochrone.parameters.direction
+      let directionServiceParameter = serviceOpIsochrone.getParameterById("direction");
+      let directionParameterDescription = {};
+      directionParameterDescription.name = "direction";
+      directionParameterDescription.in = "query";
+      directionParameterDescription.description = directionServiceParameter.description;
+      directionParameterDescription.required = directionServiceParameter.required;
+      directionParameterDescription.default = directionServiceParameter.defaultValue;
+      directionParameterDescription.schema = {};
+      directionParameterDescription.schema.type = "string";
+      directionParameterDescription.example = "departure";
+      isochroneDescription.parameters.push(directionParameterDescription);
+
+      // isochrone.parameters.constraints
+      let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
+      let constraintsParameterDescription = {};
+      constraintsParameterDescription.name = "constraints";
+      constraintsParameterDescription.in = "query";
+      constraintsParameterDescription.description = constraintsServiceParameter.description;
+      constraintsParameterDescription.required = constraintsServiceParameter.required;
+      constraintsParameterDescription.default = constraintsServiceParameter.defaultValue;
+      constraintsParameterDescription.schema = {};
+      constraintsParameterDescription.schema.type = "array";
+      constraintsParameterDescription.schema.items = {};
+      constraintsParameterDescription.schema.items.type = "object";
+      constraintsParameterDescription.schema.items.properties = {};
+      constraintsParameterDescription.schema.items.properties.constraintType = {};
+      constraintsParameterDescription.schema.items.properties.constraintType.type = "string";
+      constraintsParameterDescription.schema.items.properties.key = {};
+      constraintsParameterDescription.schema.items.properties.key.type = "string";
+      constraintsParameterDescription.schema.items.properties.operator = {};
+      constraintsParameterDescription.schema.items.properties.operator.type = "string";
+      constraintsParameterDescription.schema.items.properties.value = {};
+      constraintsParameterDescription.schema.items.properties.value.type = "string";
+      constraintsParameterDescription.explode = "false";
+      constraintsParameterDescription.style = "pipeDelimited";
+      constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
+      isochroneDescription.parameters.push(constraintsParameterDescription);
+
+      // -- end isochrone.parameters
+
+      getCapabilities.operations.push(isochroneDescription);
+
+    }
+    // -- end isochrone 
+
     // --- end operations
 
     // --- resources
@@ -304,112 +439,190 @@ module.exports = {
       // On vérifie que l'opération route est disponible et on l'intégre seulement si elle est
       if (service.verifyAvailabilityOperation("route")) {
 
-        // on récupère l'opération de ressource
-        let resourceOperation = localResource.getOperationById("route");
+        // on vérifie qu'elle est disponible sur la ressource 
+        if (localResource.verifyAvailabilityOperation("route")) {
 
-        let routeAvailableOperation = {};
-        routeAvailableOperation.id = "route";
-        routeAvailableOperation.availableParameters = new Array();
+        
+          // on récupère l'opération de ressource
+          let resourceOperation = localResource.getOperationById("route");
 
-        // route.resource
-        let resourceParameter = resourceOperation.getParameterById("resource");
-        let routeResource = {};
-        routeResource.id = "resource";
-        routeResource.values = resourceParameter.values;
-        routeAvailableOperation.availableParameters.push(routeResource);
+          let routeAvailableOperation = {};
+          routeAvailableOperation.id = "route";
+          routeAvailableOperation.availableParameters = new Array();
 
-        // route.start
-        let startParameter = resourceOperation.getParameterById("start");
-        let routeStart = {};
-        routeStart.id = "start";
-        routeStart.values = startParameter.values;
-        routeAvailableOperation.availableParameters.push(routeStart);
+          // route.resource
+          let resourceParameter = resourceOperation.getParameterById("resource");
+          let routeResource = {};
+          routeResource.id = "resource";
+          routeResource.values = resourceParameter.values;
+          routeAvailableOperation.availableParameters.push(routeResource);
 
-        // route.end
-        let endParameter = resourceOperation.getParameterById("end");
-        let routeEnd = {};
-        routeEnd.id = "end";
-        routeEnd.values = endParameter.values;
-        routeAvailableOperation.availableParameters.push(routeEnd);
+          // route.start
+          let startParameter = resourceOperation.getParameterById("start");
+          let routeStart = {};
+          routeStart.id = "start";
+          routeStart.values = startParameter.values;
+          routeAvailableOperation.availableParameters.push(routeStart);
 
-        // route.intermediates
-        let intermediatesParameter = resourceOperation.getParameterById("intermediates");
-        let routeIntermediates = {};
-        routeIntermediates.id = "intermediates";
-        routeIntermediates.values = intermediatesParameter.values;
-        routeAvailableOperation.availableParameters.push(routeIntermediates);
+          // route.end
+          let endParameter = resourceOperation.getParameterById("end");
+          let routeEnd = {};
+          routeEnd.id = "end";
+          routeEnd.values = endParameter.values;
+          routeAvailableOperation.availableParameters.push(routeEnd);
 
-        // route.profile
-        let profileParameter = resourceOperation.getParameterById("profile");
-        let routeProfile = {};
-        routeProfile.id = "profile";
-        routeProfile.values = profileParameter.values;
-        routeAvailableOperation.availableParameters.push(routeProfile);
+          // route.intermediates
+          let intermediatesParameter = resourceOperation.getParameterById("intermediates");
+          let routeIntermediates = {};
+          routeIntermediates.id = "intermediates";
+          routeIntermediates.values = intermediatesParameter.values;
+          routeAvailableOperation.availableParameters.push(routeIntermediates);
 
-        // route.optimization
-        let optmizationParameter = resourceOperation.getParameterById("optimization");
-        let routeOptimization = {};
-        routeOptimization.id = "optimization";
-        routeOptimization.values = optmizationParameter.values;
-        routeAvailableOperation.availableParameters.push(routeOptimization);
+          // route.profile
+          let profileParameter = resourceOperation.getParameterById("profile");
+          let routeProfile = {};
+          routeProfile.id = "profile";
+          routeProfile.values = profileParameter.values;
+          routeAvailableOperation.availableParameters.push(routeProfile);
 
-        // route.getSteps
-        let getStepsParameter = resourceOperation.getParameterById("getSteps");
-        let routeGetSteps = {};
-        routeGetSteps.id = "getSteps";
-        routeGetSteps.values = getStepsParameter.values;
-        routeAvailableOperation.availableParameters.push(routeGetSteps);
+          // route.optimization
+          let optmizationParameter = resourceOperation.getParameterById("optimization");
+          let routeOptimization = {};
+          routeOptimization.id = "optimization";
+          routeOptimization.values = optmizationParameter.values;
+          routeAvailableOperation.availableParameters.push(routeOptimization);
 
-        // route.waysAttributes
-        let waysAttributesParameter = resourceOperation.getParameterById("waysAttributes");
-        let routeWaysAttributes = {};
-        routeWaysAttributes.id = "waysAttributes";
-        routeWaysAttributes.values = waysAttributesParameter.values;
-        routeAvailableOperation.availableParameters.push(routeWaysAttributes);
+          // route.getSteps
+          let getStepsParameter = resourceOperation.getParameterById("getSteps");
+          let routeGetSteps = {};
+          routeGetSteps.id = "getSteps";
+          routeGetSteps.values = getStepsParameter.values;
+          routeAvailableOperation.availableParameters.push(routeGetSteps);
 
-        // route.geometryFormat
-        let geometryFormatParameter = resourceOperation.getParameterById("geometryFormat");
-        let routeGeometriesFormat = {};
-        routeGeometriesFormat.id = "geometryFormat";
-        routeGeometriesFormat.values = geometryFormatParameter.values;
-        routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
+          // route.waysAttributes
+          let waysAttributesParameter = resourceOperation.getParameterById("waysAttributes");
+          let routeWaysAttributes = {};
+          routeWaysAttributes.id = "waysAttributes";
+          routeWaysAttributes.values = waysAttributesParameter.values;
+          routeAvailableOperation.availableParameters.push(routeWaysAttributes);
 
-        // route.getBbox
-        let bboxParameter = resourceOperation.getParameterById("bbox");
-        let routeGetBbox = {};
-        routeGetBbox.id = "getBbox";
-        routeGetBbox.values = bboxParameter.values;
-        routeAvailableOperation.availableParameters.push(routeGetBbox);
+          // route.geometryFormat
+          let geometryFormatParameter = resourceOperation.getParameterById("geometryFormat");
+          let routeGeometriesFormat = {};
+          routeGeometriesFormat.id = "geometryFormat";
+          routeGeometriesFormat.values = geometryFormatParameter.values;
+          routeAvailableOperation.availableParameters.push(routeGeometriesFormat);
 
-        // route.crs
-        let projectionParameter = resourceOperation.getParameterById("projection");
-        let routeCrs = {};
-        routeCrs.id = "crs";
-        routeCrs.values = projectionParameter.values;
-        routeAvailableOperation.availableParameters.push(routeCrs);
+          // route.getBbox
+          let bboxParameter = resourceOperation.getParameterById("bbox");
+          let routeGetBbox = {};
+          routeGetBbox.id = "getBbox";
+          routeGetBbox.values = bboxParameter.values;
+          routeAvailableOperation.availableParameters.push(routeGetBbox);
 
-        // route.timeUnit
-        let timeUnitParameter = resourceOperation.getParameterById("timeUnit");
-        let routeTimeUnit = {};
-        routeTimeUnit.id = "timeUnit";
-        routeTimeUnit.values = timeUnitParameter.values;
-        routeAvailableOperation.availableParameters.push(routeTimeUnit);
+          // route.crs
+          let projectionParameter = resourceOperation.getParameterById("projection");
+          let routeCrs = {};
+          routeCrs.id = "crs";
+          routeCrs.values = projectionParameter.values;
+          routeAvailableOperation.availableParameters.push(routeCrs);
 
-        // route.distanceUnit
-        let distanceUnitParameter = resourceOperation.getParameterById("distanceUnit");
-        let routeDistanceUnit = {};
-        routeDistanceUnit.id = "distanceUnit";
-        routeDistanceUnit.values = distanceUnitParameter.values;
-        routeAvailableOperation.availableParameters.push(routeDistanceUnit);
+          // route.timeUnit
+          let timeUnitParameter = resourceOperation.getParameterById("timeUnit");
+          let routeTimeUnit = {};
+          routeTimeUnit.id = "timeUnit";
+          routeTimeUnit.values = timeUnitParameter.values;
+          routeAvailableOperation.availableParameters.push(routeTimeUnit);
 
-        // route.constraints
-        let constraintsParameter = resourceOperation.getParameterById("constraints");
-        let routeConstraints = {};
-        routeConstraints.id = "constraints";
-        routeConstraints.values = constraintsParameter.getcapabilities;
-        routeAvailableOperation.availableParameters.push(routeConstraints);
+          // route.distanceUnit
+          let distanceUnitParameter = resourceOperation.getParameterById("distanceUnit");
+          let routeDistanceUnit = {};
+          routeDistanceUnit.id = "distanceUnit";
+          routeDistanceUnit.values = distanceUnitParameter.values;
+          routeAvailableOperation.availableParameters.push(routeDistanceUnit);
 
-        resourceDescription.availableOperations.push(routeAvailableOperation);
+          // route.constraints
+          let constraintsParameter = resourceOperation.getParameterById("constraints");
+          let routeConstraints = {};
+          routeConstraints.id = "constraints";
+          routeConstraints.values = constraintsParameter.getcapabilities;
+          routeAvailableOperation.availableParameters.push(routeConstraints);
+
+          resourceDescription.availableOperations.push(routeAvailableOperation);
+
+        }
+
+      }
+      // - end route
+
+      // - isochrone
+
+      // On vérifie que l'opération isochrone est disponible et on l'intégre seulement si elle est
+      if (service.verifyAvailabilityOperation("isochrone")) {
+
+        // on vérifie qu'elle est disponible sur la ressource 
+        if (localResource.verifyAvailabilityOperation("isochrone")) {
+
+        
+          // on récupère l'opération de ressource
+          let resourceOperation = localResource.getOperationById("isochrone");
+
+          let isochroneAvailableOperation = {};
+          isochroneAvailableOperation.id = "isochrone";
+          isochroneAvailableOperation.availableParameters = new Array();
+
+          // isochrone.resource
+          let resourceParameter = resourceOperation.getParameterById("resource");
+          let isochroneResource = {};
+          isochroneResource.id = "resource";
+          isochroneResource.values = resourceParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochroneResource);
+
+          // isochrone.point
+          let pointParameter = resourceOperation.getParameterById("point");
+          let isochronePoint = {};
+          isochronePoint.id = "point";
+          isochronePoint.values = pointParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochronePoint);
+
+          // isochrone.costType
+          let costTypeParameter = resourceOperation.getParameterById("costType");
+          let isochroneCostType = {};
+          isochroneCostType.id = "costType";
+          isochroneCostType.values = costTypeParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochroneCostType);
+
+          // isochrone.costValue
+          let costValueParameter = resourceOperation.getParameterById("costValue");
+          let isochroneCostValue = {};
+          isochroneCostValue.id = "costValue";
+          isochroneCostValue.values = costValueParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochroneCostValue);
+
+          // isochrone.profile
+          let profileParameter = resourceOperation.getParameterById("profile");
+          let isochroneProfile = {};
+          isochroneProfile.id = "profile";
+          isochroneProfile.values = profileParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochroneProfile);
+
+          // isochrone.direction
+          let directionParameter = resourceOperation.getParameterById("direction");
+          let isochroneDirection = {};
+          isochroneDirection.id = "direction";
+          isochroneDirection.values = directionParameter.values;
+          isochroneAvailableOperation.availableParameters.push(isochroneDirection);
+
+          // isochrone.constraints
+          let constraintsParameter = resourceOperation.getParameterById("constraints");
+          let isochroneConstraints = {};
+          isochroneConstraints.id = "constraints";
+          isochroneConstraints.values = constraintsParameter.getcapabilities;
+          isochroneAvailableOperation.availableParameters.push(isochroneConstraints);
+
+          resourceDescription.availableOperations.push(isochroneAvailableOperation);
+
+        }
 
       }
       // - end route
