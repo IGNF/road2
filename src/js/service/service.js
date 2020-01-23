@@ -44,9 +44,6 @@ module.exports = class Service {
     // Manager des opérations disponibles sur le service
     this._operationManager = new OperationManager();
 
-    // catalogue des opérations disponibles
-    this._operationCatalog = {};
-
     // Manager des projections
     this._projectionManager = new ProjectionManager();
 
@@ -93,24 +90,13 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name get resourceCatalog
-  * @description Récupérer l'ensemble des ressources
-  *
-  */
-  get operationCatalog() {
-    return this._operationCatalog;
-  }
-
-  /**
-  *
-  * @function
   * @name verifyAvailabilityOperation
   * @description Savoir si une opération est disponible sur le service
   * @param {string} operationId - Id de l'opération
   *
   */
   verifyAvailabilityOperation(operationId) {
-    if (this._operationCatalog[operationId]) {
+    if (this._operationManager.verifyAvailabilityOperation(operationId)) {
       return true;
     } else {
       return false;
@@ -126,8 +112,8 @@ module.exports = class Service {
   *
   */
   getOperationById(operationId) {
-    if (this._operationCatalog[operationId]) {
-      return this._operationCatalog[operationId];
+    if (this._operationManager.verifyAvailabilityOperation(operationId)) {
+      return this._operationManager.getOperationById(operationId);
     } else {
       return {};
     }
@@ -456,7 +442,7 @@ module.exports = class Service {
       parametersDirectory = this._configuration.application.operations.parameters.directory;
     }
 
-    if (!this._operationManager.loadOperationDirectory(this._operationCatalog, operationsDirectory, parametersDirectory)) {
+    if (!this._operationManager.loadOperationDirectory(operationsDirectory, parametersDirectory)) {
       LOGGER.error("Erreur lors du chargement des operations.");
       return false;
     }

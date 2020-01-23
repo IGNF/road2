@@ -196,7 +196,7 @@ module.exports = class sourceManager {
         LOGGER.info("Source osrm.");
 
         // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (!operationManager.isOperationAvailable("route")) {
+        if (!operationManager.verifyAvailabilityOperation("route")) {
           LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
           return false;
         }
@@ -222,7 +222,7 @@ module.exports = class sourceManager {
         LOGGER.info("Source pgrouting.");
 
         // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (!operationManager.isOperationAvailable("route")) {
+        if (!operationManager.verifyAvailabilityOperation("route")) {
           LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
           return false;
         }

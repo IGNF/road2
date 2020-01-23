@@ -36,6 +36,12 @@ module.exports = class operationManager  {
     // Parameter manager
     this._parameterManager = new ParameterManager();
 
+    // catalogue des opérations disponibles
+    this._operationCatalog = {};
+
+    // Catalogue des configurations des opérations disponibles
+    this._operationConfigurationCatalog = {};
+
   }
 
   /**
@@ -52,25 +58,33 @@ module.exports = class operationManager  {
   /**
   *
   * @function
-  * @name isOperationAvailable
-  * @description Savoir si une opération est disponible
-  * @param {string} id - Id de l'opération de service
-  * @return {boolean}
+  * @name verifyAvailabilityOperation
+  * @description Savoir si une opération est disponible sur le service
+  * @param {string} operationId - Id de l'opération
   *
   */
-  isOperationAvailable(id) {
-    if (this._listOfVerifiedOperationId.length !== 0) {
-      for (let i = 0; i < this._listOfVerifiedOperationId.length; i++) {
-        if (id === this._listOfVerifiedOperationId[i]) {
-          return true;
-        } else {
-          // on continue
-        }
-      }
+  verifyAvailabilityOperation(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return true;
     } else {
       return false;
     }
-    return false;
+  }
+
+  /**
+  *
+  * @function
+  * @name getOperationById
+  * @description Récupérer une opération si elle est disponible sur le service
+  * @param {string} operationId - Id de l'opération
+  *
+  */
+  getOperationById(operationId) {
+    if (this._operationCatalog[operationId]) {
+      return this._operationCatalog[operationId];
+    } else {
+      return {};
+    }
   }
 
   /**
@@ -78,13 +92,12 @@ module.exports = class operationManager  {
   * @function
   * @name loadOperationDirectory
   * @description Charger les opérations du dossier
-  * @param {object} operationCatalog - Catalogue des opérations sur le service
   * @param {string} userOperationDirectory - Dossier contenant les opérations
   * @param {string} userParameterDirectory - Dossier contenant les paramètres
   * @return {boolean}
   *
   */
-  loadOperationDirectory(operationCatalog, userOperationDirectory, userParameterDirectory) {
+  loadOperationDirectory(userOperationDirectory, userParameterDirectory) {
 
     LOGGER.info("Chargement des operations...");
 
@@ -127,7 +140,8 @@ module.exports = class operationManager  {
           // on crée l'opération et on l'ajoute au catalogue
           // pour créer l'opération, il faut d'abord créer les paramètres
           let parametersTable = this._parameterManager.createParameters(operationConf);
-          operationCatalog[operationConf.id] = new Operation(operationConf.id, operationConf.name, operationConf.description, parametersTable);
+          this._operationConfigurationCatalog[operationConf.id] = operationConf;
+          this._operationCatalog[operationConf.id] = new Operation(operationConf.id, operationConf.name, operationConf.description, parametersTable);
 
         } else {
           LOGGER.error("La configuration d'une operation est incorrecte: " + operationConfFile);
@@ -254,7 +268,7 @@ module.exports = class operationManager  {
           LOGGER.info(currentOperationConf.id);
 
           // on vérifie qu'elle est bien disponible pour cette instance du service
-          if (!this.isOperationAvailable(currentOperationConf.id)) {
+          if (!this.verifyAvailabilityOperation(currentOperationConf.id)) {
             LOGGER.error("L'operation indiquee n'est pas disponible");
             // TODO: remplacer ce return par un continue pour affiner le chargement des ressources
             // par exemple, si la ressource indique une opération non disponible mais qu'on veuille quand même la charger pour les opérations disponibles
@@ -270,23 +284,34 @@ module.exports = class operationManager  {
           return false;
         } else {
 
+          if (!Array.isArray(currentOperationConf.parameters)) {
+            LOGGER.error("Les parametres de l'operation ne sont pas dans un tableau");
+            return false;
+          }
+
           if (currentOperationConf.parameters.length === 0) {
             LOGGER.error("L'objet representant l'operation ne contient aucun parametre");
             return false;
-          } else {
+          } 
 
-            for (let j = 0; j < currentOperationConf.parameters.length; j++) {
-              let currentParameterConf = currentOperationConf.parameters[j];
+          // On prend la liste des paramètres censé être là et on vérifie qu'ils sont bien présents et valides
+          // On compare le nombre de paramètres attendus au nombre de paramètres présents et on compare pour être certain qu'il n'y en ait pas trop
+          let wantedParameters = this._operationConfigurationCatalog[currentOperationConf.id].parameters;
 
-              if (!this._parameterManager.checkResourceParameterConf(currentParameterConf)) {
-                LOGGER.error("L'objet representant un parametre est mal configure");
-                return false;
-              } else {
-                // on continue
-              }
+          if (wantedParameters.length !== currentOperationConf.parameters.length) {
+            LOGGER.error("Le nombre de parametres presents n'est pas celui attendu");
+            return false;
+          }
 
+          for(let j = 0; j < currentOperationConf.parameters.length; j++) {
+            let currentParameterConf = currentOperationConf.parameters[j];
+
+            if (!this._parameterManager.checkResourceParameterConf(currentParameterConf)) {
+              LOGGER.error("L'objet representant un parametre est mal configure");
+              return false;
+            } else {
+              // on continue
             }
-
           }
 
         }
@@ -331,7 +356,7 @@ module.exports = class operationManager  {
           LOGGER.info(currentOperationConf.id);
 
           // on vérifie qu'elle est bien disponible pour cette instance du service
-          if (!this.isOperationAvailable(currentOperationConf.id)) {
+          if (!this.verifyAvailabilityOperation(currentOperationConf.id)) {
             LOGGER.error("L'operation indiquee n'est pas disponible");
             return false;
           } else {
