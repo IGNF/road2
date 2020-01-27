@@ -70,7 +70,7 @@ module.exports = {
       // -- route.parameters
       routeDescription.parameters = new Array();
 
-      // TODO: refactorer tout ce code. Une fonction qui prend en argument un paramètre et créer l'objet getCap 
+      // TODO: refactorer tout ce code. Une fonction qui prend en argument un paramètre et créer l'objet getCap
       // route.parameters.resource
       let resourceServiceParameter = serviceOpRoute.getParameterById("resource");
       let resourceParameterDescription = {};
@@ -287,7 +287,7 @@ module.exports = {
     }
     // --- end route
 
-    // isochrone 
+    // isochrone
 
     // On vérifie que l'opération isochrone est disponible et on l'intégre seulement si elle est
     if (service.verifyAvailabilityOperation("isochrone")) {
@@ -388,6 +388,19 @@ module.exports = {
       directionParameterDescription.example = "departure";
       isochroneDescription.parameters.push(directionParameterDescription);
 
+      // isochrone.parameters.crs
+      let projectionServiceParameter = serviceOpIsochrone.getParameterById("projection");
+      let crsParameterDescription = {};
+      crsParameterDescription.name = "crs";
+      crsParameterDescription.in = "query";
+      crsParameterDescription.description = projectionServiceParameter.description;
+      crsParameterDescription.required = projectionServiceParameter.required;
+      crsParameterDescription.default = projectionServiceParameter.defaultValue;
+      crsParameterDescription.schema = {};
+      crsParameterDescription.schema.type = "enumeration";
+      crsParameterDescription.example = "EPSG:4326";
+      isochroneDescription.parameters.push(crsParameterDescription);
+
       // isochrone.parameters.constraints
       let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
       let constraintsParameterDescription = {};
@@ -421,7 +434,7 @@ module.exports = {
       getCapabilities.operations.push(isochroneDescription);
 
     }
-    // -- end isochrone 
+    // -- end isochrone
 
     // --- end operations
 
@@ -448,10 +461,10 @@ module.exports = {
       // On vérifie que l'opération route est disponible et on l'intégre seulement si elle est
       if (service.verifyAvailabilityOperation("route")) {
 
-        // on vérifie qu'elle est disponible sur la ressource 
+        // on vérifie qu'elle est disponible sur la ressource
         if (localResource.verifyAvailabilityOperation("route")) {
 
-        
+
           // on récupère l'opération de ressource
           let resourceOperation = localResource.getOperationById("route");
 
@@ -611,10 +624,10 @@ module.exports = {
       // On vérifie que l'opération isochrone est disponible et on l'intégre seulement si elle est
       if (service.verifyAvailabilityOperation("isochrone")) {
 
-        // on vérifie qu'elle est disponible sur la ressource 
+        // on vérifie qu'elle est disponible sur la ressource
         if (localResource.verifyAvailabilityOperation("isochrone")) {
 
-        
+
           // on récupère l'opération de ressource
           let resourceOperation = localResource.getOperationById("isochrone");
 
