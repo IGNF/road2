@@ -309,6 +309,7 @@ module.exports = {
     let costValue;
     let profile;
     let direction;
+    let askedProjection;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -329,12 +330,25 @@ module.exports = {
     /* On récupère l'opération 'isochrone' pour faire des vérifications. */
     let isochroneOperation = resource.getOperationById("isochrone");
 
+    // Projection
+    if (parameters.crs) {
+      // Vérification de la validité des coordonnées fournies
+      if (!isochroneOperation.getParameterById("projection").check(parameters.crs)) {
+        throw errorManager.createError(" Parameter 'crs' is invalid ", 400);
+      } else {
+        askedProjection = parameters.crs;
+      }
+    } else {
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      askedProjection = isochroneOperation.getParameterById("projection").defaultValueContent;
+    }
+
     /* Paramètre 'point'. */
     if (!parameters.point) {
         throw errorManager.createError("Parameter 'point' not found.", 400);
     } else {
       /* Vérification de la validité des coordonnées fournies. */
-      if (!isochroneOperation.getParameterById("point").check(parameters.point)) {
+      if (!isochroneOperation.getParameterById("point").check(parameters.point, askedProjection)) {
         throw errorManager.createError("Parameter 'point' is invalid.", 400);
       } else {
         const tmpStringCoordinates = parameters.point.split(",");

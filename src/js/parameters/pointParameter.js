@@ -33,16 +33,16 @@ module.exports = class PointParameter extends ResourceParameter {
     // Projection
     this._projection = "";
 
-    // Xmin de la bbox 
+    // Xmin de la bbox
     this._xmin;
 
-    // Ymin de la bbox 
+    // Ymin de la bbox
     this._ymin;
 
-    // Xmax de la bbox 
+    // Xmax de la bbox
     this._xmax;
 
-    // Ymax de la bbox 
+    // Ymax de la bbox
     this._ymax;
 
   }
@@ -104,7 +104,7 @@ module.exports = class PointParameter extends ResourceParameter {
       LOGGER.error("BBox incorrecte en Y");
       return false;
     }
-    
+
     return true;
 
   }
@@ -137,7 +137,7 @@ module.exports = class PointParameter extends ResourceParameter {
         if (!userPoint.transform(this._projection)) {
           return false;
         }
-      } 
+      }
 
       if (userPoint.x < this._xmin || userPoint.x > this._xmax) {
         return false;
