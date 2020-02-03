@@ -84,12 +84,6 @@ paths:
         schema:
           type: "string"
         example: "fastest"
-      - name: "format"
-        in: "query"
-        description: "Format de la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
-        required: false
-        schema:
-          $ref: "#/components/schemas/response-type"
       - name: "geometryFormat"
         in: "query"
         description: "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline."
@@ -277,13 +271,6 @@ paths:
           items:
             type: "string"
         example: ["{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}"]
-      - name: "format"
-        in: "query"
-        description: "Format de la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
-        required: false
-        schema:
-          $ref: "#/components/schemas/response-type"
-        example: "application/json"
       - name: "geometryFormat"
         in: "query"
         description: "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline."
@@ -383,9 +370,6 @@ components:
       type: "array"
       items:
         $ref: "#/components/schemas/point"
-    response-type:
-      type: "string"
-      enum: ["application/json"]
     constraint:
       type: "object"
       properties:
@@ -434,8 +418,6 @@ components:
           type: "string"
         optmization:
           type: "string"
-        format:
-          $ref: "#/components/schemas/response-type"
         constraints:
           type: "array"
           items:
@@ -479,8 +461,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/constraintIso"
-        format:
-          $ref: "#/components/schemas/response-type"
         geometryFormat:
           type: "string"
           enum: ["geojson","polyline"]

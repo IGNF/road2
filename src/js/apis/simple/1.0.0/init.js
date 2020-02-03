@@ -695,6 +695,16 @@ module.exports = {
           }
           isochroneAvailableOperation.availableParameters.push(isochroneDirection);
 
+          // isochrone.crs
+          let projectionParameter = resourceOperation.getParameterById("projection");
+          let isochroneProjection = {};
+          isochroneProjection.id = "projection";
+          isochroneProjection.values = projectionParameter.values;
+          if (projectionParameter.serviceParameter.defaultValue === "true") {
+            isochroneProjection.defaultValue = projectionParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneProjection);
+
           // isochrone.constraints
           let constraintsParameter = resourceOperation.getParameterById("constraints");
           let isochroneConstraints = {};
