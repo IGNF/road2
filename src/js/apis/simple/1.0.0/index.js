@@ -137,6 +137,7 @@ router.route("/isochrone")
       // Formattage de la réponse.
       const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
 
+      res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
     } catch (error) {
       return next(error);
@@ -160,6 +161,7 @@ router.route("/isochrone")
       // Formattage de la réponse.
       const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
 
+      res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
     } catch (error) {
       return next(error);

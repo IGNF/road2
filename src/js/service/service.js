@@ -593,6 +593,7 @@ module.exports = class Service {
     // On va créer chaque source
     if (listOfSourceIds.length !== 0) {
       // On va charger chaque source identifiée
+      let sourceToRemove = new Array();
       for (let i = 0; i < listOfSourceIds.length; i++) {
 
         let sourceId = listOfSourceIds[i];
@@ -626,12 +627,31 @@ module.exports = class Service {
           loadedSources++;
         } catch (err) {
           // on n'a pas pu se connecter à la source
-          // TODO: remplacer ce comportement par une gestion plus fine des ressources
-          // si une source ne peut être chargée alors on supprime l'ensemble des ressources qui l'utilisent
-          LOGGER.fatal("Impossible de se connecter a la source: " + sourceId, err);
-          throw errorManager.createError("Impossible de se connecter a la source");
+          // si une source ne peut être chargée alors on la supprime
+          LOGGER.error("Impossible de se connecter a la source: " + sourceId);
+          LOGGER.debug("Erreur : " + err);
+          LOGGER.warn("Suppression des references a la source dans les ressources qui l'utilisent...");
+          let resourceList = this._sourceManager.listOfUsage(sourceId);
+          if (resourceList.length !== 0) {
+            for (let k = 0; k < resourceList.length; k++) {
+              LOGGER.warn("Suppression au sein de la ressource " + resourceList[k]);
+              let resource = this.resourceCatalog[resourceList[k]];
+              resource.removeSource(sourceId);
+            }
+          }
+          sourceToRemove.push(sourceId);
+          
         }
       }
+
+      // On supprime les sources qui n'ont pas pu être chargées
+      if (sourceToRemove.length !== 0) {
+        for (let k= 0; k < sourceToRemove.length; k++) {
+          LOGGER.warn("Suppression de la source " + sourceToRemove[k]);
+          this._sourceManager.removeSource(sourceToRemove[k]);
+        }
+      }
+      
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
@@ -639,7 +659,7 @@ module.exports = class Service {
 
     if (loadedSources === 0) {
       LOGGER.fatal("Aucune source n'a pu etre chargee");
-      throw errorManager.createError("No source found");
+      throw errorManager.createError("No source loaded");
     }
   }
 
@@ -708,7 +728,7 @@ module.exports = class Service {
   *
   */
 
-  stopServer(callback) {
+  stopServer() {
 
     // Extinction des serveurs
     if (!this._serverManager.stopAllServer()) {

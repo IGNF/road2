@@ -40,6 +40,36 @@ module.exports = class resourceManager {
   /**
   *
   * @function
+  * @name removeResource
+  * @description Supprimer une ressource
+  * @param {string} id - Id de la ressource 
+  * @return {boolean} 
+  *
+  */
+  removeResource(id) {
+
+    let index = this._listOfVerifiedResourceIds.indexOf(id);
+    if (index !== -1) {
+      this._listOfVerifiedResourceIds.splice(index,1);
+    } else {
+      return false;
+    }
+    this._listOfVerifiedResourceIds.splice(index,1);
+
+    index = this._listOfResourceIds.indexOf(id);
+    if (index !== -1) {
+      this._listOfResourceIds.splice(index,1);
+    } else {
+      return false;
+    }
+    this._listOfResourceIds.splice(index,1);
+
+    return true;
+  }
+
+  /**
+  *
+  * @function
   * @name checkResource
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource.
   * @param {json} resourceJsonObject - Description JSON de la ressource
@@ -167,7 +197,8 @@ module.exports = class resourceManager {
           LOGGER.error("La ressource contient une source invalide.");
           return false;
         } else {
-          // on ne fait rien
+          // on stocke l'id de la ressource pour cette source donnée 
+          sourceManager.addUsage(sourceJsonObject.id, resourceJsonObject.resource.id);
         }
 
         // Lien avec la topologie

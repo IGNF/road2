@@ -30,6 +30,9 @@ module.exports = class sourceManager {
     // Correspondance entre l'id d'une source et l'id de la topologie dont elle dérive
     this._sourceTopology = {};
 
+    // Correspondance entre l'id d'une source et l'id des ressources où elle est utilisée
+    this._sourceUsage = {};
+
   }
 
   /**
@@ -63,6 +66,82 @@ module.exports = class sourceManager {
   */
   get sourceDescriptions() {
     return this._sourceDescriptions;
+  }
+
+  /**
+  *
+  * @function
+  * @name get sourceUsage
+  * @description Récupérer l'ensemble des correspondances de sources
+  *
+  */
+  get sourceUsage() {
+    return this._sourceUsage;
+  }
+
+  /**
+  *
+  * @function
+  * @name listOfUsage
+  * @description Récupérer l'ensemble des id de ressources utilisant une source
+  * @param {string} id - Id de la source 
+  * @return {table} Liste des id de ressource 
+  *
+  */
+  listOfUsage(id) {
+    return this._sourceUsage[id];
+  }
+
+  /**
+  *
+  * @function
+  * @name removeSource
+  * @description Supprimer une source
+  * @param {string} id - Id de la source 
+  * @return {boolean} 
+  *
+  */
+  removeSource(id) {
+
+    let index = this._listOfSourceIds.indexOf(id);
+    if (index !== -1) {
+      this._listOfSourceIds.splice(index,1);
+    } else {
+      return false;
+    }
+    
+    if (!delete this._sourceDescriptions[id]) {
+      return false;
+    }
+    if (!delete this._sourceTopology[id]) {
+      return false;
+    }
+    if (!delete this._sourceUsage[id]) {
+      return false;
+    }
+
+    return true;
+  }
+
+    /**
+  *
+  * @function
+  * @name addUsage
+  * @description Ajouter l'usage, via l'id, d'une ressource pour une source
+  * @param {string} sourceId - Id de la source 
+  * @param {string} resourceId - Id de la ressource 
+  * @return {boolean} 
+  *
+  */
+  addUsage(sourceId, resourceId) {
+    if (!this._sourceUsage[sourceId]) {
+      this._sourceUsage[sourceId] = new Array();
+    } 
+    if (!Array.isArray(this._sourceUsage[sourceId])) {
+      return false;
+    }
+    this._sourceUsage[sourceId].push(resourceId);
+    return true;
   }
 
   /**
