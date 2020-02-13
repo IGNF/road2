@@ -46,21 +46,21 @@ paths:
         required: true
         schema:
           type: "string"
-        example: "bdtopo-v3"
+        example: "bdtopo-osrm"
       - name: "start"
         in: "query"
         description: "Point de départ. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
         required: true
         schema:
           $ref: "#/components/schemas/point"
-        example: "48.849319,2.337306"
+        example: "2.337306,48.849319"
       - name: "end"
         in: "query"
         description: "Point d'arrivée. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
         required: true
         schema:
           $ref: "#/components/schemas/point"
-        example: "48.852891,2.367776"
+        example: "2.367776,48.852891"
       - name: "intermediates"
         in: "query"
         description: "Points intermédiaires. Ils devront être exprimés dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
@@ -69,7 +69,7 @@ paths:
           $ref: "#/components/schemas/coordinates"
         explode: false
         style: "pipeDelimited"
-        example: "48.852890,2.368776"
+        example: "2.368776,48.852890"
       - name: "profile"
         in: "query"
         description: "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
@@ -224,14 +224,14 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/point"
-        example: "48.849319,2.337306"
+        example: "2.337306,48.849319"
       - name: "resource"
         in: "query"
         description: "Ressource utilisée pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver des isochrones ou des isodistances."
         required: true
         schema:
           type: "string"
-        example: "bduni"
+        example: "bdtopo-pgr"
       - name: "costValue"
         in: "query"
         description: "Valeur du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. On pourra, par exemple, préciser une distance ou un temps, selon l'optimisation choisie. L'unité dépendra aussi des paramètres distanceUnit et timeUnit."
