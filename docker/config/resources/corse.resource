@@ -112,7 +112,8 @@
           "values": [
             "hour",
             "minute",
-            "second"
+            "second",
+            "standard"
           ]
         },
         {
