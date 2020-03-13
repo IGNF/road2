@@ -99,21 +99,21 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     for(let i = 0; i < this._values.length; i++) {
       // pour chaque clé disponible
       let currentKeyDescription = {};
-      currentKeyDescription.key = this._values[i].key;
+      currentKeyDescription.key = this._values[i].key.toLowerCase();
 
-      this._verification[this._values[i].key] = {};
+      this._verification[this._values[i].key.toLowerCase()] = {};
 
-      this._verification[this._values[i].key].constraintType = new Array();
+      this._verification[this._values[i].key.toLowerCase()].constraintType = new Array();
       currentKeyDescription.availableConstraintType = new Array();
 
       for (let j = 0; j < this._values[i].availableConstraintType.length; j++) {
-        this._verification[this._values[i].key].constraintType.push(this._values[i].availableConstraintType[j]);
+        this._verification[this._values[i].key.toLowerCase()].constraintType.push(this._values[i].availableConstraintType[j]);
         currentKeyDescription.availableConstraintType.push(this._values[i].availableConstraintType[j]);
       }
 
       if (this._values[i].keyType === "name-pgr") {
 
-        this._verification[this._values[i].key].keyType = "name-pgr";
+        this._verification[this._values[i].key.toLowerCase()].keyType = "name-pgr";
 
         currentKeyDescription.availableOperators = new Array();
         currentKeyDescription.availableOperators.push("=","!=");
@@ -121,7 +121,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
         for(let l = 0; l < this._values[i].availableValues.length; l++) {
 
-          this._verification[this._values[i].key][this._values[i].availableValues[l].value] = [
+          this._verification[this._values[i].key.toLowerCase()][this._values[i].availableValues[l].value] = [
             this._values[i].availableValues[l].field,
             this._values[i].availableValues[l].condition
           ];
@@ -131,8 +131,8 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
       } else if (this._values[i].keyType === "numerical-pgr") {
 
-        this._verification[this._values[i].key].keyType = "numerical-pgr";
-        this._verification[this._values[i].key].field = this._values[i].field;
+        this._verification[this._values[i].key.toLowerCase()].keyType = "numerical-pgr";
+        this._verification[this._values[i].key.toLowerCase()].field = this._values[i].field;
 
         currentKeyDescription.availableOperators = new Array();
         currentKeyDescription.availableOperators.push("=", "!=", ">", ">=", "<", "<=");
@@ -140,17 +140,17 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
       } else if (this._values[i].keyType === "name-osrm") {
 
-          this._verification[this._values[i].key].keyType = "name-osrm";
-  
+          this._verification[this._values[i].key.toLowerCase()].keyType = "name-osrm";
+
           currentKeyDescription.availableOperators = new Array();
           currentKeyDescription.availableOperators.push("=");
           currentKeyDescription.values = new Array();
-  
+
           for(let l = 0; l < this._values[i].availableValues.length; l++) {
-  
-            this._verification[this._values[i].key][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].field;
+
+            this._verification[this._values[i].key.toLowerCase()][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].field;
             currentKeyDescription.values.push(this._values[i].availableValues[l].value);
-  
+
           }
 
       } else {
@@ -197,7 +197,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       if (typeof userJson.key !== "string") {
         return false;
       }
-      if (!this._verification[userJson.key]) {
+      if (!this._verification[userJson.key.toLowerCase()]) {
         return false;
       }
     }
@@ -210,8 +210,8 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         return false;
       }
       let found = false;
-      for (let i = 0; i < this._verification[userJson.key].constraintType.length; i++) {
-        if (userJson.constraintType === this._verification[userJson.key].constraintType[i]) {
+      for (let i = 0; i < this._verification[userJson.key.toLowerCase()].constraintType.length; i++) {
+        if (userJson.constraintType === this._verification[userJson.key.toLowerCase()].constraintType[i]) {
           found = true;
         }
       }
@@ -220,7 +220,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
     }
 
-    if (this._verification[userJson.key].keyType === "name-pgr" || this._verification[userJson.key].keyType === "name-osrm") {
+    if (this._verification[userJson.key.toLowerCase()].keyType === "name-pgr" || this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -241,7 +241,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         if (typeof userJson.value !== "string") {
           return false;
         }
-        if (!this._verification[userJson.key][userJson.value]) {
+        if (!this._verification[userJson.key.toLowerCase()][userJson.value]) {
           return false;
         } else {
           // la contrainte est bien formulée et est disponible
@@ -249,7 +249,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         }
       }
 
-    } else if (this._verification[userJson.key].keyType === "numerical-pgr") {
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "numerical-pgr") {
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -301,33 +301,33 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       return false;
     }
 
-    if (this._verification[userJson.key].keyType === "name-pgr") {
+    if (this._verification[userJson.key.toLowerCase()].keyType === "name-pgr") {
 
-      let field = this._verification[userJson.key][userJson.value][0];
-      let condition = this._verification[userJson.key][userJson.value][1];
+      let field = this._verification[userJson.key.toLowerCase()][userJson.value][0];
+      let condition = this._verification[userJson.key.toLowerCase()][userJson.value][1];
 
-      constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
+      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType === "numerical-pgr") {
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "numerical-pgr") {
 
-      let field = this._verification[userJson.key].field;
+      let field = this._verification[userJson.key.toLowerCase()].field;
 
       let condition = {
         type: userJson.operator,
         value: userJson.value
       }
-      constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value, condition);
+      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
 
-    } else if (this._verification[userJson.key].keyType === "geometry-pgr") {
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "geometry-pgr") {
       // TODO: gérer contraintes geom
       // field = the_geom
       // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }
-    } else if (this._verification[userJson.key].keyType === "name-osrm") {
-      let field = this._verification[userJson.key][userJson.value];
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
+      let field = this._verification[userJson.key.toLowerCase()][userJson.value];
 
-      constraint = new Constraint(userJson.constraintType, userJson.key, field, userJson.operator, userJson.value);
+      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
     } else {
-      // 
+      //
     }
 
     return constraint;

@@ -1,8 +1,6 @@
 'use strict';
 
 const Source = require('./source');
-const { Client } = require('pg');
-const fs = require('fs');
 const RouteResponse = require('../responses/routeResponse');
 const IsochroneResponse = require('../responses/isochroneResponse');
 const Route = require('../responses/route');
