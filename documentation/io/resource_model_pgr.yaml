@@ -129,18 +129,18 @@
 									"storage":
 										$ref: "#/components/schemas/storage"
                     required: true
-                  # Indique ou se trouve le fichier json qui a permis de générer le lua
-                  "configuration":
-                    type: object
+              # Indique ou se trouve le fichier json qui a permis de générer le lua
+              "configuration":
+                type: object
+                required: false
+                properties:
+                  # Nom de la propriété qui est utilisé dans le fichier json
+                  "name":
+                    type: string
                     required: true
-                    properties:
-                      # Nom de la propriété qui est utilisé dans le fichier json
-                      "name":
-                        type: string
-                        required: true
-                      "storage":
-                        $ref: "#/components/schemas/storage"
-                        required: true
+                  "storage":
+                    $ref: "#/components/schemas/storage"
+                    required: true
     # Liste des opérations rendus disponibles
 		"availableOperations":
 			type: array
