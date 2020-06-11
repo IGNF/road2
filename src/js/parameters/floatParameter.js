@@ -87,16 +87,24 @@ module.exports = class FloatParameter extends ResourceParameter {
   */
   specificCheck(userValue) {
 
+    let userFloat;
     /* Vérifier que la valeur introduite est de type float. */
-    if (isNaN(parseFloat(userValue))) {
+    if(typeof userValue === "string") {
+      userFloat = parseFloat(userValue);
+      if (isNaN(userFloat)) {
+        return false;
+      } 
+    } else if (typeof userValue === "number") {
+      userFloat = userValue;
+    } else {
+      return false;
+    }
+    
+    if (this._min && (userFloat < this._min)) {
       return false;
     }
 
-    if (this._min && (userValue < this._min)) {
-      return false;
-    }
-
-    if (this._max && (userValue > this._max)) {
+    if (this._max && (userFloat > this._max)) {
       return false;
     }
 
