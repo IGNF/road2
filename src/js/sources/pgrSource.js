@@ -410,6 +410,11 @@ module.exports = class pgrSource extends Source {
     // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
     response.routes.push( {geometry: routeGeometry, duration: 0, distance: 0, legs: [] } );
 
+    // Ajout des waypoints
+    for (let i = 0; i < pgrRequest.coordinates.length; i++ ) {
+      response.waypoints.push( { location: [] } );
+    }
+
     let row;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
@@ -417,14 +422,6 @@ module.exports = class pgrSource extends Source {
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
-      }
-      // Gestion du start et des waypoints intermédiaires
-      if ( row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
-        response.waypoints.push( { location: [] } );
-      }
-      // Gestion du end : séparé, car dans le cas d'un dernier chemin n'ayant qu'un tronçon, il faut rajouter 2 waypoints.
-      if (rowIdx == pgrResponse.rows.length - 1 ) {
-        response.waypoints.push( { location: [] } );
       }
 
       let finalAttributesObject = {};
@@ -505,14 +502,6 @@ module.exports = class pgrSource extends Source {
 
     // Simplification de la géométrie, tolérance à environ 5m
     routeGeometry.coordinates = simplify(routeGeometry.coordinates, 0.00005);
-    if (response.waypoints.length < 1) {
-      throw errorManager.createError(" No PGR path found: the number of waypoints is lower than 2. ");
-    }
-
-    if (response.waypoints.length != pgrRequest.coordinates.length) {
-      // Arrive si aucun chemin n'est trouvé et qu'une fraction de tronçon (origine ou départ) est à 0 ou 1
-      throw errorManager.createError(" No PGR path found: the number of waypoints is different from input waypoints ");
-    }
 
     for (let i = 0; i < pgrRequest.coordinates.length; i++){
       // Récupération des points projetés dans les waypoints
@@ -528,13 +517,13 @@ module.exports = class pgrSource extends Source {
     // start
     start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], this.topology.projection);
     if (!start.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of start in PGR response. ");
+      throw errorManager.createError(" Error during reprojection of start in PGR response. ");
     }
 
     // end
     end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], this.topology.projection);
     if (!end.transform(askedProjection)) {
-    throw errorManager.createError(" Error during reprojection of end in PGR response. ");
+      throw errorManager.createError(" Error during reprojection of end in PGR response. ");
     }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
