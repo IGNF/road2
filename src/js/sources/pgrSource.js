@@ -418,7 +418,12 @@ module.exports = class pgrSource extends Source {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
       }
-      if ( row.path_seq === 1 || rowIdx == pgrResponse.rows.length - 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
+      // Gestion du start et des waypoints intermédiaires
+      if ( row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq) ) {
+        response.waypoints.push( { location: [] } );
+      }
+      // Gestion du end : séparé, car dans le cas d'un dernier chemin n'ayant qu'un tronçon, il faut rajouter 2 waypoints.
+      if (rowIdx == pgrResponse.rows.length - 1 ) {
         response.waypoints.push( { location: [] } );
       }
 
@@ -471,11 +476,6 @@ module.exports = class pgrSource extends Source {
       }
       lastPathSeq = row.path_seq;
 
-    }
-
-    // Pour la gestion des itinéraires sur un seul tronçon
-    if (pgrResponse.rows.length == 1){
-      response.waypoints.push( { location: [] } );
     }
 
     // Troncature des géométries sur les portions (legs)
@@ -573,12 +573,12 @@ module.exports = class pgrSource extends Source {
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
         if (!legStart.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+          throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         }
 
         let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+          throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         }
 
         portions[j] = new Portion(legStart, legEnd);
