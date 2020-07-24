@@ -416,12 +416,18 @@ module.exports = class pgrSource extends Source {
     }
 
     let row;
+    let currentGeom,
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
+        // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourure (pour faire le lien)
+        // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
+        if (response.routes[0].legs.length > 1 && currentGeom) {
+          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+        }
       }
 
       let finalAttributesObject = {};
@@ -451,7 +457,7 @@ module.exports = class pgrSource extends Source {
 
       // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
       if (row.geom_json) {
-        let currentGeom = JSON.parse(row.geom_json);
+        currentGeom = JSON.parse(row.geom_json);
 
         let rowDuration = row.duration;
         let rowDistance = row.distance;
@@ -500,8 +506,8 @@ module.exports = class pgrSource extends Source {
       routeGeometry.coordinates.push(...leg.geometry.coordinates);
     }
 
-    // Simplification de la géométrie, tolérance à environ 5m
-    routeGeometry.coordinates = simplify(routeGeometry.coordinates, 0.00005);
+    // Simplification de la géométrie, tolérance à environ 1m
+    routeGeometry.coordinates = simplify(routeGeometry.coordinates, 0.00001);
 
     for (let i = 0; i < pgrRequest.coordinates.length; i++){
       // Récupération des points projetés dans les waypoints
