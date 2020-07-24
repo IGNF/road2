@@ -1,7 +1,8 @@
 'use strict';
 
 const ResourceParameter = require('../parameters/resourceParameter');
-const Constraint = require('./constraint');
+const Constraint = require('../constraint/constraint');
+const LooseConstraint = require('../constraint/looseConstraint');
 
 /**
 *
@@ -306,7 +307,11 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       let field = this._verification[userJson.key.toLowerCase()][userJson.value][0];
       let condition = this._verification[userJson.key.toLowerCase()][userJson.value][1];
 
-      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      if (userJson.constraintType === 'banned') {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      } else {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      }
 
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "numerical-pgr") {
 
@@ -316,7 +321,11 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         type: userJson.operator,
         value: userJson.value
       }
-      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      if (userJson.constraintType === 'banned') {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      } else {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      }
 
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "geometry-pgr") {
       // TODO: gérer contraintes geom
@@ -325,7 +334,11 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
       let field = this._verification[userJson.key.toLowerCase()][userJson.value];
 
-      constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+      if (userJson.constraintType === 'banned') {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+      } else {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+      }
     } else {
       //
     }

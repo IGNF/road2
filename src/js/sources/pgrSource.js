@@ -231,14 +231,23 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
+        // FIXME: pour l'instant, une seule constrainte préféretielle est possible à la fois
+        let looseConstraint;
         if (request.constraints.length !== 0) {
 
           let requestedConstraints = new Array();
           for (let i = 0; i < request.constraints.length; i++) {
-            requestedConstraints.push( request.constraints[i].toSqlString() );
+            if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
+              looseConstraint = request.constraints[i];
+            }
+            if (request.constraints[i].type === 'banned') {
+              requestedConstraints.push( request.constraints[i].toSqlString() );
+            }
           }
 
-          constraints = constraints + requestedConstraints.join(' AND ');
+          if (requestedConstraints.length > 0){
+            constraints = constraints + requestedConstraints.join(' AND ');
+          }
         } else {
           // on ne fait rien
         }
@@ -251,12 +260,23 @@ module.exports = class pgrSource extends Source {
 
       const queryString = "SELECT * FROM shortest_path_pgrouting(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[],$4)";
 
-      const SQLParametersTable = [
-        this._profile,
-        this._cost,
-        this._reverseCost,
-        constraints
-      ];
+      let SQLParametersTable;
+      if (!looseConstraint) {
+        SQLParametersTable = [
+          this._profile,
+          this._cost,
+          this._reverseCost,
+          constraints
+        ];
+      } else {
+        let onTheFlyCosts = looseConstraint.toSqlString(this._cost, this._reverseCost);
+        SQLParametersTable = [
+          this._profile,
+          onTheFlyCosts[0],
+          onTheFlyCosts[1],
+          constraints
+        ];
+      }
 
 
       return new Promise( (resolve, reject) => {
