@@ -310,7 +310,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
       } else {
-        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, userJson.costRatio);
       }
 
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "numerical-pgr") {
@@ -324,7 +324,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
       } else {
-        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, userJson.costRatio);
       }
 
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "geometry-pgr") {
@@ -337,7 +337,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
       } else {
-        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, userJson.costRatio);
       }
     } else {
       //
