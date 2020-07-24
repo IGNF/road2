@@ -423,7 +423,7 @@ module.exports = class pgrSource extends Source {
       if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
-        // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourure (pour faire le lien)
+        // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourue (pour faire le lien)
         // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
         if (response.routes[0].legs.length > 1 && currentGeom) {
           response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
@@ -477,6 +477,15 @@ module.exports = class pgrSource extends Source {
             distance: rowDistance}
           );
       }
+
+      // Gestion des derniers points intermédiaires sur le même tronçon que le point final (ticket #34962)
+      if (rowIdx == pgrResponse.rows.length - 1) {
+        while (response.routes[0].legs.length < response.waypoints.length - 1) {
+          response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
+          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+        }
+      }
+
       lastPathSeq = row.path_seq;
 
     }
@@ -554,12 +563,6 @@ module.exports = class pgrSource extends Source {
       // On récupère la distance et la durée
       routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"meter");
       routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
-
-      // On doit avoir une égalité entre ces deux valeurs pour la suite
-      // Si ce n'est pas le cas, c'est que PGR n'a pas le comportement attendu...
-      if (currentPgrRoute.legs.length !== response.waypoints.length - 1) {
-        throw errorManager.createError(" PGR response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
-      }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
