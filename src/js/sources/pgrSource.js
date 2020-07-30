@@ -436,7 +436,7 @@ module.exports = class pgrSource extends Source {
     }
 
     let row;
-    let currentGeom,
+    let currentGeom;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
