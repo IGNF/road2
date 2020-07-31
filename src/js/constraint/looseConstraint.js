@@ -92,6 +92,9 @@ module.exports = class LooseConstraint extends Constraint {
         case "!=":
           resultingString += '!=';
           break;
+        case "=":
+          resultingString += '=';
+          break;
       }
 
       resultingString += this.condition.value;
@@ -128,6 +131,9 @@ module.exports = class LooseConstraint extends Constraint {
           break;
         case "=":
           resultingString += '=';
+          break;
+        case "!=":
+          resultingString += '!=';
           break;
       }
 

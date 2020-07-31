@@ -170,6 +170,8 @@ module.exports = class pgrSource extends Source {
       const coordinatesTable = new Array();
       let attributes = "";
       let constraints = "";
+      // FIXME: pour l'instant, une seule constrainte préféretielle est possible à la fois
+      let looseConstraint;
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -231,8 +233,6 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
-        // FIXME: pour l'instant, une seule constrainte préféretielle est possible à la fois
-        let looseConstraint;
         if (request.constraints.length !== 0) {
 
           let requestedConstraints = new Array();
