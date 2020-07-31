@@ -303,7 +303,7 @@ module.exports = class parameterManager  {
       }
     }
 
-    // explode et style 
+    // explode et style
     if (parameterConf.explode) {
 
       if (parameterConf.explode !== "true" && parameterConf.explode !== "false") {
@@ -317,7 +317,7 @@ module.exports = class parameterManager  {
             if (parameterConf.style !== "pipeDelimited") {
               LOGGER.error("Le parametre style est incorrect");
               return false;
-            } 
+            }
           } else {
             LOGGER.error("Le parametre style n'est pas present alors que explode=false");
             return false;
@@ -326,7 +326,7 @@ module.exports = class parameterManager  {
         } else {
           // rien à vérifier
         }
-        
+
       }
     }
 
@@ -609,7 +609,7 @@ module.exports = class parameterManager  {
               return false;
             }
             for(let c = 0; c < key.availableConstraintType.length; c++) {
-              if (key.availableConstraintType[c] !== "banned") {
+              if (!["banned", "prefer", "avoid"].includes(key.availableConstraintType[c]) ) {
                 LOGGER.error("Les types de contrainte pour cette cle sont invalides");
                 return false;
               }
