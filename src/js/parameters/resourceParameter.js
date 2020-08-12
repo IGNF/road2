@@ -171,7 +171,7 @@ module.exports = class ResourceParameter {
   /**
   *
   * @function
-  * @name specificCheck
+  * @name specificConvertion
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options

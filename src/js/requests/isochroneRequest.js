@@ -23,9 +23,10 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} costValue - Valeur du coût.
   * @param {string} profile - Profil utilisé pour le calcul.
   * @param {string} direction - Sens du parcours.
+  * @param {string} askedProjection - Projection souhaitée.
   *
   */
-  constructor(resource, point, costType, costValue, profile, direction) {
+  constructor(resource, point, costType, costValue, profile, direction, askedProjection) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
@@ -36,6 +37,7 @@ module.exports = class isochroneRequest extends Request {
     this._costValue = costValue;
     this._profile = profile;
     this._direction = direction;
+    this._askedProjection = askedProjection;
 
     // Gestion des contraintes 
     this._constraints = new Array();
@@ -155,6 +157,29 @@ module.exports = class isochroneRequest extends Request {
   */
   set direction(dr) {
     this._direction = dr;
+  }
+
+  /**
+  *
+  * @function
+  * @name get askedProjection
+  * @description Récupérer la projection souhaitée.
+  *
+  */
+  get askedProjection() {
+    return this._askedProjection;
+  }
+
+  /**
+  *
+  * @function
+  * @name set askedProjection
+  * @description Attribuer la projection souhaitée.
+  * @param {object} prjct - Projection souhaitée.
+  *
+  */
+  set askedProjection(prjct) {
+    this._askedProjection = prjct;
   }
 
   /**

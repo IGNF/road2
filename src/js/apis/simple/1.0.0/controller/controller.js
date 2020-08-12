@@ -411,7 +411,7 @@ module.exports = {
       direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
-    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction, askedProjection);
 
     // Contraintes
     // ---
@@ -649,6 +649,9 @@ module.exports = {
 
     // direction
     userResponse.direction = isochroneResponse.direction;
+
+    // crs
+    userResponse.crs = isochroneResponse.askedProjection;
 
     // geometry
     userResponse.geometry = {};
