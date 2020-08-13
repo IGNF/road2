@@ -482,7 +482,10 @@ module.exports = class pgrSource extends Source {
       if (rowIdx == pgrResponse.rows.length - 1) {
         while (response.routes[0].legs.length < response.waypoints.length - 1) {
           response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
-          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+          // Cas possible de problème dans les données : le tronçon n'a pas de géométrie
+          if (currentGeom) {
+            response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+          }
         }
       }
 
