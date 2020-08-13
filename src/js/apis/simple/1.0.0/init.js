@@ -401,6 +401,19 @@ module.exports = {
       crsParameterDescription.example = "EPSG:4326";
       isochroneDescription.parameters.push(crsParameterDescription);
 
+      // isochrone.parameters.geometryFormat
+      let geometryFormatServiceParameter = serviceOpIsochrone.getParameterById("geometryFormat");
+      let geometryFormatParameterDescription = {};
+      geometryFormatParameterDescription.name = "geometryFormat";
+      geometryFormatParameterDescription.in = "query";
+      geometryFormatParameterDescription.description = geometryFormatServiceParameter.description;
+      geometryFormatParameterDescription.required = geometryFormatServiceParameter.required;
+      geometryFormatParameterDescription.default = geometryFormatServiceParameter.defaultValue;
+      geometryFormatParameterDescription.schema = {};
+      geometryFormatParameterDescription.schema.type = "enumeration";
+      geometryFormatParameterDescription.example = "geojson";
+      isochroneDescription.parameters.push(geometryFormatParameterDescription);
+
       // isochrone.parameters.constraints
       let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
       let constraintsParameterDescription = {};
@@ -704,6 +717,17 @@ module.exports = {
             isochroneProjection.defaultValue = projectionParameter.defaultValueContent;
           }
           isochroneAvailableOperation.availableParameters.push(isochroneProjection);
+
+
+          // isochrone.geometryFormat
+          let geometryFormatParameter = resourceOperation.getParameterById("geometryFormat");
+          let isochroneGeometriesFormat = {};
+          isochroneGeometriesFormat.id = "geometryFormat";
+          isochroneGeometriesFormat.values = geometryFormatParameter.values;
+          if (geometryFormatParameter.serviceParameter.defaultValue === "true") {
+            isochroneGeometriesFormat.defaultValue = geometryFormatParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneGeometriesFormat);
 
           // isochrone.constraints
           let constraintsParameter = resourceOperation.getParameterById("constraints");

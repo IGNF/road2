@@ -678,20 +678,22 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
-    /* Initialization des paramètres que l'on veut transmettre au proxy (uniquement ceux à transformer). */
     let point = {};
     let geometry = {};
 
-    /* Préparation de certains paramètres avant envoi.*/
+    // Création d'un objet Point (utile plus tard).
     point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
-    if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-      /* TODO: Faire un meilleur contrôle sur la géométrie retournée par le moteur ? */
-      if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-        const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
-        if ((rawGeometry.type === "Polygon") && rawGeometry.coordinates) {
-          geometry = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
-        }
-      }
+
+    const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+    if (isochroneRequest.geometryFormat === "geojson") {
+      // Nous renvoyons directement l'objet reçu, puisque le moteur sort du GeoJSON.
+      geometry = rawGeometry;
+    } else if (isochroneRequest.geometryFormat === "polyline") {
+      // Création d'un objet Polygon à partir du GeoJSON reçu.
+      const polygon = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
+
+      // Convertion du polygon en polyline.
+      geometry = polygon.getGeometryWithFormat("polyline");
     }
 
     /* Envoi de la réponse au proxy. */

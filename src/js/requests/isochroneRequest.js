@@ -24,9 +24,10 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} profile - Profil utilisé pour le calcul.
   * @param {string} direction - Sens du parcours.
   * @param {string} askedProjection - Projection souhaitée.
+  * @param {string} geometryFormat - Format souhaitée pour la géométrie en sortie.
   *
   */
-  constructor(resource, point, costType, costValue, profile, direction, askedProjection) {
+  constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
@@ -38,6 +39,7 @@ module.exports = class isochroneRequest extends Request {
     this._profile = profile;
     this._direction = direction;
     this._askedProjection = askedProjection;
+    this._geometryFormat = geometryFormat;
 
     // Gestion des contraintes 
     this._constraints = new Array();
@@ -180,6 +182,29 @@ module.exports = class isochroneRequest extends Request {
   */
   set askedProjection(prjct) {
     this._askedProjection = prjct;
+  }
+
+  /**
+  *
+  * @function
+  * @name get geometryFormat
+  * @description Récupérer le format de la géométrie en sortie.
+  *
+  */
+  get geometryFormat() {
+    return this._geometryFormat;
+  }
+
+  /**
+  *
+  * @function
+  * @name set geometryFormat
+  * @description Attribuer le format de la géométrie en sortie.
+  * @param {object} gmtrfm - Format de la géométrie en sortie.
+  *
+  */
+  set geometryFormat(gmtrfm) {
+    this._geometryFormat = gmtrfm;
   }
 
   /**
