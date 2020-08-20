@@ -13,11 +13,11 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
-const log4js = require('log4js');
 const simplify = require('../utils/simplify');
 const turf = require('@turf/turf');
 
 // Création du LOGGER
+const log4js = require('log4js');
 const LOGGER = log4js.getLogger("PGRSOURCE");
 
 /**
@@ -289,11 +289,12 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5)";
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
 
         const SQLParametersTable = [
           request.costValue,
           request.direction,
+          parseInt(request.askedProjection.split(':')[1]), // e.g. Transformer "EPSG:4326" en 4326 (pour PostGIS).
           this._configuration.storage.costColumn,
           this._configuration.storage.rcostColumn,
           constraints
@@ -677,28 +678,34 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
-    /* Initialization des paramètres que l'on veut transmettre au proxy.*/
     let point = {};
-    let resource = isochroneRequest.resource;
-    let costType = isochroneRequest.costType;
-    let costValue = isochroneRequest.costValue;
     let geometry = {};
-    let profile = isochroneRequest.profile;
-    let direction = isochroneRequest.direction;
 
-    /* Préparation de certains paramètres avant envoi.*/
+    // Création d'un objet Point (utile plus tard).
     point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
-    if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-      /* TODO: Faire un meilleur contrôle sur la géométrie retournée par le moteur ? */
-      if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-        const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
-        if ((rawGeometry.type === "Polygon") && rawGeometry.coordinates) {
-          geometry = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
-        }
-      }
+
+    const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+    if (isochroneRequest.geometryFormat === "geojson") {
+      // Nous renvoyons directement l'objet reçu, puisque le moteur sort du GeoJSON.
+      geometry = rawGeometry;
+    } else if (isochroneRequest.geometryFormat === "polyline") {
+      // Création d'un objet Polygon à partir du GeoJSON reçu.
+      const polygon = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
+
+      // Convertion du polygon en polyline.
+      geometry = polygon.getGeometryWithFormat("polyline");
     }
 
     /* Envoi de la réponse au proxy. */
-    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction);
+    return new IsochroneResponse(
+      point,
+      isochroneRequest.resource,
+      isochroneRequest.costType,
+      isochroneRequest.costValue,
+      geometry,
+      isochroneRequest.profile,
+      isochroneRequest.direction,
+      isochroneRequest.askedProjection
+    );
   }
 }
