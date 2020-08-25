@@ -217,6 +217,9 @@ function sendError(err, req, res, next) {
       res.status(500);
       res.json({ error: {errorType: "internal", message: "Internal Server Error"}});
     }
+  } else if ((process.env.NODE_ENV === "debug")) {
+    res.status(500);
+    res.json(err);
   } else {
     // En dev, on veut faire remonter n'importe quelle erreur 
     res.status(err.status || 500);

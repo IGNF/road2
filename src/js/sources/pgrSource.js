@@ -267,8 +267,8 @@ module.exports = class pgrSource extends Source {
           } else {
             try {
               resolve(this.writeRouteResponse(request, pgrRequest, result));
-            } catch (err) {
-              reject(err);
+            } catch (error) {
+              reject(error);
             }
           }
         });
@@ -307,8 +307,8 @@ module.exports = class pgrSource extends Source {
             } else {
               try {
                 resolve(this.writeIsochroneResponse(request, pgrRequest, result));
-              } catch (err) {
-                reject(err);
+              } catch (error) {
+                reject(error);
               }
             }
           });
