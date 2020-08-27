@@ -368,7 +368,10 @@ module.exports = class pgrSource extends Source {
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
-    // TODO: que faire si pgrResponse est vide ?
+    // Si pgrResponse est vide 
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
+    }
 
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
@@ -680,6 +683,11 @@ module.exports = class pgrSource extends Source {
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
     let point = {};
     let geometry = {};
+
+    // Si pgrResponse est vide 
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
+    }
 
     // Création d'un objet Point (utile plus tard).
     point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
