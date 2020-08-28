@@ -57,9 +57,6 @@ function arrays_intersection(arr1, arr2) {
 }
 
 
-
-
-
 module.exports = {
 
   /**
@@ -69,6 +66,19 @@ module.exports = {
   * @description Convertit une mutlilinetring geojson dont les segments se touchent en linestring
   * @param {Object} srcCoords - coordonnées en entrée (de multilinestring) [[[0, 1], [1, 1]], [[1, 1], [1, 2]]]
   * @return {Object} - coordonnées en sortie (de linestring) [[0, 1], [1, 1], [1, 2]]
+  *
+  * Ne convient que dans le cas de réseaux routiers réels.
+  * Ne conserve pas le sens de circulation sur un réseau constitué de 2 tronçons uniquement
+  * disposés en "8" (une seule intersection).
+  * Ne fonctionne pas parfaitement sur un réseau constitué de 3 tronçons uniquement, disposé en
+  * "boucle dans un cercle"
+  *
+  *         __a______                          _____________
+  *    ____|         |____                   a|      b|    c|
+  *   |    |__b______|    |                   |_______|_____|
+  *   |                   |      ou
+  *   |_______c___________|
+  *
   *
   */
 
@@ -86,8 +96,30 @@ module.exports = {
     const dissolvedCoords = [];
     const firstLine = srcCoords[0];
     const secondLine = srcCoords[1];
+    let common_point;
 
-    const common_point = arrays_intersection(firstLine, secondLine)[0];
+    const firstSecIntersection = arrays_intersection(firstLine, secondLine);
+    // S'il n'y a qu'une intersection, on la prend
+    if (firstSecIntersection.length === 1){
+      common_point = firstSecIntersection[0];
+    // S'il y en a plusieurs et que la multilinestring a une longueur de 2, prendre l'intersection qui
+    // entraîne le plus court chemin.
+    } else if (srcCoords.length === 2) {
+      // TODO: do something else
+      common_point = firstSecIntersection[0];
+    // S'il y en a plusieurs et que la multilinestring a une longueur d'au moins trois, prendre le
+    // point qui n'intersecte pas le 3e tronçon (sinon ce dernier serait le 2e)
+    } else {
+      const thirdLine = srcCoords[2];
+      // L'array suivant n'a qu'une seule valeur, sauf dans un cas très précis de réseau non réel
+      // de deux boucles imbriquées
+      const firstThirdIntersection = arrays_intersection(firstLine, thirdLine)[0];
+      if (arraysEquals(firstThirdIntersection, firstSecIntersection[0])) {
+        common_point = firstSecIntersection[1];
+      } else {
+        common_point = firstSecIntersection[0];
+      }
+    }
 
     if (firstLine.indexOf(common_point) === 0) {
       firstLine.reverse();

@@ -568,8 +568,9 @@ module.exports = class pgrSource extends Source {
       routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
+      let newRouteGeomCoords = [];
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
-
+        let newPortionGeomCoords = [];
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
@@ -598,41 +599,49 @@ module.exports = class pgrSource extends Source {
               let stepStart = turf.point(response.waypoints[j].location);
               let stepEnd = turf.point(response.waypoints[j + 1].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  stepEnd,
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+                turf.truncate(
+                  turf.lineSlice(
+                    stepStart,
+                    stepEnd,
+                    currentPgrRouteStep.geometry
+                  ),
+                  {precision: 6}
+                )
               ).geometry.coordinates;
             }
             // Troncature de la géométrie : cas de début de leg
             else if (k == 0){
               let stepStart = turf.point(response.waypoints[j].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+                turf.truncate(
+                  turf.lineSlice(
+                    stepStart,
+                    currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
+                    currentPgrRouteStep.geometry
+                  ),
+                  {precision: 6}
+                )
               ).geometry.coordinates;
             }
             // Troncature de la géométrie : cas de fin de leg
             else if (k == currentPgrRouteLeg.steps.length - 1) {
               let stepEnd = turf.point(response.waypoints[j+1].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
-                turf.lineSlice(
-                  currentPgrRouteStep.geometry.coordinates[0],
-                  stepEnd,
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+                turf.truncate(
+                  turf.lineSlice(
+                    currentPgrRouteStep.geometry.coordinates[0],
+                    stepEnd,
+                    currentPgrRouteStep.geometry
+                  ),
+                  {precision: 6}
+                )
               ).geometry.coordinates;
             }
+
+            newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
 
             steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
             if (!steps[k].geometry.transform(askedProjection)) {
@@ -647,6 +656,9 @@ module.exports = class pgrSource extends Source {
 
           }
 
+          let newLegDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(newPortionGeomCoords);
+          newRouteGeomCoords.push(...newLegDissolvedCoords);
+
           portions[j].steps = steps;
 
         } else {
@@ -655,6 +667,8 @@ module.exports = class pgrSource extends Source {
 
       }
 
+      currentPgrRoute.geometry.coordinates = newRouteGeomCoords;
+      routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", this._topology.projection);
       routes[i].portions = portions;
 
     }
