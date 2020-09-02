@@ -274,7 +274,7 @@ module.exports = class osrmSource extends Source {
 
     if (osrmResponse.routes.length === 0) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
-      throw errorManager.createError(" OSRM response is invalid: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No route found ", 404);
     }
 
     // routes

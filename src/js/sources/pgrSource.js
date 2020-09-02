@@ -544,7 +544,7 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      throw errorManager.createError(" No PGR path found: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No route found ", 404);
     }
 
     // routes
