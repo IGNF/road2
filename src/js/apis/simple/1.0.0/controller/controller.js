@@ -667,7 +667,7 @@ module.exports = {
     userResponse.crs = isochroneResponse.askedProjection;
 
     // geometry
-    userResponse.geometry = isochroneResponse.geometry;
+    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat(isochroneRequest.geometryFormat);
 
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;

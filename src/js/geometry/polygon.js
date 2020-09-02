@@ -76,7 +76,7 @@ module.exports = class Polygon extends Geometry {
       let result = [];
 
       // Conversion du polygone en (Multi)LineString.
-      const lines = turf.polygonToLine(polygon);
+      const lines = turf.polygonToLine(polygon.geometry.coordinates);
 
       if (lines.geometry.type === "LineString") {
         // Une seule ligne, nous convertissons donc directement.

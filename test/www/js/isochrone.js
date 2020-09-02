@@ -1,6 +1,6 @@
 // ---- Variables Globales
 
-var road2Url = "https://localhost:8080/simple/1.0.0/isochrone?";
+var road2Url = "http://localhost:8080/simple/1.0.0/isochrone?";
 var oldUrl = "https://wxs.ign.fr/jhyvi0fgmnuxvfv0zjzorvdn/isochrone/isochrone.json?"
 var map;
 var clickedPoint = new Array();
@@ -228,7 +228,7 @@ function computeIso() {
     "&direction=" + request.finalDirection +
     "&point=" + request.finalPoint +
     "&constraints=" + request.finalConstraint +
-    "&geometryFormat=polyline";
+    "&geometryFormat=geojson";
 
   // On affiche la requete sur la page 
   let requestDiv = document.getElementById('request');

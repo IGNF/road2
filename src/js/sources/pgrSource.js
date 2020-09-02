@@ -692,17 +692,10 @@ module.exports = class pgrSource extends Source {
     // Création d'un objet Point (utile plus tard).
     point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
 
-    const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
-    if (isochroneRequest.geometryFormat === "geojson") {
-      // Nous renvoyons directement l'objet reçu, puisque le moteur sort du GeoJSON.
-      geometry = rawGeometry;
-    } else if (isochroneRequest.geometryFormat === "polyline") {
-      // Création d'un objet Polygon à partir du GeoJSON reçu.
-      const polygon = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
+    let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
 
-      // Convertion du polygon en polyline.
-      geometry = polygon.getGeometryWithFormat("polyline");
-    }
+    // Création d'un objet Polygon à partir du GeoJSON reçu.
+    geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
 
     /* Envoi de la réponse au proxy. */
     return new IsochroneResponse(
