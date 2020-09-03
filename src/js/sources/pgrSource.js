@@ -263,7 +263,12 @@ module.exports = class pgrSource extends Source {
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
-            reject(err);
+            // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
+            if (err.code === "38001") {
+              reject(errorManager.createError(" No path found ", 404));
+            } else {
+              reject(err);
+            }
           } else {
             try {
               resolve(this.writeRouteResponse(request, pgrRequest, result));
