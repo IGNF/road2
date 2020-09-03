@@ -261,6 +261,27 @@
             ]
           },
           {
+            "id": "projection",
+            "defaultValueContent": "EPSG:4326",
+            "values": [
+              "EPSG:4326",
+              "EPSG:2154",
+              "EPSG:4559",
+              "EPSG:2972",
+              "EPSG:2975",
+              "EPSG:4471",
+              "EPSG:3857"
+            ]
+          },
+          {
+            "id": "geometryFormat",
+            "defaultValueContent": "geojson",
+            "values": [
+              "geojson",
+              "polyline"
+            ]
+          },
+          {
             "id": "constraints",
             "values": [
               {

@@ -310,6 +310,7 @@ module.exports = {
     let profile;
     let direction;
     let askedProjection;
+    let geometryFormat;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -411,7 +412,19 @@ module.exports = {
       direction = isochroneOperation.getParameterById("direction").defaultValueContent;
     }
 
-    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction);
+    /* Paramètre 'geometryFormat'. */
+    if (parameters.geometryFormat) {
+      /* Vérification de la validité du paramètre fourni. */
+      if (!isochroneOperation.getParameterById("geometryFormat").check(parameters.geometryFormat)) {
+        throw errorManager.createError("Parameter 'geometryFormat' is invalid.", 400);
+      } else {
+        geometryFormat = parameters.geometryFormat;
+      }
+    } else {
+      geometryFormat = isochroneOperation.getParameterById("geometryFormat").defaultValueContent;
+    }
+
+    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat);
 
     // Contraintes
     // ---
@@ -650,10 +663,11 @@ module.exports = {
     // direction
     userResponse.direction = isochroneResponse.direction;
 
+    // crs
+    userResponse.crs = isochroneResponse.askedProjection;
+
     // geometry
-    userResponse.geometry = {};
-    userResponse.geometry.type = "Polygon";
-    userResponse.geometry.coordinates = isochroneResponse.geometry.getGeomInFormat("geojson");
+    userResponse.geometry = isochroneResponse.geometry.getGeometryWithFormat(isochroneRequest.geometryFormat);
 
     // optimiszation
     userResponse.optimization = isochroneResponse.optimization;

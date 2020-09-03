@@ -10,6 +10,7 @@
     "profile",
     "direction",
     "constraints",
-    "projection"
+    "projection",
+    "geometryFormat"
   ]
 }

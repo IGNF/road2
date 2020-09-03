@@ -1,7 +1,11 @@
 'use strict';
 
+const log4js = require('log4js');
 const ResourceParameter = require('../parameters/resourceParameter');
 const Point = require('../geometry/point');
+
+// Création du LOGGER
+var LOGGER = log4js.getLogger("APISMANAGER");
 
 /**
 *

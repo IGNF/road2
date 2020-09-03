@@ -13,11 +13,11 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
-const log4js = require('log4js');
 const simplify = require('../utils/simplify');
 const turf = require('@turf/turf');
 
 // Création du LOGGER
+const log4js = require('log4js');
 const LOGGER = log4js.getLogger("PGRSOURCE");
 
 /**
@@ -263,12 +263,17 @@ module.exports = class pgrSource extends Source {
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
-            reject(err);
+            // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
+            if (err.code === "38001") {
+              reject(errorManager.createError(" No path found ", 404));
+            } else {
+              reject(err);
+            }
           } else {
             try {
               resolve(this.writeRouteResponse(request, pgrRequest, result));
-            } catch (err) {
-              reject(err);
+            } catch (error) {
+              reject(error);
             }
           }
         });
@@ -289,11 +294,12 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5)";
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
 
         const SQLParametersTable = [
           request.costValue,
           request.direction,
+          parseInt(request.askedProjection.split(':')[1]), // e.g. Transformer "EPSG:4326" en 4326 (pour PostGIS).
           this._configuration.storage.costColumn,
           this._configuration.storage.rcostColumn,
           constraints
@@ -306,8 +312,8 @@ module.exports = class pgrSource extends Source {
             } else {
               try {
                 resolve(this.writeIsochroneResponse(request, pgrRequest, result));
-              } catch (err) {
-                reject(err);
+              } catch (error) {
+                reject(error);
               }
             }
           });
@@ -367,7 +373,10 @@ module.exports = class pgrSource extends Source {
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
-    // TODO: que faire si pgrResponse est vide ?
+    // Si pgrResponse est vide 
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
+    }
 
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
@@ -547,7 +556,7 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      throw errorManager.createError(" No PGR path found: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No route found ", 404);
     }
 
     // routes
@@ -692,28 +701,32 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
-    /* Initialization des paramètres que l'on veut transmettre au proxy.*/
     let point = {};
-    let resource = isochroneRequest.resource;
-    let costType = isochroneRequest.costType;
-    let costValue = isochroneRequest.costValue;
     let geometry = {};
-    let profile = isochroneRequest.profile;
-    let direction = isochroneRequest.direction;
 
-    /* Préparation de certains paramètres avant envoi.*/
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
-    if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-      /* TODO: Faire un meilleur contrôle sur la géométrie retournée par le moteur ? */
-      if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-        const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
-        if ((rawGeometry.type === "Polygon") && rawGeometry.coordinates) {
-          geometry = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
-        }
-      }
+    // Si pgrResponse est vide 
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
     }
 
+    // Création d'un objet Point (utile plus tard).
+    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
+
+    let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+
+    // Création d'un objet Polygon à partir du GeoJSON reçu.
+    geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
+
     /* Envoi de la réponse au proxy. */
-    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction);
+    return new IsochroneResponse(
+      point,
+      isochroneRequest.resource,
+      isochroneRequest.costType,
+      isochroneRequest.costValue,
+      geometry,
+      isochroneRequest.profile,
+      isochroneRequest.direction,
+      isochroneRequest.askedProjection
+    );
   }
 }
