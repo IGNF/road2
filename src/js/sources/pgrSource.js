@@ -16,6 +16,7 @@ const gisManager = require('../utils/gisManager');
 const log4js = require('log4js');
 const simplify = require('../utils/simplify');
 const turf = require('@turf/turf');
+const LooseConstraint = require('../constraint/looseConstraint');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("PGRSOURCE");
@@ -170,8 +171,7 @@ module.exports = class pgrSource extends Source {
       const coordinatesTable = new Array();
       let attributes = "";
       let constraints = "";
-      // FIXME: pour l'instant, une seule constrainte préféretielle est possible à la fois
-      let looseConstraint;
+      const looseConstraintsArray = [];
 
       if (request.type === "routeRequest") {
         // Coordonnées
@@ -238,7 +238,7 @@ module.exports = class pgrSource extends Source {
           let requestedConstraints = new Array();
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
-              looseConstraint = request.constraints[i];
+              looseConstraintsArray.push(request.constraints[i]);
             }
             if (request.constraints[i].type === 'banned') {
               requestedConstraints.push( request.constraints[i].toSqlString() );
@@ -261,7 +261,7 @@ module.exports = class pgrSource extends Source {
       const queryString = "SELECT * FROM shortest_path_pgrouting(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[],$4)";
 
       let SQLParametersTable;
-      if (!looseConstraint) {
+      if (looseConstraintsArray.length === 0) {
         SQLParametersTable = [
           this._profile,
           this._cost,
@@ -269,7 +269,7 @@ module.exports = class pgrSource extends Source {
           constraints
         ];
       } else {
-        let onTheFlyCosts = looseConstraint.toSqlString(this._cost, this._reverseCost);
+        let onTheFlyCosts = LooseConstraint.looseConstraintsToSQL(looseConstraintsArray, this._cost, this._reverseCost);
         SQLParametersTable = [
           this._profile,
           onTheFlyCosts[0],
