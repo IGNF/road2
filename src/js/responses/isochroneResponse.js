@@ -25,9 +25,10 @@ module.exports = class isochroneResponse extends Response {
   * @param {string} profile - Profile.
   * @param {string} direction - Sens du parcours.
   * @param {string} askedProjection - Projection souhaitée.
+  * @param {string} timeUnit - Unité de temps utilisée pour le calcul.
   *
   */
-  constructor(point, resource, costType, costValue, geometry, profile, direction, askedProjection) {
+  constructor(point, resource, costType, costValue, geometry, profile, direction, askedProjection, timeUnit) {
 
     // Constructeur parent
     super(resource);
@@ -52,6 +53,9 @@ module.exports = class isochroneResponse extends Response {
 
     // direction
     this._askedProjection = askedProjection;
+
+    // timeUnit
+    this._timeUnit = timeUnit;
 
   }
 
@@ -214,6 +218,29 @@ module.exports = class isochroneResponse extends Response {
   */
   set askedProjection (prjct) {
     this._askedProjection = prjct;
+  }
+
+  /**
+  *
+  * @function
+  * @name get timeUnit
+  * @description Récupérer l'unité de temps.
+  *
+  */
+  get timeUnit() {
+    return this._timeUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set timeUnit
+  * @description Attribuer l'unité de temps.
+  * @param {object} tu - Unité de temps.
+  *
+  */
+  set timeUnit(tu) {
+    this._timeUnit = tu;
   }
 
 }

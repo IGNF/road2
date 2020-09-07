@@ -25,9 +25,20 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} direction - Sens du parcours.
   * @param {string} askedProjection - Projection souhaitée.
   * @param {string} geometryFormat - Format souhaitée pour la géométrie en sortie.
+  * @param {string} timeUnit - Unité de temps utilisée pour le calcul.
   *
   */
-  constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat) {
+  constructor(
+    resource,
+    point,
+    costType,
+    costValue,
+    profile,
+    direction,
+    askedProjection,
+    geometryFormat,
+    timeUnit
+  ) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
@@ -40,6 +51,7 @@ module.exports = class isochroneRequest extends Request {
     this._direction = direction;
     this._askedProjection = askedProjection;
     this._geometryFormat = geometryFormat;
+    this._timeUnit = timeUnit;
 
     // Gestion des contraintes 
     this._constraints = new Array();
@@ -205,6 +217,29 @@ module.exports = class isochroneRequest extends Request {
   */
   set geometryFormat(gmtrfm) {
     this._geometryFormat = gmtrfm;
+  }
+
+  /**
+  *
+  * @function
+  * @name get timeUnit
+  * @description Récupérer l'unité de temps.
+  *
+  */
+  get timeUnit() {
+    return this._timeUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set timeUnit
+  * @description Attribuer l'unité de temps.
+  * @param {object} tu - Unité de temps.
+  *
+  */
+  set timeUnit(tu) {
+    this._timeUnit = tu;
   }
 
   /**

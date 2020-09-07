@@ -414,6 +414,19 @@ module.exports = {
       geometryFormatParameterDescription.example = "geojson";
       isochroneDescription.parameters.push(geometryFormatParameterDescription);
 
+      // isochrone.parameters.timeUnit
+      let timeUnitServiceParameter = serviceOpIsochrone.getParameterById("timeUnit");
+      let timeUnitParameterDescription = {};
+      timeUnitParameterDescription.name = "timeUnit";
+      timeUnitParameterDescription.in = "query";
+      timeUnitParameterDescription.description = timeUnitServiceParameter.description;
+      timeUnitParameterDescription.required = timeUnitServiceParameter.required;
+      timeUnitParameterDescription.default = timeUnitServiceParameter.defaultValue;
+      timeUnitParameterDescription.schema = {};
+      timeUnitParameterDescription.schema.type = "enumeration";
+      timeUnitParameterDescription.example = "minute";
+      isochroneDescription.parameters.push(timeUnitParameterDescription);
+
       // isochrone.parameters.constraints
       let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
       let constraintsParameterDescription = {};
@@ -728,6 +741,16 @@ module.exports = {
             isochroneGeometriesFormat.defaultValue = geometryFormatParameter.defaultValueContent;
           }
           isochroneAvailableOperation.availableParameters.push(isochroneGeometriesFormat);
+
+          // isochrone.timeUnit
+          let timeUnitParameter = resourceOperation.getParameterById("timeUnit");
+          let isochroneTimeUnit = {};
+          isochroneTimeUnit.id = "timeUnit";
+          isochroneTimeUnit.values = timeUnitParameter.values;
+          if (timeUnitParameter.serviceParameter.defaultValue === "true") {
+            isochroneTimeUnit.defaultValue = timeUnitParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneTimeUnit);
 
           // isochrone.constraints
           let constraintsParameter = resourceOperation.getParameterById("constraints");

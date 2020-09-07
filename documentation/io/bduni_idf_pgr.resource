@@ -241,8 +241,7 @@
             ]
           },
           {
-            "id": "costValue",
-            "min": 10
+            "id": "costValue"
           },
           {
             "id": "profile",
@@ -279,6 +278,15 @@
             "values": [
               "geojson",
               "polyline"
+            ]
+          },
+          {
+            "id": "timeUnit",
+            "defaultValueContent": "second",
+            "values": [
+              "hour",
+              "minute",
+              "second"
             ]
           },
           {

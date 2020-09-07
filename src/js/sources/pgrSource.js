@@ -713,7 +713,8 @@ module.exports = class pgrSource extends Source {
       geometry,
       isochroneRequest.profile,
       isochroneRequest.direction,
-      isochroneRequest.askedProjection
+      isochroneRequest.askedProjection,
+      isochroneRequest.timeUnit
     );
   }
 }

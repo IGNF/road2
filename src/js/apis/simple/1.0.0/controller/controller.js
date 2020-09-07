@@ -5,6 +5,8 @@ const RouteRequest = require('../../../../requests/routeRequest');
 const IsochroneRequest = require('../../../../requests/isochroneRequest');
 const Point = require('../../../../geometry/point');
 const Turf = require('@turf/turf');
+const Duration = require('../../../../time/duration');
+const Distance = require('../../../../geography/distance');
 
 module.exports = {
 
@@ -306,11 +308,12 @@ module.exports = {
     let resource;
     let point = {};
     let costType;
-    let costValue;
+    let costValue = 0;
     let profile;
     let direction;
     let askedProjection;
     let geometryFormat;
+    let timeUnit;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -378,7 +381,27 @@ module.exports = {
       if (!isochroneOperation.getParameterById("costValue").check(parameters.costValue)) {
         throw errorManager.createError("Parameter 'costValue' is invalid.", 400);
       } else {
-        costValue = parameters.costValue;
+        // Paramètre 'timeUnit'.
+        if (parameters.timeUnit) {
+          // Vérification de la compatibilité de timeUnit avec costType.
+          if (costType !== "time") {
+            throw errorManager.createError(" Parameter 'timeUnit' is irrelevant ", 400);
+          }
+
+          // Vérification de la validité du paramètre fourni.
+          if (!isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
+            throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+          }
+          timeUnit = parameters.timeUnit;
+        } else {
+          timeUnit = isochroneOperation.getParameterById("timeUnit").defaultValueContent;
+        }
+
+        // Conversion de costValue en secondes (car le calcul côté moteur se fait en secondes).
+        const duration = new Duration(Math.round(parameters.costValue * 10) / 10, timeUnit);
+        if (duration.convert("second") === true) {
+          costValue = duration.value;
+        }
       }
     }
 
@@ -424,7 +447,17 @@ module.exports = {
       geometryFormat = isochroneOperation.getParameterById("geometryFormat").defaultValueContent;
     }
 
-    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat);
+    let isochroneRequest = new IsochroneRequest(
+      parameters.resource,
+      point,
+      costType,
+      costValue,
+      profile,
+      direction,
+      askedProjection,
+      geometryFormat,
+      timeUnit
+    );
 
     // Contraintes
     // ---
@@ -654,8 +687,16 @@ module.exports = {
     // costType
     userResponse.costType = isochroneResponse.costType;
 
-    // costValue
-    userResponse.costValue = isochroneResponse.costValue;
+    // costValue et timeUnit.
+    if (userResponse.costType === "time") {
+      const duration = new Duration(isochroneResponse.costValue, "second");
+      if (duration.convert(isochroneResponse.timeUnit) === true) {
+        userResponse.costValue = duration.value;
+        userResponse.timeUnit = isochroneResponse.timeUnit;
+      }
+    } else if (userResponse.costType === "distance") {
+      // WIP.
+    }
 
     // profile
     userResponse.profile = isochroneResponse.profile;
