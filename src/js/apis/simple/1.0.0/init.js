@@ -427,6 +427,19 @@ module.exports = {
       timeUnitParameterDescription.example = "minute";
       isochroneDescription.parameters.push(timeUnitParameterDescription);
 
+      // isochrone.parameters.distanceUnit
+      let distanceUnitServiceParameter = serviceOpIsochrone.getParameterById("distanceUnit");
+      let distanceUnitParameterDescription = {};
+      distanceUnitParameterDescription.name = "distanceUnit";
+      distanceUnitParameterDescription.in = "query";
+      distanceUnitParameterDescription.description = distanceUnitServiceParameter.description;
+      distanceUnitParameterDescription.required = distanceUnitServiceParameter.required;
+      distanceUnitParameterDescription.default = distanceUnitServiceParameter.defaultValue;
+      distanceUnitParameterDescription.schema = {};
+      distanceUnitParameterDescription.schema.type = "enumeration";
+      distanceUnitParameterDescription.example = "meter";
+      isochroneDescription.parameters.push(distanceUnitParameterDescription);
+
       // isochrone.parameters.constraints
       let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
       let constraintsParameterDescription = {};
@@ -751,6 +764,16 @@ module.exports = {
             isochroneTimeUnit.defaultValue = timeUnitParameter.defaultValueContent;
           }
           isochroneAvailableOperation.availableParameters.push(isochroneTimeUnit);
+
+          // isochrone.distanceUnit
+          let distanceUnitParameter = resourceOperation.getParameterById("distanceUnit");
+          let isochroneDistanceUnit = {};
+          isochroneDistanceUnit.id = "distanceUnit";
+          isochroneDistanceUnit.values = distanceUnitParameter.values;
+          if (distanceUnitParameter.serviceParameter.defaultValue === "true") {
+            isochroneDistanceUnit.defaultValue = distanceUnitParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneDistanceUnit);
 
           // isochrone.constraints
           let constraintsParameter = resourceOperation.getParameterById("constraints");

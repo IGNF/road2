@@ -290,6 +290,14 @@
             ]
           },
           {
+            "id": "distanceUnit",
+            "defaultValueContent": "meter",
+            "values": [
+              "meter",
+              "kilometer"
+            ]
+          },
+          {
             "id": "constraints",
             "values": [
               {

@@ -314,6 +314,7 @@ module.exports = {
     let askedProjection;
     let geometryFormat;
     let timeUnit;
+    let distanceUnit;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -381,26 +382,38 @@ module.exports = {
       if (!isochroneOperation.getParameterById("costValue").check(parameters.costValue)) {
         throw errorManager.createError("Parameter 'costValue' is invalid.", 400);
       } else {
-        // Paramètre 'timeUnit'.
-        if (parameters.timeUnit) {
-          // Vérification de la compatibilité de timeUnit avec costType.
-          if (costType !== "time") {
-            throw errorManager.createError(" Parameter 'timeUnit' is irrelevant ", 400);
+        if (costType === "time") {
+          if (parameters.timeUnit) {
+            // Vérification de la validité du paramètre fourni.
+            if (!isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
+              throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+            }
+            timeUnit = parameters.timeUnit;
+          } else {
+            timeUnit = isochroneOperation.getParameterById("timeUnit").defaultValueContent;
           }
 
-          // Vérification de la validité du paramètre fourni.
-          if (!isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
-            throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+          // Conversion de costValue en secondes (car le calcul côté moteur se fait en secondes).
+          const duration = new Duration(Math.round(parameters.costValue * 10) / 10, timeUnit);
+          if (duration.convert("second") === true) {
+            costValue = duration.value;
           }
-          timeUnit = parameters.timeUnit;
-        } else {
-          timeUnit = isochroneOperation.getParameterById("timeUnit").defaultValueContent;
-        }
+        } else if (costType === "distance") {
+          if (parameters.distanceUnit) {
+            // Vérification de la validité du paramètre fourni.
+            if (!isochroneOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
+              throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+            }
+            distanceUnit = parameters.distanceUnit;
+          } else {
+            distanceUnit = isochroneOperation.getParameterById("distanceUnit").defaultValueContent;
+          }
 
-        // Conversion de costValue en secondes (car le calcul côté moteur se fait en secondes).
-        const duration = new Duration(Math.round(parameters.costValue * 10) / 10, timeUnit);
-        if (duration.convert("second") === true) {
-          costValue = duration.value;
+          // Conversion de costValue en mètres (car le calcul côté moteur se fait en mètres).
+          const distance = new Distance(Math.round(parameters.costValue * 10) / 10, distanceUnit);
+          if (distance.convert("meter") === true) {
+            costValue = distance.value;
+          }
         }
       }
     }
@@ -456,7 +469,8 @@ module.exports = {
       direction,
       askedProjection,
       geometryFormat,
-      timeUnit
+      timeUnit,
+      distanceUnit
     );
 
     // Contraintes
@@ -687,7 +701,7 @@ module.exports = {
     // costType
     userResponse.costType = isochroneResponse.costType;
 
-    // costValue et timeUnit.
+    // costValue, timeUnit et distanceUnit.
     if (userResponse.costType === "time") {
       const duration = new Duration(isochroneResponse.costValue, "second");
       if (duration.convert(isochroneResponse.timeUnit) === true) {
@@ -695,7 +709,11 @@ module.exports = {
         userResponse.timeUnit = isochroneResponse.timeUnit;
       }
     } else if (userResponse.costType === "distance") {
-      // WIP.
+      const distance = new Distance(isochroneResponse.costValue, "meter");
+      if (distance.convert(isochroneResponse.distanceUnit) === true) {
+        userResponse.costValue = distance.value;
+        userResponse.distanceUnit = isochroneResponse.distanceUnit;
+      }
     }
 
     // profile

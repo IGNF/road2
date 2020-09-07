@@ -12,6 +12,7 @@
     "constraints",
     "projection",
     "geometryFormat",
-    "timeUnit"
+    "timeUnit",
+    "distanceUnit"
   ]
 }

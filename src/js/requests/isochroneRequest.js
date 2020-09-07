@@ -26,6 +26,7 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} askedProjection - Projection souhaitée.
   * @param {string} geometryFormat - Format souhaitée pour la géométrie en sortie.
   * @param {string} timeUnit - Unité de temps utilisée pour le calcul.
+  * @param {string} distanceUnit - Unité de distance utilisée pour le calcul.
   *
   */
   constructor(
@@ -37,7 +38,8 @@ module.exports = class isochroneRequest extends Request {
     direction,
     askedProjection,
     geometryFormat,
-    timeUnit
+    timeUnit,
+    distanceUnit
   ) {
 
     // Constructeur parent
@@ -52,6 +54,7 @@ module.exports = class isochroneRequest extends Request {
     this._askedProjection = askedProjection;
     this._geometryFormat = geometryFormat;
     this._timeUnit = timeUnit;
+    this._distanceUnit = distanceUnit;
 
     // Gestion des contraintes 
     this._constraints = new Array();
@@ -240,6 +243,29 @@ module.exports = class isochroneRequest extends Request {
   */
   set timeUnit(tu) {
     this._timeUnit = tu;
+  }
+
+  /**
+  *
+  * @function
+  * @name get distanceUnit
+  * @description Récupérer l'unité de distance.
+  *
+  */
+  get distanceUnit() {
+    return this._distanceUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set distanceUnit
+  * @description Attribuer l'unité de distance.
+  * @param {object} du - Unité de distance.
+  *
+  */
+  set distanceUnit(du) {
+    this._distanceUnit = du;
   }
 
   /**
