@@ -14,6 +14,7 @@ const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const simplify = require('../utils/simplify');
+const deepCopy = require('../utils/deepCopy');
 const turf = require('@turf/turf');
 
 // Création du LOGGER
@@ -373,7 +374,7 @@ module.exports = class pgrSource extends Source {
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
-    // Si pgrResponse est vide 
+    // Si pgrResponse est vide
     if (pgrResponse.rowCount === 0) {
       throw errorManager.createError(" No data found ", 404);
     }
@@ -426,20 +427,31 @@ module.exports = class pgrSource extends Source {
 
     let row;
     let currentGeom;
+    let rowDuration;
+    let rowDistance;
+    let finalAttributesObject;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
-      if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
+      if (row.path_seq != lastPathSeq) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
         // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourue (pour faire le lien)
         // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
         if (response.routes[0].legs.length > 1 && currentGeom) {
-          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
+          response.routes[0].legs.slice(-1)[0].steps.push(
+            {
+              geometry: currentGeom,
+              finalAttributesObject,
+              duration: rowDuration,
+              distance: rowDistance
+            }
+          );
         }
       }
 
-      let finalAttributesObject = {};
+      finalAttributesObject = {};
       // S'il y a donc bien des attributs à renvoyer, on lit la réponse
       if (finalAttributesKey.length !== 0) {
 
@@ -468,8 +480,8 @@ module.exports = class pgrSource extends Source {
       if (row.geom_json) {
         currentGeom = JSON.parse(row.geom_json);
 
-        let rowDuration = row.duration;
-        let rowDistance = row.distance;
+        rowDuration = row.duration;
+        rowDistance = row.distance;
 
         response.routes[0].legs.slice(-1)[0].duration += rowDuration;
         response.routes[0].legs.slice(-1)[0].distance += rowDistance;
@@ -477,14 +489,15 @@ module.exports = class pgrSource extends Source {
         response.routes[0].duration += rowDuration;
         response.routes[0].distance += rowDistance;
 
-        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
         response.routes[0].legs.slice(-1)[0].steps.push(
           {
-            geometry: JSON.parse(row.geom_json),
+            geometry: currentGeom,
             finalAttributesObject,
             duration: rowDuration,
-            distance: rowDistance}
-          );
+            distance: rowDistance
+          }
+        );
       }
 
       // Gestion des derniers points intermédiaires sur le même tronçon que le point final (ticket #34962)
@@ -493,7 +506,15 @@ module.exports = class pgrSource extends Source {
           response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
           // Cas possible de problème dans les données : le tronçon n'a pas de géométrie
           if (currentGeom) {
-            response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+            response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
+            response.routes[0].legs.slice(-1)[0].steps.push(
+              {
+                geometry: currentGeom,
+                finalAttributesObject,
+                duration: rowDuration,
+                distance: rowDistance
+              }
+            );
           }
         }
       }
@@ -597,77 +618,110 @@ module.exports = class pgrSource extends Source {
         portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
         portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
-        if (routeRequest.computeSteps) {
-          let steps = new Array();
+        let steps = new Array();
 
-          // On va associer les étapes à la portion concernée
-          for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
-            let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
-            // Troncature de la géométrie : cas où il n'y a qu'un step
-            if (k == 0 && currentPgrRouteLeg.steps.length == 1){
-              let stepStart = turf.point(response.waypoints[j].location);
-              let stepEnd = turf.point(response.waypoints[j + 1].location);
+        // On va associer les étapes à la portion concernée
+        for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
+          let currentPgrRouteStep = deepCopy(currentPgrRouteLeg.steps[k]);
+          // Troncature de la géométrie : cas où il n'y a qu'un step
+          if (k == 0 && currentPgrRouteLeg.steps.length == 1){
+            let stepStart = turf.point(response.waypoints[j].location);
+            let stepEnd = turf.point(response.waypoints[j + 1].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-                turf.truncate(
-                  turf.lineSlice(
-                    stepStart,
-                    stepEnd,
-                    currentPgrRouteStep.geometry
-                  ),
-                  {precision: 6}
-                )
-              ).geometry.coordinates;
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
+                turf.lineSlice(
+                  stepStart,
+                  stepEnd,
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              )
+            ).geometry.coordinates;
+          }
+          // Troncature de la géométrie : cas de début de leg
+          else if (k == 0){
+            let stepStart = turf.point(response.waypoints[j].location);
+
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
+                turf.lineSlice(
+                  stepStart,
+                  gisManager.arrays_intersection(
+                    currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
+                    currentPgrRouteStep.geometry.coordinates
+                  )[0],
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              )
+            ).geometry.coordinates;
+          }
+          // Troncature de la géométrie : cas de fin de leg
+          else if (k == currentPgrRouteLeg.steps.length - 1) {
+            let stepEnd = turf.point(response.waypoints[j+1].location);
+
+            // Pour le cas des boucles, il faut tester si l'intersection entre le dernier tronçon
+            // et l'avant dernier tronçon est supérieure à 1 point
+            const lastLine = currentPgrRouteStep.geometry.coordinates;
+            const secondToLastLine = currentPgrRouteLeg.steps[k - 1].geometry.coordinates;
+            let common_point;
+
+            const lastSecIntersection = gisManager.arrays_intersection(lastLine, secondToLastLine);
+            // S'il n'y a qu'une intersection, on la prend
+            if (lastSecIntersection.length === 1){
+              common_point = lastSecIntersection[0];
+            // S'il y en a plusieurs et que la multilinestring a une longueur de 2, prendre l'intersection qui
+            // entraîne le plus court chemin.
+            // TODO: vraiment ????????????
+            } else if (currentPgrRouteLeg.steps.length === 2) {
+              // TODO: do something else
+              common_point = lastSecIntersection[0];
+            // S'il y en a plusieurs et que la multilinestring a une longueur d'au moins trois, prendre le
+            // point qui n'intersecte pas l'antépenultième tronçon (sinon ce dernier serait le penultième)
+            } else {
+              const thirdToLastLine = currentPgrRouteLeg.steps[k - 2].geometry.coordinates;
+              // L'array suivant n'a qu'une seule valeur, sauf dans un cas très précis de réseau non réel
+              // de deux boucles imbriquées
+              const firstThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine)[0];
+              if (gisManager.arraysEquals(firstThirdIntersection, lastSecIntersection[0])) {
+                common_point = lastSecIntersection[1];
+              } else {
+                common_point = lastSecIntersection[0];
+              }
             }
-            // Troncature de la géométrie : cas de début de leg
-            else if (k == 0){
-              let stepStart = turf.point(response.waypoints[j].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-                turf.truncate(
-                  turf.lineSlice(
-                    stepStart,
-                    currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
-                    currentPgrRouteStep.geometry
-                  ),
-                  {precision: 6}
-                )
-              ).geometry.coordinates;
-            }
-            // Troncature de la géométrie : cas de fin de leg
-            else if (k == currentPgrRouteLeg.steps.length - 1) {
-              let stepEnd = turf.point(response.waypoints[j+1].location);
-
-              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-                turf.truncate(
-                  turf.lineSlice(
-                    currentPgrRouteStep.geometry.coordinates[0],
-                    stepEnd,
-                    currentPgrRouteStep.geometry
-                  ),
-                  {precision: 6}
-                )
-              ).geometry.coordinates;
-            }
-
-            newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
-
-            steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
-            if (!steps[k].geometry.transform(askedProjection)) {
-              throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
-            }
-            // ajout des attributs
-            steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
-
-            // On récupère la distance et la durée
-            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
-            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
-
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
+                turf.lineSlice(
+                  common_point,
+                  stepEnd,
+                  currentPgrRouteStep.geometry
+                ),
+                {precision: 6}
+              )
+            ).geometry.coordinates;
           }
 
-          let newLegDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(newPortionGeomCoords);
-          newRouteGeomCoords.push(...newLegDissolvedCoords);
+          newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
 
+          steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
+          if (!steps[k].geometry.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+          }
+          // ajout des attributs
+          steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
+
+          // On récupère la distance et la durée
+          steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
+          steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
+
+        }
+
+        let newLegDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(newPortionGeomCoords);
+        newRouteGeomCoords.push(...newLegDissolvedCoords);
+
+        if (routeRequest.computeSteps) {
           portions[j].steps = steps;
 
         } else {
@@ -704,7 +758,7 @@ module.exports = class pgrSource extends Source {
     let point = {};
     let geometry = {};
 
-    // Si pgrResponse est vide 
+    // Si pgrResponse est vide
     if (pgrResponse.rowCount === 0) {
       throw errorManager.createError(" No data found ", 404);
     }
