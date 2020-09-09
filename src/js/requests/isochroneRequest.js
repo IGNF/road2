@@ -25,9 +25,22 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} direction - Sens du parcours.
   * @param {string} askedProjection - Projection souhaitée.
   * @param {string} geometryFormat - Format souhaitée pour la géométrie en sortie.
+  * @param {string} timeUnit - Unité de temps utilisée pour le calcul.
+  * @param {string} distanceUnit - Unité de distance utilisée pour le calcul.
   *
   */
-  constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat) {
+  constructor(
+    resource,
+    point,
+    costType,
+    costValue,
+    profile,
+    direction,
+    askedProjection,
+    geometryFormat,
+    timeUnit,
+    distanceUnit
+  ) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
@@ -40,6 +53,8 @@ module.exports = class isochroneRequest extends Request {
     this._direction = direction;
     this._askedProjection = askedProjection;
     this._geometryFormat = geometryFormat;
+    this._timeUnit = timeUnit;
+    this._distanceUnit = distanceUnit;
 
     // Gestion des contraintes 
     this._constraints = new Array();
@@ -205,6 +220,52 @@ module.exports = class isochroneRequest extends Request {
   */
   set geometryFormat(gmtrfm) {
     this._geometryFormat = gmtrfm;
+  }
+
+  /**
+  *
+  * @function
+  * @name get timeUnit
+  * @description Récupérer l'unité de temps.
+  *
+  */
+  get timeUnit() {
+    return this._timeUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set timeUnit
+  * @description Attribuer l'unité de temps.
+  * @param {object} tu - Unité de temps.
+  *
+  */
+  set timeUnit(tu) {
+    this._timeUnit = tu;
+  }
+
+  /**
+  *
+  * @function
+  * @name get distanceUnit
+  * @description Récupérer l'unité de distance.
+  *
+  */
+  get distanceUnit() {
+    return this._distanceUnit;
+  }
+
+  /**
+  *
+  * @function
+  * @name set distanceUnit
+  * @description Attribuer l'unité de distance.
+  * @param {object} du - Unité de distance.
+  *
+  */
+  set distanceUnit(du) {
+    this._distanceUnit = du;
   }
 
   /**

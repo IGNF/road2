@@ -414,6 +414,32 @@ module.exports = {
       geometryFormatParameterDescription.example = "geojson";
       isochroneDescription.parameters.push(geometryFormatParameterDescription);
 
+      // isochrone.parameters.timeUnit
+      let timeUnitServiceParameter = serviceOpIsochrone.getParameterById("timeUnit");
+      let timeUnitParameterDescription = {};
+      timeUnitParameterDescription.name = "timeUnit";
+      timeUnitParameterDescription.in = "query";
+      timeUnitParameterDescription.description = timeUnitServiceParameter.description;
+      timeUnitParameterDescription.required = timeUnitServiceParameter.required;
+      timeUnitParameterDescription.default = timeUnitServiceParameter.defaultValue;
+      timeUnitParameterDescription.schema = {};
+      timeUnitParameterDescription.schema.type = "enumeration";
+      timeUnitParameterDescription.example = "minute";
+      isochroneDescription.parameters.push(timeUnitParameterDescription);
+
+      // isochrone.parameters.distanceUnit
+      let distanceUnitServiceParameter = serviceOpIsochrone.getParameterById("distanceUnit");
+      let distanceUnitParameterDescription = {};
+      distanceUnitParameterDescription.name = "distanceUnit";
+      distanceUnitParameterDescription.in = "query";
+      distanceUnitParameterDescription.description = distanceUnitServiceParameter.description;
+      distanceUnitParameterDescription.required = distanceUnitServiceParameter.required;
+      distanceUnitParameterDescription.default = distanceUnitServiceParameter.defaultValue;
+      distanceUnitParameterDescription.schema = {};
+      distanceUnitParameterDescription.schema.type = "enumeration";
+      distanceUnitParameterDescription.example = "meter";
+      isochroneDescription.parameters.push(distanceUnitParameterDescription);
+
       // isochrone.parameters.constraints
       let constraintsServiceParameter = serviceOpIsochrone.getParameterById("constraints");
       let constraintsParameterDescription = {};
@@ -728,6 +754,26 @@ module.exports = {
             isochroneGeometriesFormat.defaultValue = geometryFormatParameter.defaultValueContent;
           }
           isochroneAvailableOperation.availableParameters.push(isochroneGeometriesFormat);
+
+          // isochrone.timeUnit
+          let timeUnitParameter = resourceOperation.getParameterById("timeUnit");
+          let isochroneTimeUnit = {};
+          isochroneTimeUnit.id = "timeUnit";
+          isochroneTimeUnit.values = timeUnitParameter.values;
+          if (timeUnitParameter.serviceParameter.defaultValue === "true") {
+            isochroneTimeUnit.defaultValue = timeUnitParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneTimeUnit);
+
+          // isochrone.distanceUnit
+          let distanceUnitParameter = resourceOperation.getParameterById("distanceUnit");
+          let isochroneDistanceUnit = {};
+          isochroneDistanceUnit.id = "distanceUnit";
+          isochroneDistanceUnit.values = distanceUnitParameter.values;
+          if (distanceUnitParameter.serviceParameter.defaultValue === "true") {
+            isochroneDistanceUnit.defaultValue = distanceUnitParameter.defaultValueContent;
+          }
+          isochroneAvailableOperation.availableParameters.push(isochroneDistanceUnit);
 
           // isochrone.constraints
           let constraintsParameter = resourceOperation.getParameterById("constraints");
