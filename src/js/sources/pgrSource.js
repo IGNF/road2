@@ -13,12 +13,13 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
-const log4js = require('log4js');
 const simplify = require('../utils/simplify');
+const deepCopy = require('../utils/deepCopy');
 const turf = require('@turf/turf');
 const LooseConstraint = require('../constraint/looseConstraint');
 
 // Création du LOGGER
+const log4js = require('log4js');
 const LOGGER = log4js.getLogger("PGRSOURCE");
 
 /**
@@ -283,12 +284,17 @@ module.exports = class pgrSource extends Source {
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
           if (err) {
             LOGGER.error(err);
-            reject(err);
+            // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
+            if (err.code === "38001") {
+              reject(errorManager.createError(" No path found ", 404));
+            } else {
+              reject(err);
+            }
           } else {
             try {
               resolve(this.writeRouteResponse(request, pgrRequest, result));
-            } catch (err) {
-              reject(err);
+            } catch (error) {
+              reject(error);
             }
           }
         });
@@ -309,11 +315,12 @@ module.exports = class pgrSource extends Source {
           // on ne fait rien
         }
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5)";
+        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
 
         const SQLParametersTable = [
           request.costValue,
           request.direction,
+          parseInt(request.askedProjection.split(':')[1]), // e.g. Transformer "EPSG:4326" en 4326 (pour PostGIS).
           this._configuration.storage.costColumn,
           this._configuration.storage.rcostColumn,
           constraints
@@ -326,8 +333,8 @@ module.exports = class pgrSource extends Source {
             } else {
               try {
                 resolve(this.writeIsochroneResponse(request, pgrRequest, result));
-              } catch (err) {
-                reject(err);
+              } catch (error) {
+                reject(error);
               }
             }
           });
@@ -387,7 +394,10 @@ module.exports = class pgrSource extends Source {
     // Gestion des attributs
     let finalAttributesKey = new Array();
 
-    // TODO: que faire si pgrResponse est vide ?
+    // Si pgrResponse est vide
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
+    }
 
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
@@ -437,20 +447,31 @@ module.exports = class pgrSource extends Source {
 
     let row;
     let currentGeom;
+    let rowDuration;
+    let rowDistance;
+    let finalAttributesObject;
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
-      if (row.path_seq === 1 || (row.path_seq < 0 && row.path_seq != lastPathSeq)) {
+      if (row.path_seq != lastPathSeq) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
         // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourue (pour faire le lien)
         // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
         if (response.routes[0].legs.length > 1 && currentGeom) {
-          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
+          response.routes[0].legs.slice(-1)[0].steps.push(
+            {
+              geometry: currentGeom,
+              finalAttributesObject,
+              duration: rowDuration,
+              distance: rowDistance
+            }
+          );
         }
       }
 
-      let finalAttributesObject = {};
+      finalAttributesObject = {};
       // S'il y a donc bien des attributs à renvoyer, on lit la réponse
       if (finalAttributesKey.length !== 0) {
 
@@ -479,8 +500,8 @@ module.exports = class pgrSource extends Source {
       if (row.geom_json) {
         currentGeom = JSON.parse(row.geom_json);
 
-        let rowDuration = row.duration;
-        let rowDistance = row.distance;
+        rowDuration = row.duration;
+        rowDistance = row.distance;
 
         response.routes[0].legs.slice(-1)[0].duration += rowDuration;
         response.routes[0].legs.slice(-1)[0].distance += rowDistance;
@@ -488,21 +509,33 @@ module.exports = class pgrSource extends Source {
         response.routes[0].duration += rowDuration;
         response.routes[0].distance += rowDistance;
 
-        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+        response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
         response.routes[0].legs.slice(-1)[0].steps.push(
           {
-            geometry: JSON.parse(row.geom_json),
+            geometry: currentGeom,
             finalAttributesObject,
             duration: rowDuration,
-            distance: rowDistance}
-          );
+            distance: rowDistance
+          }
+        );
       }
 
       // Gestion des derniers points intermédiaires sur le même tronçon que le point final (ticket #34962)
       if (rowIdx == pgrResponse.rows.length - 1) {
         while (response.routes[0].legs.length < response.waypoints.length - 1) {
           response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
-          response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( currentGeom.coordinates );
+          // Cas possible de problème dans les données : le tronçon n'a pas de géométrie
+          if (currentGeom) {
+            response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
+            response.routes[0].legs.slice(-1)[0].steps.push(
+              {
+                geometry: currentGeom,
+                finalAttributesObject,
+                duration: rowDuration,
+                distance: rowDistance
+              }
+            );
+          }
         }
       }
 
@@ -564,7 +597,7 @@ module.exports = class pgrSource extends Source {
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
-      throw errorManager.createError(" No PGR path found: the number of routes is equal to 0. ");
+      throw errorManager.createError(" No route found ", 404);
     }
 
     // routes
@@ -585,8 +618,9 @@ module.exports = class pgrSource extends Source {
       routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
+      let newRouteGeomCoords = [];
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
-
+        let newPortionGeomCoords = [];
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
@@ -604,66 +638,110 @@ module.exports = class pgrSource extends Source {
         portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
         portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
-        if (routeRequest.computeSteps) {
-          let steps = new Array();
+        let steps = new Array();
 
-          // On va associer les étapes à la portion concernée
-          for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
-            let currentPgrRouteStep = currentPgrRouteLeg.steps[k];
-            // Troncature de la géométrie : cas où il n'y a qu'un step
-            if (k == 0 && currentPgrRouteLeg.steps.length == 1){
-              let stepStart = turf.point(response.waypoints[j].location);
-              let stepEnd = turf.point(response.waypoints[j + 1].location);
+        // On va associer les étapes à la portion concernée
+        for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
+          let currentPgrRouteStep = deepCopy(currentPgrRouteLeg.steps[k]);
+          // Troncature de la géométrie : cas où il n'y a qu'un step
+          if (k == 0 && currentPgrRouteLeg.steps.length == 1){
+            let stepStart = turf.point(response.waypoints[j].location);
+            let stepEnd = turf.point(response.waypoints[j + 1].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
                 turf.lineSlice(
                   stepStart,
                   stepEnd,
                   currentPgrRouteStep.geometry
                 ),
                 {precision: 6}
-              ).geometry.coordinates;
-            }
-            // Troncature de la géométrie : cas de début de leg
-            else if (k == 0){
-              let stepStart = turf.point(response.waypoints[j].location);
+              )
+            ).geometry.coordinates;
+          }
+          // Troncature de la géométrie : cas de début de leg
+          else if (k == 0){
+            let stepStart = turf.point(response.waypoints[j].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
                 turf.lineSlice(
                   stepStart,
-                  currentPgrRouteStep.geometry.coordinates[currentPgrRouteStep.geometry.coordinates.length - 1],
+                  gisManager.arrays_intersection(
+                    currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
+                    currentPgrRouteStep.geometry.coordinates
+                  )[0],
                   currentPgrRouteStep.geometry
                 ),
                 {precision: 6}
-              ).geometry.coordinates;
-            }
-            // Troncature de la géométrie : cas de fin de leg
-            else if (k == currentPgrRouteLeg.steps.length - 1) {
-              let stepEnd = turf.point(response.waypoints[j+1].location);
+              )
+            ).geometry.coordinates;
+          }
+          // Troncature de la géométrie : cas de fin de leg
+          else if (k == currentPgrRouteLeg.steps.length - 1) {
+            let stepEnd = turf.point(response.waypoints[j+1].location);
 
-              currentPgrRouteStep.geometry.coordinates = turf.truncate(
+            // Pour le cas des boucles, il faut tester si l'intersection entre le dernier tronçon
+            // et l'avant dernier tronçon est supérieure à 1 point
+            const lastLine = currentPgrRouteStep.geometry.coordinates;
+            const secondToLastLine = currentPgrRouteLeg.steps[k - 1].geometry.coordinates;
+            let common_point;
+
+            const lastSecIntersection = gisManager.arrays_intersection(lastLine, secondToLastLine);
+            // S'il n'y a qu'une intersection, on la prend
+            if (lastSecIntersection.length === 1){
+              common_point = lastSecIntersection[0];
+            // S'il y en a plusieurs et que la multilinestring a une longueur de 2, prendre l'intersection qui
+            // entraîne le plus court chemin.
+            // TODO: vraiment ????????????
+            } else if (currentPgrRouteLeg.steps.length === 2) {
+              // TODO: do something else
+              common_point = lastSecIntersection[0];
+            // S'il y en a plusieurs et que la multilinestring a une longueur d'au moins trois, prendre le
+            // point qui n'intersecte pas l'antépenultième tronçon (sinon ce dernier serait le penultième)
+            } else {
+              const thirdToLastLine = currentPgrRouteLeg.steps[k - 2].geometry.coordinates;
+              // L'array suivant n'a qu'une seule valeur, sauf dans un cas très précis de réseau non réel
+              // de deux boucles imbriquées
+              const firstThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine)[0];
+              if (gisManager.arraysEquals(firstThirdIntersection, lastSecIntersection[0])) {
+                common_point = lastSecIntersection[1];
+              } else {
+                common_point = lastSecIntersection[0];
+              }
+            }
+
+            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
+              turf.truncate(
                 turf.lineSlice(
-                  currentPgrRouteStep.geometry.coordinates[0],
+                  common_point,
                   stepEnd,
                   currentPgrRouteStep.geometry
                 ),
                 {precision: 6}
-              ).geometry.coordinates;
-            }
-
-            steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
-            if (!steps[k].geometry.transform(askedProjection)) {
-              throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
-            }
-            // ajout des attributs
-            steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
-
-            // On récupère la distance et la durée
-            steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
-            steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
-
+              )
+            ).geometry.coordinates;
           }
 
+          newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
+
+          steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
+          if (!steps[k].geometry.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+          }
+          // ajout des attributs
+          steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
+
+          // On récupère la distance et la durée
+          steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
+          steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
+
+        }
+
+        let newLegDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(newPortionGeomCoords);
+        newRouteGeomCoords.push(...newLegDissolvedCoords);
+
+        if (routeRequest.computeSteps) {
           portions[j].steps = steps;
 
         } else {
@@ -672,6 +750,8 @@ module.exports = class pgrSource extends Source {
 
       }
 
+      currentPgrRoute.geometry.coordinates = newRouteGeomCoords;
+      routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", this._topology.projection);
       routes[i].portions = portions;
 
     }
@@ -695,28 +775,32 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
-    /* Initialization des paramètres que l'on veut transmettre au proxy.*/
     let point = {};
-    let resource = isochroneRequest.resource;
-    let costType = isochroneRequest.costType;
-    let costValue = isochroneRequest.costValue;
     let geometry = {};
-    let profile = isochroneRequest.profile;
-    let direction = isochroneRequest.direction;
 
-    /* Préparation de certains paramètres avant envoi.*/
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
-    if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-      /* TODO: Faire un meilleur contrôle sur la géométrie retournée par le moteur ? */
-      if (pgrResponse.rows[0] && pgrResponse.rows[0].geometry) {
-        const rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
-        if ((rawGeometry.type === "Polygon") && rawGeometry.coordinates) {
-          geometry = new Polygon(rawGeometry.coordinates, "geojson", this._topology.projection);
-        }
-      }
+    // Si pgrResponse est vide
+    if (pgrResponse.rowCount === 0) {
+      throw errorManager.createError(" No data found ", 404);
     }
 
+    // Création d'un objet Point (utile plus tard).
+    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
+
+    let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+
+    // Création d'un objet Polygon à partir du GeoJSON reçu.
+    geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
+
     /* Envoi de la réponse au proxy. */
-    return new IsochroneResponse(point, resource, costType, costValue, geometry, profile, direction);
+    return new IsochroneResponse(
+      point,
+      isochroneRequest.resource,
+      isochroneRequest.costType,
+      isochroneRequest.costValue,
+      geometry,
+      isochroneRequest.profile,
+      isochroneRequest.direction,
+      isochroneRequest.askedProjection
+    );
   }
 }

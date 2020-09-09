@@ -24,9 +24,10 @@ module.exports = class isochroneResponse extends Response {
   * @param {Geometry} geometry - Représentation de la géométrie.
   * @param {string} profile - Profile.
   * @param {string} direction - Sens du parcours.
+  * @param {string} askedProjection - Projection souhaitée.
   *
   */
-  constructor(point, resource, costType, costValue, geometry, profile, direction) {
+  constructor(point, resource, costType, costValue, geometry, profile, direction, askedProjection) {
 
     // Constructeur parent
     super(resource);
@@ -48,6 +49,9 @@ module.exports = class isochroneResponse extends Response {
 
     // direction
     this._direction = direction;
+
+    // direction
+    this._askedProjection = askedProjection;
 
   }
 
@@ -187,6 +191,29 @@ module.exports = class isochroneResponse extends Response {
   */
   set direction (drct) {
     this._direction = drct;
+  }
+
+  /**
+  *
+  * @function
+  * @name get askedProjection
+  * @description Récupérer la projection souhaitée.
+  *
+  */
+  get askedProjection () {
+    return this._askedProjection;
+  }
+
+  /**
+  *
+  * @function
+  * @name set askedProjection
+  * @description Attribuer la projection souhaitée.
+  * @param {string} prjct - Projection souhaitée.
+  *
+  */
+  set askedProjection (prjct) {
+    this._askedProjection = prjct;
   }
 
 }
