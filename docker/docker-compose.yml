@@ -4,7 +4,7 @@ services:
   road2-centos:
     build:
       context: ..
-      dockerfile: ./docker/centos/Dockerfile
+      dockerfile: ./docker/centos-wo-aws/Dockerfile
       args:
         - dnsIP=${dns_ip}
         - dnsHost=${dns_host}
