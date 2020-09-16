@@ -11,6 +11,8 @@
     "direction",
     "constraints",
     "projection",
-    "geometryFormat"
+    "geometryFormat",
+    "timeUnit",
+    "distanceUnit"
   ]
 }
