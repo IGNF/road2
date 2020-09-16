@@ -275,11 +275,17 @@ module.exports = {
       }
       // --
 
+      // Récupération des costRation par défaut
+      const defaultCostRatios = {
+        defaultPreferredCostRatio: routeOperation.getParameterById("constraints").defaultPreferredCostRatio,
+        defaultAvoidCostRatio: routeOperation.getParameterById("constraints").defaultAvoidCostRatio,
+      }
+
       // Vérification de la validité des contraintes fournies
       if (!routeOperation.getParameterById("constraints").check(finalConstraints)) {
         throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
       } else {
-        if (!routeOperation.getParameterById("constraints").convertIntoTable(finalConstraints, routeRequest.constraints)) {
+        if (!routeOperation.getParameterById("constraints").convertIntoTable(finalConstraints, routeRequest.constraints, defaultCostRatios)) {
           throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
         }
       }

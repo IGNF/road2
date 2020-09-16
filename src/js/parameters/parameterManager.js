@@ -613,6 +613,22 @@ module.exports = class parameterManager  {
                 LOGGER.error("Les types de contrainte pour cette cle sont invalides");
                 return false;
               }
+
+              if (key.availableConstraintType[c] === "prefer") {
+                // Vérification du contenu de defaultPreferredCostRatio
+                if (!(typeof resourceParameterJsonObject.defaultPreferredCostRatio === "number")) {
+                  LOGGER.error("Le defaultPreferredCostRatio n'est pas un nombre");
+                  return false;
+                }
+              }
+
+              if (key.availableConstraintType[c] === "avoid") {
+                // Vérification du contenu de defaultAvoidCostRatio
+                if (!(typeof resourceParameterJsonObject.defaultAvoidCostRatio === "number")) {
+                  LOGGER.error("Le defaultAvoidCostRatio n'est pas un nombre");
+                  return false;
+                }
+              }
             }
           }
 

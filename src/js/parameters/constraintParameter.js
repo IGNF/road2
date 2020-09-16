@@ -41,6 +41,9 @@ module.exports = class ConstraintParameter extends ResourceParameter {
     // getcapabilities
     this._getcapabilities = {};
 
+    this._defaultPreferredCostRatio;
+    this._defaultAvoidCostRatio;
+
   }
 
   /**
@@ -52,6 +55,28 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   */
   get defaultValueContent () {
     return this._defaultValueContent;
+  }
+
+  /**
+  *
+  * @function
+  * @name get defaultPreferredCostRatio
+  * @description Récupérer la valeur par défaut du costRatio
+  *
+  */
+  get defaultPreferredCostRatio () {
+    return this._defaultPreferredCostRatio;
+  }
+
+  /**
+  *
+  * @function
+  * @name get defaultAvoidCostRatio
+  * @description Récupérer la valeur par défaut du costRatio
+  *
+  */
+  get defaultAvoidCostRatio () {
+    return this._defaultAvoidCostRatio;
   }
 
   /**
@@ -91,6 +116,9 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       this._defaultValueContent = parameterConf.defaultValueContent;
       // TODO: Vérifier que cette valeur par défaut est comprise dans les valeurs disponibles
     }
+
+    this._defaultPreferredCostRatio = parameterConf.defaultPreferredCostRatio;
+    this._defaultAvoidCostRatio = parameterConf.defaultAvoidCostRatio;
 
     this._values = parameterConf.values;
 
@@ -169,7 +197,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name check
+  * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options
@@ -218,6 +246,15 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
       if (!found) {
         return false;
+      }
+
+      // Gestion du champ costRatio pour contraintes préférentielles
+      if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
+        if (userJson.costRatio) {
+          if(typeof userJson.costRatio !== "number") {
+            return false;
+          }
+        }
       }
     }
 
@@ -288,10 +325,14 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
   * @param {string} userValue - Valeur à vérifier
+  * @param {object} defaultCostRatios - objet de la forme {
+        defaultPreferredCostRatio: 0.8,
+        defaultAvoidCostRatio: 1.2,
+      }
   * @return {object}
   *
   */
-  specificConvertion(userValue) {
+  specificConvertion(userValue, defaultCostRatios) {
 
     let userJson = {};
     let constraint;
@@ -309,6 +350,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      } else if (userJson.constraintType === 'prefer' && !userJson.costRatio) {
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, defaultCostRatios.defaultPreferredCostRatio);
+      } else if (userJson.constraintType === 'avoid' && !userJson.costRatio) {
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, defaultCostRatios.defaultAvoidCostRatio);
       } else {
         constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, userJson.costRatio);
       }
@@ -323,6 +368,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition);
+      } else if (userJson.constraintType === 'prefer' && !userJson.costRatio) {
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, defaultCostRatios.defaultPreferredCostRatio);
+      } else if (userJson.constraintType === 'avoid' && !userJson.costRatio) {
+        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, defaultCostRatios.defaultAvoidCostRatio);
       } else {
         constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, condition, userJson.costRatio);
       }
@@ -336,9 +385,8 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
       if (userJson.constraintType === 'banned') {
         constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
-      } else {
-        constraint = new LooseConstraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value, userJson.costRatio);
       }
+
     } else {
       //
     }
