@@ -27,29 +27,26 @@ RUN yum -y upgrade
 RUN yum install -y yum-utils centos-release-scl epel-release
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 
-### Utilitaires
-RUN yum -y install wget vim
-
-### Installation des dépendances de NodeJS
-RUN yum install -y python-2.7.5
-
-### Installation d'un compilateur pour Boost et GCC 6
-RUN yum install -y gcc-c++
-
-### Installation du compilateur c++ plus récent (8) pour NodeJS 
-RUN yum -y install devtoolset-8 
+### Utilitaires et dépendances
+# Pour NodeJS: python-2.7.5
+# Un compilateur pour Boost et GCC 6: gcc-c++
+# Un compilateur c++ plus récent (8) pour NodeJS: devtoolset-8
+# Pour GCC 6.3.0 afin de compiler OSRM: GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+
+# Pour OSRM: boost 1.65.1; expat 2.2.0; lua 5.2.4; bzip2 1.0.6; tbb 
+# Pour Boost: openmpi-devel python-devel
+# Pour LUA: readline-devel
+RUN yum -y install wget vim git python-2.7.5 gcc-c++ devtoolset-8 gmp-devel \
+    mpfr-devel libmpc-devel flex flex-devel cmake3 zlib zlib-devel tbb tbb-devel \
+    expat expat-devel lbzip2 bzip2-devel openmpi-devel python-devel readline-devel
 
 ### Installation de NodeJS à partir des sources
 # https://github.com/nodejs/node/blob/v12.x/BUILDING.md
 # https://github.com/nodejs/help/wiki/Installation
 WORKDIR /home/docker/nodejs
-RUN wget -O node-v10.18.0.tar.gz "https://nodejs.org/dist/v10.18.0/node-v10.18.0.tar.gz"
-RUN tar -xzf /home/docker/nodejs/node-v10.18.0.tar.gz
+RUN wget -O node-v10.18.0.tar.gz "https://nodejs.org/dist/v10.18.0/node-v10.18.0.tar.gz" && tar -xzf /home/docker/nodejs/node-v10.18.0.tar.gz
 RUN scl enable devtoolset-8 bash && export CXX=/opt/rh/devtoolset-8/root/usr/bin/g++ && cd node-v10.18.0 && ./configure && make -j4 && make install
 
 ### Installation de gcc 6.2.0 pour compiler OSRM 
-# Installation de GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+
-RUN yum install -y git gmp-devel mpfr-devel libmpc-devel flex flex-devel
 WORKDIR /home/docker/gcc
 # TODO: essayer avec gcc 6.3.1 
 RUN git clone -b releases/gcc-6.3.0 --depth 1 https://gcc.gnu.org/git/gcc.git
@@ -57,20 +54,16 @@ RUN git clone -b releases/gcc-6.3.0 --depth 1 https://gcc.gnu.org/git/gcc.git
 WORKDIR /home/docker/gcc/objdir
 # https://gibsonic.org/tools/2019/08/08/gcc_building.html
 RUN /home/docker/gcc/gcc/configure --prefix=$(pwd) --disable-multilib --disable-werror --enable-languages=c,c++ && make -j4 && make DESTDIR=/opt/gcc-6/ install
-
 ### Installation des dépendances de OSRM
 # https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM
-## Versions trouvées via MASON: boost 1.65.1; expat 2.2.0; lua 5.2.4; bzip2 1.0.6; tbb 
-RUN yum -y install cmake3 zlib zlib-devel tbb tbb-devel expat expat-devel lbzip2 bzip2-devel
+
 # Installation de boost 1.65.1 (boost, filesystem, iostreams, program-options, regex, test, date-time, thread, system)
 WORKDIR /home/docker/boost 
-RUN yum install -y openmpi-devel python-devel
 RUN wget https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz && tar -xzf boost_1_65_1.tar.gz
 WORKDIR /home/docker/boost/boost_1_65_1
 RUN ./bootstrap.sh && ./b2 install 
 # Installation de lua 5.2.4
 WORKDIR /home/docker/lua
-RUN yum install -y readline-devel
 RUN wget http://www.lua.org/ftp/lua-5.2.4.tar.gz && tar zxf lua-5.2.4.tar.gz
 WORKDIR /home/docker/lua/lua-5.2.4
 RUN make linux test && make linux install 
@@ -93,10 +86,7 @@ ENV LD_LIBRARY_PATH=/opt/gcc-6/home/docker/gcc/objdir/lib64:$LD_LIBRARY_PATH
 WORKDIR /home/docker/internal
 
 ### Récupération de données sur la Corse
-# L'objectif est d'avoir un container indépendant du docker-compose
-RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
-RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua
-RUN osrm-contract corse-latest.osrm
+RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf && osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua && osrm-contract corse-latest.osrm
 
 ### Dossier contenant la configuration
 WORKDIR /home/docker/config
