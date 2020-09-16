@@ -103,4 +103,4 @@ resource:
                 - "banned"
               availableValues:
                 - value: "autoroute"
-                  id: "autoroute"
+                  field: "autoroute"
