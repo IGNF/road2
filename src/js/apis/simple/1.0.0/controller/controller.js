@@ -5,6 +5,8 @@ const RouteRequest = require('../../../../requests/routeRequest');
 const IsochroneRequest = require('../../../../requests/isochroneRequest');
 const Point = require('../../../../geometry/point');
 const Turf = require('@turf/turf');
+const Duration = require('../../../../time/duration');
+const Distance = require('../../../../geography/distance');
 
 module.exports = {
 
@@ -312,11 +314,13 @@ module.exports = {
     let resource;
     let point = {};
     let costType;
-    let costValue;
+    let costValue = 0;
     let profile;
     let direction;
     let askedProjection;
     let geometryFormat;
+    let timeUnit;
+    let distanceUnit;
 
     /* Paramètre 'resource'. */
     if (!parameters.resource) {
@@ -384,7 +388,39 @@ module.exports = {
       if (!isochroneOperation.getParameterById("costValue").check(parameters.costValue)) {
         throw errorManager.createError("Parameter 'costValue' is invalid.", 400);
       } else {
-        costValue = parameters.costValue;
+        if (costType === "time") {
+          if (parameters.timeUnit) {
+            // Vérification de la validité du paramètre fourni.
+            if (!isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
+              throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+            }
+            timeUnit = parameters.timeUnit;
+          } else {
+            timeUnit = isochroneOperation.getParameterById("timeUnit").defaultValueContent;
+          }
+
+          // Conversion de costValue en secondes (car le calcul côté moteur se fait en secondes).
+          const duration = new Duration(Math.round(parameters.costValue * 10) / 10, timeUnit);
+          if (duration.convert("second") === true) {
+            costValue = duration.value;
+          }
+        } else if (costType === "distance") {
+          if (parameters.distanceUnit) {
+            // Vérification de la validité du paramètre fourni.
+            if (!isochroneOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
+              throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+            }
+            distanceUnit = parameters.distanceUnit;
+          } else {
+            distanceUnit = isochroneOperation.getParameterById("distanceUnit").defaultValueContent;
+          }
+
+          // Conversion de costValue en mètres (car le calcul côté moteur se fait en mètres).
+          const distance = new Distance(Math.round(parameters.costValue * 10) / 10, distanceUnit);
+          if (distance.convert("meter") === true) {
+            costValue = distance.value;
+          }
+        }
       }
     }
 
@@ -430,7 +466,18 @@ module.exports = {
       geometryFormat = isochroneOperation.getParameterById("geometryFormat").defaultValueContent;
     }
 
-    let isochroneRequest = new IsochroneRequest(parameters.resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat);
+    let isochroneRequest = new IsochroneRequest(
+      parameters.resource,
+      point,
+      costType,
+      costValue,
+      profile,
+      direction,
+      askedProjection,
+      geometryFormat,
+      timeUnit,
+      distanceUnit
+    );
 
     // Contraintes
     // ---
@@ -660,8 +707,20 @@ module.exports = {
     // costType
     userResponse.costType = isochroneResponse.costType;
 
-    // costValue
-    userResponse.costValue = isochroneResponse.costValue;
+    // costValue, timeUnit et distanceUnit.
+    if (userResponse.costType === "time") {
+      const duration = new Duration(isochroneResponse.costValue, "second");
+      if (duration.convert(isochroneResponse.timeUnit) === true) {
+        userResponse.costValue = duration.value;
+        userResponse.timeUnit = isochroneResponse.timeUnit;
+      }
+    } else if (userResponse.costType === "distance") {
+      const distance = new Distance(isochroneResponse.costValue, "meter");
+      if (distance.convert(isochroneResponse.distanceUnit) === true) {
+        userResponse.costValue = distance.value;
+        userResponse.distanceUnit = isochroneResponse.distanceUnit;
+      }
+    }
 
     // profile
     userResponse.profile = isochroneResponse.profile;
