@@ -4,7 +4,7 @@ import scala.concurrent.duration._
 
 class road2RouteLoadTest extends Simulation {
 
-    val urls = ssv("./resources/road2_parameters_pgr.ssv").shuffle.circular
+    val urls = ssv("./resources/road2_parameters.ssv").shuffle.circular
 
     val httpConf = http.baseUrl("http://road2-centos:8080/simple/1.0.0/route?").disableCaching
 
@@ -19,7 +19,7 @@ class road2RouteLoadTest extends Simulation {
     scn.inject(
         // nothingFor(5 seconds),
         // rampUsersPerSec (0) to (10) during (60 seconds),
-        constantUsersPerSec(1) during (1000 seconds) randomized
+        constantUsersPerSec(1) during (100 seconds) randomized
     ).protocols(httpConf))
 
 }

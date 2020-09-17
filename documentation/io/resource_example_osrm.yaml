@@ -2,7 +2,9 @@ resource:
 	id: "bduni"
 	type: "osrm"
 	description: "Données BDUNI v2."
-	topology:
+  topology:
+    id: "bduni-topo"
+    type: "osm"
 		description: "Données issues de la BDUNI de l'IGN."
 		storage: #utile pour les administrateurs
 			file: "bduni.osm"
@@ -68,6 +70,30 @@ resource:
         - id: "waysAttributes"
           values:
             - "name"
+        - id: "geometryFormat"
+          defaultValueContent: "geojson"
+          values:
+            - "geojson"
+            - "polyline"
+        - id: "bbox"
+          defaultValueContent: "true"
+        - id: "projection"
+          defaultValueContent: "EPSG:43260"
+          values:
+            - "EPSG:4326"
+            - "EPSG:2154"
+        - id: "timeUnit"
+          defaultValueContent: "minute"
+          values:
+            - "hour"
+            - "minute"
+            - "second"
+            - "standard"
+        - id: "distanceUnit"
+          defaultValueContent: "meter"
+          values:
+            - "meter"
+            - "kilometer"
         - id: "constraints"
           values:
             - keyType: "kvp"
@@ -77,4 +103,4 @@ resource:
                 - "banned"
               availableValues:
                 - value: "autoroute"
-                  id: "autoroute"
+                  field: "autoroute"

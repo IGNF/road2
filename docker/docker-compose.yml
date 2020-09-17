@@ -4,7 +4,7 @@ services:
   road2-centos:
     build:
       context: ..
-      dockerfile: ./docker/centos/Dockerfile
+      dockerfile: ./docker/centos-wo-aws/Dockerfile
       args:
         - dnsIP=${dns_ip}
         - dnsHost=${dns_host}
@@ -64,7 +64,7 @@ services:
     expose:
       - 5432
     ports:
-      - 5432:5432
+      - 5433:5432
     networks:
       - iti-network
     volumes:

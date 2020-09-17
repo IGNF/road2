@@ -14,7 +14,7 @@ describe('Test du storageManager', function() {
         "corse-latest.osrm": "",
         "corse-latest.osm.pbf": "",
       },
-      "/home/docker/osrm/osrm-backend/osrm-backend-5.20.0/profiles": {
+      "/home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles": {
         "car.lua": "",
       },
     });

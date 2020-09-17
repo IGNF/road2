@@ -26,7 +26,9 @@ router.use(helmet());
 // POST
 // ---
 // Pour cette API, on va permettre la lecture des requêtes POST
-router.use(express.json()) // for parsing application/json
+router.use(express.json(
+  //TODO: faire une fonction de vérification du JSON pour récupérer les erreurs
+)); // for parsing application/json
 // ---
 
 // Accueil de l'API

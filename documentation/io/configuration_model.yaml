@@ -74,9 +74,9 @@
 				"directories":
 					type: array
 					required: true
-          minItems: 1
-          items:
-            type: string
+					minItems: 1
+					items:
+						type: string
 		# Configuration du network
 		"network":
 			type: object

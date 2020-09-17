@@ -13,7 +13,7 @@ On peut trouver un [exemple](./configuration_example.yaml) de ce fichier et le [
 ## log4js.json
 
 Ce fichier permet de spécificier le niveau des logs, l'emplacement des fichiers et le format de leur contenu. Il ne suit pas strictement la syntaxe des JSON employés pour configurer [log4js](https://log4js-node.github.io/log4js-node/).
-
+Le format est celui d'un JSON qui contient deux objets `mainConf` et `httpConf`. Le contenu de ces deux objets suit la syntaxe de log4js. 
 On peut trouver un [exemple](../../docker/config/log4js.json) de ce fichier au format JSON. C'est celui qui est utilisé dans les images docker.  
 
 ## Les projections 

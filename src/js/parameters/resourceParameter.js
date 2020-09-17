@@ -83,15 +83,16 @@ module.exports = class ResourceParameter {
     } else {
 
       // on lit une string qui contient plusieurs valeurs
-      if (typeof userValue !== "string") {
-        return false;
-      }
-
-      // on sépare les valeurs
-      if (this.serviceParameter.style === "pipeDelimited") {
-        userTable = userValue.split("|");
+      if (typeof userValue === "string") {
+        // on sépare les valeurs
+        if (this.serviceParameter.style === "pipeDelimited") {
+          userTable = userValue.split("|");
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        // on peut avoir simplement un float
+        userTable = userValue;
       }
 
     }
