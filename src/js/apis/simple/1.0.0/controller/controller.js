@@ -517,17 +517,21 @@ module.exports = {
   * @description Ré-écriture de la réponse d'un moteur pour une requête sur /route
   * @param {object} RouteRequest - Instance de la classe RouteRequest
   * @param {object} RouteResponse - Instance de la classe RouteResponse
+  * @param {object} service - Instance de la classe Service
   * @return {object} userResponse - Réponse envoyée à l'utilisateur
   *
   */
 
-  writeRouteResponse: function(routeRequest, routeResponse) {
+  writeRouteResponse: function(routeRequest, routeResponse, service) {
 
     let userResponse = {};
     let route = routeResponse.routes[0];
 
     // resource
     userResponse.resource = routeResponse.resource;
+
+    // resourceVersion
+    userResponse.resourceVersion = service.getResourceById(routeResponse.resource).version;
 
     // start
     userResponse.start = routeResponse.start.toString();
@@ -690,11 +694,12 @@ module.exports = {
   * @description Ré-écriture de la réponse d'un moteur pour une requête sur /isochrone
   * @param {object} IsochroneRequest - Instance de la classe IsochroneRequest
   * @param {object} IsochroneResponse - Instance de la classe IsochroneResponse
+  * @param {object} service - Instance de la classe Service
   * @return {object} userResponse - Réponse envoyée à l'utilisateur
   *
   */
 
-  writeIsochroneResponse: function(isochroneRequest, isochroneResponse) {
+  writeIsochroneResponse: function(isochroneRequest, isochroneResponse, service) {
 
     let userResponse = {};
 
@@ -703,6 +708,9 @@ module.exports = {
 
     // resource
     userResponse.resource = isochroneResponse.resource;
+
+    // resourceVersion
+    userResponse.resourceVersion = service.getResourceById(isochroneResponse.resource).version;
 
     // costType
     userResponse.costType = isochroneResponse.costType;

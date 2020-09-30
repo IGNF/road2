@@ -505,6 +505,8 @@ components:
           format: "date"
         resource:
           type: "string"
+        resourceVersion:
+          type: "string"
         profile:
           type: "string"
         optimization:
@@ -589,6 +591,8 @@ components:
         point:
           $ref: "#/components/schemas/point"
         resource:
+          type: "string"
+        resourceVersion:
           type: "string"
         costType:
           type: "string"

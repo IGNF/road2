@@ -77,7 +77,7 @@ router.route("/route")
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse
-      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse);
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
@@ -108,7 +108,7 @@ router.route("/route")
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       // Formattage de la réponse
-      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse);
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
@@ -137,7 +137,7 @@ router.route("/isochrone")
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
       // Formattage de la réponse.
-      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
+      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse, service);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
@@ -161,7 +161,7 @@ router.route("/isochrone")
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
       // Formattage de la réponse.
-      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse);
+      const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse, service);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);

@@ -25,7 +25,7 @@ module.exports = class osrmResource extends Resource {
   constructor(resourceJsonObject, operations) {
 
     // Constructeur parent
-    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type, operations);
+    super(resourceJsonObject.resource.id,resourceJsonObject.resource.type, resourceJsonObject.resource.resourceVersion, operations);
 
     // Stockage de la configuration
     this._configuration = resourceJsonObject.resource;

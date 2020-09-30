@@ -1,7 +1,8 @@
 resource:
 	id: "bduni"
 	type: "osrm"
-	description: "Données BDUNI v2."
+  description: "Données BDUNI v2."
+  resourceVersion: "2020-09-28 09:45:09.875101"
   topology:
     id: "bduni-topo"
     type: "osm"
