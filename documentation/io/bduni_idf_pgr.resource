@@ -3,6 +3,7 @@
     "id": "bduni-idf-pgr",
     "type": "pgr",
     "description": "Donn\u00e9es BDUNI v2.",
+    "resourceVersion": "2020-09-28 09:45:09.875101",
     "topology": {
       "id": "base-bduni",
       "type": "db",

@@ -18,15 +18,19 @@ module.exports = class Resource {
   * @description Constructeur de la classe Resource
   * @param {string} id - Id de la ressource
   * @param {string} type - Type de la ressource
+  * @param {string} version - Version de la ressource
   * @param {object} operations - Objet contenant les opérations disponibles sur la ressource
   *
   */
-  constructor(id, type, operations) {
+  constructor(id, type, version, operations) {
     // Id d'une ressource. Il doit être unique.
     this._id = id;
 
     // Type de la ressource
     this._type = type;
+
+    // Version de la ressource 
+    this._version = version;
 
     // Opérations disponibles sur la ressource
     this._operations = operations;
@@ -53,6 +57,17 @@ module.exports = class Resource {
   */
   get type () {
     return this._type;
+  }
+
+  /**
+  *
+  * @function
+  * @name get version
+  * @description Récupérer la version de la resource
+  *
+  */
+  get version () {
+    return this._version;
   }
 
   /**

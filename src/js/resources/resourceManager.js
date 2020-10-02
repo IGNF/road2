@@ -107,6 +107,18 @@ module.exports = class resourceManager {
       }
     }
 
+    // Version 
+    if (!resourceJsonObject.resource.resourceVersion) {
+      LOGGER.error("La ressource ne contient pas de version.");
+      return false;
+    } else {
+      // on vérifie que c'est bien une string 
+      if (typeof resourceJsonObject.resource.resourceVersion !== "string") {
+        LOGGER.error("La version de la ressource n'est pas une chaine de carateres.");
+        return false;
+      }
+    }
+
     // Type
     if (!resourceJsonObject.resource.type) {
       LOGGER.error("La ressource ne contient pas de type.");

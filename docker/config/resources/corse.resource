@@ -3,6 +3,7 @@
   "id": "corse-osm",
   "type": "osrm",
   "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
+  "resourceVersion": "2020-09-28 09:45:09.875101",
   "topology": {
     "id": "corse-osm",
     "type": "osm",

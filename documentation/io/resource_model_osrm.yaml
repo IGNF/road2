@@ -18,6 +18,10 @@
 		"description":
 			type: string
       required: true
+    # Version de la ressource. C'est généralement la date de génération de cette ressource. 
+    "resourceVersion"
+      type: "string"
+      required: true
     # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources).
 		"topology":
 			type: object
