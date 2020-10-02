@@ -701,11 +701,22 @@ module.exports = class pgrSource extends Source {
             // point qui n'intersecte pas l'antépenultième tronçon (sinon ce dernier serait le penultième)
             } else {
               const thirdToLastLine = currentPgrRouteLeg.steps[k - 2].geometry.coordinates;
-              // L'array suivant n'a qu'une seule valeur, sauf dans un cas très précis de réseau non réel
-              // de deux boucles imbriquées
-              const firstThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine)[0];
-              if (gisManager.arraysEquals(firstThirdIntersection, lastSecIntersection[0])) {
-                common_point = lastSecIntersection[1];
+              // Soit l'array suivant n'a qu'une seule valeur (sauf cas imaginaires), soit lastLine
+              // et thirdToLastLine sont le même tronçon.
+              let last_common_point;
+              const lastThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine);
+              // Premier cas, on prend l'unique valeur.
+              if (lastThirdIntersection.length === 1) {
+                last_common_point = lastThirdIntersection[0];
+                if (gisManager.arraysEquals(last_common_point, lastSecIntersection[0])) {
+                  common_point = lastSecIntersection[1];
+                } else {
+                  common_point = lastSecIntersection[0];
+                }
+              // Second cas, last et thirdToLast sont identiques
+              // Hypothèse : n'arrive que dans une configuration à 2 tronçons à sens unique
+              // Si l'hypothèse est vraie, alors il faut prendre l'autre point que pour le
+              // début de leg.
               } else {
                 common_point = lastSecIntersection[0];
               }
