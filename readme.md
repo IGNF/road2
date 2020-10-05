@@ -1,40 +1,40 @@
 # Road2
 
-Road2 est un serveur de calcul d'itinéraire écrit avec NodeJS. Ce serveur propose le calcul d'itinéraires via des moteurs existants, comme OSRM ou PGRouting. Road2 est donc une interface pour moteurs de calculs d'itinéraires. Les calculs ne sont pas fait dans le code mais via l'appel à des librairies. 
+Road2 est un serveur de calcul d'itinéraire écrit avec NodeJS. Ce serveur propose le calcul d'itinéraires via des moteurs existants, comme OSRM ou PGRouting. Road2 est donc une interface pour moteurs de calculs d'itinéraires. Les calculs ne sont pas fait dans le code mais via l'appel à des librairies.
 
-Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs, pour les calculs, et de nouvelles APIs, pour accéder au service. 
+Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs, pour les calculs, et de nouvelles APIs, pour accéder au service.
 
-## Installation 
+## Installation
 
-Cette partie détaille l'installation sur un serveur. Pour des tests rapides sur des données déjà intégrées, utilisez les images docker de Road2 sur [Centos](./docker/centos/readme.md) ou [Debian](./docker/debian/readme.md), ou encore via [docker-compose](./docker/readme.md). 
+Cette partie détaille l'installation sur un serveur. Pour des tests rapides sur des données déjà intégrées, utilisez les images docker de Road2 sur [Centos](./docker/centos/readme.md) ou [Debian](./docker/debian/readme.md), ou encore via [docker-compose](./docker/readme.md).
 
-### Pré-recquis 
+### Pré-recquis
 
-Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.13.0*. 
+Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.13.0*.
 
-Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.22.0*. 
+Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.22.0*.
 
-### Installation des modules 
+### Installation des modules
 
 L'installation des modules est effectuée via NPM. En se plaçant dans la racine du projet:
 ```
 npm install
 ```
 
-### Configuration 
+### Configuration
 
-Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/io/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettants l'instanciation du serveur avec des ressources. 
+Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/io/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettants l'instanciation du serveur avec des ressources.
 
-## Utilisation via Docker 
+## Utilisation via Docker
 
-Il est possible d'utiliser directement des images docker pour tester le serveur. Il existe une image sous [Centos](./docker/centos/readme.md) et une autre pour [Debian](./docker/debian/readme.md). 
+Il est possible d'utiliser directement des images docker pour tester le serveur. Il existe une image sous [Centos](./docker/centos/readme.md) et une autre pour [Debian](./docker/debian/readme.md).
 
-## Utilisation via docker-compose 
+## Utilisation via docker-compose
 
-Il est conseillé d'utiliser [docker-compose](./docker/readme.md) pour tester et développer ce serveur. 
+Il est conseillé d'utiliser [docker-compose](./docker/readme.md) pour tester et développer ce serveur.
 
 ## Versions
 
 Cette version de Road2 fonctionne avec les versions suivantes:
-- route-graph-generator 1.0.02-DEVELOP
-- pgrouting-procedures 1.0.02-DEVELOP
+- route-graph-generator 1.0.01
+- pgrouting-procedures 1.0.02
