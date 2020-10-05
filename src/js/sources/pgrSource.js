@@ -600,6 +600,8 @@ module.exports = class pgrSource extends Source {
       throw errorManager.createError(" No route found ", 404);
     }
 
+    let routeDistance = 0;
+    let routeDuration = 0;
     // routes
     // Il peut y avoir plusieurs itinéraires
     for (let i = 0; i < response.routes.length; i++) {
@@ -613,12 +615,10 @@ module.exports = class pgrSource extends Source {
         throw errorManager.createError(" Error during reprojection of geometry in PGR response. ");
       }
 
-      // On récupère la distance et la durée
-      routes[i].distance = new Distance(Math.round(currentPgrRoute.distance*10)/10,"meter");
-      routes[i].duration = new Duration(Math.round(currentPgrRoute.duration*10)/10,"second");
-
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       let newRouteGeomCoords = [];
+      let portionDistance = 0;
+      let portionDuration = 0;
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
         let newPortionGeomCoords = [];
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
@@ -634,15 +634,16 @@ module.exports = class pgrSource extends Source {
         }
 
         portions[j] = new Portion(legStart, legEnd);
-        // On récupère la distance et la durée
-        portions[j].distance = new Distance(Math.round(currentPgrRouteLeg.distance*10)/10,"meter");
-        portions[j].duration = new Duration(Math.round(currentPgrRouteLeg.duration*10)/10,"second");
 
         let steps = new Array();
 
         // On va associer les étapes à la portion concernée
         for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
           let currentPgrRouteStep = deepCopy(currentPgrRouteLeg.steps[k]);
+
+          // Pour le calcul de la portion véritablement parcourue (fin et début de leg)
+          let currentPgrRouteStepDistance = turf.length(currentPgrRouteStep.geometry);
+
           // Troncature de la géométrie : cas où il n'y a qu'un step
           if (k == 0 && currentPgrRouteLeg.steps.length == 1){
             let stepStart = turf.point(response.waypoints[j].location);
@@ -658,6 +659,7 @@ module.exports = class pgrSource extends Source {
                 {precision: 6}
               )
             ).geometry.coordinates;
+
           }
           // Troncature de la géométrie : cas de début de leg
           else if (k == 0){
@@ -734,6 +736,13 @@ module.exports = class pgrSource extends Source {
             ).geometry.coordinates;
           }
 
+          // Pour le calcul de la portion véritablement parcourue (fin et début de leg)
+          // vaut currentPgrRouteStepDistance lorsque le step actuel n'est pas début ni fin de leg
+          let currentPgrRouteStepPortionDistance = turf.length(currentPgrRouteStep.geometry);
+          // Calcul de la portion véritablement parcourue (fin et début de leg) pour la distance et duration
+          // vaut 1 lorsque le step actuel n'est pas début ni fin de leg
+          let currentDistanceRatio = currentPgrRouteStepPortionDistance / currentPgrRouteStepDistance;
+
           newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
 
           steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
@@ -744,10 +753,19 @@ module.exports = class pgrSource extends Source {
           steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
 
           // On récupère la distance et la durée
-          steps[k].distance = new Distance(Math.round(currentPgrRouteStep.distance*10)/10,"meter");
-          steps[k].duration = new Duration(Math.round(currentPgrRouteStep.duration*10)/10,"second");
+          steps[k].distance = new Distance(Math.round(currentDistanceRatio * currentPgrRouteStep.distance * 10) / 10,"meter");
+          steps[k].duration = new Duration(Math.round(currentDistanceRatio * currentPgrRouteStep.duration * 10) / 10,"second");
 
+          portionDistance += currentDistanceRatio * currentPgrRouteStep.distance;
+          portionDuration += currentDistanceRatio * currentPgrRouteStep.distance;
         }
+
+        // On récupère la distance et la durée
+        portions[j].distance = new Distance(Math.round(portionDistance * 10) / 10,"meter");
+        portions[j].duration = new Duration(Math.round(portionDuration * 10) / 10,"second");
+
+        routeDistance += portionDistance;
+        routeDuration += portionDuration;
 
         let newLegDissolvedCoords = gisManager.geoJsonMultiLineStringCoordsToSingleLineStringCoords(newPortionGeomCoords);
         newRouteGeomCoords.push(...newLegDissolvedCoords);
@@ -760,6 +778,10 @@ module.exports = class pgrSource extends Source {
         }
 
       }
+
+      // On récupère la distance et la durée
+      routes[i].distance = new Distance(Math.round(routeDistance * 10) / 10,"meter");
+      routes[i].duration = new Duration(Math.round(routeDuration * 10) / 10,"second");
 
       currentPgrRoute.geometry.coordinates = newRouteGeomCoords;
       routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", this._topology.projection);
