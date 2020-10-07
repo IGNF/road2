@@ -1,146 +1,146 @@
-# Description d'un fichier de configuration de ressource OSRM
+# Description d'un fichier des ressources OSRM pour Road2
 
-# Une ressource est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
+
+# Information sur la ressource générée. La plupart de ces informations permettront de générer le fichier de ressource utilisable par l'application de calcul d'itinéraire.
 "resource":
-	type: object
+  type: object
   required: true
-	properties:
-    # Id de la ressource. C'est l'id qui apparaîtra dans le getcap et sera utilisé pour les requêtes.
-		"id":
-			type: string
+  properties:	
+    # Id de la ressource
+    "id":
+      type: string
       required: true
-    # Type de la ressource: osmr ou pgr. Selon le type, différentes informations seront alors attendues.
-		"type":
-			type: string
+    # Type de la ressource, osrm dans ce cas
+    "type":
+      type: string
       required: true
-			enum: ["osrm"]
-    # Description de la ressource qui apparaîtra dans le getcap.
-		"description":
-			type: string
+    # Description de la ressource
+    "description":
+      type: string
       required: true
     # Version de la ressource. C'est généralement la date de génération de cette ressource. 
     "resourceVersion"
       type: "string"
       required: true
-    # Une ressource correspond à une topologie et plusieurs calculs de coûts (qui seront dans les sources).
-		"topology":
-			type: object
+    # Informations sur la topologie de la ressource
+    "topology":
+      type: object
       required: true
-			properties:
-        # Description de la topologie. Permet de savoir sur quelle topologie se base cette ressource. Cela est utile pour l'utilisateur et l'administrateur.
-				"description":
-					type: string
+      properties:
+        # id de la topologie, utile pour la charger une seule fois dans Road2
+        "id":
+          type: string
           required: true
-        # Bbox dans laquelle les requêtes seront autorisées. Cette bbox doit être exprimée dans la projection d'origine des données.
+        # Type de la topologie
+        "type":
+          type: string
+          required: true
+        # Description de la topologie
+        "description":
+          type: string
+          required: true
+        # Stockage de la topologie
+        "storage":
+          $ref: "#/components/schemas/storage"
+          required: true
+        # Projection des données sources
+        "projection":
+          type: string
+          required: true
+        # Bbox des données de la topologie, pas nécessairement la même que pour la ressource 
         "bbox":
           type: string
-          required: true
-        # Projection de diffusion par défaut
-        "projection":
-          type: string
-          required: true
-        # Permet de savoir où est stocké la topologie utilisée. Cela est utile uniquement pour l'administrateur.
-        "storage":
-					$ref: "#/components/schemas/storage"
-          required: false
-        # Projection d'origine des données
-        "projection":
-          type: string
-          required: true
-    # Liste des sources permettants de construire la ressource.
-		"sources":
-			type: array
+          required: true 
+    # Liste des sources qui vont être générées 
+    "sources":
+      type: array 
       required: true
-			minItems: 1
-			items:
-				type: object
-				properties:
-          # Id de la source
-					"id":
-						type: string
-            required: true
-          # Type de la source
-					"type":
-						type: string
-            required: true
-          # Le storage indique ou se trouve le fichier .osrm (ce peut être un fichier ou un objet ceph)
-					"storage":
-						$ref: "#/components/schemas/storage"
-            required: true
-          # A chaque .osrm correspond un coût, soit un mode de déplacement et une optimisation combinée.
-					"cost":
-						type: object
-            required: true
-						properties:
-              # Mode de déplacement
-							"profile":
-								type: string
-                required: true
-              # Optimisation
-							"optimization":
-								type: string
-                required: true
-              # Indique où se trouve le fichier .lua qui a permis de générer le .osrm
-							"compute":
-								type: object
-                required: false
-								properties:
-									"storage":
-										$ref: "#/components/schemas/storage"
-                    required: true
-                  # Indique ou se trouve le fichier json qui a permis de générer le lua
-                  "configuration":
-                    type: object
-                    required: false
-                    properties:
-                      # Nom de la propriété qui est utilisé dans le fichier json
-                      "name":
-                        type: string
-                        required: true
-                      "storage":
-                        $ref: "#/components/schemas/storage"
-                        required: true
-    # Liste des opérations rendus disponibles
-		"availableOperations":
-			type: array
-      required: true
-			minItems: 1
-      uniqueItems: true
-			items:
+      minItems: 1
+      items:
         type: object
         properties:
-          # Id de l'opération
+          # id de la source, utile pour la charger une seule fois dans Road2.  
           "id":
             type: string
-          # Tableau des parametres de l'opération
-          "parameters":
-            type: array
-            items:
-              type: object
-              properties:
-                # Id du paramètre
-                "id":
+            required: true
+          # Type de la source, ici ce doit être osrm
+          "type":
+            type: string
+            required: true
+          # Stockage de la source, du .osrm en l'occurence
+          "storage":
+            $ref: "#/components/schemas/storage"
+            required: true
+          # Coûts calculés sur la topologie précisée précedemment. On peut en avoir plusieurs. 
+          "cost":
+            type: object
+            required: true
+            properties:
+                # Chaque coût correspond à un profil
+                "profile":
                   type: string
                   required: true
-                # Valeur par défaut
-                "defaultValueContent":
+                # Chaque coût correspond à un profil
+                "optmization":
                   type: string
-                  required: false
-                # Valeurs possibles
-                "values":
-                  required: false
-                  type:
-                    oneOf:
-                      - array
-                      - string
-                      - object
+                  required: true
+                # Fichier permettant de calculer le coût
+                "compute":
+                  type: object
+                  required: true
+                  properties:
+                    # Stockage du fichier permettant de calculer le coût
+                    "storage":
+                      $ref: "#/components/schemas/storage"
+                # Configuration pour le calcul des couts 
+                "configuration":
+                  type: object 
+                  required: false 
+                  properties:
+                    # Nom du coût dans le fichier de configuration 
+                    "name":
+                      type: string 
+                      required: true
+                    # Stockage du fichier de calcul des couts. C'est un JSON. 
+                    "storage":
+                      $ref: "#/components/schemas/storage"
+    # Informations sur les opérations autorisées sur la ressource qui va être générée. 
+    "availableOperations":
+      type: array
+      required: true
+      minItems: 1
+      items:
+        # Id de l'opération
+        "id":
+          type: string 
+          required: true 
+        # Paramètres de l'opération 
+        "parameters":
+          type: array
+          required: true
+          items:
+            type: object 
+            properties:
+              # Id du parametre
+              "id":
+                type: string
+                required: true
+              # Valeur par défaut possible pour ce parametre
+              "defaultValueContent":
+                type: string 
+                required: false 
+              # Valeurs possibles pour ce parametre
+              "values":
+                type: string or array or object 
+                required: true
+				
 components:
   schemas:
     # storage d'un document: fichier ou ceph
   	"storage":
   		type: object
   		properties:
-        # Fichier
-				- "file":
-						type: string
-            required: false
+        	# Fichier 
+  			"file":
+  				type: string
+            	required: false
