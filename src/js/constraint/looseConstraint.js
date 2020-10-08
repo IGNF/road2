@@ -165,6 +165,31 @@ module.exports = class LooseConstraint extends Constraint {
     let conditionsArray = [];
     let costRatios = [];
 
+    // S'il n'y a qu'une condition, le traitement est différent et plus simple
+    if (looseConstraints.length === 1) {
+      let constraintCondition = looseConstraints[0]._toSqlCondition();
+      let resultString = '';
+      resultString += ' WHEN ';
+      resultString += constraintCondition;
+      resultString += ' THEN ';
+      resultString += looseConstraints[0].costRatio;
+      resultString += ' * ';
+
+      costResultingString += resultString;
+      costResultingString += costname;
+      costResultingString += ' ELSE ';
+      costResultingString += costname;
+      costResultingString += ' END';
+
+      rcostResultingString += resultString;
+      rcostResultingString += rcostname;
+      rcostResultingString += ' ELSE ';
+      rcostResultingString += rcostname;
+      rcostResultingString += ' END';
+
+      return [costResultingString, rcostResultingString]
+    }
+
     // Fonction pour produit cartésien entre tableaux (https://stackoverflow.com/questions/12303989/cartesian-product-of-multiple-arrays-in-javascript)
     let f = (a, b) => [].concat(...a.map(a => b.map(b => [].concat(a, b))));
     let cartesian = (a, b, ...c) => b ? cartesian(f(a, b), ...c) : a;
@@ -180,13 +205,6 @@ module.exports = class LooseConstraint extends Constraint {
       let constraintCondition = currentConstraint._toSqlCondition();
       conditionsArray.push([constraintCondition, 'NOT(' + constraintCondition + ')']);
       costRatios.push([currentConstraint.costRatio, 1]);
-    }
-
-    // S'il n'y a qu'une condition, il faut ajouter une dimension au tableau pour que la fonction
-    // de produit cartesien fonctionne corectemment.
-    if (conditionsArray.length === 1) {
-      conditionsArray = [conditionsArray];
-      costRatios = [costRatios];
     }
 
     const conditionsCombinations = cartesian(...conditionsArray);
