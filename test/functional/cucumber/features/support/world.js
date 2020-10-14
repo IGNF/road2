@@ -124,7 +124,17 @@ class road2World {
         
         let arrayParameters = new Array();
         for(let i = 0; i < valuesToAdd.length; i++) {
-            arrayParameters.push(valuesToAdd[i].value)
+            arrayParameters.push(valuesToAdd[i].value);
+        }
+        this._body[key] = arrayParameters;
+        
+    }
+
+    setTableOfObjectParameters(key, valuesToAdd) {
+        
+        let arrayParameters = new Array();
+        for(let i = 0; i < valuesToAdd.length; i++) {
+            arrayParameters.push(JSON.parse(valuesToAdd[i].value));
         }
         this._body[key] = arrayParameters;
         
@@ -291,6 +301,31 @@ class road2World {
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
                 
                 if (jsonValue) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } catch(error) {
+                return false;
+            }
+            
+        }
+        
+        return false;
+
+    }
+
+    checkResponseAttributString(key) {
+
+        if (this.checkHeaderContent("content-type","application/json")) {
+            try {
+
+                let responseJSON = JSON.parse(this._response);
+
+                let jsonValue = this.getJsonContentByKey(responseJSON, key);
+                
+                if (typeof jsonValue === "string") {
                     return true;
                 } else {
                     return false;
