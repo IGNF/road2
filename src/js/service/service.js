@@ -454,10 +454,9 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name loadOperations
+  * @name loadProjections
   * @description Chargement des opérations
-  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
-  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
+  * @param {string} projectionsDirectory - Dossier contenant les projections à charger
   *
   */
 
@@ -526,7 +525,7 @@ module.exports = class Service {
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
           if (!this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)) {
-            LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+            LOGGER.error("Erreur lors du chargement de la ressource: " + resourceFile);
           } else {
             // Création de la ressource
             this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
@@ -535,7 +534,7 @@ module.exports = class Service {
 
         } catch (error) {
           LOGGER.error(error);
-          LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
+          LOGGER.error("Erreur lors de la lecture de la ressource: " + resourceFile);
         }
 
       });

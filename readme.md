@@ -12,7 +12,7 @@ Cette partie détaille l'installation sur un serveur. Pour des tests rapides sur
 
 Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.13.0*.
 
-Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.22.0*.
+Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.23.0*.
 
 ### Installation des modules
 

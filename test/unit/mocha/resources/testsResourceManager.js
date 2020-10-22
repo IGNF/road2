@@ -19,7 +19,7 @@ describe('Test de la classe ResourceManager', function() {
         "corse-latest.osrm": "",
         "corse-latest.osm.pbf": "",
       },
-      "/home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles": {
+      "/home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles": {
         "car.lua": "",
       },
     });
@@ -56,7 +56,7 @@ describe('Test de la classe ResourceManager', function() {
           "optimization": "fastest",
           "compute": {
             "storage": {
-              "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua"
+              "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua"
             }
           }
         }

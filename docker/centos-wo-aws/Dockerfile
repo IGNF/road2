@@ -48,7 +48,6 @@ RUN scl enable devtoolset-8 bash && export CXX=/opt/rh/devtoolset-8/root/usr/bin
 
 ### Installation de gcc 6.2.0 pour compiler OSRM 
 WORKDIR /home/docker/gcc
-# TODO: essayer avec gcc 6.3.1 
 RUN git clone -b releases/gcc-6.3.0 --depth 1 https://gcc.gnu.org/git/gcc.git
 # C'est volontairement en dehors des sources de gcc (voir documentation)
 WORKDIR /home/docker/gcc/objdir
@@ -74,19 +73,28 @@ RUN make linux test && make linux install
 # https://github.com/door2door-io/osrm-express-server-demo
 # https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
 WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.22.0.zip && unzip v5.22.0.zip -d ./osrm-backend
-WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.23.0.zip && unzip v5.23.0.zip -d ./osrm-backend
+WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/
 RUN npm install --production 
-WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/build 
+WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/build 
 # https://developers.redhat.com/blog/2015/02/05/gcc5-and-the-c11-abi/
 RUN export CC=/opt/gcc-6/home/docker/gcc/objdir/bin/gcc && export CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=OFF -DCMAKE_CXX_COMPILER=/opt/gcc-6/home/docker/gcc/objdir/bin/g++ -DENABLE_NODE_BINDINGS=ON && make -j4 && make install
 # https://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.how_to_set_paths
 ENV LD_LIBRARY_PATH=/opt/gcc-6/home/docker/gcc/objdir/lib64:$LD_LIBRARY_PATH
+
+### Dossier de l'application
+WORKDIR /home/docker/osrm/nodejs-binding/osrm-5.23.0/
+# Création du module node osrm 
+RUN mkdir lib && mkdir node_modules && cp -r ../../osrm-backend/osrm-backend-5.23.0/lib/* lib/ && \
+    cp /usr/lib64/libtbb* lib/binding/ && cp -r ../../osrm-backend/osrm-backend-5.23.0/node_modules/* ./node_modules && \
+    cp ../../osrm-backend/osrm-backend-5.23.0/package* ./ && cp ../../osrm-backend/osrm-backend-5.23.0/taginfo.json ./ && \
+    tar -cvzf ../osrm-5.23.0.tgz ./
+
 ### Dossier des données
 WORKDIR /home/docker/internal
 
 ### Récupération de données sur la Corse
-RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf && osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua && osrm-contract corse-latest.osrm
+RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf && osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua && osrm-contract corse-latest.osrm
 
 ### Dossier contenant la configuration
 WORKDIR /home/docker/config
@@ -106,10 +114,8 @@ COPY /test ./test/
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 # https://expressjs.com/fr/starter/installing.html
-RUN sed -i 's/"\s*osrm\s*"\s*:\s*".*",//g' package.json
+RUN sed -i 's/"\s*osrm\s*"\s*:\s*".*",/"osrm":"\/home\/docker\/osrm\/nodejs-binding\/osrm-5\.23\.0\.tgz",/g' package.json
 RUN npm install 
-# Installation du module node osrm 
-RUN mkdir -p osrm/lib && mkdir osrm/node_modules && cp -r ../osrm/osrm-backend/osrm-backend-5.22.0/lib/* osrm/lib/ && cp /usr/lib64/libtbb* osrm/lib/binding/ && cp -r ../osrm/osrm-backend/osrm-backend-5.22.0/node_modules/* ./osrm/node_modules && cp ../osrm/osrm-backend/osrm-backend-5.22.0/package* ./osrm/ && cp ../osrm/osrm-backend/osrm-backend-5.22.0/taginfo.json ./osrm/ && mv osrm ./node_modules/
 
 ### Installation de mocha pour les tests
 # https://mochajs.org/#installation

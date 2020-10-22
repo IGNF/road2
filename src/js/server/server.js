@@ -65,7 +65,7 @@ module.exports = class Server {
 
         this._server = https.createServer(optionsContent, this._app);
       } catch (err) {
-        LOGGER.fatal("Impossible de lire les cerrificats")
+        LOGGER.fatal("Impossible de lire les certificats")
         throw errorManager.createError("Certificate not found");
       }
 
