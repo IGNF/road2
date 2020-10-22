@@ -186,8 +186,7 @@ module.exports = class topologyManager {
       LOGGER.info("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
     } else {
       if (!storageManager.checkJsonStorage(topologyJsonDescription.storage)) {
-        LOGGER.error("Stockage de la topologie incorrect.");
-        return false;
+        LOGGER.warn("Stockage de la topologie incorrect.");
       } else {
         // rien à faire
       }

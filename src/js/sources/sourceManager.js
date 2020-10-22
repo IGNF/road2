@@ -389,8 +389,7 @@ module.exports = class sourceManager {
           return false;
         } else {
           if (!storageManager.checkJsonStorage(sourceJsonObject.cost.compute.storage)) {
-            LOGGER.error("La ressource contient une source ayant un stockage du cout incorrect.");
-            return false;
+            LOGGER.warn("La ressource contient une source ayant un stockage du cout incorrect.");
           } else {
             // rien à faire
           }
