@@ -14,6 +14,7 @@ const TopologyManager = require('../topology/topologyManager');
 const ProjectionManager = require('../geography/projectionManager');
 const ServerManager = require('../server/serverManager');
 const log4js = require('log4js');
+const pkg = require('../../../package.json');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -700,7 +701,7 @@ module.exports = class Service {
     }
 
     road2.all('/', (req, res) => {
-      res.send('Road2 is running !! \n');
+      res.send('Road2 ' + pkg.version);
     });
 
     // Création des serveurs

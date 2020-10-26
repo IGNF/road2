@@ -9,7 +9,7 @@ Feature: Road2
     Given an "HTTP" "GET" request on "/"
     When I send the request 
     Then the server should send a response with status 200
-    And the response should contain "Road2 is running"
+    And the response should contain "Road2"
 
   Scenario: API simple 1.0.0
     Given an "HTTP" "GET" request on "/simple/1.0.0/"
