@@ -90,10 +90,14 @@ module.exports = class FloatParameter extends ResourceParameter {
     let userFloat;
     /* Vérifier que la valeur introduite est de type float. */
     if(typeof userValue === "string") {
-      userFloat = parseFloat(userValue);
+      userFloat = this.filterFloat(userValue);
       if (isNaN(userFloat)) {
         return false;
-      } 
+      }
+      // TODO: la fonction isFinite() ne fonctionne pas...
+      if (userFloat === Infinity || userFloat === -Infinity) {
+        return false;
+      }
     } else if (typeof userValue === "number") {
       userFloat = userValue;
     } else {
@@ -125,6 +129,26 @@ module.exports = class FloatParameter extends ResourceParameter {
 
     return parseFloat(userValue);
 
+  }
+
+  /**
+  *
+  * @function
+  * @name filterFloat
+  * @description Convertir une valeur en float
+  * @param {string} value - Valeur à convertir
+  * @return {float}
+  *
+  */
+
+  filterFloat(value) {
+
+    if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value)) {
+      return Number(value);
+    } else {
+      return NaN;
+    }
+    
   }
 
 
