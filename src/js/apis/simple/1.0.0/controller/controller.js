@@ -420,6 +420,8 @@ module.exports = {
           if (distance.convert("meter") === true) {
             costValue = distance.value;
           }
+        } else {
+          throw errorManager.createError("Parameter 'costType' not found.", 400);
         }
       }
     }

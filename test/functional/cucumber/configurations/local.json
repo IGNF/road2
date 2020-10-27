@@ -9,6 +9,31 @@
                 "start": "9.449347257614134,42.563930726519345",
                 "end": "9.448360204696655,42.567660375593306"
             }
+        },
+        {
+            "id": "route-osrm",
+            "parameters": {
+                "resource": "bduni-idf-osrm",
+                "start": "2.333865,48.881989",
+                "end": "2.344851,48.872393"
+            }
+        },
+        {
+            "id": "route-pgr",
+            "parameters": {
+                "resource": "bduni-idf-pgr",
+                "start": "2.333865,48.881989",
+                "end": "2.344851,48.872393"
+            }
+        },
+        {
+            "id": "isochrone",
+            "parameters": {
+                "resource": "bduni-idf-pgr",
+                "point": "2.333865,48.881989",
+                "costValue": "100",
+                "costType": "time"
+            }
         }
     ]
 }

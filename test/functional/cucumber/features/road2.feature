@@ -406,6 +406,52 @@ Feature: Road2
     And the response should have an header "content-type" with value "application/json"
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with query parameters:
+      | key            | value             |
+      | waysAttributes | name \| name      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with table parameters for "waysAttributes":
+      | value     |
+      | name      |
+      | name      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+
+Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with query parameters:
+      | key            | value             |
+      | waysAttributes | name \| test      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with table parameters for "waysAttributes":
+      | value     |
+      | name      |
+      | test      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+
     
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getBbox=true
     Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
@@ -903,3 +949,24 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec plusieurs fois le start 
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with "&start=9.449347257614130,42.563930726519340" at the end of the url
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'start' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec plusieurs fois le start 
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with table parameters for "start":
+      | value                                    |
+      | 9.449347257614130,42.563930726519340     |
+      | 9.449347257614135,42.563930726519345     |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'start' is invalid"

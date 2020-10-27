@@ -53,6 +53,9 @@ class road2World {
         // header de la réponse
         this._header = {}; 
 
+        //chaine aditionnelle pour l'url
+        this._adendumUrl = "";
+
     }
 
     loadConfiguration() {
@@ -140,6 +143,12 @@ class road2World {
         
     }
 
+    setStringToUrl(key) {
+
+        this._adendumUrl = this._adendumUrl + key;
+
+    }
+
     sendRequest() {
 
         let finalOptions = {};
@@ -151,6 +160,7 @@ class road2World {
             for(let param in this._body) {
                 finalUrl +=  "&" + param + "=" + this._body[param].toString();
             }
+            finalUrl += this._adendumUrl;
 
             // Retour d'une promesse pour gérer l'asynchronisme du http.get
             return new Promise ( (resolve, reject) => {
@@ -185,7 +195,7 @@ class road2World {
 
             finalOptions = {
                 protocol: this._protocol.toLowerCase()+":",
-                host: this._url,
+                host: this._url + this._adendumUrl,
                 port: this._port,
                 path: this._path,
                 method: "POST",
