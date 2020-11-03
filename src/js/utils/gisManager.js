@@ -40,14 +40,14 @@ module.exports = {
   /**
   *
   * @function
-  * @name arrays_intersection
+  * @name arraysIntersection
   * @description Retourne l'intersection entre 2 arrays d'arrays
   * @param {Array} arr1 - array
   * @param {Array} arr2 - array
   * @return {Array} - intersection entre les arrays
   *
   */
-  arrays_intersection: function(arr1, arr2) {
+  arraysIntersection: function(arr1, arr2) {
     const result = [];
     for (let arr_a of arr1) {
       for (let arr_b of arr2) {
@@ -99,7 +99,7 @@ module.exports = {
     let common_point;
 
     // TODO: à factoriser avec pgrSource
-    const firstSecIntersection = this.arrays_intersection(firstLine, secondLine);
+    const firstSecIntersection = this.arraysIntersection(firstLine, secondLine);
     // S'il n'y a qu'une intersection, on la prend
     if (firstSecIntersection.length === 1){
       common_point = firstSecIntersection[0];
@@ -115,7 +115,7 @@ module.exports = {
       const thirdLine = srcCoords[2];
       // L'array suivant n'a qu'une seule valeur, sauf dans un cas très précis de réseau non réel
       // de deux boucles imbriquées
-      const firstThirdIntersection = this.arrays_intersection(firstLine, thirdLine)[0];
+      const firstThirdIntersection = this.arraysIntersection(firstLine, thirdLine)[0];
       if (this.arraysEquals(firstThirdIntersection, firstSecIntersection[0])) {
         common_point = firstSecIntersection[1];
       } else {

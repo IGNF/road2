@@ -669,7 +669,7 @@ module.exports = class pgrSource extends Source {
               turf.truncate(
                 turf.lineSlice(
                   stepStart,
-                  gisManager.arrays_intersection(
+                  gisManager.arraysIntersection(
                     currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
                     currentPgrRouteStep.geometry.coordinates
                   )[0],
@@ -689,7 +689,7 @@ module.exports = class pgrSource extends Source {
             const secondToLastLine = currentPgrRouteLeg.steps[k - 1].geometry.coordinates;
             let common_point;
 
-            const lastSecIntersection = gisManager.arrays_intersection(lastLine, secondToLastLine);
+            const lastSecIntersection = gisManager.arraysIntersection(lastLine, secondToLastLine);
             // S'il n'y a qu'une intersection, on la prend
             if (lastSecIntersection.length === 1){
               common_point = lastSecIntersection[0];
@@ -706,7 +706,7 @@ module.exports = class pgrSource extends Source {
               // Soit l'array suivant n'a qu'une seule valeur (sauf cas imaginaires), soit lastLine
               // et thirdToLastLine sont le même tronçon.
               let last_common_point;
-              const lastThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine);
+              const lastThirdIntersection = gisManager.arraysIntersection(lastLine, thirdToLastLine);
               // Premier cas, on prend l'unique valeur.
               if (lastThirdIntersection.length === 1) {
                 last_common_point = lastThirdIntersection[0];
