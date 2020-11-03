@@ -19,7 +19,7 @@ module.exports = class Resource {
   * @param {string} id - Id de la ressource
   * @param {string} type - Type de la ressource
   * @param {string} version - Version de la ressource
-  * @param {object} operations - Objet contenant les opérations disponibles sur la ressource
+  * @param {object} operations - Objet contenant les opérations disponibles sur la ressource (classes ResourceOperation)
   *
   */
   constructor(id, type, version, operations) {

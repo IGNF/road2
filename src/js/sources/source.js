@@ -18,7 +18,7 @@ module.exports = class Source {
   * @description Constructeur de la classe source
   * @param {string} id - Identifiant de la source
   * @param {string} type - Type de la source
-  * @param {Topology} topology - Topologie dont dérive la source
+  * @param {Topology} topology - Topologie dont dérive la source (classe fille de topology)
   *
   */
   constructor(id, type, topology) {

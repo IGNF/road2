@@ -191,7 +191,7 @@ module.exports = class Parameter  {
   /**
   *
   * @function
-  * @name get example
+  * @name set example
   * @description Attribuer l'exemple du paramètre
   * @param {string} value - Exemple
   *
@@ -203,7 +203,7 @@ module.exports = class Parameter  {
   /**
   *
   * @function
-  * @name get min
+  * @name set min
   * @description Attribuer le nombre minimal d'occurence du paramètre
   * @param {string} value - Minimum
   *
@@ -215,7 +215,7 @@ module.exports = class Parameter  {
   /**
   *
   * @function
-  * @name get max
+  * @name set max
   * @description Attribuer le nombre maximal d'occurence du paramètre
   * @param {string} value - Maximum
   *
@@ -227,7 +227,7 @@ module.exports = class Parameter  {
   /**
   *
   * @function
-  * @name get explode
+  * @name set explode
   * @description Attribuer l'explode du paramètre
   * @param {string} value - Explode
   *
@@ -239,7 +239,7 @@ module.exports = class Parameter  {
   /**
   *
   * @function
-  * @name get style
+  * @name set style
   * @description Attribuer le style du paramètre
   * @param {string} value - Style
   *
