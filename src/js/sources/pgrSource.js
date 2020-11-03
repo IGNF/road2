@@ -14,7 +14,7 @@ const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const simplify = require('../utils/simplify');
-const deepCopy = require('../utils/deepCopy');
+const copyManager = require('../utils/copyManager');
 const turf = require('@turf/turf');
 const LooseConstraint = require('../constraint/looseConstraint');
 
@@ -639,7 +639,7 @@ module.exports = class pgrSource extends Source {
 
         // On va associer les étapes à la portion concernée
         for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
-          let currentPgrRouteStep = deepCopy(currentPgrRouteLeg.steps[k]);
+          let currentPgrRouteStep = copyManager.deepCopy(currentPgrRouteLeg.steps[k]);
 
           // Pour le calcul de la portion véritablement parcourue (fin et début de leg)
           let currentPgrRouteStepDistance = turf.length(currentPgrRouteStep.geometry);
