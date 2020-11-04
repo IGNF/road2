@@ -244,19 +244,12 @@ module.exports = class sourceManager {
             }
 
           } else {
-            // on continue de vérifier
+            // on continue la boucle de vérification
           }
-        }
-
-        if (!present) {
-          this._listOfSourceIds.push(sourceJsonObject.id);
-          this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
         }
 
       } else {
         // C'est la première source.
-        this._listOfSourceIds.push(sourceJsonObject.id);
-        this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
       }
     }
 
@@ -328,6 +321,9 @@ module.exports = class sourceManager {
         return false;
       }
     }
+
+    this._listOfSourceIds.push(sourceJsonObject.id);
+    this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
 
     LOGGER.info("Fin de la verification de la source.");
     return true;
