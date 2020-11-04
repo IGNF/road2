@@ -34,8 +34,8 @@ On trouvera donc les classes ou les fichiers suivants:
 - errorManager
 - gisManager
 - processManager (log4js)
-- simplify.js
-- storageManager (log4js)*
+- simplify.js //TODO
+- storageManager (log4js)
 
 ## Tests d'intégration
 
