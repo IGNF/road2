@@ -9,7 +9,7 @@ var router = express.Router();
 
 // Accueil de l'API
 router.all("/", function(req, res) {
-  res.send("Road2 via l'API simple 1.0.0");
+  res.send("success");
 });
 
 module.exports = router;

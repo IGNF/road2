@@ -8,7 +8,7 @@ const TopologyManager = require('../../../../src/js/topology/topologyManager');
 const ServerManager = require('../../../../src/js/server/serverManager');
 const Resource = require('../../../../src/js/resources/resource');
 const Source = require('../../../../src/js/sources/source');
-const logManager = require('../logManager');
+const logManager = require('../../../unit/mocha/logManager');
 const path = require('path');
 const fs = require('fs');
 

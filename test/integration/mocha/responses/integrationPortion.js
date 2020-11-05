@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Portion = require('../../../../src/js/responses/portion');
 const Step = require('../../../../src/js/responses/step');
-const logManager = require('../logManager');
+const logManager = require('../../../unit/mocha/logManager');
 
 describe('Test de la classe Portion', function() {
 

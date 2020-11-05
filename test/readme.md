@@ -42,8 +42,8 @@ On trouvera donc les classes ou les fichiers suivants:
 C'est l'approche bottom-up qui a été choisie. On va tester les classes qui dépendent d'une autre pour fonctionner. On testera donc les classes suivantes dans l'ordre indiqué:
 
 - Premier niveau:
-    - apiManager (ExpressJS, api, log4js) 
-    - baseManager (base, log4js)
+    - apiManager (ExpressJS, api, log4js)
+    - baseManager (base, log4js)*
     - looseConstraint (constraint)
     - line (geometry, proj4, polyline)
     - point (geometry, proj4)

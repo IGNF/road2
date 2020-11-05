@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Line = require('../../../../src/js/geometry/line');
 const proj4 = require('proj4');
-const logManager = require('../logManager');
+const logManager = require('../../../unit/mocha/logManager');
 
 describe('Test de la classe Line', function() {
 
