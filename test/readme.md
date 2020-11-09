@@ -43,13 +43,13 @@ C'est l'approche bottom-up qui a été choisie. On va tester les classes qui dé
 
 - Premier niveau:
     - apiManager (ExpressJS, api, log4js)
-    - baseManager (base, log4js)*
+    - baseManager (base, log4js)
     - looseConstraint (constraint)
     - line (geometry, proj4, polyline)
     - point (geometry, proj4)
     - polygon (geoemtry, turf, proj4, polyline)
     - operation (parameter)
-    - resourceParameter (parameter)
+    - resourceParameter (parameter)*
     - routeRequest (request)
     - isochroneRequest (request)
     - serverManager (server, ExpressJS, log4js)

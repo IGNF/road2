@@ -2,7 +2,6 @@ const assert = require('assert');
 const Operation = require('../../../../src/js/operations/operation');
 const Parameter = require('../../../../src/js/parameters/parameter');
 const logManager = require('../../../unit/mocha/logManager');
-const sinon = require('sinon');
 
 describe('Test de la classe Operation', function() {
 
@@ -11,27 +10,37 @@ describe('Test de la classe Operation', function() {
     logManager.manageLogs();
   });
 
-  // Pour ne pas dépendre de la classe Parameter
-  let serviceParameter = sinon.mock(Parameter);
-  serviceParameter.id = "start";
-
+  let id = "route";
+  let name = "Calcul d'itinéraire";
+  let description = "Calculer un itinéraire";
   let parameters = {};
-  parameters["start"] = serviceParameter;
 
-  let serviceOperation = new Operation("route", "Calcul d'itinéraire", "Calculer un itinéraire", parameters);
+  let paramId = "start";
+  let paramType = "point";
+  let paramName = "Point de départ";
+  let paramDescription = "Point de départ de l'itineraire";
+  let paramRequired = "true";
+  let paramDefaultValue = "false";
+
+  // Pour ne pas dépendre de la classe Parameter
+  let serviceParameter = new Parameter(paramId, paramType, paramName, paramDescription, paramRequired, paramDefaultValue);
+  
+  parameters[paramId] = serviceParameter;
+
+  let serviceOperation = new Operation(id, name, description, parameters);
 
   describe('Test du constructeur et des getters', function() {
 
     it('Get id', function() {
-      assert.equal(serviceOperation.id, "route");
+      assert.equal(serviceOperation.id, id);
     });
 
     it('Get name', function() {
-      assert.equal(serviceOperation.name, "Calcul d'itinéraire");
+      assert.equal(serviceOperation.name, name);
     });
 
     it('Get description', function() {
-      assert.equal(serviceOperation.description, "Calculer un itinéraire");
+      assert.equal(serviceOperation.description, description);
     });
 
     it('Get parameters', function() {
@@ -39,7 +48,7 @@ describe('Test de la classe Operation', function() {
     });
 
     it('getParameterById()', function() {
-      assert.deepEqual(serviceOperation.getParameterById("start"), parameters["start"]);
+      assert.deepEqual(serviceOperation.getParameterById(paramId), parameters[paramId]);
     });
 
   });

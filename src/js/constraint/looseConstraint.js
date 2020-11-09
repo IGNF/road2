@@ -24,7 +24,7 @@ module.exports = class LooseConstraint extends Constraint {
     * @param {string} operator - Opérateur demandé pour la contrainte
     * @param {object} value - Valeur demandée pour la contrainte
     * @param {object} condition - Correspondance de la valeur avec le moteur
-    *
+    * @param {float} costRatio - Ratio utilisé pour modifier les coûts des arcs visés par la contrainte
     */
     constructor(type, key, field, operator, value, condition, costRatio) {
 

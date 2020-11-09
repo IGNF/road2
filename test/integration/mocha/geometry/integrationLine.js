@@ -23,6 +23,18 @@ describe('Test de la classe Line', function() {
          [ 8.76361, 41.95397 ],
          [ 8.76383, 41.9539 ] ] };
 
+  let convertedGeometry = { type: 'LineString',
+  coordinates:
+    [ [ 1178411.3702245904, 6112264.370008742 ],
+      [ 1178414.783047793, 6112274.6641448 ],
+      [ 1178418.1958582269, 6112284.95828151 ],
+      [ 1178425.3291479656, 6112289.944109647 ],
+      [ 1178437.677910604, 6112291.963088431 ],
+      [ 1178447.0367111054, 6112289.299192761 ],
+      [ 1178459.043857622, 6112284.59682449 ],
+      [ 1178477.842686485, 6112278.158974494 ] ]
+  };
+
   let line = new Line(refPolyline, "polyline", "EPSG:4326");
 
   describe('Test du constructeur et des getters/setters', function() {
@@ -59,8 +71,16 @@ describe('Test de la classe Line', function() {
 
   describe('Reprojection des geometries', function() {
 
+    proj4.defs("EPSG:2154", "+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
+
+    it('getLineIn()', function() {
+      let tmpGeometry = line.getLineIn("EPSG:2154", "geojson");
+      assert.deepEqual(tmpGeometry, convertedGeometry);
+      assert.deepEqual(line.geom, "kba_G{ont@QIQIGQA]DUH[Lk@");
+    });
+
     it('transform()', function() {
-      proj4.defs("EPSG:2154", "+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
       assert.deepEqual(line.transform("EPSG:2154"), true);
     });
 

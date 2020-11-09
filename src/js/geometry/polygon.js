@@ -24,7 +24,7 @@ module.exports = class Polygon extends Geometry {
   *
   */
   constructor (geom, format, projection) {
-    super("Polygone", projection);
+    super("polygon", projection);
 
     this._geom = geom;
 
