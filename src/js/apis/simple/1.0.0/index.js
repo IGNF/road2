@@ -25,10 +25,31 @@ router.use(helmet());
 
 // POST
 // ---
-// Pour cette API, on va permettre la lecture des requêtes POST
+// Pour cette API, on va permettre la lecture des requêtes POST en parsant les contenus du type application/json
 router.use(express.json(
-  //TODO: faire une fonction de vérification du JSON pour récupérer les erreurs
-)); // for parsing application/json
+  // Fonctions utilisées pour vérifier le body d'un POST et ainsi récupérer les erreurs
+  {
+    type: (req) => {
+      // Le seul content-type accepté a toujours été application/json, on rend cela plus explicite
+      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct. 
+      // Sans elle, le traitement continue.
+      if (req.get('Content-Type') !== "application/json") {
+        throw errorManager.createError(" Wrong Content-Type. Must be 'application/json' ", 400);
+      } else {
+        return true;
+      }
+    },
+    verify: (req, res, buf, encoding) => {
+      // Cette fonction permet de vérifier que le JSON envoyé est valide. 
+      // Si ce n'est pas le cas, le traitement de la requête est arrêté. 
+      try {
+        JSON.parse(buf);
+      } catch (error) {
+        throw errorManager.createError("Invalid request body. Error during the parsing of the body: " + error.message, 400);
+      }
+    }
+  }
+)); 
 // ---
 
 // Accueil de l'API
