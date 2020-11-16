@@ -93,6 +93,7 @@ module.exports = class Polygon extends Geometry {
 
       return result;
     } else {
+      //TODO: voir si on peut remplacer ce throw par un return {}
       throw errorManager.createError("Unsupported geometry conversion");
     }
   }

@@ -56,6 +56,7 @@ module.exports = class Server {
     this._options = options;
 
     // serveur
+    //TODO: enlever cette partie du constructeur, qu'il ne puisse pas y avoir d'erreurs possibles 
     if (this._enableHttps === "true") {
 
       let optionsContent = {};
