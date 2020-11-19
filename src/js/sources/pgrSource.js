@@ -649,36 +649,42 @@ module.exports = class pgrSource extends Source {
             let stepStart = turf.point(response.waypoints[j].location);
             let stepEnd = turf.point(response.waypoints[j + 1].location);
 
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  stepEnd,
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                stepStart,
+                stepEnd,
+                currentPgrRouteStep.geometry
+              ),
+              {precision: 6}
             ).geometry.coordinates;
 
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
+
           // Troncature de la géométrie : cas de début de leg
           else if (k == 0){
             let stepStart = turf.point(response.waypoints[j].location);
-
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  gisManager.arraysIntersection(
-                    currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
-                    currentPgrRouteStep.geometry.coordinates
-                  )[0],
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                stepStart,
+                gisManager.arrays_intersection(
+                  currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
+                  currentPgrRouteStep.geometry.coordinates
+                )[0],
+                currentPgrRouteStep.geometry
+              ),
+              {precision: 6}
             ).geometry.coordinates;
+
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
+
           // Troncature de la géométrie : cas de fin de leg
           else if (k == currentPgrRouteLeg.steps.length - 1) {
             let stepEnd = turf.point(response.waypoints[j+1].location);
@@ -724,16 +730,19 @@ module.exports = class pgrSource extends Source {
               }
             }
 
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  common_point,
-                  stepEnd,
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                common_point,
+                stepEnd,
+                  urrentPgrRouteStep.geometry
+              ),
+              {precision: 6}
             ).geometry.coordinates;
+
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
 
           // Pour le calcul de la portion véritablement parcourue (fin et début de leg)

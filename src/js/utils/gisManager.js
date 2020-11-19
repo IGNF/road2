@@ -48,7 +48,7 @@ module.exports = {
   *
   */
   arraysIntersection: function(arr1, arr2) {
-    const result = [];
+    let result = [];
     for (let arr_a of arr1) {
       for (let arr_b of arr2) {
         if (this.arraysEquals(arr_a, arr_b)) {
@@ -56,6 +56,8 @@ module.exports = {
         }
       }
     }
+    // Unicité des points d'intersection
+    result = Array.from(new Set(result.map(JSON.stringify))).map(JSON.parse);
     return result;
   },
 
