@@ -5,10 +5,6 @@ services:
     build:
       context: ..
       dockerfile: ./docker/centos-wo-aws/Dockerfile
-      args:
-        - dnsIP=${dns_ip}
-        - dnsHost=${dns_host}
-        - proxy=${proxy}
     image: road2-centos
     container_name: road2-centos-server
     depends_on:
@@ -34,8 +30,6 @@ services:
     build:
       context: ../../route-graph-generator/
       dockerfile: ./docker/centos7/Dockerfile
-      args:
-        - proxy=${proxy}
     image: route-graph-generator-centos
     container_name: route-graph-generator-centos
     depends_on:
@@ -57,7 +51,6 @@ services:
       context: ../../pgrouting-procedures/
       dockerfile: ./docker/centos7/Dockerfile
       args:
-        - proxy=${proxy}
         - ipRange=${iprange}
     image: pgrouting-procedures-centos
     container_name: pgrouting-procedures-centos-server
@@ -75,10 +68,6 @@ services:
     build:
       context: ..
       dockerfile: ./docker/web/Dockerfile
-      args:
-        - dnsIP=${dns_ip}
-        - dnsHost=${dns_host}
-        - proxy=${proxy}
     image: road2-web-debian
     container_name: road2-web-debian-server
     depends_on:

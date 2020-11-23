@@ -3,24 +3,6 @@ FROM centos:7.8.2003
 LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.1"
 
-### Arguments pour le build de l'image
-# DNS
-ARG dnsHost=""
-ARG dnsIP=""
-# Proxy
-ARG proxy=""
-
-### DNS
-
-RUN if [ "$dnsHost" != "" ] ; then echo "search $dnsHost" > /etc/resolv.conf ; fi
-RUN if [ "$dnsHost" != "" ] ; then echo "nameserver $dnsIP" >> /etc/resolv.conf ; fi
-
-### PROXY
-ENV http_proxy=$proxy
-ENV https_proxy=$proxy
-ENV HTTP_PROXY=$proxy
-ENV HTTPS_PROXY=$proxy
-
 ### MAJ
 RUN yum -y update
 RUN yum -y upgrade

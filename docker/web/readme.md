@@ -12,14 +12,6 @@ Pour construire l'image, il suffit de lancer la commande suivante à la racine d
 docker build -t web-road2 -f docker/web/Dockerfile .
 ```
 
-Les éléments suivants peuvent être spécifiés:
-- DNS (host et IP)
-- Proxy
-
-```
-docker build -t web-road2 --build-arg dnsIP=$dnsIP --build-arg dnsHost=$dnsHost --build-arg proxy=$proxy -f docker/web/Dockerfile .
-```
-
 # Lancer le serveur web
 
 Pour lancer le serveur web qui rend la page accessible, il suffit d'utiliser la commande suivante:

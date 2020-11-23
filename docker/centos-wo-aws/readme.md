@@ -22,14 +22,6 @@ Pour construire l'image, il suffit de lancer la commande suivante à la racine d
 docker build -t road2-centos -f docker/centos/Dockerfile .
 ```
 
-Les éléments suivants peuvent être spécifiés:
-- DNS (host et IP)
-- Proxy
-
-```
-docker build -t road2-centos --build-arg dnsIP=$dnsIP --build-arg dnsHost=$dnsHost --build-arg proxy=$proxy -f docker/centos/Dockerfile .
-```
-
 # Lancer l'application
 
 Pour lancer l'application, il suffit d'utiliser la commande suivante:
