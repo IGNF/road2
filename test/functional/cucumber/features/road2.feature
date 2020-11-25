@@ -11,11 +11,34 @@ Feature: Road2
     Then the server should send a response with status 200
     And the response should contain "Road2"
 
+  Scenario Outline: [<method>] Route principale en HTTPS
+    Given an "HTTPS" "<method>" request on "/"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should contain "Road2"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario: API simple 1.0.0
     Given an "HTTP" "GET" request on "/simple/1.0.0/"
     When I send the request 
     Then the server should send a response with status 200
     And the response should contain "Road2 via l'API simple 1.0.0"
+
+
+  Scenario Outline: [<method>] API simple 1.0.0 en HTTPS
+    Given an "HTTPS" "<method>" request on "/simple/1.0.0/"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should contain "Road2 via l'API simple 1.0.0"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
 
   Scenario: GetCapabilities sur l'API simple 1.0.0
     Given an "HTTP" "GET" request on "/simple/1.0.0/getcapabilities"
@@ -31,6 +54,18 @@ Feature: Road2
     And the response should contain an attribute "operations.[1].id" with value "isochrone"
     And the response should contain an attribute "operations.[1].methods.[0]" with value "GET"
     And the response should contain an attribute "operations.[1].parameters.[1].name" with value "point"
+
+  Scenario Outline: [<method>] GetCapabilities sur l'API simple 1.0.0 en HTTPS
+    Given an "HTTPS" "<method>" request on "/simple/1.0.0/getcapabilities"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "info.name" with value "Road2"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
     Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
@@ -64,8 +99,36 @@ Feature: Road2
     | GET     |
     | POST    | 
 
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 en HTTPS 
+    Given an "HTTPS" "<method>" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "resource" with value "corse-osm"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 sans ressource 
     Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And without query parameters:
+      | key       | 
+      | resource  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'resource' not found"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec une erreur en HTTPS
+    Given an "HTTPS" "<method>" request on "/simple/1.0.0/route"
     And with default parameters for "route"
     And without query parameters:
       | key       | 

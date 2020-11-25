@@ -226,8 +226,14 @@ module.exports = class osrmSource extends Source {
 
             LOGGER.error("osrm error:");
             LOGGER.error(err);
-            // on ne renvoie pas l'erreur d'OSRM
-            reject(errorManager.createError(" Internal OSRM error. "));
+
+            if (err.code === "NoRoute" || err.code === "NoSegment") {
+              reject(errorManager.createError(" No path found ", 404));
+            } else {
+              // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
+              // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
+              reject("Internal OSRM error");
+            }
 
           } else {
 

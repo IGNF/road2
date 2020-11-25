@@ -69,6 +69,66 @@ Feature: Road2-complement
     | GET     |
     | POST    | 
 
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with query parameters:
+      | key            | value                             |
+      | waysAttributes | name \| nature \| importance      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with table parameters for "waysAttributes":
+      | value      |
+      | name       |
+      | nature     |
+      | importance |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
+
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with query parameters:
+      | key            | value                             |
+      | waysAttributes | name \| nature \| importance \| cleabs \| urbain \| access_pieton \| cpx_numero \| largeur_de_chaussee \| position_par_rapport_au_sol \| restriction_de_hauteur \| sens_de_circulation   |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'waysAttributes' is invalid"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route"
+    And with table parameters for "waysAttributes":
+      | value                       |
+      | name                        |
+      | nature                      |
+      | importance                  |
+      | cleabs                      |
+      | urbain                      |
+      | access_pieton               |
+      | cpx_numero                  |
+      | largeur_de_chaussee         |
+      | position_par_rapport_au_sol |
+      | restriction_de_hauteur      |
+      | sens_de_circulation         |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'waysAttributes' is invalid"
+
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource OSRM 
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"
     And with default parameters for "route-osrm"
