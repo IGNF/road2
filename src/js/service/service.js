@@ -598,7 +598,6 @@ module.exports = class Service {
 
         let sourceId = listOfSourceIds[i];
         LOGGER.info("Chargement de la source: " + sourceId);
-        LOGGER.debug(sourceDescriptions[sourceId]);
 
         // On récupère la bonne topologie
         let topologyId = this._sourceManager.getSourceTopology(sourceId);
