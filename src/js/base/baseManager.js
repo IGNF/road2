@@ -64,7 +64,7 @@ module.exports = class baseManager {
   * @param{string} dbConfig - Nom du fichier contenant les informations de connexion à la base
   *
   */
-  checkBase(dbConfig) {
+  async checkBase(dbConfig) {
 
     LOGGER.info("Verification de la configuration de la base de donnees...");
 
@@ -90,7 +90,18 @@ module.exports = class baseManager {
       return false;
     }
 
-    // TODO: est-ce qu'on vérifie le contenu du fichier ?
+    let fullPath = path.resolve(__dirname, dbConfig);
+    let configuration = JSON.parse(fs.readFileSync(fullPath));
+    base = new Base(configuration);
+
+    try {
+      LOGGER.info("Test de connexion à la base de donnees...");
+      await base.connect();
+      await base.disconnect();
+    } catch (err) {
+      LOGGER.error("Connection à la base décrite dans " + fullPath + " échouée.");
+      return false;
+    }
 
     // on stocke le chemin du fichier
     this._listOfVerifiedDbConfig.push(fullPath);

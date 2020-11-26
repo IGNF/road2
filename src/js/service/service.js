@@ -487,7 +487,7 @@ module.exports = class Service {
   *
   */
 
-  loadResources(userResourceDirectories) {
+  async loadResources(userResourceDirectories) {
 
     LOGGER.info("Chargement des ressources...");
 
@@ -525,7 +525,7 @@ module.exports = class Service {
 
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
-          if (!this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)) {
+          if (!(await this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager))) {
             LOGGER.error("Erreur lors du chargement de la ressource: " + resourceFile);
           } else {
             // Création de la ressource
@@ -640,7 +640,7 @@ module.exports = class Service {
             }
           }
           sourceToRemove.push(sourceId);
-          
+
         }
       }
 
@@ -651,7 +651,7 @@ module.exports = class Service {
           this._sourceManager.removeSource(sourceToRemove[k]);
         }
       }
-      
+
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");

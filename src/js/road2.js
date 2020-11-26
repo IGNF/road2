@@ -54,7 +54,7 @@ async function start() {
   }
 
   // Chargement des ressources
-  if (!service.loadResources()) {
+  if (!(await service.loadResources())) {
     pm.shutdown(1);
   }
 

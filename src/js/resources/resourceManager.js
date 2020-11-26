@@ -42,8 +42,8 @@ module.exports = class resourceManager {
   * @function
   * @name removeResource
   * @description Supprimer une ressource
-  * @param {string} id - Id de la ressource 
-  * @return {boolean} 
+  * @param {string} id - Id de la ressource
+  * @return {boolean}
   *
   */
   removeResource(id) {
@@ -79,7 +79,7 @@ module.exports = class resourceManager {
   *
   */
 
-  checkResource(resourceJsonObject, sourceManager, operationManager, topologyManager) {
+  async checkResource(resourceJsonObject, sourceManager, operationManager, topologyManager) {
 
     LOGGER.info("Verification de la ressource...");
 
@@ -107,12 +107,12 @@ module.exports = class resourceManager {
       }
     }
 
-    // Version 
+    // Version
     if (!resourceJsonObject.resource.resourceVersion) {
       LOGGER.error("La ressource ne contient pas de version.");
       return false;
     } else {
-      // on vérifie que c'est bien une string 
+      // on vérifie que c'est bien une string
       if (typeof resourceJsonObject.resource.resourceVersion !== "string") {
         LOGGER.error("La version de la ressource n'est pas une chaine de carateres.");
         return false;
@@ -169,7 +169,7 @@ module.exports = class resourceManager {
       LOGGER.error("La ressource ne contient pas de topologie.");
       return false;
     } else {
-      if (!topologyManager.checkTopology(resourceJsonObject.resource.topology)) {
+      if (!(await topologyManager.checkTopology(resourceJsonObject.resource.topology))) {
         LOGGER.error("La ressource contient une topologie incorrecte.");
         return false;
       }
@@ -209,12 +209,12 @@ module.exports = class resourceManager {
           LOGGER.error("La ressource contient une source invalide.");
           return false;
         } else {
-          // on stocke l'id de la ressource pour cette source donnée 
+          // on stocke l'id de la ressource pour cette source donnée
           sourceManager.addUsage(sourceJsonObject.id, resourceJsonObject.resource.id);
         }
 
         // Lien avec la topologie
-        // TODO: vérifier que le type de la topologie soit cohérent avec le type de la source 
+        // TODO: vérifier que le type de la topologie soit cohérent avec le type de la source
 
         // On stocke la correspondance entre une source et la topologie dont elle dérive
         sourceManager.sourceTopology[sourceJsonObject.id] = resourceJsonObject.resource.topology.id;
