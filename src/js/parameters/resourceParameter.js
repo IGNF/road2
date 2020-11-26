@@ -1,5 +1,12 @@
 'use strict';
 
+const log4js = require('log4js');
+const errorManager = require('../utils/errorManager');
+const validationManager = require('../utils/validationManager');
+
+
+var LOGGER = log4js.getLogger("RESOURCEPARAM");
+
 /**
 *
 * @class
@@ -59,10 +66,13 @@ module.exports = class ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options
-  * @return {boolean}
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
   */
   check(userValue, options) {
+
+    LOGGER.debug("check()");
 
     let userTable = new Array();
 
@@ -70,46 +80,76 @@ module.exports = class ResourceParameter {
 
     if (this.serviceParameter.explode === "true") {
 
+      LOGGER.debug("the serviceParameter is exploded");
+
       // on lit un tableau de valeurs
       // on vérifie donc que c'est un tableau qui contient des valeurs
       if (!Array.isArray(userValue)) {
-        return false;
+        return errorManager.createErrorMessage("value is not an array but it should be");
+      } else {
+        // on continue 
+        LOGGER.debug("user parameter is an array");
       }
+
       if (userValue.length === 0) {
-        return false;
+        return errorManager.createErrorMessage("value is an empty array but it should not be");
+      } else {
+        LOGGER.debug("user parameter is NOT an empty array");
+        userTable = userValue;
       }
-      userTable = userValue;
+
+      
 
     } else {
 
+      LOGGER.debug("the serviceParameter is NOT exploded");
+
       // on lit une string qui contient plusieurs valeurs
       if (typeof userValue === "string") {
+
+        LOGGER.debug("user parameter is a string");
+
         // on sépare les valeurs
         if (this.serviceParameter.style === "pipeDelimited") {
+
+          LOGGER.debug("user parameter is pipeDelimited");
           userTable = userValue.split("|");
+
         } else {
-          return false;
+          //TODO: ce n'est pas censé arriver, que fait-on ? 
+          return errorManager.createErrorMessage("");
         }
+
       } else {
-        // on peut avoir simplement un float
+
+        // on peut avoir simplement un float 
+        // TODO: vérification du float ? 
+        LOGGER.debug("user parameter is NOT a string");
         userTable = userValue;
+
       }
 
     }
 
     // on vérifie le nombre valeur
     if (userTable.length < this.serviceParameter.min || userTable.length > this.serviceParameter.max) {
-      return false;
+      return errorManager.createErrorMessage("Min (or max) is not respected. " + userTable.length + " values is given but min is " + this.serviceParameter.min + " and max is " + this.serviceParameter.max);
+    } else {
+      LOGGER.debug("parameter has a good number of occurence");
     }
 
     for (let i = 0; i < userTable.length; i++) {
-      if (!this.specificCheck(userTable[i], options)) {
-        return false;
+      let result = this.specificCheck(userTable[i], options);
+      if (result.code !== "ok") {
+        LOGGER.debug("user paramter " + i + " is NOT valide");
+        return result;
+      } else {
+        LOGGER.debug("user parameter " + i + " is valide");
       }
     }
 
     // tout s'est bien passé
-    return true;
+    return validationManager.createValidationMessage("");
 
   }
 
@@ -120,12 +160,14 @@ module.exports = class ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options
-  * @return {boolean}
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
   */
   specificCheck(userValue, options) {
 
-    return false;
+    LOGGER.debug("specificCheck()");
+    return errorManager.createErrorMessage("");
 
   }
 
@@ -141,6 +183,8 @@ module.exports = class ResourceParameter {
   *
   */
   convertIntoTable(userValue, finalTable, options) {
+
+    LOGGER.debug("convertIntoTable()");
 
     let userTable = new Array();
 
@@ -161,6 +205,8 @@ module.exports = class ResourceParameter {
       finalTable[i] = this.specificConvertion(userTable[i], options);
       if (finalTable[i] === null) {
         return false;
+      } else {
+        LOGGER.debug("user value " + i + " is converted");
       }
 
     }

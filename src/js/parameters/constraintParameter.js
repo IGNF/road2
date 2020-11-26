@@ -3,6 +3,12 @@
 const ResourceParameter = require('../parameters/resourceParameter');
 const Constraint = require('../constraint/constraint');
 const LooseConstraint = require('../constraint/looseConstraint');
+const log4js = require('log4js');
+const errorManager = require('../utils/errorManager');
+const validationManager = require('../utils/validationManager');
+
+
+var LOGGER = log4js.getLogger("CONSTRAINTPARAM");
 
 /**
 *
@@ -201,43 +207,65 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options
-  * @return {boolean}
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
+  *
   *
   */
   specificCheck(userValue, options) {
 
+    LOGGER.debug("specificCheck()");
+
     let userJson = {};
 
     if (typeof userValue !== "string") {
-      return false;
+      return errorManager.createErrorMessage("user value is NOT a string");
+    } else {
+      LOGGER.debug("user value is a string");
     }
 
     // peut-on bien convertir l'entrée de l'utilisateur en JSON
     try {
       userJson = JSON.parse(userValue);
+      LOGGER.debug("user value has been converted to JSON object");
     } catch (err) {
-      return false;
+      return errorManager.createErrorMessage("user value can't be converted to JSON object");
     }
 
     // Vérification de la clé
     if (!userJson.key) {
-      return false;
+      return errorManager.createErrorMessage("user value doesn't have a 'key'");
     } else {
+
+      LOGGER.debug("user value has a 'key'");
+
       if (typeof userJson.key !== "string") {
-        return false;
+        return errorManager.createErrorMessage("user value key is not a string");
+      } else {
+        LOGGER.debug("the key is a string");
       }
+
       if (!this._verification[userJson.key.toLowerCase()]) {
-        return false;
+        return errorManager.createErrorMessage("user value key is not available");
+      } else {
+        LOGGER.debug("the key is available");
       }
+
     }
 
     // Vérification du type de la contrainte
     if (!userJson.constraintType) {
-      return false;
+      return errorManager.createErrorMessage("user value doesn't have a 'constraintType'");
     } else {
+
+      LOGGER.debug("user value has a 'constraintType'");
+
       if (typeof userJson.constraintType !== "string") {
-        return false;
+        return errorManager.createErrorMessage("user value constraintType is not a string");
+      } else {
+        LOGGER.debug("the constraintType is a string");
       }
+
       let found = false;
       for (let i = 0; i < this._verification[userJson.key.toLowerCase()].constraintType.length; i++) {
         if (userJson.constraintType === this._verification[userJson.key.toLowerCase()].constraintType[i]) {
@@ -245,76 +273,133 @@ module.exports = class ConstraintParameter extends ResourceParameter {
         }
       }
       if (!found) {
-        return false;
+        return errorManager.createErrorMessage("user value constraintType is not available");
+      } else {
+        LOGGER.debug("the constraintType is available");
       }
 
       // Gestion du champ costRatio pour contraintes préférentielles
       if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
+
         if (userJson.costRatio) {
+
+          LOGGER.debug("user value has a 'costRatio'");
+
           if(typeof userJson.costRatio !== "number") {
-            return false;
+            return errorManager.createErrorMessage("user value costRatio is NOT a number");
+          } else {
+            // on ne vérifie rien de plus 
+            LOGGER.debug("user value costRatio is a number");
           }
+
+        } else {
+          // ce n'est pas grave, il y a des valeurs par défaut
+          LOGGER.debug("user value doesn't have a 'costRatio', defaults will be used");
         }
+
+      } else {
+        // il n'y a rien à vérifier pour les costRatio
+        LOGGER.debug("no costRatio verification");
       }
+
     }
 
     if (this._verification[userJson.key.toLowerCase()].keyType === "name-pgr" || this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
 
+      LOGGER.debug("keyType is name-pgr ror name-osrm");
+
       // Vérification de l'opérateur
       if (!userJson.operator) {
-        return false;
+        return errorManager.createErrorMessage("user value doesn't have an 'operator'");
       } else {
+
+        LOGGER.debug("user value has an 'operator'");
+
         if (typeof userJson.operator !== "string") {
-          return false;
+          return errorManager.createErrorMessage("user value 'operator' is NOT a string");
+        } else {
+          LOGGER.debug("operator is a string");
         }
+
         if ( !(["=", "!="].includes(userJson.operator)) ) {
-          return false;
+          return errorManager.createErrorMessage("user value 'operator' is NOT in: " + ["=", "!="]);
+        } else {
+          LOGGER.debug("operator is ok");
         }
+
       }
 
       // Vérification de la valeur
       if (!userJson.value) {
-        return false;
+        return errorManager.createErrorMessage("user value doesn't have an 'value'");
       } else {
+
+        LOGGER.debug("user value has a 'value'");
+
         if (typeof userJson.value !== "string") {
-          return false;
+          return errorManager.createErrorMessage("user value 'value' is NOT a string");
+        } else {
+          LOGGER.debug("value is a string");
         }
+
         if (!this._verification[userJson.key.toLowerCase()][userJson.value]) {
-          return false;
+          return errorManager.createErrorMessage("user value 'value' is NOT available");
         } else {
           // la contrainte est bien formulée et est disponible
-          return true;
+          LOGGER.debug("value is ok");
+          return validationManager.createValidationMessage("");
         }
+
       }
 
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "numerical-pgr") {
 
+      LOGGER.debug(" keyType is numerical-pgr");
+
       // Vérification de l'opérateur
       if (!userJson.operator) {
-        return false;
+        return errorManager.createErrorMessage("user value doesn't have an 'operator'");
       } else {
+
+        LOGGER.debug("user value has an 'operator'");
+
         if (typeof userJson.operator !== "string") {
-          return false;
+          return errorManager.createErrorMessage("user value 'operator' is NOT a string");
+        } else {
+          LOGGER.debug("operator is a string");
         }
+
         if ( !(["=", "!=", ">", "<", ">=", "<="].includes(userJson.operator)) ) {
-          return false;
+          return errorManager.createErrorMessage("user value 'operator' is NOT in: " + ["=", "!=", ">", "<", ">=", "<="]);
+        } else {
+          LOGGER.debug("operator is ok");
         }
+
       }
 
       // Vérification de la valeur
       if (!userJson.value) {
-        return false;
+        return errorManager.createErrorMessage("user value doesn't have an 'value'");
       } else {
+
+        LOGGER.debug("user value has a 'value'");
+
         if (typeof userJson.value !== "number") {
-          return false;
+          return errorManager.createErrorMessage("user value 'value' is NOT a number");
+        } else {
+          // la contrainte est bien formulée et est disponible
+          LOGGER.debug("value is ok");
+          return validationManager.createValidationMessage("");
         }
-        // la contrainte est bien formulée et est disponible
-        return true;
 
       }
 
     } else {
-      return false;
+
+      // TODO: cela ne devrait pas arriver il me semble, à vérifier et décider ce qu'on renvoit 
+      LOGGER.debug(" keyType is unknown");
+      return errorManager.createErrorMessage("");
+
     }
 
   }

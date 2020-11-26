@@ -8,6 +8,7 @@ const Turf = require('@turf/turf');
 const Duration = require('../../../../time/duration');
 const Distance = require('../../../../geography/distance');
 const log4js = require('log4js');
+const validationManager = require('../../../../utils/validationManager');
 
 var LOGGER = log4js.getLogger("CONTROLLER");
 
@@ -47,13 +48,13 @@ module.exports = {
 
       // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
       if (!service.verifyResourceExistenceById(parameters.resource)) {
-        throw errorManager.createError(" Parameter 'resource' is invalid ", 400);
+        throw errorManager.createError(" Parameter 'resource' is invalid: it does not exist on this service ", 400);
       } else {
 
         resource = service.getResourceById(parameters.resource);
         // On vérifie que la ressource peut accepter cette opération
         if (!resource.verifyAvailabilityOperation("route")){
-          throw errorManager.createError(" Operation not permitted on this resource ", 400);
+          throw errorManager.createError(" Operation 'route' is not permitted on this resource ", 400);
         } else {
           LOGGER.debug("operation route valide on this resource");
         }
@@ -72,8 +73,9 @@ module.exports = {
       LOGGER.debug(parameters.crs);
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("projection").check(parameters.crs)) {
-        throw errorManager.createError(" Parameter 'crs' is invalid ", 400);
+      let validity = routeOperation.getParameterById("projection").check(parameters.crs);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'crs' is invalid: " + validity.message, 400);
       } else {
         askedProjection = parameters.crs;
         LOGGER.debug("user crs valide");
@@ -96,8 +98,9 @@ module.exports = {
       LOGGER.debug(parameters.start);
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("start").check(parameters.start, askedProjection)) {
-        throw errorManager.createError(" Parameter 'start' is invalid. Wrong format or out of the bbox.", 400);
+      let validity = routeOperation.getParameterById("start").check(parameters.start, askedProjection);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'start' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("user start valide")
@@ -119,8 +122,9 @@ module.exports = {
       LOGGER.debug(parameters.end);
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("end").check(parameters.end, askedProjection)) {
-        throw errorManager.createError(" Parameter 'end' is invalid. Wrong format or out of the bbox. ", 400);
+      let validity = routeOperation.getParameterById("end").check(parameters.end, askedProjection);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'end' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("user end valide")
@@ -148,8 +152,9 @@ module.exports = {
       LOGGER.debug(parameters.profile);
 
       // Vérification de la validité du paramètre
-      if (!routeOperation.getParameterById("profile").check(parameters.profile)) {
-        throw errorManager.createError(" Parameter 'profile' is invalid ", 400);
+      let validity = routeOperation.getParameterById("profile").check(parameters.profile);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'profile' is invalid: " + validity.message, 400);
       } else {
         profile = parameters.profile;
         LOGGER.debug("user profile valide");
@@ -170,8 +175,9 @@ module.exports = {
       LOGGER.debug(parameters.optimization);
 
       // Vérification de la validité du paramètre
-      if (!routeOperation.getParameterById("optimization").check(parameters.optimization)) {
-        throw errorManager.createError(" Parameter 'optimization' is invalid ", 400);
+      let validity = routeOperation.getParameterById("optimization").check(parameters.optimization);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'optimization' is invalid: " + validity.message, 400);
       } else {
         optimization = parameters.optimization;
         LOGGER.debug("user optmization valide");
@@ -221,8 +227,9 @@ module.exports = {
       
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection)) {
-        throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
+      let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'intermediates' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("intermediates valides");
@@ -249,8 +256,9 @@ module.exports = {
       LOGGER.debug(parameters.getSteps);
 
       // Vérification de la validité des coordonnées fournies
-      if (!routeOperation.getParameterById("getSteps").check(parameters.getSteps)) {
-        throw errorManager.createError(" Parameter 'getSteps' is invalid ", 400);
+      let validity = routeOperation.getParameterById("getSteps").check(parameters.getSteps);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'getSteps' is invalid: " + validity.message, 400);
       } else {
 
         routeRequest.computeSteps = routeOperation.getParameterById("getSteps").specificConvertion(parameters.getSteps)
@@ -292,8 +300,9 @@ module.exports = {
       // --
 
       // Vérification de la validité des attributs demandés
-      if (!routeOperation.getParameterById("waysAttributes").check(finalWaysAttributes)) {
-        throw errorManager.createError(" Parameter 'waysAttributes' is invalid ", 400);
+      let validity = routeOperation.getParameterById("waysAttributes").check(finalWaysAttributes);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'waysAttributes' is invalid: " + validity.message, 400);
       } else {
         LOGGER.debug("waysAttributes valides");
         if (!routeOperation.getParameterById("waysAttributes").convertIntoTable(finalWaysAttributes, routeRequest.waysAttributes)) {
@@ -316,8 +325,9 @@ module.exports = {
       LOGGER.debug(parameters.geometryFormat);
 
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("geometryFormat").check(parameters.geometryFormat)) {
-        throw errorManager.createError(" Parameter 'geometryFormat' is invalid ", 400);
+      let validity = routeOperation.getParameterById("geometryFormat").check(parameters.geometryFormat);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'geometryFormat' is invalid: " + validity.message, 400);
       } else {
         LOGGER.debug("geometryFormat valide");
       }
@@ -341,8 +351,9 @@ module.exports = {
       LOGGER.debug(parameters.getBbox);
 
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("bbox").check(parameters.getBbox)) {
-        throw errorManager.createError(" Parameter 'getBbox' is invalid ", 400);
+      let validity = routeOperation.getParameterById("bbox").check(parameters.getBbox);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'getBbox' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("getBbox valide");
@@ -373,8 +384,9 @@ module.exports = {
       LOGGER.debug(parameters.timeUnit);
 
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
-        throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+      let validity = routeOperation.getParameterById("timeUnit").check(parameters.timeUnit);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'timeUnit' is invalid: " + validity.message, 400);
       } else {
         LOGGER.debug("timeUnit valide");
         routeRequest.timeUnit = parameters.timeUnit;
@@ -397,8 +409,9 @@ module.exports = {
       LOGGER.debug(parameters.distanceUnit);
 
       // Vérification de la validité du paramètre fourni
-      if (!routeOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
-        throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+      let validity = routeOperation.getParameterById("distanceUnit").check(parameters.distanceUnit);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'distanceUnit' is invalid: " + validity.message, 400);
       } else {
         LOGGER.debug("distanceUnit valide");
         routeRequest.distanceUnit = parameters.distanceUnit;
@@ -440,8 +453,9 @@ module.exports = {
       }
 
       // Vérification de la validité des contraintes fournies
-      if (!routeOperation.getParameterById("constraints").check(finalConstraints)) {
-        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      let validity = routeOperation.getParameterById("constraints").check(finalConstraints);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'constraints' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("constraints valide");
@@ -528,8 +542,9 @@ module.exports = {
       LOGGER.debug(parameters.crs);
 
       // Vérification de la validité des coordonnées fournies
-      if (!isochroneOperation.getParameterById("projection").check(parameters.crs)) {
-        throw errorManager.createError(" Parameter 'crs' is invalid ", 400);
+      let validity = isochroneOperation.getParameterById("projection").check(parameters.crs);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'crs' is invalid: " + validity.message, 400);
       } else {
         askedProjection = parameters.crs;
         LOGGER.debug("crs valide");
@@ -552,8 +567,9 @@ module.exports = {
       LOGGER.debug(parameters.point);
 
       /* Vérification de la validité des coordonnées fournies. */
-      if (!isochroneOperation.getParameterById("point").check(parameters.point, askedProjection)) {
-        throw errorManager.createError("Parameter 'point' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("point").check(parameters.point, askedProjection);
+      if (validity.code != "ok") {
+        throw errorManager.createError("Parameter 'point' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("point valide");
@@ -575,8 +591,9 @@ module.exports = {
       LOGGER.debug(parameters.costType);
 
       /* Vérification de la validité du paramètre fourni. */
-      if (!isochroneOperation.getParameterById("costType").check(parameters.costType)) {
-        throw errorManager.createError("Parameter 'costType' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("costType").check(parameters.costType);
+      if (validity.code != "ok") {
+        throw errorManager.createError("Parameter 'costType' is invalid: " + validity.message, 400);
       } else {
         costType = parameters.costType;
         LOGGER.debug("costType valide");
@@ -593,8 +610,9 @@ module.exports = {
       LOGGER.debug(parameters.costValue);
 
       /* Vérification de la validité du paramètre fourni. */
-      if (!isochroneOperation.getParameterById("costValue").check(parameters.costValue)) {
-        throw errorManager.createError("Parameter 'costValue' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("costValue").check(parameters.costValue);
+      if (validity.code != "ok") {
+        throw errorManager.createError("Parameter 'costValue' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("costValue valide");
@@ -607,8 +625,9 @@ module.exports = {
             LOGGER.debug(parameters.timeUnit);
 
             // Vérification de la validité du paramètre fourni.
-            if (!isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit)) {
-              throw errorManager.createError(" Parameter 'timeUnit' is invalid ", 400);
+            let subValidity = isochroneOperation.getParameterById("timeUnit").check(parameters.timeUnit);
+            if (subValidity.code !== "ok") {
+              throw errorManager.createError(" Parameter 'timeUnit' is invalid: " + subValidity.message, 400);
             } else {
               timeUnit = parameters.timeUnit;
               LOGGER.debug("timeUnit valide");
@@ -636,8 +655,9 @@ module.exports = {
             LOGGER.debug(parameters.distanceUnit);
 
             // Vérification de la validité du paramètre fourni.
-            if (!isochroneOperation.getParameterById("distanceUnit").check(parameters.distanceUnit)) {
-              throw errorManager.createError(" Parameter 'distanceUnit' is invalid ", 400);
+            let subValidity = isochroneOperation.getParameterById("distanceUnit").check(parameters.distanceUnit);
+            if (subValidity.code !== "ok") {
+              throw errorManager.createError(" Parameter 'distanceUnit' is invalid: " + subValidity.message, 400);
             } else {
               distanceUnit = parameters.distanceUnit;
               LOGGER.debug("distanceUnit valide");
@@ -672,8 +692,9 @@ module.exports = {
       LOGGER.debug(parameters.profile);
 
       /* Vérification de la validité du paramètre fourni. */
-      if (!isochroneOperation.getParameterById("profile").check(parameters.profile)) {
-        throw errorManager.createError("Parameter 'profile' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("profile").check(parameters.profile);
+      if (validity.code !== "ok") {
+        throw errorManager.createError("Parameter 'profile' is invalid: " + validity.message, 400);
       } else {
         profile = parameters.profile;
         LOGGER.debug("profile valide");
@@ -701,8 +722,9 @@ module.exports = {
       LOGGER.debug(parameters.direction);
 
       /* Vérification de la validité du paramètre fourni. */
-      if (!isochroneOperation.getParameterById("direction").check(parameters.direction)) {
-        throw errorManager.createError("Parameter 'direction' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("direction").check(parameters.direction);
+      if (validity.code !== "ok") {
+        throw errorManager.createError("Parameter 'direction' is invalid: " + validity.message, 400);
       } else {
         direction = parameters.direction;
         LOGGER.debug("direction valide");
@@ -722,8 +744,9 @@ module.exports = {
       LOGGER.debug(parameters.geometryFormat);
 
       /* Vérification de la validité du paramètre fourni. */
-      if (!isochroneOperation.getParameterById("geometryFormat").check(parameters.geometryFormat)) {
-        throw errorManager.createError("Parameter 'geometryFormat' is invalid.", 400);
+      let validity = isochroneOperation.getParameterById("geometryFormat").check(parameters.geometryFormat);
+      if (validity.code !== "ok") {
+        throw errorManager.createError("Parameter 'geometryFormat' is invalid: " + validity.message, 400);
       } else {
         geometryFormat = parameters.geometryFormat;
         LOGGER.debug("geometryFormat valide");
@@ -769,8 +792,9 @@ module.exports = {
       // --
 
       // Vérification de la validité des contraintes fournies
-      if (!isochroneOperation.getParameterById("constraints").check(finalConstraints)) {
-        throw errorManager.createError(" Parameter 'constraints' is invalid ", 400);
+      let validity = isochroneOperation.getParameterById("constraints").check(finalConstraints);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'constraints' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("constraints valide");

@@ -1,6 +1,12 @@
 'use strict';
 
 const ResourceParameter = require('../parameters/resourceParameter');
+const log4js = require('log4js');
+const errorManager = require('../utils/errorManager');
+const validationManager = require('../utils/validationManager');
+
+
+var LOGGER = log4js.getLogger("BOOLPARAM");
 
 /**
 *
@@ -82,19 +88,26 @@ module.exports = class BoolParameter extends ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {object} options - Options
-  * @return {boolean}
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
+  *
   *
   */
   specificCheck(userValue, options) {
 
+    LOGGER.debug("specificCheck()");
+
     if (typeof userValue !== "string") {
-      return false;
+      return errorManager.createErrorMessage("value is not a string but it should be");
+    } else {
+      LOGGER.debug("user value is a string");
     }
 
     if (userValue !== "true" && userValue !== "false") {
-      return false;
+      return errorManager.createErrorMessage("value should be 'true' or 'false'");
     } else {
-      return true;
+      LOGGER.debug("user value is ok");
+      return validationManager.createValidationMessage("");
     }
 
   }

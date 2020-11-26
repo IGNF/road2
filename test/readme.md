@@ -36,6 +36,7 @@ On trouvera donc les classes ou les fichiers suivants:
 - processManager (log4js)
 - simplify.js //TODO
 - storageManager (log4js)
+- validationManager
 
 ## Tests d'intégration
 
