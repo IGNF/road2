@@ -6,6 +6,7 @@
   "main": "src/js/road2.js",
   "scripts": {
     "start": "node ./src/js/road2.js",
+    "configCheck": "node ./src/js/road2.js --configCheck",
     "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "itest": "mocha --recursive './test/integration/mocha/**/*.js'",
     "ftest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/cucumber/features/road2.feature",
@@ -25,7 +26,8 @@
     "@turf/turf": "5.1.6",
     "proj4": "2.6.0",
     "assert": "2.0.0",
-    "helmet": "3.21.2"
+    "helmet": "3.21.2",
+    "yargs": "16.1.1"
   },
   "devDependencies": {
     "sinon": "^7.2.7",

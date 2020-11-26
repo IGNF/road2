@@ -90,9 +90,8 @@ module.exports = class baseManager {
       return false;
     }
 
-    let fullPath = path.resolve(__dirname, dbConfig);
     let configuration = JSON.parse(fs.readFileSync(fullPath));
-    base = new Base(configuration);
+    const base = new Base(configuration);
 
     try {
       LOGGER.info("Test de connexion à la base de donnees...");

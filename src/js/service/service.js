@@ -513,9 +513,10 @@ module.exports = class Service {
       let resourceDirectory =  path.resolve(__dirname, userResourceDirectories[i]);
 
       // Pour chaque fichier du dossier des ressources, on crée une ressource
-      fs.readdirSync(resourceDirectory).filter( (file) => {
+      const files = fs.readdirSync(resourceDirectory).filter( (file) => {
         return path.extname(file).toLowerCase() === ".resource";
-      }).forEach(fileName => {
+      })
+      for (let fileName of files){
 
         let resourceFile = resourceDirectory + "/" + fileName;
         LOGGER.info("Chargement de: " + resourceFile);
@@ -525,7 +526,8 @@ module.exports = class Service {
 
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
-          if (!(await this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager))) {
+          let resourceChecked = await this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)
+          if (!resourceChecked) {
             LOGGER.error("Erreur lors du chargement de la ressource: " + resourceFile);
           } else {
             // Création de la ressource
@@ -538,7 +540,7 @@ module.exports = class Service {
           LOGGER.error("Erreur lors de la lecture de la ressource: " + resourceFile);
         }
 
-      });
+      };
 
     }
 
