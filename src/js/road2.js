@@ -6,17 +6,6 @@ const Service = require('./service/service');
 const path = require('path');
 const fs = require('fs');
 const pm = require('./utils/processManager.js');
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
-
-const argv = yargs(hideBin(process.argv))
-  .options({
-    'configCheck': {
-      description: "Ne procéde qu'à la vérification de la configuration, et quitte avec code 0 si la configuration est OK.",
-      type: 'boolean'
-    }
-  })
-  .argv;
 
 var LOGGER;
 
@@ -70,7 +59,7 @@ async function start() {
   }
 
   // En mode check de configuration, fermeteure du serveur sans code d'erreur
-  if (argv.configCheck) {
+  if (nconf.argv().get('configCheck')) {
     LOGGER.info("La vérification de la configuration est terminée");
     pm.shutdown(0);
   }

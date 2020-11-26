@@ -26,8 +26,7 @@
     "@turf/turf": "5.1.6",
     "proj4": "2.6.0",
     "assert": "2.0.0",
-    "helmet": "3.21.2",
-    "yargs": "16.1.1"
+    "helmet": "3.21.2"
   },
   "devDependencies": {
     "sinon": "^7.2.7",
