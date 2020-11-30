@@ -365,7 +365,139 @@ Feature: Road2-complement
     And the response should have an header "content-type" with value "application/json"
     And the response should contain "Parameter 'constraints' is invalid"
 
-  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr 
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"importance","operator":">=","value":4}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"importance","operator":">=","value":"4"}      |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr 
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"importance","operator":">=","value":4}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"importance","operator":">=","value":"4"}          |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"prefer","key":"cpx_classement_administratif","operator":"=","value":"autoroute"}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"prefer","key":"cpx_classement_administratif","operator":"=","value":"test"}      |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"prefer","key":"cpx_classement_administratif","operator":"=","value":"autoroute"}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"prefer","key":"cpx_classement_administratif","operator":"=","value":"test"}          |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"avoid","key":"cpx_classement_administratif","operator":"=","value":"autoroute"}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"avoid","key":"cpx_classement_administratif","operator":"=","value":"test"}      |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"avoid","key":"cpx_classement_administratif","operator":"=","value":"autoroute"}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"avoid","key":"cpx_classement_administratif","operator":"=","value":"test"}          |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
     And with default parameters for "isochrone"
     When I send the request 
