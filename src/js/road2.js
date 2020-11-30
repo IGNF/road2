@@ -54,8 +54,14 @@ async function start() {
   }
 
   // Chargement des ressources
-  if (!service.loadResources()) {
+  if (!(await service.loadResources())) {
     pm.shutdown(1);
+  }
+
+  // En mode check de configuration, fermeteure du serveur sans code d'erreur
+  if (nconf.argv().get('configCheck')) {
+    LOGGER.info("La vérification de la configuration est terminée");
+    pm.shutdown(0);
   }
 
   // Chargement des topologies
