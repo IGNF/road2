@@ -29,6 +29,7 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('loadProjection()', function() {
       assert.equal(projManager.loadProjection(configuration), true);
+      assert.deepEqual(projManager.listOfProjectionId, ["EPSG:4326"]);
     });
 
   });
@@ -40,6 +41,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('loadProjectionFile()', function() {
       assert.equal(projManager.loadProjectionFile(file), true);
+      assert.equal(projManager.isAvailableById("EPSG:4326"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2154"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2155"), false);
     });
 
   });
@@ -51,6 +55,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('loadProjectionDirectory()', function() {
       assert.equal(projManager.loadProjectionDirectory(directory), true);
+      assert.equal(projManager.isAvailableById("EPSG:4326"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2154"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2155"), false);
     });
 
   });
@@ -63,6 +70,8 @@ describe('Test de la classe ProjectionManager', function() {
     it('isAvailableById()', function() {
       projManager.loadProjectionDirectory(directory);
       assert.equal(projManager.isAvailableById("EPSG:4326"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2154"), true);
+      assert.equal(projManager.isAvailableById("EPSG:2155"), false);
     });
 
   });

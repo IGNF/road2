@@ -3,24 +3,6 @@ FROM debian:buster-20181112
 LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.0"
 
-### Arguments pour le build de l'image
-# DNS
-ARG dnsHost=""
-ARG dnsIP=""
-# Proxy
-ARG proxy=""
-
-### DNS
-
-RUN if [ "$dnsHost" != "" ] ; then echo "search $dnsHost" > /etc/resolv.conf ; fi
-RUN if [ "$dnsHost" != "" ] ; then echo "nameserver $dnsIP" >> /etc/resolv.conf ; fi
-
-### PROXY
-ENV http_proxy=$proxy
-ENV https_proxy=$proxy
-ENV HTTP_PROXY=$proxy
-ENV HTTPS_PROXY=$proxy
-
 ### MAJ
 RUN apt-get -y update
 RUN apt-get -y upgrade
@@ -49,9 +31,9 @@ RUN apt-get install -y cmake libboost-dev libboost-filesystem-dev libboost-threa
 # https://github.com/door2door-io/osrm-express-server-demo
 # https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
 WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.22.0.zip
-RUN unzip v5.22.0.zip -d ./osrm-backend
-RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/ && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && cmake --build . --target install
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.23.0.zip
+RUN unzip v5.23.0.zip -d ./osrm-backend
+RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/ && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && cmake --build . --target install
 
 ### Dossier des données
 WORKDIR /home/docker/internal
@@ -59,7 +41,7 @@ WORKDIR /home/docker/internal
 ### Récupération de données sur la Corse
 # L'objectif est d'avoir un container indépendant du docker-compose
 RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
-RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua
 RUN osrm-contract corse-latest.osrm
 
 ### Dossier contenant la configuration

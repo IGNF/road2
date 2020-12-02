@@ -25,6 +25,14 @@ Given('with table parameters for {string}:', function (key, table) {
     this.setTableParameters(key, table.hashes());
 });
 
+Given('with table parameters of object for {string}:', function (key, table) {
+    this.setTableOfObjectParameters(key, table.hashes());
+});
+
+Given('with {string} at the end of the url', function (key) {
+    this.setStringToUrl(key);
+});
+
 When("I send the request", function(done) {
     this.sendRequest()
     .then(() => {
@@ -54,6 +62,10 @@ Then("the response should contain an attribute {string} with value {string}", fu
 
 Then("the response should contain an attribute {string}", function(key) {
     assert.equal(this.checkResponseAttribut(key), true);
+});
+
+Then("the response should contain a string attribute {string}", function(key) {
+    assert.equal(this.checkResponseAttributString(key), true);
 });
 
 Then("the response should not contain an attribute {string}", function(key) {

@@ -81,7 +81,7 @@ module.exports = class topologyManager {
   * @param{json} topologyJsonDescription - JSON décrivant une topologie
   *
   */
-  checkTopology(topologyJsonDescription) {
+  async checkTopology(topologyJsonDescription) {
 
     // Id de la topologie
     if (!topologyJsonDescription.id) {
@@ -147,7 +147,7 @@ module.exports = class topologyManager {
     } else {
 
       if (topologyJsonDescription.type === "db") {
-        if (!this.checkDbTopology(topologyJsonDescription)) {
+        if (!(await this.checkDbTopology(topologyJsonDescription))) {
           LOGGER.error("La topologie db est incorrecte.");
           return false;
         }
@@ -186,8 +186,7 @@ module.exports = class topologyManager {
       LOGGER.info("La ressource ne contient pas d'information sur le stockage du fichier de generation de la topologie.");
     } else {
       if (!storageManager.checkJsonStorage(topologyJsonDescription.storage)) {
-        LOGGER.error("Stockage de la topologie incorrect.");
-        return false;
+        LOGGER.warn("Stockage de la topologie incorrect.");
       } else {
         // rien à faire
       }
@@ -205,7 +204,7 @@ module.exports = class topologyManager {
   * @param{json} topologyJsonDescription - JSON décrivant une topologie
   *
   */
-  checkDbTopology(topologyJsonDescription) {
+  async checkDbTopology(topologyJsonDescription) {
 
     // Stockage de la topologie
     if (!topologyJsonDescription.storage) {
@@ -225,7 +224,7 @@ module.exports = class topologyManager {
       LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.dbConfig'.");
       return false;
     } else {
-      if (!this._baseManager.checkBase(topologyJsonDescription.storage.base.dbConfig)) {
+      if (!(await this._baseManager.checkBase(topologyJsonDescription.storage.base.dbConfig))) {
         LOGGER.error("La ressource contient un parametre 'topology.storage.dbConfig' incorrect.");
         return false;
       }
@@ -380,7 +379,7 @@ module.exports = class topologyManager {
       if (topologyJsonObject.storage) {
         osmFile = topologyJsonObject.storage.file;
       } else {
-        // ce n'est pas obligatoire 
+        // ce n'est pas obligatoire
       }
 
       topology = new OsmTopology(topologyJsonObject.id, topologyJsonObject.description,

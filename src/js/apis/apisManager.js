@@ -54,7 +54,9 @@ module.exports = class apisManager {
   * @function
   * @name getApi
   * @description Récupérer l'api qui correspond à l'id et la version demandée
-  *
+  * @param {string} id - Id de l'api concerné (simple)
+  * @param {string} version - Version de l'api concerné (1.0.0) 
+  * 
   */
   getApi (id, version) {
     return this._apisCatalog[id+version];

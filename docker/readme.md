@@ -6,13 +6,32 @@ Road2 est un service de calcul d'itinéraires. Pour fonctionner, il doit avoir a
 
 ## Pré-requis
 
+### Généralités 
+
 Pour utiliser ce `docker-compose.yml`, il suffit de :
 - télécharger les trois projets dans le même dossier.
 - installer `docker`.
 - se placer dans le dossier `/docker/` du projet Road2.
 - créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
 
-### Pour les tests avec HTTPS
+### Proxy
+Si on utilise ces Dockerfile derrière un proxy, il faudra vérifier que docker fonctionne déjà correctement avec le proxy:
+- le fichier `/etc/systemd/system/docker.service.d/http-proxy.conf` est correctement rempli et permet à dockerd de télécharger des images sur internet. 
+- le fichier `~/.docker/config.json` est correctement rempli et permet au CLI docker de fournir le proxy à chaque image lancée par l'utilisateur.
+
+### DNS 
+Si on utilise ces Dockerfile avec un VPN, on vérifiera que les configurations DNS utilsées par Docker sont les bonnes: 
+- le fichier `/etc/docker/daemon.json` doit être rempli pour permettre à dockerd de spécifier à chaque image quel DNS utiliser. On veillera donc à bien remplir les attributs `dns` et `dns-search`.
+
+### IP 
+Si on utilise ces Dockerfile sur un réseau avec lequel il peut y avoir des problèmes d'IP, il sera utile de dédier à Docker une plage d'IP non utilisées:
+- L'attribut `bip` du fichier ``/etc/docker/daemon.json` permet de préciser une plage d'IP. 
+- Si bip a été rempli, on veillera à ce que ces IP soient bien ajouter à l'inferface docker0. La commande `sudo ip route add {plage_ip} dev docker0` permet de le faire. 
+
+Cette plage d'IP sera différente de celle attribuée à la stack Road2 lancée via docker-compose (eg. celui présent dans le fichier `.env`). 
+
+### HTTPS
+Si on souhaite tester le serveur en HTTPS, certaines actions sont nécessaires en amont: 
 - générer un certificat auto-signé pour lancer l'application en HTTPS (ex. `openssl req -nodes -new -x509 -keyout server.key -out server.cert`).
 - s'assurer qu'aucun serveur ne fonctionne sur le port *443*.
 

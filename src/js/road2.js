@@ -54,27 +54,39 @@ async function start() {
   }
 
   // Chargement des ressources
-  if (!service.loadResources()) {
+  if (!(await service.loadResources())) {
     pm.shutdown(1);
   }
 
-  // Chargement des topologies
-  if (!service.loadTopologies()) {
-    pm.shutdown(1);
+  // En mode check de configuration, fermeteure du serveur sans code d'erreur
+  if (nconf.argv().get('configCheck')) {
+
+    LOGGER.info("La vérification de la configuration est terminée");
+    pm.shutdown(0);
+
+  } else {
+
+    // Chargement des topologies
+    if (!service.loadTopologies()) {
+      pm.shutdown(1);
+    }
+
+    // Chargement des sources uniques
+    try {
+      await service.loadSources();
+    } catch (err) {
+      LOGGER.fatal("Impossible de charger les sources", err);
+      pm.shutdown(1);
+    }
+
+    // Création du serveur web
+    if (!service.createServer("../apis/", "")) {
+      pm.shutdown(1);
+    }
+    
   }
 
-  // Chargement des sources uniques
-  try {
-    await service.loadSources();
-  } catch (err) {
-    LOGGER.fatal("Impossible de charger les sources", err);
-    pm.shutdown(1);
-  }
-
-  // Création du serveur web
-  if (!service.createServer("../apis/", "")) {
-    pm.shutdown(1);
-  }
+  
 
 }
 

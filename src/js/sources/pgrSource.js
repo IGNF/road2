@@ -14,7 +14,7 @@ const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const gisManager = require('../utils/gisManager');
 const simplify = require('../utils/simplify');
-const deepCopy = require('../utils/deepCopy');
+const copyManager = require('../utils/copyManager');
 const turf = require('@turf/turf');
 const LooseConstraint = require('../constraint/looseConstraint');
 
@@ -162,9 +162,14 @@ module.exports = class pgrSource extends Source {
   *
   */
   computeRequest (request) {
+
+    LOGGER.debug("computeRequest()");
+
     let pgrRequest = {};
 
     if (request.operation === "route") {
+
+      LOGGER.debug("operation request is route");
 
       // Construction de l'objet pour la requête pgr
       // Cette construction dépend du type de la requête fournie
@@ -175,6 +180,9 @@ module.exports = class pgrSource extends Source {
       const looseConstraintsArray = [];
 
       if (request.type === "routeRequest") {
+
+        LOGGER.debug("type of request is routeRequest");
+
         // Coordonnées
         // start
         coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
@@ -187,11 +195,16 @@ module.exports = class pgrSource extends Source {
         // end
         coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
+        LOGGER.debug("coordinates:");
+        LOGGER.debug(coordinatesTable);
+
         pgrRequest.coordinates = coordinatesTable;
 
         // --- waysAttributes
         // attributes est déjà vide, on met les attributs par défaut
         attributes = this._topology.defaultAttributesString;
+
+        LOGGER.debug("default attributes: " + attributes);
 
         // on complète avec les attributs demandés
         if (request.waysAttributes.length !== 0) {
@@ -222,40 +235,64 @@ module.exports = class pgrSource extends Source {
           }
 
           if (requestedAttributes.length !== 0) {
+
             if (attributes !== "") {
-              attributes = attributes + ",";
+              attributes = attributes + "," + requestedAttributes.join(",");
+            } else {
+              attributes = requestedAttributes.join(",");
             }
-            attributes = attributes + requestedAttributes.join(",");
+            LOGGER.debug("final attributes: " + attributes);
+
+          } else {
+            LOGGER.debug("no more attributes to add");
           }
 
           // --- waysAttributes
 
         } else {
+
           // on ne fait rien
+          LOGGER.debug("no more attributes were required");
+
         }
 
         if (request.constraints.length !== 0) {
+
+          LOGGER.debug("constraints are asked");
 
           let requestedConstraints = new Array();
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
               looseConstraintsArray.push(request.constraints[i]);
-            }
-            if (request.constraints[i].type === 'banned') {
+            } else if (request.constraints[i].type === 'banned') {
               requestedConstraints.push( request.constraints[i].toSqlString() );
+            } else {
+              //TODO: que fait-on ? throw error ? 
+              LOGGER.error("constraint type is unknown");
             }
           }
 
           if (requestedConstraints.length > 0){
             constraints = constraints + requestedConstraints.join(' AND ');
+            LOGGER.debug("final constraints: " + constraints);
+          } else {
+            //TODO: que fait-on ? throw error ? 
+            LOGGER.error("no final constraints");
           }
+
         } else {
-          // on ne fait rien
+
+          // pas de contraintes à ajouter 
+          LOGGER.debug("no constraints asked");
+
         }
 
 
       } else {
-        // on va voir si c'est un autre type de requête
+
+        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse
+        LOGGER.error("type of request not found");
+
       }
       // ---
 
@@ -281,38 +318,68 @@ module.exports = class pgrSource extends Source {
 
 
       return new Promise( (resolve, reject) => {
+
+        LOGGER.debug("queryString: " + queryString);
+        LOGGER.debug("SQLParametersTable:"); 
+        LOGGER.debug(SQLParametersTable);
+
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+
           if (err) {
+
+            LOGGER.error("pgr error:");
             LOGGER.error(err);
+
             // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
             if (err.code === "38001") {
               reject(errorManager.createError(" No path found ", 404));
             } else {
               reject(err);
             }
+
           } else {
+
+            LOGGER.debug("pgr response:");
+            LOGGER.debug(result);
+
             try {
               resolve(this.writeRouteResponse(request, pgrRequest, result));
             } catch (error) {
               reject(error);
             }
+
           }
+
         });
+
       });
 
     } else if (request.operation === "isochrone") {
+
+      LOGGER.debug("operation request is isochrone");
+
       if (request.type === "isochroneRequest") {
+
+        LOGGER.debug("type of request is isochroneRequest");
+
         const point = [request.point.lon, request.point.lat];
+
         let constraints = "";
 
         if (request.constraints.length !== 0) {
+
+          LOGGER.debug("constraints are asked");
+
           let requestedConstraints = new Array();
           for (let i = 0; i < request.constraints.length; i++) {
             requestedConstraints.push( request.constraints[i].toSqlString() );
           }
           constraints = constraints + requestedConstraints.join(' AND ');
+          LOGGER.debug("constraints: " + constraints);
+
         } else {
           // on ne fait rien
+          LOGGER.debug("no constraints asked");
         }
 
         const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
@@ -327,22 +394,49 @@ module.exports = class pgrSource extends Source {
         ];
 
         return new Promise( (resolve, reject) => {
+
+          LOGGER.debug("queryString: " + queryString);
+          LOGGER.debug("SQLParametersTable:"); 
+          LOGGER.debug(SQLParametersTable);
+
           this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+
             if (err) {
+
+              LOGGER.error("pgr error:");
+              LOGGER.error(err);
+
               reject(err);
+
             } else {
+
+              LOGGER.debug("pgr response:");
+              LOGGER.debug(result);
+
               try {
                 resolve(this.writeIsochroneResponse(request, pgrRequest, result));
               } catch (error) {
                 reject(error);
               }
+
             }
+
           });
+
         });
+
+      } else {
+
+        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ? 
+        LOGGER.error("type of request not found");
+
       }
+
     } else {
-      /* TODO: Y a peut-être un truc à améliorer ici (bien que ce cas n'est pas censé arriver). */
-      throw errorManager.createError("Unknow request operation.");
+
+      // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ?
+      LOGGER.error("request operation not found"); 
+
     }
 
   }
@@ -360,6 +454,8 @@ module.exports = class pgrSource extends Source {
   *
   */
   writeRouteResponse (routeRequest, pgrRequest, pgrResponse) {
+
+    LOGGER.debug("writeRouteResponse()");
 
     let resource;
     let start;
@@ -397,15 +493,20 @@ module.exports = class pgrSource extends Source {
     // Si pgrResponse est vide
     if (pgrResponse.rowCount === 0) {
       throw errorManager.createError(" No data found ", 404);
+    } else {
+      LOGGER.debug("pgr response has data");
     }
 
+    LOGGER.debug("attributes management");
     // On fait la liste des attributs par défaut
     if (this._topology.defaultAttributesKeyTable.length !== 0) {
       for (let i = 0; i < this._topology.defaultAttributesKeyTable.length; i++) {
         finalAttributesKey.push(this._topology.defaultAttributesKeyTable[i]);
+        LOGGER.debug(this._topology.defaultAttributesKeyTable[i] + " added");
       }
     } else {
       // il n'y a aucun attribut par défaut
+      LOGGER.debug("no default attributes");
     }
 
     // On ajoute la liste des attributs demandés
@@ -425,6 +526,7 @@ module.exports = class pgrSource extends Source {
           for (let j = 0; j < this._topology.otherAttributes.length; j++) {
             if (routeRequest.waysAttributes[i] === this._topology.otherAttributes[j].key) {
               finalAttributesKey.push(this._topology.otherAttributes[j].key);
+              LOGGER.debug(this._topology.otherAttributes[j].key + " added");
               break;
             }
           }
@@ -435,6 +537,7 @@ module.exports = class pgrSource extends Source {
       }
     } else {
       // il n'y a aucun attribut demandé par l'utilisateur
+      LOGGER.debug("no attributes requested");
     }
 
     // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
@@ -450,6 +553,9 @@ module.exports = class pgrSource extends Source {
     let rowDuration;
     let rowDistance;
     let finalAttributesObject;
+
+    LOGGER.debug("reading rows of pgr response...");
+
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
@@ -586,18 +692,26 @@ module.exports = class pgrSource extends Source {
     start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], this.topology.projection);
     if (!start.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of start in PGR response. ");
+    } else {
+      LOGGER.debug("start in asked projection:");
+      LOGGER.debug(start);
     }
 
     // end
     end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], this.topology.projection);
     if (!end.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of end in PGR response. ");
+    } else {
+      LOGGER.debug("end in asked projection:");
+      LOGGER.debug(end);
     }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
 
     if (response.routes.length === 0) {
       throw errorManager.createError(" No route found ", 404);
+    } else {
+      LOGGER.debug("intermediates response (after pgr response analysis) has data");
     }
 
     let routeDistance = 0;
@@ -606,6 +720,8 @@ module.exports = class pgrSource extends Source {
     // Il peut y avoir plusieurs itinéraires
     for (let i = 0; i < response.routes.length; i++) {
 
+      LOGGER.debug("route number " + i);
+
       let portions = new Array();
       let currentPgrRoute = response.routes[i];
 
@@ -613,25 +729,39 @@ module.exports = class pgrSource extends Source {
       routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", this._topology.projection) );
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of geometry in PGR response. ");
+      } else {
+        LOGGER.debug("route geometry is converted");
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       let newRouteGeomCoords = [];
       let portionDistance = 0;
       let portionDuration = 0;
+
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
+
+        LOGGER.debug("Portion number " + j + " for route number " + i);
+
         let newPortionGeomCoords = [];
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+        } else {
+          LOGGER.debug("portion start in asked projection:");
+          LOGGER.debug(legStart);
         }
+    
 
         let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+        } else {
+          LOGGER.debug("portion end in asked projection:");
+          LOGGER.debug(legEnd);
         }
+    
 
         portions[j] = new Portion(legStart, legEnd);
 
@@ -639,7 +769,10 @@ module.exports = class pgrSource extends Source {
 
         // On va associer les étapes à la portion concernée
         for (let k = 0; k < currentPgrRouteLeg.steps.length; k++) {
-          let currentPgrRouteStep = deepCopy(currentPgrRouteLeg.steps[k]);
+
+          LOGGER.debug("Step number " + k + " of portion number " + j + " for route number " + i);
+
+          let currentPgrRouteStep = copyManager.deepCopy(currentPgrRouteLeg.steps[k]);
 
           // Pour le calcul de la portion véritablement parcourue (fin et début de leg)
           let currentPgrRouteStepDistance = turf.length(currentPgrRouteStep.geometry);
@@ -649,36 +782,42 @@ module.exports = class pgrSource extends Source {
             let stepStart = turf.point(response.waypoints[j].location);
             let stepEnd = turf.point(response.waypoints[j + 1].location);
 
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  stepEnd,
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                stepStart,
+                stepEnd,
+                currentPgrRouteStep.geometry
+              ),
+              {precision: 6}
             ).geometry.coordinates;
 
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
+
           // Troncature de la géométrie : cas de début de leg
           else if (k == 0){
             let stepStart = turf.point(response.waypoints[j].location);
-
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  stepStart,
-                  gisManager.arrays_intersection(
-                    currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
-                    currentPgrRouteStep.geometry.coordinates
-                  )[0],
-                  currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                stepStart,
+                gisManager.arraysIntersection(
+                  currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
+                  currentPgrRouteStep.geometry.coordinates
+                )[0],
+                currentPgrRouteStep.geometry
+              ),
+              {precision: 6}
             ).geometry.coordinates;
+
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
+
           // Troncature de la géométrie : cas de fin de leg
           else if (k == currentPgrRouteLeg.steps.length - 1) {
             let stepEnd = turf.point(response.waypoints[j+1].location);
@@ -689,7 +828,7 @@ module.exports = class pgrSource extends Source {
             const secondToLastLine = currentPgrRouteLeg.steps[k - 1].geometry.coordinates;
             let common_point;
 
-            const lastSecIntersection = gisManager.arrays_intersection(lastLine, secondToLastLine);
+            const lastSecIntersection = gisManager.arraysIntersection(lastLine, secondToLastLine);
             // S'il n'y a qu'une intersection, on la prend
             if (lastSecIntersection.length === 1){
               common_point = lastSecIntersection[0];
@@ -706,7 +845,7 @@ module.exports = class pgrSource extends Source {
               // Soit l'array suivant n'a qu'une seule valeur (sauf cas imaginaires), soit lastLine
               // et thirdToLastLine sont le même tronçon.
               let last_common_point;
-              const lastThirdIntersection = gisManager.arrays_intersection(lastLine, thirdToLastLine);
+              const lastThirdIntersection = gisManager.arraysIntersection(lastLine, thirdToLastLine);
               // Premier cas, on prend l'unique valeur.
               if (lastThirdIntersection.length === 1) {
                 last_common_point = lastThirdIntersection[0];
@@ -724,16 +863,19 @@ module.exports = class pgrSource extends Source {
               }
             }
 
-            currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(
-              turf.truncate(
-                turf.lineSlice(
-                  common_point,
-                  stepEnd,
+            currentPgrRouteStep.geometry.coordinates = turf.truncate(
+              turf.lineSlice(
+                common_point,
+                stepEnd,
                   currentPgrRouteStep.geometry
-                ),
-                {precision: 6}
-              )
+              ),
+              {precision: 6}
             ).geometry.coordinates;
+
+            // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
+            if (currentPgrRouteStep.geometry.coordinates.length > 2) {
+              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+            }
           }
 
           // Pour le calcul de la portion véritablement parcourue (fin et début de leg)
@@ -748,6 +890,8 @@ module.exports = class pgrSource extends Source {
           steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+          } else {
+            LOGGER.debug("step geometry is converted");
           }
           // ajout des attributs
           steps[k].attributes = currentPgrRouteStep.finalAttributesObject;
@@ -772,9 +916,11 @@ module.exports = class pgrSource extends Source {
 
         if (routeRequest.computeSteps) {
           portions[j].steps = steps;
-
         } else {
+
           // Comme les steps ne sont pas demandées, on ne les donne pas
+          LOGGER.debug("no steps asked by user");
+
         }
 
       }

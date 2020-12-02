@@ -6,7 +6,7 @@
      "http": { "type": "file", "filename": "/var/log/road2/access.log"}
    },
    "categories": {
-     "default": { "appenders": ["console","file"], "level": "info" },
+     "default": { "appenders": ["console","file"], "level": "debug" },
      "request": { "appenders": ["console","http"], "level": "info" }
    },
    "disableClustering": true

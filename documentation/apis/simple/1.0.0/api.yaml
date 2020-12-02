@@ -177,7 +177,7 @@ paths:
       tags:
       - "Utilisation"
       summary: "Calculer un itinéraire"
-      description: "Calculer un itinéraire en fournissant un point de départ et un point d'arrivé. Plusieurs options peuvent être fournies."
+      description: "Calculer un itinéraire en fournissant un point de départ et un point d'arrivé. Plusieurs options peuvent être fournies. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête."
       operationId: "routeItineraire-post"
       requestBody:
         required: true
@@ -328,7 +328,7 @@ paths:
       tags:
       - "Utilisation"
       summary: "Calculer une isochrone ou une isodistance"
-      description: "Obtenir une surface géo-localisée représentant l’ensemble des points atteignables à partir d’un point de départ. Les points de départ et d’arrivée peuvent être inversés: on obtient alors la liste des points de départs possibles permettant d’atteindre un point d’arrivée donné. On peut aussi fournir un critère de distance plutôt que de temps: on parle alors de calcul d’iso-distances."
+      description: "Obtenir une surface géo-localisée représentant l’ensemble des points atteignables à partir d’un point de départ. Les points de départ et d’arrivée peuvent être inversés: on obtient alors la liste des points de départs possibles permettant d’atteindre un point d’arrivée donné. On peut aussi fournir un critère de distance plutôt que de temps: on parle alors de calcul d’iso-distances. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête."
       operationId: "isochrone-post"
       requestBody:
         required: true

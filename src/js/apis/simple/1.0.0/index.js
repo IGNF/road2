@@ -25,28 +25,54 @@ router.use(helmet());
 
 // POST
 // ---
-// Pour cette API, on va permettre la lecture des requêtes POST
+// Pour cette API, on va permettre la lecture des requêtes POST en parsant les contenus du type application/json
 router.use(express.json(
-  //TODO: faire une fonction de vérification du JSON pour récupérer les erreurs
-)); // for parsing application/json
+  // Fonctions utilisées pour vérifier le body d'un POST et ainsi récupérer les erreurs
+  {
+    type: (req) => {
+      // Le seul content-type accepté a toujours été application/json, on rend cela plus explicite
+      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct. 
+      // Sans elle, le traitement continue.
+      if (req.get('Content-Type') !== "application/json") {
+        throw errorManager.createError(" Wrong Content-Type. Must be 'application/json' ", 400);
+      } else {
+        return true;
+      }
+    },
+    verify: (req, res, buf, encoding) => {
+      // Cette fonction permet de vérifier que le JSON envoyé est valide. 
+      // Si ce n'est pas le cas, le traitement de la requête est arrêté. 
+      try {
+        JSON.parse(buf);
+      } catch (error) {
+        throw errorManager.createError("Invalid request body. Error during the parsing of the body: " + error.message, 400);
+      }
+    }
+  }
+)); 
 // ---
 
 // Accueil de l'API
 router.all("/", function(req, res) {
+  LOGGER.debug("requete sur /simple/1.0.0/");
   res.send("Road2 via l'API simple 1.0.0");
 });
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
 
+  LOGGER.debug("requete sur /simple/1.0.0/getcapabilities?");
+
   // récupération du service
   let service = req.app.get("service");
 
   // récupération du uid
   let uid = service.apisManager.getApi("simple","1.0.0").uid;
+  LOGGER.debug(uid);
 
   // récupération du getCapabilities précalculé dans init.js
   let getCapabilities = req.app.get(uid + "-getcap");
+  LOGGER.debug(getCapabilities);
 
   res.set('content-type', 'application/json');
   res.status(200).json(getCapabilities);
@@ -59,6 +85,9 @@ router.route("/route")
 
   .get(async function(req, res, next) {
 
+    LOGGER.debug("requete GET sur /simple/1.0.0/route?");
+    LOGGER.debug(req.originalUrl);
+
     // On récupère l'instance de Service pour faire les calculs
     let service = req.app.get("service");
 
@@ -69,15 +98,19 @@ router.route("/route")
 
     // on récupère l'ensemble des paramètres de la requête
     let parameters = req.query;
+    LOGGER.debug(parameters);
 
     try {
 
       // Vérification des paramètres de la requête
       const routeRequest = controller.checkRouteParameters(parameters, service, "GET");
+      LOGGER.debug(routeRequest);
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
+      LOGGER.debug(routeResponse);
       // Formattage de la réponse
       const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service);
+      LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
@@ -90,6 +123,8 @@ router.route("/route")
 
   .post(async function(req, res, next) {
 
+    LOGGER.debug("requete POST sur /simple/1.0.0/route?");
+
     // On récupère l'instance de Service pour faire les calculs
     let service = req.app.get("service");
 
@@ -100,15 +135,19 @@ router.route("/route")
 
     // on récupère l'ensemble des paramètres de la requête
     let parameters = req.body;
+    LOGGER.debug(parameters);
 
     try {
 
       // Vérification des paramètres de la requête
       const routeRequest = controller.checkRouteParameters(parameters, service, "POST");
+      LOGGER.debug(routeRequest);
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
+      LOGGER.debug(routeResponse);
       // Formattage de la réponse
       const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service);
+      LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
@@ -123,6 +162,10 @@ router.route("/route")
 router.route("/isochrone")
 
   .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /simple/1.0.0/isochrone?");
+    LOGGER.debug(req.originalUrl);
+
     let service = req.app.get("service");
 
     if (!service.verifyAvailabilityOperation("isochrone")) {
@@ -130,23 +173,32 @@ router.route("/isochrone")
     }
 
     let parameters = req.query;
+    LOGGER.debug(parameters);
 
     try {
+
       // Vérification des paramètres de la requête
       const isochroneRequest = controller.checkIsochroneParameters(parameters, service, "GET");
+      LOGGER.debug(isochroneRequest);
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
+      LOGGER.debug(isochroneResponse);
       // Formattage de la réponse.
       const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse, service);
+      LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
+
     } catch (error) {
       return next(error);
     }
   })
 
   .post(async function(req, res, next) {
+
+    LOGGER.debug("requete POST sur /simple/1.0.0/isochrone?");
+
     let service = req.app.get("service");
 
     if (!service.verifyAvailabilityOperation("isochrone")) {
@@ -154,17 +206,23 @@ router.route("/isochrone")
     }
 
     let parameters = req.body;
+    LOGGER.debug(parameters);
 
     try {
+      
       // Vérification des paramètres de la requête
       const isochroneRequest = controller.checkIsochroneParameters(parameters, service, "POST");
+      LOGGER.debug(isochroneRequest);
       // Envoie au service et récupération de l'objet réponse
       const isochroneResponse = await service.computeRequest(isochroneRequest);
+      LOGGER.debug(isochroneResponse);
       // Formattage de la réponse.
       const userResponse = controller.writeIsochroneResponse(isochroneRequest, isochroneResponse, service);
+      LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
       res.status(200).json(userResponse);
+
     } catch (error) {
       return next(error);
     }
@@ -190,6 +248,8 @@ router.use(notFoundError);
 function logError(err, req, res, next) {
   LOGGER.error({
     request: req.originalUrl,
+    query: req.query,
+    body: req.body,
     error: {
       errorType: err.code,
       message: err.message,

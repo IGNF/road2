@@ -19,6 +19,7 @@ module.exports = class Request {
   * @description Constructeur de la classe Request
   * @param {string} operation - Type d'opération concernée
   * @param {string} resource - Ressource concernée
+  * @param {string} type - Type de la requête
   *
   */
   constructor(operation, resource, type) {

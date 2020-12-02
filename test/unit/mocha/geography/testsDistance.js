@@ -27,6 +27,7 @@ describe('Test de la classe Distance', function() {
 
     it('Convert()', function() {
       assert.equal(distance.convert("kilometer"), true);
+      assert.equal(distance.value, 0.01);
     });
 
   });

@@ -56,6 +56,7 @@ module.exports = class Server {
     this._options = options;
 
     // serveur
+    //TODO: enlever cette partie du constructeur, qu'il ne puisse pas y avoir d'erreurs possibles 
     if (this._enableHttps === "true") {
 
       let optionsContent = {};
@@ -65,7 +66,7 @@ module.exports = class Server {
 
         this._server = https.createServer(optionsContent, this._app);
       } catch (err) {
-        LOGGER.fatal("Impossible de lire les cerrificats")
+        LOGGER.fatal("Impossible de lire les certificats")
         throw errorManager.createError("Certificate not found");
       }
 

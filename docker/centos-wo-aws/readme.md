@@ -1,19 +1,25 @@
 # Dockerfile pour utiliser Road2 sous CentOS mais sans faire appel à AWS
 
+Il est possible d'installer OSRM, et plus particulièrement le binding NodeJS, depuis les sources sans faire appel aux binaires hébergés sur AWS. Ce dockerfile en est un exemple. Voici la procèdure à suivre: 
+
+1. Installer un compilateur pour Boost et GCC 6: gcc-c++
+2. Installer les dépendances pour GCC 6.3.0 afin de compiler OSRM: GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+
+3. Installer les dépendances pour OSRM: boost 1.65.1; expat 2.2.0; lua 5.2.4; bzip2 1.0.6; tbb 
+4. Installer les dépendances pour Boost: openmpi-devel python-devel
+5. Installer les dépendances pour LUA: readline-devel
+6. Compiler et installer gcc 6.2.0 pour compiler OSRM 
+7. Compiler et installer boost 1.65.1
+8. Compiler et installer lua 5.2.4
+9. Compiler et installer OSRM 5.23.0 (cf Dockerfile)
+10. Ajouter la variable LD_LIBRARY_PATH=/opt/gcc-6/home/docker/gcc/objdir/lib64:$LD_LIBRARY_PATH pour que les binaires trouvent les librairies utilisées lors de la compilation. 
+11. Créer le module NodeJS d'OSRM (cf. Dockerfile)
+
 
 # Construction de l'image
 
 Pour construire l'image, il suffit de lancer la commande suivante à la racine du projet Road2:
 ```
 docker build -t road2-centos -f docker/centos/Dockerfile .
-```
-
-Les éléments suivants peuvent être spécifiés:
-- DNS (host et IP)
-- Proxy
-
-```
-docker build -t road2-centos --build-arg dnsIP=$dnsIP --build-arg dnsHost=$dnsHost --build-arg proxy=$proxy -f docker/centos/Dockerfile .
 ```
 
 # Lancer l'application

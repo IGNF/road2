@@ -4,9 +4,14 @@ Cucumber sera utilisé afin de tester les APIs de Road2, et cela, dans leurs asp
 
 ## Cucumber pour les APIs
 
+Il y a deux features cucumber pour effectuer les tests fonctionnels. La première `road2.feature` permet de tester les fonctionnalités principales. Elle a l'avantage d'être accessible dès que l'image docker a été construite. La seconde `road2-complement.feature` permet de tester plus de fonctionnalités. Pour que cette feature soit testable, il est nécessaire de construire une ressource OSRM et une ressource PGR sur l'île-de-France. C'est pour cette raison que ces features sont séparées. 
+
 Afin de lancer les tests Cucumber, on suivra la procédure suivante:
 - lancer le serveur Road2 via docker-compose 
 - exécuter la commande `npm run ftest` via docker-compose
+- générer une ressource OSRM et une ressource PGR sur l'île-de-France via docker-compose 
+- exécuter la commande `npm run cftest` via docker-compose
+
 
 ## Ansible pour la gestion du service
 

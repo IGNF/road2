@@ -19,12 +19,36 @@ module.exports = {
   createError: function(msg, status) {
 
     let err = new Error(msg);
+    
     if (status) {
       err.status = status;
     } else {
       err.status = 500;
     }
+
     return err;
+
+  },
+
+   /**
+  *
+  * @function
+  * @name createErrorMessage
+  * @description Création d'un message d'erreur
+  * @param {string} msg - Message d'erreur
+  * @return {object} err - Objet qui contient un message d'erreur 
+  *
+  */
+
+  createErrorMessage: function(msg) {
+
+    return {
+      code: "error",
+      message: msg
+    };
+    
+
   }
+
 
 }

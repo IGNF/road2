@@ -7,7 +7,7 @@
   "example": "name",
   "type": "enumeration",
   "min": 0,
-  "max": 4,
+  "max": 10,
   "explode": "false",
   "style": "pipeDelimited"
 }

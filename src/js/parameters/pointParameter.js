@@ -3,9 +3,11 @@
 const log4js = require('log4js');
 const ResourceParameter = require('../parameters/resourceParameter');
 const Point = require('../geometry/point');
+const errorManager = require('../utils/errorManager');
+const validationManager = require('../utils/validationManager');
 
-// Création du LOGGER
-var LOGGER = log4js.getLogger("APISMANAGER");
+var LOGGER = log4js.getLogger("POINTPARAM");
+
 
 /**
 *
@@ -120,39 +122,60 @@ module.exports = class PointParameter extends ResourceParameter {
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @param {string} userProjection - Projection dans laquelle sont exprimées les coordonnées de l'utilisateur
-  * @return {boolean}
-  *
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
+  *  
   */
   specificCheck(userValue, userProjection) {
 
+    LOGGER.debug("specificCheck()");
+
     if (typeof userValue !== "string") {
-      return false;
+      return errorManager.createErrorMessage("user value is NOT a string");
+    } else {
+      LOGGER.debug("user value is a string");
     }
 
     let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
 
     if (!tmpStringCoordinates) {
-      return false;
+      return errorManager.createErrorMessage("user value is NOT like 'float,float'");
     } else {
+
+      LOGGER.debug("user value is a well formated");
+
       // Vérification de l'inclusion des coordonnées dans la bbox de la ressource
       let userPoint = this.specificConvertion(userValue, userProjection);
 
       if (this._projection !== userProjection) {
+
+        LOGGER.debug("user value need to be transformed from " + userProjection + " to " + this._projection);
+
         if (!userPoint.transform(this._projection)) {
-          return false;
+          return errorManager.createErrorMessage("user value can't be transformed from " + userProjection + " to " + this._projection);
+        } else {
+          LOGGER.debug("user value has been well transformed");
         }
+
+      } else {
+        LOGGER.debug("user value doesn't need to be transformed");
       }
 
       if (userPoint.x < this._xmin || userPoint.x > this._xmax) {
-        return false;
+        return errorManager.createErrorMessage("user value (" + userPoint.x + ") is NOT in bbox for X. Between " + this._xmin + " and " + this._xmax);
+      } else {
+        LOGGER.debug("user value is in bbox for x");
       }
+
       if (userPoint.y < this._ymin || userPoint.y > this._ymax) {
-        return false;
+        return errorManager.createErrorMessage("user value (" + userPoint.y + ") is NOT in bbox for Y. Between " + this._ymin + " and " + this._ymax);
+      } else {
+        LOGGER.debug("user value is in bbox for y");
       }
 
     }
 
-    return true;
+    return validationManager.createValidationMessage("");
   }
 
   /**

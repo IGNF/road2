@@ -3,24 +3,6 @@ FROM centos:7.5.1804
 LABEL maintainer="IGN <rdev@ign.fr>"
 LABEL version="1.0"
 
-### Arguments pour le build de l'image
-# DNS
-ARG dnsHost=""
-ARG dnsIP=""
-# Proxy
-ARG proxy=""
-
-### DNS
-
-RUN if [ "$dnsHost" != "" ] ; then echo "search $dnsHost" > /etc/resolv.conf ; fi
-RUN if [ "$dnsHost" != "" ] ; then echo "nameserver $dnsIP" >> /etc/resolv.conf ; fi
-
-### PROXY
-ENV http_proxy=$proxy
-ENV https_proxy=$proxy
-ENV HTTP_PROXY=$proxy
-ENV HTTPS_PROXY=$proxy
-
 ### MAJ
 RUN yum -y update
 RUN yum -y upgrade
@@ -56,9 +38,9 @@ RUN scl enable devtoolset-8 bash && yum -y install cmake3 zlib-devel
 # https://github.com/door2door-io/osrm-express-server-demo
 # https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
 WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.22.0.zip
-RUN unzip v5.22.0.zip -d ./osrm-backend
-WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/build
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.23.0.zip
+RUN unzip v5.23.0.zip -d ./osrm-backend
+WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/build
 RUN scl enable devtoolset-8 bash && export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ && make && make install
 
 ### Dossier des données
@@ -67,7 +49,7 @@ WORKDIR /home/docker/internal
 ### Récupération de données sur la Corse
 # L'objectif est d'avoir un container indépendant du docker-compose
 RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
-RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua
 RUN osrm-contract corse-latest.osrm
 
 ### Dossier contenant la configuration

@@ -1,7 +1,0 @@
-{
-  "host": "10.201.0.2",
-  "database": "pgrouting",
-  "user": "postgres",
-  "password": "postgres",
-  "port": 5432
-}

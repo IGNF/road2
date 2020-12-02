@@ -14,6 +14,7 @@ const TopologyManager = require('../topology/topologyManager');
 const ProjectionManager = require('../geography/projectionManager');
 const ServerManager = require('../server/serverManager');
 const log4js = require('log4js');
+const pkg = require('../../../package.json');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -454,10 +455,9 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name loadOperations
+  * @name loadProjections
   * @description Chargement des opérations
-  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
-  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
+  * @param {string} projectionsDirectory - Dossier contenant les projections à charger
   *
   */
 
@@ -487,7 +487,7 @@ module.exports = class Service {
   *
   */
 
-  loadResources(userResourceDirectories) {
+  async loadResources(userResourceDirectories) {
 
     LOGGER.info("Chargement des ressources...");
 
@@ -513,9 +513,10 @@ module.exports = class Service {
       let resourceDirectory =  path.resolve(__dirname, userResourceDirectories[i]);
 
       // Pour chaque fichier du dossier des ressources, on crée une ressource
-      fs.readdirSync(resourceDirectory).filter( (file) => {
+      const files = fs.readdirSync(resourceDirectory).filter( (file) => {
         return path.extname(file).toLowerCase() === ".resource";
-      }).forEach(fileName => {
+      })
+      for (let fileName of files){
 
         let resourceFile = resourceDirectory + "/" + fileName;
         LOGGER.info("Chargement de: " + resourceFile);
@@ -525,8 +526,9 @@ module.exports = class Service {
 
           let resourceContent = JSON.parse(fs.readFileSync(resourceFile));
           // Vérification du contenu
-          if (!this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)) {
-            LOGGER.error("Erreur lors du chargement de: " + resourceFile);
+          let resourceChecked = await this._resourceManager.checkResource(resourceContent, this._sourceManager, this._operationManager, this._topologyManager)
+          if (!resourceChecked) {
+            LOGGER.error("Erreur lors du chargement de la ressource: " + resourceFile);
           } else {
             // Création de la ressource
             this._resourceCatalog[resourceContent.resource.id] = this._resourceManager.createResource(resourceContent, this._operationManager);
@@ -535,10 +537,10 @@ module.exports = class Service {
 
         } catch (error) {
           LOGGER.error(error);
-          LOGGER.error("Erreur lors de la lecture de: " + resourceFile);
+          LOGGER.error("Erreur lors de la lecture de la ressource: " + resourceFile);
         }
 
-      });
+      };
 
     }
 
@@ -598,7 +600,6 @@ module.exports = class Service {
 
         let sourceId = listOfSourceIds[i];
         LOGGER.info("Chargement de la source: " + sourceId);
-        LOGGER.debug(sourceDescriptions[sourceId]);
 
         // On récupère la bonne topologie
         let topologyId = this._sourceManager.getSourceTopology(sourceId);
@@ -640,7 +641,7 @@ module.exports = class Service {
             }
           }
           sourceToRemove.push(sourceId);
-          
+
         }
       }
 
@@ -651,7 +652,7 @@ module.exports = class Service {
           this._sourceManager.removeSource(sourceToRemove[k]);
         }
       }
-      
+
     } else {
       LOGGER.fatal("Il n'y a aucune source a charger.");
       throw errorManager.createError("No source found");
@@ -701,7 +702,7 @@ module.exports = class Service {
     }
 
     road2.all('/', (req, res) => {
-      res.send('Road2 is running !! \n');
+      res.send('Road2 ' + pkg.version);
     });
 
     // Création des serveurs

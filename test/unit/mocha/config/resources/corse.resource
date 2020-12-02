@@ -25,7 +25,7 @@
         "optimization": "fastest",
         "compute": {
           "storage": {
-            "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.22.0/profiles/car.lua"
+            "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua"
           }
         }
       }

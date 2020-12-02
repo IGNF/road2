@@ -143,7 +143,11 @@ module.exports = class osrmSource extends Source {
   */
   computeRequest (request) {
 
+    LOGGER.debug("computeRequest()");
+
     if (request.operation === "route") {
+
+      LOGGER.debug("operation request is route");
 
       // Construction de l'objet pour la requête OSRM
       // Cette construction dépend du type de la requête fournie
@@ -155,6 +159,9 @@ module.exports = class osrmSource extends Source {
       osrmRequest.overview = "full";
 
       if (request.type === "routeRequest") {
+
+        LOGGER.debug("type of request is routeRequest");
+
         // Coordonnées
         let coordinatesTable = new Array();
         // start
@@ -168,6 +175,9 @@ module.exports = class osrmSource extends Source {
         // end
         coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
 
+        LOGGER.debug("coordinates:");
+        LOGGER.debug(coordinatesTable);
+
         osrmRequest.coordinates = coordinatesTable;
 
         // steps
@@ -179,37 +189,74 @@ module.exports = class osrmSource extends Source {
 
         // Gestion des contraintes d'exclusion.
         if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
+
           osrmRequest.exclude = [];
           for (let i = 0; i < request.constraints.length; i++) {
             let constraint = request.constraints[i];
 
             if (constraint.type === "banned") {
               osrmRequest.exclude.push(constraint.field);
+            } else {
+              // ce sont des contraintes non gérées donc il n'y a rien à faire 
+              LOGGER.debug("no banned contraints");
             }
+
           }
+
+        } else {
+          // il n'y rien à faire car pas de contraintes 
+          LOGGER.debug("no contraints");
         }
 
       } else {
-        // on va voir si c'est un autre type de requête
+
+        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse
+        LOGGER.error("type of request not found");
+
       }
 
       return new Promise ( (resolve, reject) => {
+
+        LOGGER.debug("orsmRequest:");
+        LOGGER.debug(osrmRequest);
+
         this.osrm.route(osrmRequest, (err, result) => {
+
           if (err) {
-            // on ne renvoie pas l'erreur d'OSRM
-            reject(errorManager.createError(" Internal OSRM error. "));
+
+            LOGGER.error("osrm error:");
+            LOGGER.error(err);
+
+            if (err.code === "NoRoute" || err.code === "NoSegment") {
+              reject(errorManager.createError(" No path found ", 404));
+            } else {
+              // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
+              // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
+              reject("Internal OSRM error");
+            }
+
           } else {
+
+            LOGGER.debug("osrm response:");
+            LOGGER.debug(result);
+
             try {
               resolve(this.writeRouteResponse(request, result));
             } catch (error) {
               reject(error);
             }
+
           }
+
         });
+
       });
 
     } else {
-      // on va voir si c'est une autre opération
+
+      // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse
+      LOGGER.error("request operation not found"); 
+
     }
 
   }
@@ -227,6 +274,8 @@ module.exports = class osrmSource extends Source {
   *
   */
   writeRouteResponse (routeRequest, osrmResponse) {
+
+    LOGGER.debug("writeRouteResponse()");
 
     let resource;
     let start;
@@ -253,21 +302,32 @@ module.exports = class osrmSource extends Source {
     if (osrmResponse.waypoints.length < 2) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
       throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 2. ");
+    } else {
+      LOGGER.debug("osrm response has 2 or more waypoints");
     }
 
     // projection demandée dans la requête
     let askedProjection = routeRequest.start.projection;
+    LOGGER.debug("asked projection: " + askedProjection);
+
+    LOGGER.debug("topology projection: " + this.topology.projection);
 
     // start
     start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
     if (!start.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
+    } else {
+      LOGGER.debug("start in asked projection:");
+      LOGGER.debug(start);
     }
 
     // end
     end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
     if (!end.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
+    } else {
+      LOGGER.debug("end in asked projection:");
+      LOGGER.debug(end);
     }
 
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
@@ -275,11 +335,15 @@ module.exports = class osrmSource extends Source {
     if (osrmResponse.routes.length === 0) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
       throw errorManager.createError(" No route found ", 404);
+    } else {
+      LOGGER.debug("osrm response has 1 or more routes");
     }
 
     // routes
     // Il peut y avoir plusieurs itinéraires
     for (let i = 0; i < osrmResponse.routes.length; i++) {
+
+      LOGGER.debug("osrm route number " + i);
 
       let portions = new Array();
       let currentOsrmRoute = osrmResponse.routes[i];
@@ -288,6 +352,8 @@ module.exports = class osrmSource extends Source {
       routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", this._topology.projection) );
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of geometry in OSRM response. ");
+      } else {
+        LOGGER.debug("route geometry is converted");
       }
 
       // On récupère la distance et la durée
@@ -298,21 +364,31 @@ module.exports = class osrmSource extends Source {
       // Si ce n'est pas le cas, c'est qu'OSRM n'a pas le comportement attendu...
       if (currentOsrmRoute.legs.length !== osrmResponse.waypoints.length-1) {
         throw errorManager.createError(" OSRM response is invalid: the number of legs is not proportionnal to the number of waypoints. ");
+      } else {
+        LOGGER.debug("number of osrm legs et asked waypoints are compatible");
       }
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       for (let j = 0; j < currentOsrmRoute.legs.length; j++) {
+
+        LOGGER.debug("Portion (osrm legs) number " + j + " for route number " + i);
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
 
         let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
+        } else {
+          LOGGER.debug("portion start in asked projection:");
+          LOGGER.debug(legStart);
         }
 
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+        } else {
+          LOGGER.debug("portion end in asked projection:");
+          LOGGER.debug(legEnd);
         }
 
         portions[j] = new Portion(legStart, legEnd);
@@ -327,11 +403,16 @@ module.exports = class osrmSource extends Source {
         // On va associer les étapes à la portion concernée
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
 
+          LOGGER.debug("Step number " + k + " of portion number " + j + " for route number " + i);
+
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
           steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", this._topology.projection) );
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
+          } else {
+            LOGGER.debug("step geometry is converted");
           }
+
           // Ajout de l'attribut name 
           let nameAttributs;
           try {

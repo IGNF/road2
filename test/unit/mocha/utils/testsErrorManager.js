@@ -24,4 +24,20 @@ describe('Test du errorManager', function() {
 
   });
 
+
+  describe('Test de la fonction createErrorMessage()', function() {
+
+    let msg = "Un message d'erreur";
+
+    let goodResult = {
+      code: "error",
+      message: msg
+    };
+
+    it('createErrorMessage() should return the right object', function() {
+      assert.deepEqual(errorManager.createErrorMessage(msg), goodResult);
+    });
+
+  });
+
 });

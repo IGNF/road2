@@ -10,10 +10,10 @@ describe('Test de la classe Base', function() {
   });
 
   let configuration = {
-    "host": "baseHost",
-    "database": "baseName",
-    "user": "user",
-    "password": "pwd",
+    "host": "pgrouting-procedures-centos",
+    "database": "pgrouting",
+    "user": "postgres",
+    "password": "postgres",
     "port": "5432"
   };
 
@@ -26,20 +26,21 @@ describe('Test de la classe Base', function() {
     });
 
     it('Get pool', function() {
-        assert.equal(base.pool.options.host, "baseHost");
+        assert.equal(base.pool.options.host, "pgrouting-procedures-centos");
     });
 
   });
 
-  describe('Test de la connexion a une base', function() {
+  describe('Test de la connexion et de la deconnexion', function() {
 
-    it('Connect() avec les mauvais arguments', async function() {
-      try {
+    xit('Connect()', async function() {
         await base.connect();
-      } catch(err) {
-        assert.equal(base.connected, false);
-      }
-        
+        assert.equal(base.connected, true);
+    });
+
+    xit('Disconnect()', async function() {
+      await base.disconnect();
+      assert.equal(base.connected, false);
     });
 
   });

@@ -103,6 +103,7 @@ module.exports = class Line extends Geometry {
     } else if (srcFormat === "geojson" && outFormat === "polyline") {
       return polyline.fromGeoJSON(geom);
     } else {
+      //TODO: voir si on peut remplacer ce throw par un return {}
       throw errorManager.createError("Unsupported geometry conversion");
     }
   }

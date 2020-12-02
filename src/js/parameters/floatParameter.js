@@ -1,6 +1,12 @@
 'use strict';
 
 const ResourceParameter = require('./resourceParameter');
+const log4js = require('log4js');
+const errorManager = require('../utils/errorManager');
+const validationManager = require('../utils/validationManager');
+
+
+var LOGGER = log4js.getLogger("FLOATPARAM");
 
 /**
 *
@@ -82,33 +88,58 @@ module.exports = class FloatParameter extends ResourceParameter {
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @return {boolean}
+  * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
+  *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
+  *
   *
   */
   specificCheck(userValue) {
 
+    LOGGER.debug("specificCheck()");
+
     let userFloat;
-    /* Vérifier que la valeur introduite est de type float. */
+
+    // Vérifier que la valeur introduite est de type float
     if(typeof userValue === "string") {
-      userFloat = parseFloat(userValue);
-      if (isNaN(userFloat)) {
-        return false;
-      } 
+
+      LOGGER.debug("user value is a string");
+      userFloat = this.filterFloat(userValue);
+
     } else if (typeof userValue === "number") {
+
+      LOGGER.debug("user value is a number");
       userFloat = userValue;
+
     } else {
-      return false;
+      return errorManager.createErrorMessage("user value is nor a string, nor a number");
+    }
+
+    if (isNaN(userFloat)) {
+      return errorManager.createErrorMessage("user value is NaN");
+    } else {
+      LOGGER.debug("user value is NOT NaN");
+    }
+
+    // TODO: trouver une meilleure solution sachant que la fonction isFinite() ne fonctionne pas...
+    if (userFloat === Infinity || userFloat === -Infinity) {
+      return errorManager.createErrorMessage("user value is Infinity");
+    } else {
+      LOGGER.debug("user value is NOT infinity");
     }
     
     if (this._min && (userFloat < this._min)) {
-      return false;
+      return errorManager.createErrorMessage("user value is inferior to the min " + this._min);
+    } else {
+      LOGGER.debug("user value is NOT inferior to the min");
     }
 
     if (this._max && (userFloat > this._max)) {
-      return false;
+      return errorManager.createErrorMessage("user value is superior to the max " + this._max);
+    } else {
+      LOGGER.debug("user value is NOT superior to the max");
     }
 
-    return true;
+    return validationManager.createValidationMessage("");
 
   }
 
@@ -125,6 +156,26 @@ module.exports = class FloatParameter extends ResourceParameter {
 
     return parseFloat(userValue);
 
+  }
+
+  /**
+  *
+  * @function
+  * @name filterFloat
+  * @description Convertir une valeur en float
+  * @param {string} value - Valeur à convertir
+  * @return {float}
+  *
+  */
+
+  filterFloat(value) {
+
+    if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value)) {
+      return Number(value);
+    } else {
+      return NaN;
+    }
+    
   }
 
 
