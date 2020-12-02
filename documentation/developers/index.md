@@ -242,3 +242,7 @@ docker run -d --name sonarqube -p 9000:9000 sonarqube
 Cela demande d'installer le binaire `sonar-scanner` sur la machine. 
 
 Pour une analyse continue lors des développements, il est possible d'installer l'extension Sonarlint dans certains IDE. 
+
+### GIT 
+
+La gestion des branches et des versions est détaillée [ici](./version.md). 

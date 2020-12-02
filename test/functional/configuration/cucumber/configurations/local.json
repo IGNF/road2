@@ -1,0 +1,4 @@
+{
+    "defaultServerConfiguration": "/home/docker/config/road2.json",
+    "road2": "/home/docker/app/src/js/road2.js"
+}
