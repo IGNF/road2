@@ -36,5 +36,5 @@ Il est conseillé d'utiliser [docker-compose](./docker/readme.md) pour tester et
 ## Versions
 
 Cette version de Road2 fonctionne avec les versions suivantes:
-- route-graph-generator 1.0.1
-- pgrouting-procedures 1.0.1
+- route-graph-generator 1.0.2-DEVELOP
+- pgrouting-procedures 1.0.2-DEVELOP
