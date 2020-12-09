@@ -227,7 +227,7 @@ module.exports = class osrmSource extends Source {
             LOGGER.error("osrm error:");
             LOGGER.error(err);
 
-            if (err.code === "NoRoute" || err.code === "NoSegment") {
+            if (err.message === "NoRoute" || err.message === "NoSegment") {
               reject(errorManager.createError(" No path found ", 404));
             } else {
               // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
