@@ -9,12 +9,36 @@ Given("a valid configuration", function() {
     assert.equal(this.readServerConfigurationFiles(), true);
 });
 
-// Given("with parameter {string} for {string} in {string} configuration", function(value, attribute, object) {
-//     this.modifyServerConfiguration(value, attribute, object);
+Given("with parameter {string} for attribute {string} in server configuration", function(value, attribute) {
+    this.modifyServerConfiguration(value, attribute, "", "server", "modify");
+});
+
+Given("without attribute {string} in server configuration", function(attribute) {
+    this.modifyServerConfiguration("", attribute, "", "server", "delete");
+});
+
+// Given("with parameter {string} for attribute {string} in log configuration", function(value, attribute) {
+//     this.modifyServerConfiguration(value, attribute, "", "log", "modify");
 // });
 
-// Given("with parameter {string} for {string} in {string} resource", function(value, attribute, id) {
-//     this.modifyServerConfiguration(value, attribute, id);
+// Given("without attribute {string} in log configuration", function(attribute) {
+//     this.modifyServerConfiguration("", attribute, "", "log", "delete");
+// });
+
+// Given("with parameter {string} for attribute {string} in {string} resource", function(value, attribute, id) {
+//     this.modifyServerConfiguration(value, attribute, id, "resource", "modify");
+// });
+
+// Given("without attribute {string} in server configuration", function(attribute) {
+//     this.modifyServerConfiguration("", attribute, "", "resource", "delete");
+// });
+
+// Given("with parameter {string} for attribute {string} in {string} projection configuration", function(value, attribute, id) {
+//     this.modifyServerConfiguration(value, attribute, id, "projection", "modify");
+// });
+
+// Given("without attribute {string} in server configuration", function(attribute) {
+//     this.modifyServerConfiguration("", attribute, "", "projection", "delete");
 // });
 
 // When("I load the server", function(done) {
@@ -38,16 +62,20 @@ When("I test the configuration", function(done) {
     });
 
 });
-  
+
 Then("the configuration analysis should give an exit code {int}", function(code) {
     assert.equal(this.verifyCommandExitCode(code), true);
 });
 
-// Then("the server log should contain {string}", function(message) {
-//     assert.equal(this.findInServerLog(message), true);
-// });
+Then("the server log should contain {string}", function(message) {
+    assert.equal(this.findInServerLog(message), true);
+});
 
-// Then("the server log should not contain {string}", function(message) {
-//     assert.equal(this.findInServerLog(message), false);
-// });
+Then("the server log should not contain {string}", function(message) {
+    assert.equal(this.findInServerLog(message), false);
+});
+
+Then("the server log should not contain error", function() {
+    assert.equal(this._stderr, "");
+});
 

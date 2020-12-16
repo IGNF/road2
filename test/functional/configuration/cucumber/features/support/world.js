@@ -2,6 +2,7 @@ const { setWorldConstructor } = require("cucumber");
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { spawn } = require('child_process');
 
 /**
 *
@@ -31,20 +32,29 @@ class road2World {
         // Espace temporaire pour stocker les configurations de chaque test
         this._tmpDirectory = os.tmpdir();
 
-        // Contenu du server.json
+        // Contenu du server.json pour le test en cours
         this._serverConf = {};
 
-        // Contenu du log4js.json
+        // Contenu du log4js.json pour le test en cours
         this._logConf = {};
 
-        // Contenu des projections
+        // Contenu des projections pour le test en cours
         this._projConf = {};
 
-        // Contenu des ressources 
+        // Contenu des ressources pour le test en cours
         this._resourceConf = {};
 
         // Dossier temporaire pour le test en cours
         this._tmpDirConf = "";
+
+        // Code de retour de Road2 pour le test en cours
+        this._code;
+
+        // stdout de Road2 pour le test en cours
+        this._stdout = "";
+
+        // stderr de Road2 pour le test en cours
+        this._stderr = "";
 
     }
 
@@ -156,6 +166,143 @@ class road2World {
 
     }
 
+    // Modification de la configuration stockée en mémoire
+    modifyServerConfiguration(attributeValue, attributeSchema, configurationId, configurationType, modificationType) {
+
+        let modification;
+        let attributesTable = new Array();
+
+        // 1. On commence par déterminer sur quelle élément de la configuration on va faire des modifications
+        if (configurationType === "server") {
+            modification = this._serverConf;
+        } else if (configurationType === "log") {
+            modification = this._logConf;
+        } else if (configurationType === "projection") {
+
+        } else if (configurationType === "resource") {
+
+        } else {
+            throw "Modification configurationType is unknown for this test: " + configurationType;
+        }
+
+        // 2. On modifie l'objet 
+        attributesTable = attributeSchema.split(".");
+        if (attributesTable.length === 0) {
+            throw "AttributeSchema is empty";
+        }
+
+        let currentObject = modification;
+
+        // Pour chaque attribut, on va voir s'il existe et le rajouter sinon 
+        for (let i = 0; i < attributesTable.length; i++) {
+
+            // Analyse de l'attribut courant pour son nom ou son indice
+            let attributeName;
+
+            let attributeProperties = attributesTable[i].match(/^\[\d+\]$/g);
+            if (attributeProperties !== null) {
+                attributeName = parseInt(attributeProperties[0]);
+            } else {
+                attributeName = attributesTable[i];
+            }
+
+            // Si c'est le dernier attribut alors on met la valeur
+            if (i === attributesTable.length - 1) {
+
+                if (typeof currentObject === "object" && typeof attributeName === "string" ) {
+                    
+                    if (modificationType === "delete") {
+                        delete currentObject[attributeName];
+                    } else if (modificationType === "modify") {
+                        Object.defineProperty(currentObject, attributeName, { value: attributeValue, configurable: true, enumerable: true, writable: true });
+                    } else {
+                        throw "modificationType is unknown: " + modificationType;
+                    }
+                    return true;
+
+                } else if (Array.isArray(currentObject) && typeof attributeName === "number" ) {
+
+                    if (attributeName < currentObject.length) {
+
+                        if (modificationType === "delete") {
+                            currentObject.splice(attributeName, 1);
+                        } else if (modificationType === "modify") {
+                            currentObject.splice(attributeName, 1, attributeValue);
+                        } else {
+                            throw "modificationType is unknown: " + modificationType;
+                        }
+                        return true;
+
+                    } else if (attributeName === currentObject.length) {
+                        currentObject.push(attributeValue);
+                        return true;
+                    } else {
+                        throw "Problem with last array length";
+                    }
+
+                } else {
+                    throw "Last object type is unknown";
+                }
+                
+            } else {
+
+                // Si ce n'est pas le dernier attribut 
+                // On regarde s'il est déjà dans l'objet courant (cette vérification dépend de son type)
+                
+                if (typeof currentObject === "object" && typeof attributeName === "string" ) {
+
+                    let currentObjectTable = Object.keys(currentObject);
+
+                    if (currentObjectTable.includes(attributeName)) {
+                        currentObject = currentObject[attributeName];
+                        continue;           
+                    } else {
+
+                        // On va créer l'attribut dans l'objet (selon son type, donné par l'analyse de l'attribut suivant)
+                        let nextProperties = attributesTable[i+1].match(/\[\d+\]/g);
+                        if (nextProperties !== null) {
+                            Object.defineProperty(currentObject, attributeName, { value: new Array(), configurable: true, enumerable: true, writable: true });
+                        } else {
+                            Object.defineProperty(currentObject, attributeName, { value: new Object(), configurable: true, enumerable: true, writable: true });
+                        }
+                        currentObject = currentObject[attributeName];
+                        continue;
+                        
+                    }
+
+                } else if (Array.isArray(currentObject) && typeof attributeName === "number" ) {
+
+                    if (attributeName < currentObject.length) {
+                        currentObject = currentObject[attributeName];
+                        continue;
+                    } else if ( attributeName === currentObject.length) {
+
+                        // On va créer l'attribut dans l'objet (selon son type, donné par l'analyse de l'attribut suivant)
+                        let nextProperties = attributesTable[i+1].match(/\[\d+\]/g);
+                        if (nextProperties !== null) {
+                            currentObject.push(new Array());
+                        } else {
+                            currentObject.push(new Object());
+                        }
+                        currentObject = currentObject[attributeName];
+                        continue;
+
+                    } else {
+                        throw "Problem with current array length";
+                    }
+
+                } else {
+                    throw "Current object type is unknown";
+                }
+
+            }
+   
+        }
+
+        return false;
+
+    }
+
     // Test de la configuration stockée 
     testConfiguration() {
 
@@ -181,7 +328,58 @@ class road2World {
                 }
             });
         });
+
+        // On lance l'analyse de la conf par Road2 
+        return new Promise ( (resolve, reject) => {
+
+            const command = spawn("node", [this._road2, "--configCheck", "--ROAD2_CONF_FILE=" + path.join(this._tmpDirConf, "server.json")]);
+
+            command.stdout.on("data", (data) => {
+                this._stdout += data.toString();
+            });
+              
+            command.stderr.on("data", (data) => {
+                this._stderr += data.toString();
+            });
+
+            command.on("error", (err) => {
+                reject(err);
+            });
+              
+            command.on("close", (code) => {
+                this._code = code;
+                resolve();
+            });
+
+
+        });
         
+    }
+
+    // Analyse du code de retour de la commande 
+    verifyCommandExitCode(code) {
+
+        if (code === this._code) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    // Analyse des logs 
+    findInServerLog(message) {
+
+        if (this._stdout.includes(message)) {
+            return true;
+        } else {
+            if (this._stderr.includes(message)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
     }
  
 }
