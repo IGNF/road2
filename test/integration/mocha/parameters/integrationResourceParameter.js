@@ -9,13 +9,12 @@ describe('Test de la classe RouteRequest', function() {
     logManager.manageLogs();
   });
 
-  let resourceParameterExplode = new ResourceParameter({explode: true, min: 0, max: 5, style: "pipeDelimited"});
-  let resourceParameterNotExplode = new ResourceParameter({explode: false, min: 0, max: 5, style: "pipeDelimited"});
+  let resourceParameter = new ResourceParameter({explode: true, min: 0, max: 5, style: "pipeDelimited"});
 
   describe('Test du constructeur et des getters', function() {
 
     it('Get Parameter', function() {
-      assert.equal(resourceParameterExplode.parameter, "corse-osm");
+      assert.equal(resourceParameter.serviceParameter.style, "pipeDelimited");
     });
 
   });
@@ -23,27 +22,19 @@ describe('Test de la classe RouteRequest', function() {
   describe('Test de load', function() {
 
     it('Load', function() {
-      assert.equal(resourceParameterExplode.load("toto"), false);
+      assert.equal(resourceParameter.load("toto"), false);
     });
 
   });
 
   describe('Test des check', function() {
 
-    it('Check good parameter', function() {
-      assert.equal(resourceParameterExplode.check("toto", {}).code, "ok");
-    });
-
-    it('Check bad parameter', function() {
-      assert.equal(resourceParameterExplode.check("toto", {}).code, "error");
-    });
-
-    it('Check other bad parameter', function() {
-      assert.equal(resourceParameterExplode.check("toto", {}).code, "error");
+    it('Check', function() {
+      assert.equal(resourceParameter.check("toto", {}).code, "error");
     });
 
     it('Specific check', function() {
-      assert.equal(resourceParameterExplode.specificCheck("toto", {}).code, "error");
+      assert.equal(resourceParameter.specificCheck("toto", {}).code, "error");
     });
 
   });
@@ -51,23 +42,15 @@ describe('Test de la classe RouteRequest', function() {
   describe('Test des conversions', function() {
 
     it('Convert into table OK', function() {
-      assert.equal(resourceParameterExplode.convertIntoTable(["toto", "tata"], [], {}), true);
+      assert.equal(resourceParameter.convertIntoTable(["toto", "tata"], [], {}), false);
     });
 
     it('Convert into table OK not exploded', function() {
       assert.equal(resourceParameterNotExplode.convertIntoTable("toto|tata", [], {}), true);
     });
 
-    it('Convert into table NOK', function() {
-      assert.equal(resourceParameterExplode.convertIntoTable("toto", [], {}), false);
-    });
-
-    it('Convert into table other NOK', function() {
-      assert.equal(resourceParameterExplode.convertIntoTable("toto", [], {}), false);
-    });
-
     it('Specific Convertion', function() {
-      assert.equal(resourceParameterExplode.specificConvertion("toto", {}), null);
+      assert.equal(resourceParameter.specificConvertion("toto", {}), null);
     });
 
   });
