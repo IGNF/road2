@@ -1,6 +1,7 @@
 getCapabilities:
 	info:
 		name: "Calcul d'itinéraire"
+		title: "Service d'itinéraire"
 		url: "https://wxs.ign.fr/#KEY/geoportail/itineraire"
 		description: "Service permettant plusieurs opérations liées au calcul d'itinéraire."
 	api:

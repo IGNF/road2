@@ -14,6 +14,10 @@
 				"name":
 					type: string
 					required: true
+				# Titre du service
+				"title":
+					type: string
+					required: true
 				# Url d'accès au service
 				"url":
 					type: string
