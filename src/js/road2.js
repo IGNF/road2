@@ -115,12 +115,20 @@ function loadGlobalConfiguration() {
   if (nconf.get('ROAD2_CONF_FILE')) {
 
     // chemin absolu du fichier
-    file = path.resolve(__dirname,nconf.get('ROAD2_CONF_FILE'));
+    file = path.resolve(process.cwd(), nconf.get('ROAD2_CONF_FILE'));
 
     // vérification de l'exitence du fichier
     if (fs.existsSync(file)) {
+      
       // chargement dans une variable pour la classe Service
-      globalConfiguration = JSON.parse(fs.readFileSync(file));
+      try {
+        globalConfiguration = JSON.parse(fs.readFileSync(file));
+      } catch (error) {
+        console.log("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration de Road2:");
+        console.log(error);
+        process.exit(1);
+      }
+
     } else {
       console.log("Mauvaise configuration: fichier de configuration global inexistant: " + file);
       console.log("Utilisez le paramètre ROAD2_CONF_FILE en ligne de commande ou en variable d'environnement pour le préciser.");
@@ -204,12 +212,32 @@ function getLoggerConfiguration(userConfiguration) {
           userLogConfigurationFile = userConfiguration.application.logs.configuration;
 
           // chemin absolu du fichier
-          let file = path.resolve(__dirname,userLogConfigurationFile);
+          let file = "";
+          
+          try {
 
+            let tmpRoad2ConfFile = path.resolve(process.cwd(), nconf.get('ROAD2_CONF_FILE'));
+            let tmpRoad2ConfDir = path.dirname(tmpRoad2ConfFile);
+            file = path.resolve(tmpRoad2ConfDir, userLogConfigurationFile);
+  
+          } catch (error) {
+
+            console.log("Impossible de recuperer le chemin absolu du fichier de log:");
+            console.log(error);
+            process.exit(1);
+
+          }
+          
           // vérification de l'exitence du fichier
           if (fs.existsSync(file)) {
             //Lecture du fichier de configuration des logs
-            logsConf = JSON.parse(fs.readFileSync(file));
+            try {
+              logsConf = JSON.parse(fs.readFileSync(file));
+            } catch (error) {
+              console.log("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration des logs:");
+              console.log(error);
+              process.exit(1);
+            }
           } else {
             console.log("Mauvaise configuration: fichier de configuration des logs inexistant:");
             console.log(file);
@@ -232,6 +260,7 @@ function getLoggerConfiguration(userConfiguration) {
     }
 
   } else {
+    // cela ne doit arriver que si cette fonction est appelée sans paramètre
     console.log("Absence de configuration pour l'application.");
     process.exit(1);
   }
