@@ -303,6 +303,40 @@ class road2World {
 
     }
 
+    // Creation de fichiers reabable ou pas 
+    createFile(relativeFilePath, contentFile, readable) {
+
+        try {
+            fs.writeFileSync(path.join(this._tmpDirConf, relativeFilePath), contentFile);
+        } catch(error) {
+            throw "Can't write file " + relativeFilePath + " : " + error;
+        }
+
+        if (!readable) {
+            // On ne veut pas que le fichier soit lisible 
+            try {
+                fs.chmodSync(path.join(this._tmpDirConf, relativeFilePath), "077");
+                return true;
+            } catch (error) {
+                throw "Can't chmod file " + relativeFilePath + " : " + error;
+            }
+
+        } else {
+            return true;
+        }
+
+    }
+
+    createWrongJSONFile(relativeFilePath) {
+
+        try {
+            fs.writeFileSync(path.join(this._tmpDirConf, relativeFilePath), "{'a': 1,}");
+        } catch(error) {
+            throw "Can't write file " + relativeFilePath + " : " + error;
+        }
+
+    }
+
     // Test de la configuration stockée 
     testConfiguration() {
 

@@ -17,6 +17,18 @@ Given("without attribute {string} in server configuration", function(attribute) 
     this.modifyServerConfiguration("", attribute, "", "server", "delete");
 });
 
+Given("a file {string}", function(relativeFilePath) {
+    this.createFile(relativeFilePath, "", true);
+});
+
+Given("a file {string} non readable", function(relativeFilePath) {
+    this.createFile(relativeFilePath, "", false);
+});
+
+Given("a wrong JSON file {string}", function(relativeFilePath) {
+    this.createWrongJSONFile(relativeFilePath);
+});
+
 // Given("with parameter {string} for attribute {string} in log configuration", function(value, attribute) {
 //     this.modifyServerConfiguration(value, attribute, "", "log", "modify");
 // });

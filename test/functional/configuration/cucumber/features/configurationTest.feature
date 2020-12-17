@@ -17,18 +17,87 @@ Feature: Road2 configuration
     And with parameter "test" for attribute "application" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs' absent"
 
   Scenario: Modification du server.json (application vide)
     Given a valid configuration 
     And with parameter "" for attribute "application" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application' absent"
 
   Scenario: Modification du server.json (application absent)
     Given a valid configuration 
     And without attribute "application" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application' absent"
+
+  Scenario: Modification du server.json (application.logs different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.logs" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs.configuration' absent"
+
+  Scenario: Modification du server.json (application.logs vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.logs" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs' absent"
+
+  Scenario: Modification du server.json (application.logs absent)
+    Given a valid configuration 
+    And without attribute "application.logs" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs' absent"
+
+  Scenario: Modification du server.json (application.logs.configuration different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: fichier de configuration des logs inexistant"
+
+  Scenario: Modification du server.json (application.logs.configuration vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs.configuration' absent"
+
+  Scenario: Modification du server.json (application.logs.configuration absent)
+    Given a valid configuration 
+    And without attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvais configuration: 'application.logs.configuration' absent"
+
+  Scenario: Modification du server.json (application.logs.configuration sur un fichier non lisible)
+    Given a valid configuration 
+    And a file "file.json" non readable
+    And with parameter "file.json" for attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: impossible de lire ou de parser le fichier de configuration des logs"
+
+  Scenario: Modification du server.json (application.logs.configuration sur un fichier vide)
+    Given a valid configuration 
+    And a file "file.json" 
+    And with parameter "file.json" for attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: impossible de lire ou de parser le fichier de configuration des logs"
+
+  Scenario: Modification du server.json (application.logs.configuration sur un fichier incorrect)
+    Given a valid configuration 
+    And a wrong JSON file "file.json" 
+    And with parameter "file.json" for attribute "application.logs.configuration" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: impossible de lire ou de parser le fichier de configuration des logs"
 
   Scenario: Modification du server.json (name different)
     Given a valid configuration 
