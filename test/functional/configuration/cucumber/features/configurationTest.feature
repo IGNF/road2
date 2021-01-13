@@ -122,18 +122,170 @@ Feature: Road2 configuration
     And with parameter "test" for attribute "application.title" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
 
   Scenario: Modification du server.json (title vide)
     Given a valid configuration 
     And with parameter "" for attribute "application.title" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:title' manquant !"
 
   Scenario: Modification du server.json (title absent)
     Given a valid configuration 
     And without attribute "application.title" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:title' manquant !"
+
+  Scenario: Modification du server.json (description different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.description" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+
+  Scenario: Modification du server.json (description vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.description" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:description' manquant !"
+
+  Scenario: Modification du server.json (description absent)
+    Given a valid configuration 
+    And without attribute "application.description" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:description' manquant !"
+
+  Scenario: Modification du server.json (provider different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.provider" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:provider:name' manquant !"
+
+  Scenario: Modification du server.json (provider vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.provider" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+    Then the server log should contain "Configuration incomplete: Objet 'application:provider' manquant !"
+
+  Scenario: Modification du server.json (provider absent)
+    Given a valid configuration 
+    And without attribute "application.provider" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+    Then the server log should contain "Configuration incomplete: Objet 'application:provider' manquant !"
+  
+  Scenario: Modification du server.json (provider.name different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.provider.name" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+
+  Scenario: Modification du server.json (provider.name vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.provider.name" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:provider:name' manquant !"
+
+  Scenario: Modification du server.json (provider.name absent)
+    Given a valid configuration 
+    And without attribute "application.provider.name" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:provider:name' manquant !"
+
+  Scenario: Modification du server.json (provider.site different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.provider.site" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+
+  Scenario: Modification du server.json (provider.site vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.provider.site" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Le champ 'application:provider:site' n'est pas renseigne."
+
+  Scenario: Modification du server.json (provider.site absent)
+    Given a valid configuration 
+    And without attribute "application.provider.site" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Le champ 'application:provider:site' n'est pas renseigne."
+
+  Scenario: Modification du server.json (provider.mail different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.provider.mail" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should not contain error
+
+  Scenario: Modification du server.json (provider.mail vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.provider.mail" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:provider:mail' manquant !"
+
+  Scenario: Modification du server.json (provider.mail absent)
+    Given a valid configuration 
+    And without attribute "application.provider.mail" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:provider:mail' manquant !"
+
+  Scenario: Modification du server.json (operations different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.operations" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:operations:directory' manquant !"
+
+  Scenario: Modification du server.json (operations vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.operations" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Objet 'application:operations' manquant !"
+
+  Scenario: Modification du server.json (operations absent)
+    Given a valid configuration 
+    And without attribute "application.operations" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Objet 'application:operations' manquant !"
+
+  Scenario: Modification du server.json (operations.directory sur un dossier qui n'existe pas)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.operations.directory" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Le dossier /home/docker/app/src/js/service/test n'existe pas."
+
+  Scenario: Modification du server.json (operations.directory vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.operations.directory" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:operations:directory' manquant !"
+
+  Scenario: Modification du server.json (operations.directory absent)
+    Given a valid configuration 
+    And without attribute "application.operations.directory" in server configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:operations:directory' manquant !"
 
 # tester les options de lancement (configCheck et ROAD2_CONF_FILE)
 # tester sans certains fichiers ( proj.json, resource.json)

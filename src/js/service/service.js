@@ -292,6 +292,7 @@ module.exports = class Service {
         return false;
       } else {
         // On vérifie que le dossier existe et qu'il contient des fichiers de description des opérations
+        // TODO: mettre un try et remplacer __dirname 
         let directory =  path.resolve(__dirname,userConfiguration.application.operations.directory);
         if (fs.existsSync(directory)) {
           // On vérifie que l'application peut lire les fichiers du dossier
