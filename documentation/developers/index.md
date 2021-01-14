@@ -234,11 +234,28 @@ tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
 
 ### Sonakube 
 
-Il est possible d'analyser régulièrement le code avec Sonarkube. On pourra utiliser un container pour le serveur: 
+#### Avec docker
+
+Il est possible d'analyser régulièrement le code avec Sonarkube. On pourra utiliser les containers proposés par Sonarqube. 
+
+La commande suivante lance un serveur Sonarqube qui permettra de visualiser les résultats:
+
 ```
-docker run -d --name sonarqube -p 9000:9000 sonarqube
+docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest
 ```
 
-Cela demande d'installer le binaire `sonar-scanner` sur la machine. 
+Une fois lancée, il y a un serveur disponible http://localhost:9000. Il faut s'y connecter pour créer un projet qui s'appelle `road2` et générer un token. Le nom du projet est important. Si un autre est choisi, il faut modifier le fichier `./sonar-project.properties`. 
+
+La commande suivante permet de lancer l'analyse sur le code:
+
+```
+docker run --rm -e SONAR_HOST_URL="http://${SONARQUBE_URL}" -e SONAR_LOGIN="myAuthenticationToken" -v "${YOUR_REPO}:/usr/src" sonarsource/sonar-scanner-cli
+```
+
+#### Avec une autre installation
+
+Il est possible d'utiliser un serveur SOnarkube tiers et d'y charger les données d'analyse via le binaire de Sonarqube. 
+
+#### Sonarlint 
 
 Pour une analyse continue lors des développements, il est possible d'installer l'extension Sonarlint dans certains IDE. 
