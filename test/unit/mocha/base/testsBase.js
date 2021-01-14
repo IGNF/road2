@@ -1,6 +1,8 @@
 const assert = require('assert');
 const Base = require('../../../../src/js/base/base');
 const logManager = require('../logManager');
+const fs = require('fs');
+const path = require('path');
 
 describe('Test de la classe Base', function() {
 
@@ -9,13 +11,8 @@ describe('Test de la classe Base', function() {
     logManager.manageLogs();
   });
 
-  let configuration = {
-    "host": "pgrouting-procedures-centos",
-    "database": "pgrouting",
-    "user": "postgres",
-    "password": "postgres",
-    "port": "5432"
-  };
+  let file = path.resolve(__dirname, "../config/base/config.json");
+  let configuration = JSON.parse(fs.readFileSync(file));
 
   let base = new Base(configuration);
 
