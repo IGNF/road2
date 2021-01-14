@@ -333,6 +333,9 @@ module.exports = class pgrSource extends Source {
             // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
             if (err.code === "38001") {
               reject(errorManager.createError(" No path found ", 404));
+            } else if (err.code === "42703") {
+              // cette erreur remonte quand il n'y a pas de données dans PGR
+              reject(errorManager.createError(" No data found ", 503));
             } else {
               reject(err);
             }
@@ -493,6 +496,12 @@ module.exports = class pgrSource extends Source {
     // Si pgrResponse est vide
     if (pgrResponse.rowCount === 0) {
       throw errorManager.createError(" No data found ", 404);
+    } else if (pgrResponse.rowCount === 1) {
+      if (pgrResponse.rows[0].edge === null) {
+        throw errorManager.createError(" No data found ", 404);
+      } else {
+        // on continue
+      }
     } else {
       LOGGER.debug("pgr response has data");
     }

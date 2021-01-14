@@ -259,3 +259,7 @@ Il est possible d'utiliser un serveur SOnarkube tiers et d'y charger les donnée
 #### Sonarlint 
 
 Pour une analyse continue lors des développements, il est possible d'installer l'extension Sonarlint dans certains IDE. 
+
+### GIT 
+
+La gestion des branches et des versions est détaillée [ici](./version.md). 

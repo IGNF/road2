@@ -29,13 +29,37 @@ module.exports = {
     let getCapabilities = {};
 
     // info
-    // info.name
     getCapabilities.info = {};
+    // info.name
     getCapabilities.info.name = globalConfiguration.application.name;
+    // info.title
+    getCapabilities.info.title = globalConfiguration.application.title;
     // info.description
     getCapabilities.info.description = globalConfiguration.application.description;
     // info.url
     getCapabilities.info.url = globalConfiguration.application.url;
+
+    // provider 
+    getCapabilities.provider = {};
+    
+    if (globalConfiguration.application.provider) {
+
+      // provider.name
+      getCapabilities.provider.name = globalConfiguration.application.provider.name;
+      // provider.site
+      if (globalConfiguration.application.provider.site) {
+        getCapabilities.provider.site = globalConfiguration.application.provider.site;
+      } else {
+        getCapabilities.provider.site = "";
+      }
+      // provider.mail
+      getCapabilities.provider.mail = globalConfiguration.application.provider.mail;
+
+    } else {
+      getCapabilities.provider.name = "";
+      getCapabilities.provider.site = "";
+      getCapabilities.provider.mail = "";
+    }
 
     // api
     getCapabilities.api = {};

@@ -9,8 +9,10 @@
     "configCheck": "node ./src/js/road2.js --configCheck",
     "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "itest": "mocha --recursive './test/integration/mocha/**/*.js'",
-    "ftest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/cucumber/features/road2.feature",
-    "cftest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/cucumber/features/road2-complement.feature",
+    "rtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestTest.feature",
+    "crtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestComplementTest.feature",
+    "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationTest.feature",
+    "cctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationComplementTest.feature",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
     "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
