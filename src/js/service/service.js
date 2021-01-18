@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const assert = require('assert').strict;
+const cors = require('cors');
+const helmet = require('helmet');
 const ApisManager = require('../apis/apisManager');
 const ResourceManager = require('../resources/resourceManager');
 const errorManager = require('../utils/errorManager');
@@ -14,7 +16,6 @@ const TopologyManager = require('../topology/topologyManager');
 const ProjectionManager = require('../geography/projectionManager');
 const ServerManager = require('../server/serverManager');
 const log4js = require('log4js');
-const pkg = require('../../../package.json');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -413,6 +414,37 @@ module.exports = class Service {
         }
       }
 
+      if (!userConfiguration.application.network.cors) {
+        LOGGER.warn("Configuration incomplete: Objet 'application:network:cors' manquant !");
+      } else {
+
+        if (!userConfiguration.application.network.cors.configuration) {
+          LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors.configuration' manquant !");
+          return false; 
+        } else {
+
+          let corsFile = userConfiguration.application.network.cors.configuration;
+
+          if (fs.existsSync(corsFile)) {
+
+            try {
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              JSON.parse(fs.readFileSync(corsFile));
+            } catch (error) {
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de cors de Road2:");
+              LOGGER.error(error);
+              return false;
+            }
+
+          } else {
+            LOGGER.fatal("Mauvaise configuration: Fichier de cors inexistant : " + corsFile);
+            return false; 
+          }
+
+        }
+
+      }
+
     }
 
     LOGGER.info("Verification terminee.");
@@ -685,6 +717,18 @@ module.exports = class Service {
     // Stockage de l'instance Service dans l'app expressJS afin que les informations soient accessibles par les requêtes
     road2.set("service", this);
 
+    // Initialisation des CORS 
+    let corsConfiguration = {};
+    if (this._configuration.application.network.cors) {
+      corsConfiguration = JSON.parse(fs.readFileSync(this._configuration.application.network.cors.configuration));
+    } else {
+      corsConfiguration.origin = false;
+    }
+    road2.use(cors(corsConfiguration));
+    
+    // Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
+    road2.use(helmet());
+
     if (this._logConfiguration !== {}) {
 
       // Pour le log des requêtes reçues sur le service avec la syntaxe
@@ -703,7 +747,7 @@ module.exports = class Service {
     }
 
     road2.all('/', (req, res) => {
-      res.send('Road2 ' + pkg.version);
+      res.send('Road2');
     });
 
     // Création des serveurs

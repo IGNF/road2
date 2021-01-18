@@ -16,6 +16,11 @@ Ce fichier permet de spécificier le niveau des logs, l'emplacement des fichiers
 Le format est celui d'un JSON qui contient deux objets `mainConf` et `httpConf`. Le contenu de ces deux objets suit la syntaxe de log4js. 
 On peut trouver un [exemple](../../docker/config/log4js.json) de ce fichier au format JSON. C'est celui qui est utilisé dans les images docker.  
 
+## cors.json 
+
+Ce fichier permet d'indiquer la configuration que l'on veut appliquer à l'application en terme de CORS. Son contenu est lié à la configuration du module [CORS](https://www.npmjs.com/package/cors#configuration-options) de NodeJS. 
+On peut trouver un [exemple](../../docker/config/cors.json) de ce fichier au format JSON. C'est celui qui est utilisé dans les images docker.  
+
 ## Les projections 
 
 Le fichier *server.json* indique un dossier de projections. Ce dossier peut contenir plusieurs fichiers JSON. Ces fichiers seront lus, indépendamment de leur extension, pour obtenir les informations nécessaires permettant à [PROJ4](http://proj4js.org/) d'effectuer des reprojections. 
