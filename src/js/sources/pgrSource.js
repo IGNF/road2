@@ -744,14 +744,14 @@ module.exports = class pgrSource extends Source {
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       let newRouteGeomCoords = [];
-      let portionDistance = 0;
-      let portionDuration = 0;
 
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
 
         LOGGER.debug("Portion number " + j + " for route number " + i);
 
         let newPortionGeomCoords = [];
+        let portionDistance = 0;
+        let portionDuration = 0;
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
