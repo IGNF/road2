@@ -42,11 +42,11 @@
             "cert": "/run/secrets/cert"
           }
         }
-      ]
+      ],
+      "cors": {
+        "configuration": "/home/docker/config/cors.json"
+      }
     }, 
-    "cors": {
-      "configuration": "/home/docker/config/cors.json"
-    },
     "projections": {
       "directory": "/home/docker/config/projections/"
     }
