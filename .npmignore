@@ -1,0 +1,9 @@
+/test
+/documentation
+/docker
+
+/.vscode
+sonar-project.properties
+jsdoc.json
+eslint.json
+changelog.md
