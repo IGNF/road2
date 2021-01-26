@@ -52,12 +52,28 @@ Then("the response should contain {string}", function(message) {
     assert.equal(this.verifyRawResponseContent(message), true);
 });
 
+Then("the response should contain a complete and valid road", function() {
+    assert.equal(this.checkCompleteRoad(), true);
+});
+
+Then("the response should contain a complete and valid iso", function() {
+    assert.equal(this.checkCompleteIso(), true);
+});
+
 Then("the response should have an header {string} with value {string}", function(key, value) {
     assert.equal(this.checkHeaderContent(key, value), true);
 });
 
 Then("the response should contain an attribute {string} with value {string}", function(key, value) {
     assert.equal(this.checkResponseContent(key, value), true);
+});
+
+Then("the road should be similar to {string}", function(path) {
+    assert.equal(this.checkRoadContent(path), true);
+});
+
+Then("the iso should be similar to {string}", function(path) {
+    assert.equal(this.checkIsoContent(path), true);
 });
 
 Then("the response should contain an attribute {string}", function(key) {

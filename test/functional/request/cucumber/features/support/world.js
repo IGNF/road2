@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const turf = require('@turf/turf')
 
 /**
 *
@@ -346,7 +347,7 @@ class road2World {
 
     verifyResponseStatus(status) {
         if (this._status !== status) {
-            return false;
+            return "Wrong status: " + this._status;
         } else {
             return true;
         }
@@ -356,17 +357,17 @@ class road2World {
         if (this._response.includes(message)) {
             return true;
         } else {
-            return false;
+            return "Message is not in response: " + this._response;
         }
     }
 
     checkHeaderContent(key, value) {
 
         if (!this._header[key]) {
-            return false;
+            return "Key is not in header";
         } else {
             if (!this._header[key].includes(value)) {
-                return false;
+                return "Key doesn't contain the good value";
             } else {
                 return true;
             }
@@ -501,6 +502,163 @@ class road2World {
 
         return false;
 
+    }
+
+    checkCompleteRoad() {
+
+        if (!this.checkResponseAttribut("resource")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("profile")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("optimization")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("distanceUnit")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("timeUnit")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("crs")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("geometry")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("bbox")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("distance")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("duration")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0]")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].start")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].end")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].distance")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].duration")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].steps.[0]")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].steps.[0].geometry")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].steps.[0].attributes")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].steps.[0].distance")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("portions.[0].steps.[0].duration")) {
+            return false;
+        }
+
+        return true; 
+
+    }
+
+    checkCompleteIso() {
+
+        if (!this.checkResponseAttribut("point")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("resource")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("resourceVersion")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("profile")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("costType")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("costValue")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("crs")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("geometry")) {
+            return false;
+        }
+        if (!this.checkResponseAttribut("direction")) {
+            return false;
+        }
+        
+        return true; 
+
+    }
+
+    checkRoadContent(filePath) {
+
+        let referenceRoad = {};
+        let refDistanceMin = 0;
+        let refDistanceMax = 0;
+        let refDurationMin = 0;
+        let refDurationMax = 0;
+        let responseJSON = JSON.parse(this._response);
+
+        try {
+            referenceRoad = JSON.parse(fs.readFileSync(path.resolve(__dirname,filePath)));
+        } catch (error) {
+            return "Can't parse JSON file";
+        }
+
+        if (referenceRoad.distance > 100 ) {
+            refDistanceMin = referenceRoad.distance - 100;
+        }
+        refDistanceMax = referenceRoad.distance + 100;
+
+        if (referenceRoad.duration > 2 ) {
+            refDurationMin = referenceRoad.duration - 2;
+        }
+        refDurationMax = referenceRoad.duration + 2;
+
+
+        if (responseJSON.distance < refDistanceMin || responseJSON.distance > refDistanceMax) {
+            return "Distance is out of boundaries";
+        }
+
+        if (responseJSON.distance < refDistanceMin || responseJSON.distance > refDistanceMax) {
+            return "Duration is out of boundaries";
+        }
+
+        let bufferStart = turf.buffer(turf.point(referenceRoad.start.split(",")), 0.01, {units: "kilometers"});
+
+        if (!turf.booleanWithin(turf.point(responseJSON.start.split(",")), bufferStart)) {
+            return "Start is out of the buffer";
+        }
+
+        let bufferEnd = turf.buffer(turf.point(referenceRoad.end.split(",")), 0.01, {units: "kilometers"});
+
+        if (!turf.booleanWithin(turf.point(responseJSON.end.split(",")), bufferEnd)) {
+            return "End is out of the buffer";
+        }
+
+        let bufferGeometry = turf.buffer(referenceRoad.geometry, 0.1, {units: "kilometers"});
+
+        if (!turf.booleanWithin(responseJSON.geometry, bufferGeometry)) {
+            return "Gemetry is out of the buffer";
+        }
+
+        return true;
+        
     }
 
 
