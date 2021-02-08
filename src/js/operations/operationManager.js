@@ -92,8 +92,8 @@ module.exports = class operationManager  {
   * @function
   * @name loadOperationDirectory
   * @description Charger les opérations du dossier
-  * @param {string} userOperationDirectory - Dossier contenant les opérations
-  * @param {string} userParameterDirectory - Dossier contenant les paramètres
+  * @param {string} userOperationDirectory - Dossier contenant les opérations (chemin absolu)
+  * @param {string} userParameterDirectory - Dossier contenant les paramètres (chemin absolu)
   * @return {boolean}
   *
   */
@@ -102,14 +102,14 @@ module.exports = class operationManager  {
     LOGGER.info("Chargement des operations...");
 
     // Vérification de l'existence du dossier operations
-    let operationsDirectory = path.resolve(__dirname, userOperationDirectory);
+    let operationsDirectory = userOperationDirectory;
     if (!fs.statSync(operationsDirectory).isDirectory()) {
       LOGGER.error("Le dossier contenant la configuration des operations n'existe pas: " + operationsDirectory);
       return false;
     }
 
     // Vérification de l'existence du dossier parameters
-    let parametersDirectory = path.resolve(__dirname, userParameterDirectory);
+    let parametersDirectory = userParameterDirectory;
     if (!fs.statSync(parametersDirectory).isDirectory()) {
       LOGGER.error("Le dossier contenant la configuration des parametres n'existe pas: " + parametersDirectory);
       return false;

@@ -75,7 +75,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name loadProjectionDirectory
   * @description Charger l'ensemble des projections décrites dans un dossier
-  * @param {string} directory - Dossier qui contient des fichiers de description de projections
+  * @param {string} directory - Dossier qui contient des fichiers de description de projections (chemin absolu)
   *
   */
   loadProjectionDirectory (directory) {
@@ -89,22 +89,27 @@ module.exports = class ProjectionManager {
       LOGGER.info(directory);
     }
 
-    let pathDir = path.resolve(__dirname, directory);
-
-    let contentDir = fs.readdirSync(pathDir);
+    let contentDir = new Array();
+    try {
+      contentDir = fs.readdirSync(directory);
+    } catch(error) {
+      LOGGER.error("Impossible de lire le dossier des projections: " + directory);
+      LOGGER.error(error);
+      return false;
+    }
 
     if (!Array.isArray(contentDir)) {
-      LOGGER.error("Erreur lors de la lecture du dossier " + pathDir);
+      LOGGER.error("Erreur lors de la lecture du dossier " + directory);
       return false;
     } 
 
     if (contentDir.length === 0) {
-      LOGGER.error("Le dossier " + pathDir + " ne contient aucun fichier.");
+      LOGGER.error("Le dossier " + directory + " ne contient aucun fichier.");
       return false;
     } 
 
     for (let i = 0; i < contentDir.length; i++) {
-      let pathFile = pathDir + "/" + contentDir[i];
+      let pathFile = directory + "/" + contentDir[i];
       if (!this.loadProjectionFile(pathFile)) {
         LOGGER.error("Erreur lors du chargement d'une projection du fichier.");
         return false;
@@ -121,7 +126,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name loadProjectionFile
   * @description Charger l'ensemble des projections décrites dans un fichier
-  * @param {string} file - Fichier qui contient un ensemble de descriptions des projections
+  * @param {string} file - Fichier qui contient un ensemble de descriptions des projections (chemin absolu)
   *
   */
   loadProjectionFile (file) {
@@ -135,7 +140,7 @@ module.exports = class ProjectionManager {
       LOGGER.info(file);
     }
 
-    let pathFile = path.resolve(__dirname, file);
+    let pathFile = file;
 
     try {
       fs.accessSync(pathFile, fs.constants.R_OK);
@@ -144,7 +149,14 @@ module.exports = class ProjectionManager {
       return false;
     }
 
-    let fileContent = JSON.parse(fs.readFileSync(pathFile));
+    let fileContent = {};
+    try {
+      fileContent = JSON.parse(fs.readFileSync(pathFile));
+    } catch (error) {
+      LOGGER.error("Impossible de lire la configuration de bdd: " + pathFile);
+      LOGGER.error(error);
+      return false;
+    }
 
     if (!Array.isArray(fileContent.projectionsList)) {
       LOGGER.error("Le fichier n'est pas un tableau.");

@@ -132,7 +132,8 @@ module.exports = class serverManager {
         } else {
           // on vérifie que le fichier est exploitable
           try {
-            let file = path.resolve(__dirname, config.options.key);
+            // TODO : gérer les chemins relatifs
+            let file = config.options.key;
             fs.accessSync(file, fs.constants.R_OK);
           } catch (err) {
             LOGGER.error("Le fichier " + file + " ne peut etre lu.");
@@ -145,7 +146,8 @@ module.exports = class serverManager {
         } else {
           // on vérifie que le fichier est exploitable
           try {
-            let file = path.resolve(__dirname, config.options.cert);
+            // TODO : gérer les chemins relatifs
+            let file = config.options.cert;
             fs.accessSync(file, fs.constants.R_OK);
           } catch (err) {
             LOGGER.error("Le fichier " + file + " ne peut etre lu.");

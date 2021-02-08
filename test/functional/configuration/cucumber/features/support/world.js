@@ -32,8 +32,17 @@ class road2World {
         // Espace temporaire pour stocker les configurations de chaque test
         this._tmpDirectory = os.tmpdir();
 
+        // Parametre pour la ligne de commande par défaut
+        this._defaultCLParameter = "";
+
+        // Parametres pour la ligne de commande pour le test en cours 
+        this._commandLineParameters = {};
+
         // Contenu du server.json pour le test en cours
         this._serverConf = {};
+
+        // Boolean pour savoir si le fichier de conf sera lisible ou pas 
+        this._serverReadable = true;
 
         // Contenu du log4js.json pour le test en cours
         this._logConf = {};
@@ -67,16 +76,39 @@ class road2World {
         try {
 
             configuration = JSON.parse(fs.readFileSync(configurationPath));
-            this._defaultServerConfiguration = configuration.defaultServerConfiguration;
-            this._road2 = configuration.road2;
-            this._tmpDirectory = configuration.tmpDirectory;
-
-            return true;
 
         } catch(error) {
+            return error;
+        }
+
+        // On sauvegarde les paramètres qui ne vont pas changés durant tout les tests
+        this._defaultServerConfiguration = configuration.defaultServerConfiguration;
+        this._road2 = configuration.road2;
+        this._tmpDirectory = configuration.tmpDirectory;
+        this._defaultCLParameter = configuration.defaultCLParameter;
+
+        return true;
+
+    }
+
+    // Modification des paramètres de la ligne de commande 
+    modifyCommandLineParameter(commandParameterValue, commandeParameterKey, modificationType) {
+
+        if (modificationType === "modify") {
+            Object.defineProperty(this._commandLineParameters, commandeParameterKey, { value: commandParameterValue, configurable: true, enumerable: true, writable: true });
+        } else if (modificationType === "delete") {
+            delete this._commandLineParameters[commandeParameterKey];
+        } else {
             return false;
         }
 
+        return true;
+
+    }
+
+    // Modification de l'objet serverConf pour que le fichier ne soit pas lisible pendant le test
+    nonReadableServerConfiguration() {
+        this._serverReadable = false;
     }
 
     // Lecture de la configuration de Road2 
@@ -102,14 +134,14 @@ class road2World {
         try {
             this._serverConf = JSON.parse(fs.readFileSync(this._defaultServerConfiguration));
         } catch(error) {
-            return false;
+            throw "Can't parse server conf: "  + error;
         }
 
         // Lecture du log4js.json
         try {
             this._logConf = JSON.parse(fs.readFileSync(this._serverConf.application.logs.configuration));
         } catch(error) {
-            return false;
+            throw "Can't parse log conf: "  + error;
         }
 
         // Lecture des projections 
@@ -118,7 +150,7 @@ class road2World {
         try {
             projDirFiles = fs.readdirSync(projDir);
         } catch(error) {
-            return false;
+            throw "Can't read proj dir: "  + error;
         }
 
         for (let i = 0; i < projDirFiles.length; i++) {
@@ -148,7 +180,7 @@ class road2World {
                 }
 
             } catch(error) {
-                return false;
+                throw "Can't read resources dir or files: "  + error;
             }
 
         }
@@ -161,6 +193,10 @@ class road2World {
 
         // Emplacement des ressources 
         this._serverConf.application.resources.directories = newResourcesDirectories;
+
+        // Emplacement du fichier server.json 
+        this._commandLineParameters[this._defaultCLParameter] = path.join(this._tmpDirConf, "server.json");;
+
 
         return true;
 
@@ -201,7 +237,7 @@ class road2World {
 
             let attributeProperties = attributesTable[i].match(/^\[\d+\]$/g);
             if (attributeProperties !== null) {
-                attributeName = parseInt(attributeProperties[0]);
+                attributeName = parseInt(attributeProperties[0].slice(1, attributeProperties[0].length -1));
             } else {
                 attributeName = attributesTable[i];
             }
@@ -347,6 +383,16 @@ class road2World {
             throw "Can't write server.json : " + error;
         }
 
+        if (!this._serverReadable) {
+            // On ne veut pas que le fichier soit lisible 
+            try {
+                fs.chmodSync(path.join(this._tmpDirConf, "server.json"), "077");
+            } catch (error) {
+                throw "Can't chmod file " + relativeFilePath + " : " + error;
+            }
+
+        } 
+
         try {
             fs.writeFileSync(path.join(this._tmpDirConf, "log4js.json"), JSON.stringify(this._logConf));
         } catch(error) {
@@ -363,10 +409,32 @@ class road2World {
             });
         });
 
+        // -- On prépare les arguments de la ligne de commande 
+        let options = new Array();
+
+        // Fichier main de Road2
+        options.push(this._road2);
+
+        // Pour le moment, on utilise toujours configCheck
+        options.push("--configCheck");
+
+        // On ajoute le contenu les command line parameters
+        for (let key in this._commandLineParameters) {
+            let command = "--" + key;
+
+            if (this._commandLineParameters[key] !== "") {
+                command = command + "=" + this._commandLineParameters[key];
+            }
+
+            options.push(command);
+        }
+
+        // --
+
         // On lance l'analyse de la conf par Road2 
         return new Promise ( (resolve, reject) => {
 
-            const command = spawn("node", [this._road2, "--configCheck", "--ROAD2_CONF_FILE=" + path.join(this._tmpDirConf, "server.json")]);
+            const command = spawn("node", options);
 
             command.stdout.on("data", (data) => {
                 this._stdout += data.toString();
