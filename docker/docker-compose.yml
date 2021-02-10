@@ -25,7 +25,8 @@ services:
     secrets:
       - key
       - cert
-
+    command: sleep 60000
+    
   route-graph-generator-centos:
     build:
       context: ../../route-graph-generator/

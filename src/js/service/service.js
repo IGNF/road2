@@ -444,7 +444,7 @@ module.exports = class Service {
       }
 
       if (!Array.isArray(userConfiguration.application.network.servers)) {
-        LOGGER.fatal("Mauvaise configuration: Objet 'application:network' n'est pas un tableau !");
+        LOGGER.fatal("Mauvaise configuration: Objet 'application:network:servers' n'est pas un tableau !");
         return false;
       }
 
@@ -465,7 +465,7 @@ module.exports = class Service {
       } else {
 
         if (!userConfiguration.application.network.cors.configuration) {
-          LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors.configuration' manquant !");
+          LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors:configuration' manquant !");
           return false; 
         } else {
 
@@ -502,7 +502,7 @@ module.exports = class Service {
     }
 
     if (!userConfiguration.application.projections) {
-      LOGGER.fatal("Configuration incomplete: Objet 'application:projections' manquant !");
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:projections' manquant !");
       return false;
     } else {
 
@@ -853,21 +853,38 @@ module.exports = class Service {
     } else {
       corsConfiguration.origin = false;
     }
-    road2.use(cors(corsConfiguration));
+
+    try {
+      road2.use(cors(corsConfiguration));
+    } catch (error) {
+      LOGGER.fatal("Impossible d'initialiser les cors: ");
+      LOGGER.error(corsConfiguration)
+      LOGGER.error(error);
+      return false;
+    }
     
     // Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
     road2.use(helmet());
 
-    if (this._logConfiguration !== {}) {
+    // Pour le log des requêtes reçues sur le service avec la syntaxe
+    LOGGER.info("Instanciation du logger pour les requêtes...");
 
-      // Pour le log des requêtes reçues sur le service avec la syntaxe
-      LOGGER.info("Instanciation du logger pour les requêtes...");
+    try {
+
       road2.use(log4js.connectLogger(log4js.getLogger('request'), {
         level: this._logConfiguration.httpConf.level,
         format: (req, res, format) => format(this._logConfiguration.httpConf.format)
       }));
 
+    } catch (error) {
+      LOGGER.fatal("Impossible de connecter le logger pour les requetes: ");
+      LOGGER.error(this._logConfiguration.httpConf)
+      LOGGER.error(error);
+      return false;
     }
+    
+
+  
 
     // Chargement des APIs
     if (!this._apisManager.loadAPISDirectory(road2, userApiDirectory, userServerPrefix)) {

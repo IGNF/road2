@@ -30,7 +30,7 @@ async function start() {
 
   // Instanciation du logger et sauvegarde de sa configuration
   let logConfiguration = getLoggerConfiguration(configuration, configurationPath);
-  initLogger(logConfiguration);
+  checkAndInitLogger(logConfiguration);
 
   // Création du service
   let service = new Service();
@@ -162,7 +162,7 @@ function loadGlobalConfiguration() {
 *
 */
 
-function initLogger(userLogConfiguration) {
+function checkAndInitLogger(userLogConfiguration) {
 
   console.log("Instanciation du logger...");
 
@@ -171,7 +171,13 @@ function initLogger(userLogConfiguration) {
     if (userLogConfiguration.mainConf) {
 
       // Configuration du logger
-      log4js.configure(userLogConfiguration.mainConf);
+      try {
+        log4js.configure(userLogConfiguration.mainConf);
+      } catch (error) {
+        console.log("Mauvaise configuration des logs dans mainConf");
+        console.log(error);
+        process.exit(1);
+      }
 
       //Instanciation du logger
       LOGGER = log4js.getLogger('SERVER');
@@ -180,6 +186,33 @@ function initLogger(userLogConfiguration) {
 
     } else {
       console.log("Mausvaise configuration pour les logs: 'mainConf' absent.");
+      process.exit(1);
+    }
+
+    if (userLogConfiguration.httpConf) {
+
+      if (!userLogConfiguration.httpConf.level) {
+        console.log("Mausvaise configuration pour les logs: 'httpConf.level' absent.");
+        process.exit(1);
+      } else {
+        if (typeof userLogConfiguration.httpConf.level !== "string") {
+          console.log("Mausvaise configuration pour les logs: 'httpConf.level' n'est pas une chaine de caracteres");
+          process.exit(1);
+        }
+      }
+
+      if (!userLogConfiguration.httpConf.format) {
+        console.log("Mausvaise configuration pour les logs: 'httpConf.format' absent.");
+        process.exit(1);
+      } else {
+        if (typeof userLogConfiguration.httpConf.format !== "string") {
+          console.log("Mausvaise configuration pour les logs: 'httpConf.format' n'est pas une chaine de caracteres");
+          process.exit(1);
+        }
+      }
+
+    } else {
+      console.log("Mausvaise configuration pour les logs: 'httpConf' absent.");
       process.exit(1);
     }
 
