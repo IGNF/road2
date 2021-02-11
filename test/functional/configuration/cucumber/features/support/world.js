@@ -47,6 +47,9 @@ class road2World {
         // Contenu du log4js.json pour le test en cours
         this._logConf = {};
 
+        // Contenu du cors.json pour le test en cours
+        this._corsConf = {};
+
         // Contenu des projections pour le test en cours
         this._projConf = {};
 
@@ -144,6 +147,13 @@ class road2World {
             throw "Can't parse log conf: "  + error;
         }
 
+        // Lecture du cors.json
+        try {
+            this._corsConf = JSON.parse(fs.readFileSync(this._serverConf.application.network.cors.configuration));
+        } catch(error) {
+            throw "Can't parse cors conf: "  + error;
+        }
+
         // Lecture des projections 
         let projDir = this._serverConf.application.projections.directory;
 
@@ -213,6 +223,8 @@ class road2World {
             modification = this._serverConf;
         } else if (configurationType === "log") {
             modification = this._logConf;
+        } else if (configurationType === "cors") {
+            modification = this._corsConf;
         } else if (configurationType === "projection") {
 
         } else if (configurationType === "resource") {
@@ -397,6 +409,12 @@ class road2World {
             fs.writeFileSync(path.join(this._tmpDirConf, "log4js.json"), JSON.stringify(this._logConf));
         } catch(error) {
             throw "Can't write log4js.json : " + error;
+        }
+
+        try {
+            fs.writeFileSync(path.join(this._tmpDirConf, "cors.json"), JSON.stringify(this._corsConf));
+        } catch(error) {
+            throw "Can't write cors.json : " + error;
         }
 
         Object.keys(this._resourceConf).forEach( resourceDir => {

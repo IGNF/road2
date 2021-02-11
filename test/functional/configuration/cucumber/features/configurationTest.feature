@@ -802,3 +802,19 @@ Feature: Road2 configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "Mausvaise configuration pour les logs: 'httpConf.format' absent"
+
+  Scenario: [cors.json] Contenu different
+    Given a valid configuration 
+    And with parameter "127.0.0.1" for attribute "origin" in cors configuration
+    And with parameter "GET,POST" for attribute "methods" in cors configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    And the server log should not contain error
+
+  Scenario: [cors.json] Contenu mauvais
+    Given a valid configuration 
+    And with parameter "TEST" for attribute "methods" in cors configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    And the server log should not contain error
+

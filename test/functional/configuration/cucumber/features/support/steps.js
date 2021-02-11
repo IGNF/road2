@@ -53,6 +53,14 @@ Given("without attribute {string} in log configuration", function(attribute) {
     this.modifyServerConfiguration("", attribute, "", "log", "delete");
 });
 
+Given("with parameter {string} for attribute {string} in cors configuration", function(value, attribute) {
+    this.modifyServerConfiguration(value, attribute, "", "cors", "modify");
+});
+
+Given("without attribute {string} in cors configuration", function(attribute) {
+    this.modifyServerConfiguration("", attribute, "", "cors", "delete");
+});
+
 // Given("with parameter {string} for attribute {string} in {string} resource", function(value, attribute, id) {
 //     this.modifyServerConfiguration(value, attribute, id, "resource", "modify");
 // });
