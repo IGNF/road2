@@ -2,7 +2,7 @@
 
 ## Vue globale 
 
-Pour instancier Road2, il est nécessaire de lui fournir un certain nombre d'informations. Pour cela, il y a un unique point d'entrée qui est le *server.json*. Ce fichier va indiquer l'emplacement des autres: *log4js.json* pour les logs, le dossier des *projections* et les dossiers des *ressources*. 
+Pour instancier Road2, il est nécessaire de lui fournir un certain nombre d'informations. Pour cela, il y a un unique point d'entrée qui est le *server.json*. Ce fichier va indiquer l'emplacement des autres: *log4js.json* pour les logs, le *cors.json* si on souhaite spécifier une politique de CORS, le dossier des *projections* et les dossiers des *ressources*. 
 
 ## server.json
 
