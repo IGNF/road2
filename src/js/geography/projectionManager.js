@@ -153,18 +153,23 @@ module.exports = class ProjectionManager {
     try {
       fileContent = JSON.parse(fs.readFileSync(pathFile));
     } catch (error) {
-      LOGGER.error("Impossible de lire la configuration de bdd: " + pathFile);
+      LOGGER.error("Impossible de lire la configuration des projections: " + pathFile);
       LOGGER.error(error);
       return false;
     }
 
+    if (!fileContent.projectionsList) {
+      LOGGER.error("La configuration des projections ne contient pas de liste");
+      return false;
+    }
+
     if (!Array.isArray(fileContent.projectionsList)) {
-      LOGGER.error("Le fichier n'est pas un tableau.");
+      LOGGER.error("L'attribut projectionsList de la configuration n'est pas un tableau.");
       return false;
     }
 
     if (fileContent.projectionsList.length === 0) {
-      LOGGER.error("Le fichier est un tableau vide.");
+      LOGGER.error("L'attribut projectionsList de la configuration est un tableau vide.");
       return false;
     }
 
@@ -194,13 +199,13 @@ module.exports = class ProjectionManager {
 
     // id de la projection
     if (!configuration) {
-      LOGGER.error("Pas de configuration");
+      LOGGER.error("La configuration de la projection est vide");
       return false;
     } 
 
     // id de la projection
     if (!configuration.id) {
-      LOGGER.error("Pas d'id");
+      LOGGER.error("La configuration de la projection n'a pas d'id");
       return false;
     } else {
       LOGGER.info(configuration.id);
@@ -208,7 +213,7 @@ module.exports = class ProjectionManager {
 
     // Parametres de la projection
     if (!configuration.parameters) {
-      LOGGER.error("Pas de parametres");
+      LOGGER.error("La configuration de la projection n'a pas de parametres");
       return false;
     } else {
       // TODO: vérification des parametres ?
@@ -225,10 +230,18 @@ module.exports = class ProjectionManager {
     }
 
     // On charge la projection dans proj4
-    proj4.defs(configuration.id, configuration.parameters);
+    try {
 
-    // On stocke l'id
-    this._listOfProjectionId.push(configuration.id);
+      proj4.defs(configuration.id, configuration.parameters);
+      // On stocke l'id
+      this._listOfProjectionId.push(configuration.id);
+
+    } catch(error) {
+      LOGGER.error("Impossible de charger la projection dans proj4: ");
+      LOGGER.error(error);
+      return false;
+    }
+
 
     return true;
 

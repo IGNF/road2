@@ -311,12 +311,25 @@ module.exports = class Service {
         if (fs.existsSync(directory)) {
           // On vérifie que l'application peut lire les fichiers du dossier
           fs.readdirSync(directory).forEach(operation => {
+
+            let operationFile = "";
+
             try {
-              var file = directory + "/" + operation;
-              fs.accessSync(file, fs.constants.R_OK);
+              operationFile = directory + "/" + operation;
+              fs.accessSync(operationFile, fs.constants.R_OK);
             } catch (err) {
-              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+              LOGGER.error("Le fichier d'operation ne peut etre lu: " + operationFile);
             }
+
+            try {
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              JSON.parse(fs.readFileSync(operationFile));
+            } catch (error) {
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier d'operation: " + operationFile);
+              LOGGER.error(error);
+              return false;
+            }
+
           });
 
           // On vérifie que la partie concernant les paramètres est bien renseignée
@@ -344,12 +357,25 @@ module.exports = class Service {
               if (fs.existsSync(directory)) {
                 // On vérifie que l'application peut lire les fichiers du dossier
                 fs.readdirSync(directory).forEach(parameter => {
+
+                  let parameterFile = "";
+
                   try {
-                    var file = directory + "/" + parameter;
-                    fs.accessSync(file, fs.constants.R_OK);
+                    parameterFile = directory + "/" + parameter;
+                    fs.accessSync(parameterFile, fs.constants.R_OK);
                   } catch (err) {
-                    LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                    LOGGER.error("Le fichier de parametres ne peut etre lu: " + parameterFile);
                   }
+
+                  try {
+                    // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                    JSON.parse(fs.readFileSync(parameterFile));
+                  } catch (error) {
+                    LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de parametres: " + parameterFile);
+                    LOGGER.error(error);
+                    return false;
+                  }
+
                 });
 
               } else {
@@ -405,13 +431,25 @@ module.exports = class Service {
             if (fs.existsSync(directory)) {
               // On vérifie que l'application peut lire les fichiers du dossier
               fs.readdirSync(directory).forEach(resource => {
+
+                let resourceFile = "";
                 try {
-                  var file = directory + "/" + resource;
-                  fs.accessSync(file, fs.constants.R_OK);
+                  resourceFile = directory + "/" + resource;
+                  fs.accessSync(resourceFile, fs.constants.R_OK);
                   resourceCount++;
                 } catch (err) {
-                  LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                  LOGGER.error("Le fichier de ressource ne peut etre lu: " + resourceFile);
                 }
+
+                try {
+                  // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                  JSON.parse(fs.readFileSync(resourceFile));
+                } catch (error) {
+                  LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de ressource: " + resourceFile);
+                  LOGGER.error(error);
+                  return false;
+                }
+
               });
             } else {
               LOGGER.error("Mauvaise configuration: Le dossier n'existe pas: " + directory );
@@ -525,11 +563,23 @@ module.exports = class Service {
 
           // On vérifie que l'application peut lire les fichiers du dossier
           fs.readdirSync(projDir).forEach(projection => {
+
+            let projectionFile = "";
+
             try {
-              var file = projDir + "/" + projection;
-              fs.accessSync(file, fs.constants.R_OK);
+              projectionFile = projDir + "/" + projection;
+              fs.accessSync(projectionFile, fs.constants.R_OK);
             } catch (err) {
-              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+              LOGGER.error("Le fichier de projection ne peut etre lu: " + projectionFile);
+            }
+
+            try {
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              JSON.parse(fs.readFileSync(projectionFile));
+            } catch (error) {
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de projection: " + projectionFile);
+              LOGGER.error(error);
+              return false;
             }
           });
 

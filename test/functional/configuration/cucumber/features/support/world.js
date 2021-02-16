@@ -204,6 +204,13 @@ class road2World {
         // Emplacement des ressources 
         this._serverConf.application.resources.directories = newResourcesDirectories;
 
+        // Emplacement des projections 
+        let curProjDir = path.join(this._tmpDirConf, "projections");
+        this._serverConf.application.projections.directory = curProjDir;
+        if (!fs.existsSync(curProjDir)) {
+            fs.mkdirSync(curProjDir, {recursive: true, mode: "766"});
+        }
+
         // Emplacement du fichier server.json 
         this._commandLineParameters[this._defaultCLParameter] = path.join(this._tmpDirConf, "server.json");;
 
@@ -226,11 +233,15 @@ class road2World {
         } else if (configurationType === "cors") {
             modification = this._corsConf;
         } else if (configurationType === "projection") {
-
+            modification = this._projConf[configurationId];
         } else if (configurationType === "resource") {
 
         } else {
             throw "Modification configurationType is unknown for this test: " + configurationType;
+        }
+
+        if (!modification) {
+            throw "Objet a modifie incorrect";
         }
 
         // 2. On modifie l'objet 
@@ -416,6 +427,15 @@ class road2World {
         } catch(error) {
             throw "Can't write cors.json : " + error;
         }
+
+        let curProjDir = path.join(this._tmpDirConf, "projections");
+        Object.keys(this._projConf).forEach( projFile => {
+            try {
+                fs.writeFileSync(path.join(curProjDir, projFile), JSON.stringify(this._projConf[projFile]));
+            } catch(error) {
+                throw "Can't write " + projFile + " in " + curProjDir + " : " + error;
+            }
+        });
 
         Object.keys(this._resourceConf).forEach( resourceDir => {
             Object.keys(this._resourceConf[resourceDir]).forEach( resourceFile => {
