@@ -77,6 +77,22 @@ Given("without attribute {string} in {string} projection", function(attribute, i
     this.modifyServerConfiguration("", attribute, id, "projection", "delete");
 });
 
+Given("with parameter {string} for attribute {string} in {string} operation", function(value, attribute, id) {
+    this.modifyServerConfiguration(value, attribute, id, "operations", "modify");
+});
+
+Given("without attribute {string} in {string} operation", function(attribute, id) {
+    this.modifyServerConfiguration("", attribute, id, "operations", "delete");
+});
+
+Given("with parameter {string} for attribute {string} in {string} parameter", function(value, attribute, id) {
+    this.modifyServerConfiguration(value, attribute, id, "parameters", "modify");
+});
+
+Given("without attribute {string} in {string} parameter", function(attribute, id) {
+    this.modifyServerConfiguration("", attribute, id, "parameters", "delete");
+});
+
 // When("I load the server", function(done) {
 //     this.loadServer()
 //     .then(() => {

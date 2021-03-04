@@ -53,6 +53,12 @@ class road2World {
         // Contenu des projections pour le test en cours
         this._projConf = {};
 
+        // Contenu des operations pour le test en cours
+        this._operationsConf = {};
+
+        // Contenu des parametres pour le test en cours
+        this._parametersConf = {};
+
         // Contenu des ressources pour le test en cours
         this._resourceConf = {};
 
@@ -118,6 +124,8 @@ class road2World {
     readServerConfigurationFiles() {
 
         let projDirFiles = new Array();
+        let operationsDirFiles = new Array();
+        let parametersDirFiles = new Array();
         let resourceDirFiles = new Array();
         let newResourcesDirectories = new Array();
 
@@ -164,7 +172,45 @@ class road2World {
         }
 
         for (let i = 0; i < projDirFiles.length; i++) {
-            this._projConf[projDirFiles[i]] = JSON.parse(fs.readFileSync(path.join(projDir, projDirFiles[i])));
+            try {
+                this._projConf[projDirFiles[i]] = JSON.parse(fs.readFileSync(path.join(projDir, projDirFiles[i])));
+            } catch(error) {
+                throw "Can't read projection file: " + error;
+            }
+        }
+
+        // Lecture des operations 
+        let operationsDir = this._serverConf.application.operations.directory;
+
+        try {
+            operationsDirFiles = fs.readdirSync(operationsDir);
+        } catch(error) {
+            throw "Can't read operations dir: "  + error;
+        }
+
+        for (let i = 0; i < operationsDirFiles.length; i++) {
+            try {
+                this._operationsConf[operationsDirFiles[i]] = JSON.parse(fs.readFileSync(path.join(operationsDir, operationsDirFiles[i])));
+            } catch(error) {
+                throw "Can't read operations file: " + error;
+            }
+        }
+
+        // Lecture des parametres 
+        let parametersDir = this._serverConf.application.operations.parameters.directory;
+
+        try {
+            parametersDirFiles = fs.readdirSync(parametersDir);
+        } catch(error) {
+            throw "Can't read parameters dir: "  + error;
+        }
+
+        for (let i = 0; i < parametersDirFiles.length; i++) {
+            try {
+                this._parametersConf[parametersDirFiles[i]] = JSON.parse(fs.readFileSync(path.join(parametersDir, parametersDirFiles[i])));
+            } catch(error) {
+                throw "Can't read parameters file: " + error;
+            }
         }
 
         // Lecture des ressources 
@@ -211,6 +257,20 @@ class road2World {
             fs.mkdirSync(curProjDir, {recursive: true, mode: "766"});
         }
 
+        // Emplacement des operations 
+        let curOperationsDir = path.join(this._tmpDirConf, "operations");
+        this._serverConf.application.operations.directory = curOperationsDir;
+        if (!fs.existsSync(curOperationsDir)) {
+            fs.mkdirSync(curOperationsDir, {recursive: true, mode: "766"});
+        }
+
+        // Emplacement des parameters 
+        let curParametersDir = path.join(this._tmpDirConf, "parameters");
+        this._serverConf.application.operations.parameters.directory = curParametersDir;
+        if (!fs.existsSync(curParametersDir)) {
+            fs.mkdirSync(curParametersDir, {recursive: true, mode: "766"});
+        }
+
         // Emplacement du fichier server.json 
         this._commandLineParameters[this._defaultCLParameter] = path.join(this._tmpDirConf, "server.json");;
 
@@ -236,6 +296,10 @@ class road2World {
             modification = this._projConf[configurationId];
         } else if (configurationType === "resource") {
 
+        } else if (configurationType === "operations") {
+            modification = this._operationsConf[configurationId];
+        } else if (configurationType === "parameters") {
+            modification = this._parametersConf[configurationId];
         } else {
             throw "Modification configurationType is unknown for this test: " + configurationType;
         }
@@ -434,6 +498,24 @@ class road2World {
                 fs.writeFileSync(path.join(curProjDir, projFile), JSON.stringify(this._projConf[projFile]));
             } catch(error) {
                 throw "Can't write " + projFile + " in " + curProjDir + " : " + error;
+            }
+        });
+
+        let curOperationsDir = path.join(this._tmpDirConf, "operations");
+        Object.keys(this._operationsConf).forEach( operationsFile => {
+            try {
+                fs.writeFileSync(path.join(curOperationsDir, operationsFile), JSON.stringify(this._operationsConf[operationsFile]));
+            } catch(error) {
+                throw "Can't write " + operationsFile + " in " + curOperationsDir + " : " + error;
+            }
+        });
+
+        let curParametersDir = path.join(this._tmpDirConf, "parameters");
+        Object.keys(this._parametersConf).forEach( parametersFile => {
+            try {
+                fs.writeFileSync(path.join(curParametersDir, parametersFile), JSON.stringify(this._parametersConf[parametersFile]));
+            } catch(error) {
+                throw "Can't write " + parametersFile + " in " + curParametersDir + " : " + error;
             }
         });
 

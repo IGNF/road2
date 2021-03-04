@@ -216,18 +216,23 @@ module.exports = class operationManager  {
       return false;
     } else {
 
+      if (!Array.isArray(operationConf.parameters)) {
+        LOGGER.error("Les parametres de l'operation ne sont pas dans un tableau");
+        return false; 
+      }
+
       if (operationConf.parameters.length !== 0) {
         // on vérifie la validité des ids de paramètre fournis
         for (let i = 0; i < operationConf.parameters.length; i++ ) {
           if (!this._parameterManager.isParameterAvailable(operationConf.parameters[i])) {
-            LOGGER.error("L'operation précise un attribut qui n'est pas disponible: " + operationConf.parameters[i]);
+            LOGGER.error("L'operation précise un parametre qui n'est pas disponible: " + operationConf.parameters[i]);
             return false;
           } else {
             // on continue
           }
         }
       } else {
-        LOGGER.error("L'operation ne contient pas d'attribut parameters valide");
+        LOGGER.error("Le tableau des parametres est vide");
         return false;
       }
 
