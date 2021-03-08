@@ -1338,3 +1338,16 @@ Feature: Road2 configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "Le parametre style n'est pas present alors que explode=false"
+
+  Scenario: [osrm resource] resource absent
+    Given a valid configuration 
+    And without attribute "resource" in "corse.resource" resource
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Erreur lors de la lecture de la ressource"
+
+  Scenario: [osrm resource] id different
+    Given a valid configuration 
+    And with parameter "test" for attribute "resource.id" in "corse.resource" resource
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0

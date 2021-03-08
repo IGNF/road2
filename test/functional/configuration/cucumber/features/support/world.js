@@ -295,7 +295,11 @@ class road2World {
         } else if (configurationType === "projection") {
             modification = this._projConf[configurationId];
         } else if (configurationType === "resource") {
-
+            for(const directoryName in this._resourceConf) {
+                if (this._resourceConf[directoryName][configurationId]) {
+                    modification = this._resourceConf[directoryName][configurationId];
+                }
+            }
         } else if (configurationType === "operations") {
             modification = this._operationsConf[configurationId];
         } else if (configurationType === "parameters") {
