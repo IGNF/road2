@@ -25,7 +25,6 @@ services:
     secrets:
       - key
       - cert
-    command: "sleep 60000"
 
   r2gg:
     build:
@@ -40,7 +39,7 @@ services:
       - ${r2gg_src}:/usr/lib/python3.6/site-packages/r2gg/r2gg
     networks:
       - iti-network
-    command: "sleep 60000"
+    command: "./r2gg_pipeline.sh"
     environment:
       - R2GG_ARG=${R2GG_ARG}
       - GENERATION_TYPE=${GENERATION_TYPE}
