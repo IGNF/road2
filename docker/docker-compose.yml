@@ -1,14 +1,14 @@
 version: "3.7"
 
 services:
-  road2-centos:
+  road2:
     build:
       context: ..
       dockerfile: ./docker/centos-wo-aws/Dockerfile
-    image: road2-centos
-    container_name: road2-centos-server
+    image: road2
+    container_name: road2-server
     depends_on:
-      - pgrouting-procedures-centos
+      - pgrouting
     environment:
       - NODE_ENV=debug
     ports:
@@ -25,35 +25,36 @@ services:
     secrets:
       - key
       - cert
+    command: "sleep 60000"
 
-  route-graph-generator-centos:
+  r2gg:
     build:
       context: ../../route-graph-generator/
       dockerfile: ./docker/centos7/Dockerfile
-    image: route-graph-generator-centos
-    container_name: route-graph-generator-centos
+    image: r2gg
+    container_name: r2gg
     depends_on:
-      - pgrouting-procedures-centos
+      - pgrouting
     volumes:
       - iti-data-volume:/home/docker/data
       - ${r2gg_src}:/usr/lib/python3.6/site-packages/r2gg/r2gg
     networks:
       - iti-network
-    command: "./r2gg_pipeline.sh"
+    command: "sleep 60000"
     environment:
       - R2GG_ARG=${R2GG_ARG}
       - GENERATION_TYPE=${GENERATION_TYPE}
     secrets:
       - db_config
 
-  pgrouting-procedures-centos:
+  pgrouting:
     build:
       context: ../../pgrouting-procedures/
       dockerfile: ./docker/centos7/Dockerfile
       args:
         - ipRange=${iprange}
-    image: pgrouting-procedures-centos
-    container_name: pgrouting-procedures-centos-server
+    image: pgrouting
+    container_name: pgrouting-server
     expose:
       - 5432
     ports:
@@ -64,14 +65,14 @@ services:
       - pgr-data-volume:/var/lib/pgsql
       - ${procedures_path}:/home/docker/pgrouting-procedures/sql
 
-  road2-web-debian:
+  road2-web:
     build:
       context: ..
       dockerfile: ./docker/web/Dockerfile
     image: road2-web-debian
-    container_name: road2-web-debian-server
+    container_name: road2-web-server
     depends_on:
-      - road2-centos
+      - road2
     ports:
       - 8081:80
     volumes:
@@ -79,11 +80,11 @@ services:
     networks:
       - iti-network
 
-  gatling-road2:
+  road2-gatling:
     image: denvazh/gatling
-    container_name: gatling-road2-server
+    container_name: road2-gatling
     depends_on:
-      - road2-centos
+      - road2
     volumes:
       - ${gatling_user_files}:/opt/gatling/user-files
       - ${gatling_results}:/opt/gatling/results

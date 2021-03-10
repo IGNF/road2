@@ -44,18 +44,18 @@ Il suffit de lancer la commande `docker-compose build`.
 ## Démarrage des services
 
 Pour lancer un service, il suffit d'exécuter la commande `docker-compose up $service` avec :
-- `$service=road2-centos` pour Road2. Cela va également instancier un PGRouting.
-- `$service=pgrouting-procedures-centos` pour PGRouting.
-- `$service=route-graph-generator-centos` pour Route-Graph-Generator. Cela va également instancier un PGRouting.
+- `$service=road2` pour Road2. Cela va également instancier un PGRouting.
+- `$service=pgrouting` pour PGRouting.
+- `$service=r2gg` pour Route-Graph-Generator. Cela va également instancier un PGRouting.
 
 On pourra utiliser l'option `-d` pour lancer en tâche de fond.
 
 ### Ordre de démarrage des services
 
-Pour faire marcher la pipeline complète, il faut pour l'instant lancer les services dans l'ordre suivant :
-`docker-compose up -d pgrouting-procedures-centos`
-`docker-compose up route-graph-generator-centos` pour générer des données
-`docker-compose up road2-centos`
+Pour faire marcher le pipeline complet, il faut pour l'instant lancer les services dans l'ordre suivant :
+`docker-compose up -d pgrouting`
+`docker-compose up r2gg` pour générer des données
+`docker-compose up road2`
 
 ## Gestion des variables
 
@@ -74,8 +74,8 @@ Les secrets permettent de transférer des données sensibles. Dans notre cas, il
 
 ### Page web 
 
-Il y a une page web qui permet de tester le service en observant le résultat sur une carte. Pour cela, il suffit de lancer le service `road2-web-debian`. Cela va instancier un serveur Road2 et un serveur NGINX. Il sera alors possible de tester Road2 sur l'url suivante: `localhost:8081/road2`. 
+Il y a une page web qui permet de tester le service en observant le résultat sur une carte. Pour cela, il suffit de lancer le service `road2-web`. Cela va instancier un serveur Road2 et un serveur NGINX. Il sera alors possible de tester Road2 sur l'url suivante: `localhost:8081/road2`. 
 
 ### Gatling 
 
-Il est également possible de lancer des tests de charge. Pour cela, il suffit de lancer le service `gatling-road2`. Cela va automatiquement lancer des tests sur un serveur Road2. 
+Il est également possible de lancer des tests de charge. Pour cela, il suffit de lancer le service `road2-gatling`. Cela va automatiquement lancer des tests sur un serveur Road2. 

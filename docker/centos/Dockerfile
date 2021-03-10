@@ -24,9 +24,9 @@ RUN yum -y install devtoolset-8 gcc gcc-c++
 # https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms
 # https://github.com/nodejs/help/wiki/Installation
 WORKDIR /home/docker/nodejs
-RUN wget -O node-v10.13.0.tar.gz "https://nodejs.org/dist/v10.13.0/node-v10.13.0.tar.gz"
-RUN tar -xzf /home/docker/nodejs/node-v10.13.0.tar.gz
-RUN cd node-v10.13.0  && ./configure && make -j4 && make install
+RUN wget -O node-v12.14.0.tar.gz "https://nodejs.org/dist/v12.14.0/node-v12.14.0.tar.gz"
+RUN tar -xzf /home/docker/nodejs/node-v12.14.0.tar.gz
+RUN cd node-v12.14.0  && ./configure && make -j4 && make install
 
 ### Installation des dépendances de OSRM
 # https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM
@@ -38,9 +38,9 @@ RUN scl enable devtoolset-8 bash && yum -y install cmake3 zlib-devel
 # https://github.com/door2door-io/osrm-express-server-demo
 # https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
 WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.23.0.zip
-RUN unzip v5.23.0.zip -d ./osrm-backend
-WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/build
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.24.0.zip
+RUN unzip v5.24.0.zip -d ./osrm-backend
+WORKDIR /home/docker/osrm/osrm-backend/osrm-backend-5.24.0/build
 RUN scl enable devtoolset-8 bash && export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc && cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=ON -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ && make && make install
 
 ### Dossier des données
@@ -49,7 +49,7 @@ WORKDIR /home/docker/internal
 ### Récupération de données sur la Corse
 # L'objectif est d'avoir un container indépendant du docker-compose
 RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
-RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.23.0/profiles/car.lua
+RUN osrm-extract corse-latest.osm.pbf -p /home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles/car.lua
 RUN osrm-contract corse-latest.osrm
 
 ### Dossier contenant la configuration

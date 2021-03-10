@@ -6,7 +6,7 @@ class road2RouteLoadTestPgr extends Simulation {
 
     val urls = ssv("./resources/road2_parameters_idf_pgr_wo_int.ssv").shuffle.circular
 
-    val httpConf = http.baseUrl("http://road2-centos:8080/simple/1.0.0/route?").disableCaching
+    val httpConf = http.baseUrl("http://road2:8080/simple/1.0.0/route?").disableCaching
 
     val scn = scenario("road2")
     .feed(urls).repeat(1){
