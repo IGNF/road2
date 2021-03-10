@@ -23,7 +23,7 @@ describe('Test de la classe Base', function() {
     });
 
     it('Get pool', function() {
-        assert.equal(base.pool.options.host, "pgrouting-procedures-centos");
+        assert.equal(base.pool.options.host, "pgrouting");
     });
 
   });

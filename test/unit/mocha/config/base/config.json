@@ -1,5 +1,5 @@
 {
-    "host": "pgrouting-procedures-centos",
+    "host": "pgrouting",
     "database": "pgrouting",
     "user": "postgres",
     "password": "postgres",

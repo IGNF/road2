@@ -9,7 +9,7 @@ Le dossier `gatling` contient le dossier `user-files` nécessaire à Getling pou
 Si Gatling est installé sur la machine, on pourra pointer le dossier `user-files`. De la même manière, il est possible d'utiliser Docker. 
 
 Avec le `docker-compose` du repository, il est possible de lancer les tests de charge avec les données déjà disponibles:
-`docker-compose up gatling-road2`
+`docker-compose up road2-gatling`
 
 Pour utiliser le `docker-compose` avec d'autres données, il suffira de modifier le `.env` associé et ainsi de pointer vers un autre `user-files`. On priviligiera cette approche à celle modifiant les fichiers de ce repository.  
 
