@@ -101,11 +101,30 @@ module.exports = class serverManager {
         return false;
       } else {
 
-        if (tmpPort > 65536) {
+        if (!Array.isArray(tmpPort)) {
+          LOGGER.fatal("Le port est mal renseigne.");
+          return false;
+        }
+
+        if (tmpPort.length === 0) {
+          LOGGER.fatal("Le port est mal renseigne.");
+          return false;
+        }
+
+        let userPort = parseInt(tmpPort[0]);
+
+        if (userPort > 65536) {
           LOGGER.fatal("Le port est mal renseigne: Numero de port invalide");
           return false;
         } else {
           // rien à faire
+        }
+
+        if (config.https === "true") {
+          if (userPort !== 443) {
+            LOGGER.fatal("Le port est different de 443 pour un serveur HTTPS");
+            return false;
+          }
         }
 
       }
@@ -131,11 +150,14 @@ module.exports = class serverManager {
           return false;
         } else {
           // on vérifie que le fichier est exploitable
+          let file = "";
           try {
-            let file = path.resolve(__dirname, config.options.key);
+            // TODO : gérer les chemins relatifs
+            file = config.options.key;
             fs.accessSync(file, fs.constants.R_OK);
           } catch (err) {
-            LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+            LOGGER.error("Le fichier ne peut etre lu: " + file);
+            return false;
           }
         }
 
@@ -144,11 +166,14 @@ module.exports = class serverManager {
           return false;
         } else {
           // on vérifie que le fichier est exploitable
+          let file = "";
           try {
-            let file = path.resolve(__dirname, config.options.cert);
+            // TODO : gérer les chemins relatifs
+            file = config.options.cert;
             fs.accessSync(file, fs.constants.R_OK);
           } catch (err) {
-            LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+            LOGGER.error("Le fichier ne peut etre lu: " + file);
+            return false;
           }
         }
 

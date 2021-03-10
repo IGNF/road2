@@ -73,6 +73,9 @@ module.exports = class Service {
     // Stockage de la configuration
     this._configuration = {};
 
+    // Stockage du chemin de la configuration 
+    this._configurationPath = "";
+
     // Stockage de la configuration des logs
     this._logConfiguration = {};
 
@@ -239,10 +242,11 @@ module.exports = class Service {
   * @name checkAndSaveGlobalConfiguration
   * @description Vérification de la configuration globale du serveur
   * @param {json} userConfiguration - JSON décrivant la configuration du service
+  * @param {string} userConfigurationPath - Chemin absolu du fichier de configuration
   *
   */
 
-  checkAndSaveGlobalConfiguration(userConfiguration) {
+  checkAndSaveGlobalConfiguration(userConfiguration, userConfigurationPath) {
 
     LOGGER.info("Verification de la configuration globale de l'application...");
 
@@ -292,55 +296,109 @@ module.exports = class Service {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:directory' manquant !");
         return false;
       } else {
+
         // On vérifie que le dossier existe et qu'il contient des fichiers de description des opérations
-        // TODO: mettre un try et remplacer __dirname 
-        let directory =  path.resolve(__dirname,userConfiguration.application.operations.directory);
+        let directory = "";
+
+        try {
+          directory =  path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.operations.directory);
+        } catch (error) {
+          LOGGER.fatal("Can't get absolute path of operations directory: " + userConfiguration.application.operations.directory);
+          LOGGER.fatal(error);
+          return false;
+        }
+
         if (fs.existsSync(directory)) {
           // On vérifie que l'application peut lire les fichiers du dossier
           fs.readdirSync(directory).forEach(operation => {
+
+            let operationFile = "";
+
             try {
-              var file = directory + "/" + operation;
-              fs.accessSync(file, fs.constants.R_OK);
+              operationFile = directory + "/" + operation;
+              fs.accessSync(operationFile, fs.constants.R_OK);
             } catch (err) {
-              LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+              LOGGER.error("Le fichier d'operation ne peut etre lu: " + operationFile);
             }
+
+            try {
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              JSON.parse(fs.readFileSync(operationFile));
+            } catch (error) {
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier d'operation: " + operationFile);
+              LOGGER.error(error);
+              return false;
+            }
+
           });
+
           // On vérifie que la partie concernant les paramètres est bien renseignée
           if (!userConfiguration.application.operations.parameters) {
-            LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters' manquant !");
+            LOGGER.fatal("Mauvaise configuration: Objet 'application:operations:parameters' manquant !");
             return false;
           } else {
+
             if (!userConfiguration.application.operations.parameters.directory) {
               LOGGER.fatal("Mauvaise configuration: Champ 'application:operations:parameters:directory' manquant !");
               return false;
             } else {
-              // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres
-              let directory =  path.resolve(__dirname,userConfiguration.application.operations.parameters.directory);
+
+              // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres              
+              let directory = "";
+
+              try {
+                directory =  path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.operations.parameters.directory);
+              } catch (error) {
+                LOGGER.fatal("Can't get absolute path of parameters directory: " + userConfiguration.application.operations.parameters.directory);
+                LOGGER.fatal(error);
+                return false;
+              }
+
               if (fs.existsSync(directory)) {
                 // On vérifie que l'application peut lire les fichiers du dossier
                 fs.readdirSync(directory).forEach(parameter => {
+
+                  let parameterFile = "";
+
                   try {
-                    var file = directory + "/" + parameter;
-                    fs.accessSync(file, fs.constants.R_OK);
+                    parameterFile = directory + "/" + parameter;
+                    fs.accessSync(parameterFile, fs.constants.R_OK);
                   } catch (err) {
-                    LOGGER.error("Le fichier " + file + " ne peut etre lu.");
+                    LOGGER.error("Le fichier de parametres ne peut etre lu: " + parameterFile);
                   }
+
+                  try {
+                    // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                    JSON.parse(fs.readFileSync(parameterFile));
+                  } catch (error) {
+                    LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de parametres: " + parameterFile);
+                    LOGGER.error(error);
+                    return false;
+                  }
+
                 });
+
               } else {
-                LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+                LOGGER.fatal("Mauvaise configuration: Le dossier des parametres n'existe pas : " + directory);
                 return false;
               }
+
             }
+
           }
+
         } else {
-          LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
+          LOGGER.fatal("Mauvaise configuration: Le dossier des operations n'existe pas: " + directory);
           return false;
         }
+
       }
+
     } else {
       LOGGER.fatal("Mauvaise configuration: Objet 'application:operations' manquant !");
       return false;
     }
+
     // Information sur les ressources
     if (userConfiguration.application.resources) {
       // Dossier contenant les fichiers de ressources
@@ -360,28 +418,54 @@ module.exports = class Service {
           return false;
         }
 
+        let resourceCount = 0;
         for (let i = 0; i < resourcesDirectories.length; i++) {
 
           // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
-          let directory =  path.resolve(__dirname, resourcesDirectories[i]);
-          if (fs.existsSync(directory)) {
-            // On vérifie que l'application peut lire les fichiers du dossier
-            fs.readdirSync(directory).forEach(resource => {
-              try {
-                var file = directory + "/" + resource;
-                fs.accessSync(file, fs.constants.R_OK);
-              } catch (err) {
-                LOGGER.error("Le fichier " + file + " ne peut etre lu.");
-              }
-            });
+          if (resourcesDirectories[i] === "") {
+            LOGGER.warn("Mauvaise configuration: Champ 'application:resources:directories' contient un élément vide");
+            continue;
           } else {
-            LOGGER.fatal("Mauvaise configuration: Le dossier " + directory + " n'existe pas.");
-            return false;
-          }
 
+            let directory =  path.resolve(path.dirname(userConfigurationPath), resourcesDirectories[i]);
+            if (fs.existsSync(directory)) {
+              // On vérifie que l'application peut lire les fichiers du dossier
+              fs.readdirSync(directory).forEach(resource => {
+
+                let resourceFile = "";
+                try {
+                  resourceFile = directory + "/" + resource;
+                  fs.accessSync(resourceFile, fs.constants.R_OK);
+                  resourceCount++;
+                } catch (err) {
+                  LOGGER.error("Le fichier de ressource ne peut etre lu: " + resourceFile);
+                }
+
+                try {
+                  // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                  JSON.parse(fs.readFileSync(resourceFile));
+                } catch (error) {
+                  LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de ressource: " + resourceFile);
+                  LOGGER.error(error);
+                  return false;
+                }
+
+              });
+            } else {
+              LOGGER.error("Mauvaise configuration: Le dossier n'existe pas: " + directory );
+            }
+
+          }
+          
+        }
+
+        if (resourceCount === 0) {
+          LOGGER.fatal("Mauvaise configuration: Champ 'application:resources:directories' ne pointe vers aucune ressource disponible !");
+          return false;
         }
 
       }
+      
     } else {
       LOGGER.fatal("Mauvaise configuration: Objet 'application:resources' manquant !");
       return false;
@@ -398,7 +482,7 @@ module.exports = class Service {
       }
 
       if (!Array.isArray(userConfiguration.application.network.servers)) {
-        LOGGER.fatal("Mauvaise configuration: Objet 'application:network' n'est pas un tableau !");
+        LOGGER.fatal("Mauvaise configuration: Objet 'application:network:servers' n'est pas un tableau !");
         return false;
       }
 
@@ -419,11 +503,19 @@ module.exports = class Service {
       } else {
 
         if (!userConfiguration.application.network.cors.configuration) {
-          LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors.configuration' manquant !");
+          LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors:configuration' manquant !");
           return false; 
         } else {
 
-          let corsFile = userConfiguration.application.network.cors.configuration;
+          let corsFile = "";
+          
+          try {
+            corsFile = path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.network.cors.configuration);
+          } catch (error) {
+            LOGGER.error("Impossible d'avoir le chemin absolu du fichier de cors: " + userConfiguration.application.network.cors.configuration);
+            LOGGER.error(error);
+            return false;
+          }
 
           if (fs.existsSync(corsFile)) {
 
@@ -431,7 +523,7 @@ module.exports = class Service {
               // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
               JSON.parse(fs.readFileSync(corsFile));
             } catch (error) {
-              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de cors de Road2:");
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de cors de Road2: " + corsFile);
               LOGGER.error(error);
               return false;
             }
@@ -447,8 +539,63 @@ module.exports = class Service {
 
     }
 
+    if (!userConfiguration.application.projections) {
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:projections' manquant !");
+      return false;
+    } else {
+
+      if (!userConfiguration.application.projections.directory) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:projections:directory' manquant !");
+        return false; 
+      } else {
+
+        let projDir = "";
+        
+        try {
+          projDir = path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.projections.directory);
+        } catch (error) {
+          LOGGER.error("Impossible d'avoir le chemin aboslu du dossier de projection: " + projDir);
+          LOGGER.error(error);
+          return false;
+        }
+
+        if (fs.existsSync(projDir)) {
+
+          // On vérifie que l'application peut lire les fichiers du dossier
+          fs.readdirSync(projDir).forEach(projection => {
+
+            let projectionFile = "";
+
+            try {
+              projectionFile = projDir + "/" + projection;
+              fs.accessSync(projectionFile, fs.constants.R_OK);
+            } catch (err) {
+              LOGGER.error("Le fichier de projection ne peut etre lu: " + projectionFile);
+            }
+
+            try {
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              JSON.parse(fs.readFileSync(projectionFile));
+            } catch (error) {
+              LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de projection: " + projectionFile);
+              LOGGER.error(error);
+              return false;
+            }
+          });
+
+        } else {
+          LOGGER.fatal("Mauvaise configuration: Dossier de projections inexistant : " + projDir);
+          return false; 
+        }
+
+      }
+
+    }
+
     LOGGER.info("Verification terminee.");
     this._configuration = userConfiguration;
+    // On stocke le chemin absolu car c'est utile pour la suite, notamment pour les chemins relatifs que l'on aura
+    this._configurationPath = userConfigurationPath;
     return true;
 
   }
@@ -459,8 +606,8 @@ module.exports = class Service {
   * @function
   * @name loadOperations
   * @description Chargement des opérations
-  * @param {string} operationsDirectory - Dossier contenant les opérations à charger
-  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger
+  * @param {string} operationsDirectory - Dossier contenant les opérations à charger (chemin absolu)
+  * @param {string} parametersDirectory - Dossier contenant les paramètres à charger (chemin absolu)
   *
   */
 
@@ -469,11 +616,23 @@ module.exports = class Service {
     LOGGER.info("Chargement des operations...");
 
     if (!operationsDirectory) {
-      operationsDirectory = this._configuration.application.operations.directory;
+      try {
+        operationsDirectory = path.resolve(path.dirname(this._configurationPath), this._configuration.application.operations.directory);
+      } catch (error) {
+        LOGGER.error("Impossible d'avoir le chemin aboslu du dossier des operations: " + this._configuration.application.operations.directory);
+        LOGGER.error(error);
+        return false;
+      }
     }
 
     if (!parametersDirectory) {
-      parametersDirectory = this._configuration.application.operations.parameters.directory;
+      try {
+        parametersDirectory = path.resolve(path.dirname(this._configurationPath), this._configuration.application.operations.parameters.directory);
+      } catch (error) {
+        LOGGER.error("Impossible d'avoir le chemin aboslu du dossier des parametres: " + this._configuration.application.operations.parameters.directory);
+        LOGGER.error(error);
+        return false;
+      }
     }
 
     if (!this._operationManager.loadOperationDirectory(operationsDirectory, parametersDirectory)) {
@@ -490,7 +649,7 @@ module.exports = class Service {
   * @function
   * @name loadProjections
   * @description Chargement des opérations
-  * @param {string} projectionsDirectory - Dossier contenant les projections à charger
+  * @param {string} projectionsDirectory - Dossier contenant les projections à charger (chemin absolu)
   *
   */
 
@@ -499,7 +658,13 @@ module.exports = class Service {
     LOGGER.info("Chargement des projections...");
 
     if (!projectionsDirectory) {
-      projectionsDirectory = this._configuration.application.projections.directory;
+      try {
+        projectionsDirectory = path.resolve(path.dirname(this._configurationPath), this._configuration.application.projections.directory);
+      } catch (error) {
+        LOGGER.error("Impossible d'avoir le chemin aboslu du dossier des projections: " + this._configuration.application.projections.directory);
+        LOGGER.error(error);
+        return false;
+      }
     }
 
     if (!this._projectionManager.loadProjectionDirectory(projectionsDirectory)) {
@@ -516,7 +681,7 @@ module.exports = class Service {
   * @function
   * @name loadResources
   * @description Chargement des ressources
-  * @param {table} userResourceDirectories - Tableau de dossiers contenant les ressources à charger
+  * @param {table} userResourceDirectories - Tableau de dossiers contenant les ressources à charger (chemins absolus)
   *
   */
 
@@ -543,8 +708,16 @@ module.exports = class Service {
 
     for (let i = 0; i < userResourceDirectories.length; i++) {
 
-      let resourceDirectory =  path.resolve(__dirname, userResourceDirectories[i]);
+      let resourceDirectory = "";
 
+      try {
+        resourceDirectory = path.resolve(path.dirname(this._configurationPath), userResourceDirectories[i]);
+      } catch (error) {
+        LOGGER.error("Impossible d'obtenir le chemin absolu du dossier de ressources: " + userResourceDirectories[i]);
+        LOGGER.error(error);
+        return false;
+      }
+      
       // Pour chaque fichier du dossier des ressources, on crée une ressource
       const files = fs.readdirSync(resourceDirectory).filter( (file) => {
         return path.extname(file).toLowerCase() === ".resource";
@@ -720,25 +893,48 @@ module.exports = class Service {
     // Initialisation des CORS 
     let corsConfiguration = {};
     if (this._configuration.application.network.cors) {
-      corsConfiguration = JSON.parse(fs.readFileSync(this._configuration.application.network.cors.configuration));
+      try {
+        corsConfiguration = JSON.parse(fs.readFileSync(path.resolve(path.dirname(this._configurationPath), this._configuration.application.network.cors.configuration)));
+      } catch (error) {
+        LOGGER.error("Impossible de lire le fichier de configuration des cors: " + this._configuration.application.network.cors.configuration);
+        LOGGER.error(error);
+        return false;
+      }
     } else {
       corsConfiguration.origin = false;
     }
-    road2.use(cors(corsConfiguration));
+
+    try {
+      road2.use(cors(corsConfiguration));
+    } catch (error) {
+      LOGGER.fatal("Impossible d'initialiser les cors: ");
+      LOGGER.error(corsConfiguration)
+      LOGGER.error(error);
+      return false;
+    }
     
     // Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
     road2.use(helmet());
 
-    if (this._logConfiguration !== {}) {
+    // Pour le log des requêtes reçues sur le service avec la syntaxe
+    LOGGER.info("Instanciation du logger pour les requêtes...");
 
-      // Pour le log des requêtes reçues sur le service avec la syntaxe
-      LOGGER.info("Instanciation du logger pour les requêtes...");
+    try {
+
       road2.use(log4js.connectLogger(log4js.getLogger('request'), {
         level: this._logConfiguration.httpConf.level,
         format: (req, res, format) => format(this._logConfiguration.httpConf.format)
       }));
 
+    } catch (error) {
+      LOGGER.fatal("Impossible de connecter le logger pour les requetes: ");
+      LOGGER.error(this._logConfiguration.httpConf)
+      LOGGER.error(error);
+      return false;
     }
+    
+
+  
 
     // Chargement des APIs
     if (!this._apisManager.loadAPISDirectory(road2, userApiDirectory, userServerPrefix)) {

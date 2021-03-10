@@ -26,17 +26,17 @@ async function start() {
 
   // Chargement de la configuration
   // Notamment pour pouvoir charger le logger
-  let configuration = loadGlobalConfiguration();
+  let [configuration, configurationPath] = loadGlobalConfiguration();
 
   // Instanciation du logger et sauvegarde de sa configuration
-  let logConfiguration = getLoggerConfiguration(configuration);
-  initLogger(logConfiguration);
+  let logConfiguration = getLoggerConfiguration(configuration, configurationPath);
+  checkAndInitLogger(logConfiguration);
 
   // Création du service
   let service = new Service();
 
   // Vérification de la configuration globale du service et sauvegarde
-  if (!service.checkAndSaveGlobalConfiguration(configuration)) {
+  if (!service.checkAndSaveGlobalConfiguration(configuration, configurationPath)) {
     pm.shutdown(1);
   }
 
@@ -95,7 +95,7 @@ async function start() {
 * @function
 * @name loadGlobalConfiguration
 * @description Charger la configuration globale du serveur
-* @return {json} Configuration global du serveur
+* @return {array} Configuration global du serveur et chemin absolu du fichier de configuration
 *
 */
 
@@ -103,7 +103,7 @@ function loadGlobalConfiguration() {
 
   console.log("Lecture de la configuration...");
 
-  let file;
+  let configurationPath;
   let globalConfiguration;
 
   // on lit en priorité les arguments de la ligne de commande puis les variables d'environnement
@@ -115,14 +115,20 @@ function loadGlobalConfiguration() {
   if (nconf.get('ROAD2_CONF_FILE')) {
 
     // chemin absolu du fichier
-    file = path.resolve(process.cwd(), nconf.get('ROAD2_CONF_FILE'));
+    try {
+      configurationPath = path.resolve(process.cwd(), nconf.get('ROAD2_CONF_FILE'));
+    } catch (error) {
+      console.log("Impossible de recuperer le chemin absolu du fichier de configuration:");
+      console.log(error);
+      process.exit(1);
+    }
 
     // vérification de l'exitence du fichier
-    if (fs.existsSync(file)) {
+    if (fs.existsSync(configurationPath)) {
       
       // chargement dans une variable pour la classe Service
       try {
-        globalConfiguration = JSON.parse(fs.readFileSync(file));
+        globalConfiguration = JSON.parse(fs.readFileSync(configurationPath));
       } catch (error) {
         console.log("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration de Road2:");
         console.log(error);
@@ -130,7 +136,7 @@ function loadGlobalConfiguration() {
       }
 
     } else {
-      console.log("Mauvaise configuration: fichier de configuration global inexistant: " + file);
+      console.log("Mauvaise configuration: fichier de configuration global inexistant: " + configurationPath);
       console.log("Utilisez le paramètre ROAD2_CONF_FILE en ligne de commande ou en variable d'environnement pour le préciser.");
       process.exit(1);
     }
@@ -143,7 +149,7 @@ function loadGlobalConfiguration() {
 
   console.log("Configuration chargee.")
 
-  return globalConfiguration;
+  return [globalConfiguration,configurationPath];
 
 }
 
@@ -156,7 +162,7 @@ function loadGlobalConfiguration() {
 *
 */
 
-function initLogger(userLogConfiguration) {
+function checkAndInitLogger(userLogConfiguration) {
 
   console.log("Instanciation du logger...");
 
@@ -165,7 +171,13 @@ function initLogger(userLogConfiguration) {
     if (userLogConfiguration.mainConf) {
 
       // Configuration du logger
-      log4js.configure(userLogConfiguration.mainConf);
+      try {
+        log4js.configure(userLogConfiguration.mainConf);
+      } catch (error) {
+        console.log("Mauvaise configuration des logs dans mainConf");
+        console.log(error);
+        process.exit(1);
+      }
 
       //Instanciation du logger
       LOGGER = log4js.getLogger('SERVER');
@@ -174,6 +186,33 @@ function initLogger(userLogConfiguration) {
 
     } else {
       console.log("Mausvaise configuration pour les logs: 'mainConf' absent.");
+      process.exit(1);
+    }
+
+    if (userLogConfiguration.httpConf) {
+
+      if (!userLogConfiguration.httpConf.level) {
+        console.log("Mausvaise configuration pour les logs: 'httpConf.level' absent.");
+        process.exit(1);
+      } else {
+        if (typeof userLogConfiguration.httpConf.level !== "string") {
+          console.log("Mausvaise configuration pour les logs: 'httpConf.level' n'est pas une chaine de caracteres");
+          process.exit(1);
+        }
+      }
+
+      if (!userLogConfiguration.httpConf.format) {
+        console.log("Mausvaise configuration pour les logs: 'httpConf.format' absent.");
+        process.exit(1);
+      } else {
+        if (typeof userLogConfiguration.httpConf.format !== "string") {
+          console.log("Mausvaise configuration pour les logs: 'httpConf.format' n'est pas une chaine de caracteres");
+          process.exit(1);
+        }
+      }
+
+    } else {
+      console.log("Mausvaise configuration pour les logs: 'httpConf' absent.");
       process.exit(1);
     }
 
@@ -190,11 +229,12 @@ function initLogger(userLogConfiguration) {
 * @name getLoggerConfiguration
 * @description Récupérer la configuration des logs du serveur
 * @param {json} userConfiguration - Configuration de l'application
+* @param {string} userConfigurationPath - CHemin absolu du fichier de configuration
 * @return {json} Configuration des logs du serveur
 *
 */
 
-function getLoggerConfiguration(userConfiguration) {
+function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
 
   console.log("Recuperation de la configuration du logger...");
 
@@ -216,9 +256,7 @@ function getLoggerConfiguration(userConfiguration) {
           
           try {
 
-            let tmpRoad2ConfFile = path.resolve(process.cwd(), nconf.get('ROAD2_CONF_FILE'));
-            let tmpRoad2ConfDir = path.dirname(tmpRoad2ConfFile);
-            file = path.resolve(tmpRoad2ConfDir, userLogConfigurationFile);
+            file = path.resolve(path.dirname(userConfigurationPath), userLogConfigurationFile);
   
           } catch (error) {
 
@@ -227,7 +265,7 @@ function getLoggerConfiguration(userConfiguration) {
             process.exit(1);
 
           }
-          
+                    
           // vérification de l'exitence du fichier
           if (fs.existsSync(file)) {
             //Lecture du fichier de configuration des logs
