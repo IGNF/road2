@@ -1,0 +1,9 @@
+{
+  "host": "pgrouting",
+  "database": "pgrouting",
+  "user": "postgres",
+  "password": "postgres",
+  "port": "5432",
+  "statement_timeout": 20000,
+  "max": 8
+}

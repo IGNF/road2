@@ -35,3 +35,16 @@ On peut trouver un [exemple](../../docker/config/projections/projection.json) de
 Dans le fichier *server.json*, il est possible d'indiquer plusieurs dossiers *resources*. Chaque dossier sera lu et les fichiers `*.resource` seront analysés par Road2. Chacun de ces fichiers représente une ressource pour Road2. 
 
 On peut trouver un [exemple](../../docker/config/resources/corse.resource) de ce fichier et le [modèle](./resource_model_osrm.yaml) au format YAML pour OSRM. Pour PGRouting, il y a également un [exemple](./bduni_idf_pgr.resource) et un [modèle](./resource_model_pgr.yaml). 
+
+### Les lua et les json des sources 
+
+Chaque source d'une ressource est rattaché à un profile et une optimisation. Cela détermine un coût pour chaque tronçon du graphe. Pour calculer ces coût, nous utilisons un fichier spécifique qui contient les régles de passage des attributs d'un tronçon à son coût. Ce fichier est un json géré dans le projet route-graph-generator. Cer dernier contient donc au moins un exemple. 
+À partir de ce json, un lua est créé pour OSRM. Ce fichier lua est aussi dans le projet route-graph-generator. 
+
+Ces deux fichiers ne sont pas obligatoires dans la configuration mais ils sont fournis pour que l'on puisse retrouver les informations de création des graphes. Il est donc utile de les avoir. Ils devraient être fournis par route-graph-generator lors d'une génération. 
+
+## Les fichiers liés à certains moteurs de Road2
+
+### PGRouting: La configuration d'une base de données 
+
+Afin de lire les données dans un base, il est nécessaire de fournir à Road2 un fichier qui lui donne les identifiants de connexion à la base. Cela est possible via un fichier json. Un exemple de ce fichier est fourni [ici](./configuration_bdd.json). Le contenu de ce fichier correspond aux options du module NodeJS `pg`. 
