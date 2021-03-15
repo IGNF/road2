@@ -53,6 +53,7 @@ Les tests fonctionnels sont décrits [ici](./functional/readme.md).
 Pour résumer, il suffit de lancer les commandes suivantes en ayant pris soin de démarrer Road2 via docker-compose: 
 ```
 docker-compose exec road2 npm run rtest #tests sur les requêtes
+docker-compose exec road2 npm run artest #tests sur les requêtes admin
 docker-compose exec road2 npm run crtest #tests complémentaires sur les requêtes
 docker-compose exec road2 npm run drtest #tests qui dépendent des données sur les requêtes
 docker-compose exec road2 npm run ctest #tests sur la configuration

@@ -12,6 +12,7 @@
     "rtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestTest.feature",
     "crtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestComplementTest.feature",
     "drtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestDataTest.feature",
+    "artest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestAdminTest.feature",
     "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationTest.feature",
     "cctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationComplementTest.feature",
     "lint": "eslint -c eslint.json ./src/",

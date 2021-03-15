@@ -1,6 +1,6 @@
 # Tests fonctionnels de Road2
 
-Cucumber sera utilisé afin de tester les APIs de Road2, et cela, dans leurs aspects fonctionnels. On pourra utiliser Ansible pour les déploiement, ainsi que pour la gestion de la vie du service (start, restart, stop). 
+Cucumber sera utilisé afin de tester les APIs de Road2, et cela, dans leurs aspects fonctionnels. Il sera également utilisé pour tester la configuration de Road2. 
 
 ## Utilisation de Cucumber 
 
@@ -13,9 +13,10 @@ Enfin, la troisième `requestDataTest.feature` se concentre sur les tests qui im
 
 Afin de lancer les tests Cucumber, on suivra la procédure suivante:
 - lancer le serveur Road2 via docker-compose 
-- exécuter la commande `npm run rtest` via docker-compose
+- exécuter la commande `npm run rtest` via docker-compose (pour tester les fonctionnalités principales de l'api simple 1.0.0)
+- exécuter la commande `npm run artest` via docker-compose (pour tester l'api admin 1.0.0)
 - générer une ressource OSRM et une ressource PGR sur l'île-de-France via docker-compose 
-- exécuter la commande `npm run crtest` via docker-compose
+- exécuter la commande `npm run crtest` via docker-compose 
 - exécuter la commande `npm run drtest` via docker-compose
 
 ### Configuration 
@@ -28,26 +29,6 @@ Afin de lancer les tests Cucumber, on suivra la procédure suivante:
 - générer une ressource PGR sur l'île-de-France via docker-compose 
 - exécuter la commande `npm run ccftest` via docker-compose
 
-
-## Cahier des tests fonctionnels 
-
-Ce cahier contient la description des tests fonctionnels. 
-
-### Gestion du service 
-
-Une partie des tests concerne la gestion du service. Il s'agit de déployer le service puis de gérer sa vie. 
-
-#### Déploiement 
-
-Le service peut être déployé sur plusieurs OS. Chacun d'entre eux va être testé:
-- Debian
-- Centos 
-
-#### Start 
-
-#### Restart 
-
-#### Stop 
 
 
 
