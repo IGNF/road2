@@ -46,5 +46,5 @@ Pour le moment, il y a une seule API utilisateur qui est documentée via un [fic
 ## Versions
 
 Cette version de Road2 fonctionne avec les versions suivantes:
-- route-graph-generator 1.0.2-DEVELOP
-- pgrouting-procedures 1.0.2-DEVELOP
+- route-graph-generator 1.0.2
+- pgrouting-procedures 1.0.1

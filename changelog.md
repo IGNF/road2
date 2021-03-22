@@ -1,4 +1,4 @@
-# 1.0.2-DEVELOP
+# 1.0.2
 
 ADDED:
  - Modification du server.json: emplacement du fichier de configuration des CORS 
