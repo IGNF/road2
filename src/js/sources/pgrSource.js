@@ -267,7 +267,7 @@ module.exports = class pgrSource extends Source {
             } else if (request.constraints[i].type === 'banned') {
               requestedConstraints.push( request.constraints[i].toSqlString() );
             } else {
-              //TODO: que fait-on ? throw error ? 
+              //TODO: que fait-on ? throw error ?
               LOGGER.error("constraint type is unknown");
             }
           }
@@ -276,13 +276,13 @@ module.exports = class pgrSource extends Source {
             constraints = constraints + requestedConstraints.join(' AND ');
             LOGGER.debug("final constraints: " + constraints);
           } else {
-            //TODO: que fait-on ? throw error ? 
+            //TODO: que fait-on ? throw error ?
             LOGGER.error("no final constraints");
           }
 
         } else {
 
-          // pas de contraintes à ajouter 
+          // pas de contraintes à ajouter
           LOGGER.debug("no constraints asked");
 
         }
@@ -320,7 +320,7 @@ module.exports = class pgrSource extends Source {
       return new Promise( (resolve, reject) => {
 
         LOGGER.debug("queryString: " + queryString);
-        LOGGER.debug("SQLParametersTable:"); 
+        LOGGER.debug("SQLParametersTable:");
         LOGGER.debug(SQLParametersTable);
 
         this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
@@ -333,6 +333,9 @@ module.exports = class pgrSource extends Source {
             // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
             if (err.code === "38001") {
               reject(errorManager.createError(" No path found ", 404));
+            } else if (err.code === "42703") {
+              // cette erreur remonte quand il n'y a pas de données dans PGR
+              reject(errorManager.createError(" No data found ", 503));
             } else {
               reject(err);
             }
@@ -396,7 +399,7 @@ module.exports = class pgrSource extends Source {
         return new Promise( (resolve, reject) => {
 
           LOGGER.debug("queryString: " + queryString);
-          LOGGER.debug("SQLParametersTable:"); 
+          LOGGER.debug("SQLParametersTable:");
           LOGGER.debug(SQLParametersTable);
 
           this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
@@ -427,7 +430,7 @@ module.exports = class pgrSource extends Source {
 
       } else {
 
-        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ? 
+        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ?
         LOGGER.error("type of request not found");
 
       }
@@ -435,7 +438,7 @@ module.exports = class pgrSource extends Source {
     } else {
 
       // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ?
-      LOGGER.error("request operation not found"); 
+      LOGGER.error("request operation not found");
 
     }
 
@@ -493,6 +496,12 @@ module.exports = class pgrSource extends Source {
     // Si pgrResponse est vide
     if (pgrResponse.rowCount === 0) {
       throw errorManager.createError(" No data found ", 404);
+    } else if (pgrResponse.rowCount === 1) {
+      if (pgrResponse.rows[0].edge === null) {
+        throw errorManager.createError(" No data found ", 404);
+      } else {
+        // on continue
+      }
     } else {
       LOGGER.debug("pgr response has data");
     }
@@ -735,14 +744,14 @@ module.exports = class pgrSource extends Source {
 
       // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
       let newRouteGeomCoords = [];
-      let portionDistance = 0;
-      let portionDuration = 0;
 
       for (let j = 0; j < currentPgrRoute.legs.length; j++) {
 
         LOGGER.debug("Portion number " + j + " for route number " + i);
 
         let newPortionGeomCoords = [];
+        let portionDistance = 0;
+        let portionDuration = 0;
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
         let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
@@ -752,7 +761,7 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("portion start in asked projection:");
           LOGGER.debug(legStart);
         }
-    
+
 
         let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
         if (!legEnd.transform(askedProjection)) {
@@ -761,7 +770,7 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("portion end in asked projection:");
           LOGGER.debug(legEnd);
         }
-    
+
 
         portions[j] = new Portion(legStart, legEnd);
 
@@ -901,7 +910,7 @@ module.exports = class pgrSource extends Source {
           steps[k].duration = new Duration(Math.round(currentDistanceRatio * currentPgrRouteStep.duration * 10) / 10,"second");
 
           portionDistance += currentDistanceRatio * currentPgrRouteStep.distance;
-          portionDuration += currentDistanceRatio * currentPgrRouteStep.distance;
+          portionDuration += currentDistanceRatio * currentPgrRouteStep.duration;
         }
 
         // On récupère la distance et la durée

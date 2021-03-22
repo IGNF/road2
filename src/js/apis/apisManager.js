@@ -75,12 +75,21 @@ module.exports = class apisManager {
 
   loadAPISDirectory (app, dir, prefix) {
 
-    let APIsDirectory = path.resolve(__dirname, dir);
-
     LOGGER.info("Chargement des APIS...");
 
+    // Soit dir est un chemin absolu qui pointe vers un autre repo d'APIs, soit c'est celui du repo officiel de Road2 (usage de __dirname)
+    let APIsDirectory = path.resolve(__dirname, dir);
+
     // on lit le contenu du dossier
-    let APIsDirectoryTable = fs.readdirSync(APIsDirectory);
+    let APIsDirectoryTable = new Array();
+
+    try {
+      APIsDirectoryTable = fs.readdirSync(APIsDirectory);
+    } catch (error) {
+      LOGGER.error("Le dossier n'est pas lisible: " + APIsDirectory);
+      LOGGER.error(error);
+      return false;
+    }
 
     // S'il est vide ce n'est pas normal
     if (APIsDirectoryTable.length === 0) {

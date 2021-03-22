@@ -390,6 +390,7 @@ module.exports = class sourceManager {
             // rien à faire
           }
         }
+        //TODO: ajouter la vérification de configuration
       }
     }
 
@@ -458,6 +459,7 @@ module.exports = class sourceManager {
           // rien à faire
         }
       }
+      // TODO: ajouter la vérification de configuration
     }
   }
 

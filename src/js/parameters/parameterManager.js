@@ -188,7 +188,7 @@ module.exports = class parameterManager  {
 
         for (let i = 0; i < this._listOfVerifiedParameterId.length; i++ ) {
           if (this._listOfVerifiedParameterId[i] === parameterConf.id) {
-            LOGGER.info("Le parametre contenant l'id " + parameterConf.id + " est deja referencee.");
+            LOGGER.info("Le parametre contenant l'id " + parameterConf.id + " est deja reference.");
             return false;
           } else {
             // on continue de vérifier

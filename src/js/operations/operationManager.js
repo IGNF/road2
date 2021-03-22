@@ -92,8 +92,8 @@ module.exports = class operationManager  {
   * @function
   * @name loadOperationDirectory
   * @description Charger les opérations du dossier
-  * @param {string} userOperationDirectory - Dossier contenant les opérations
-  * @param {string} userParameterDirectory - Dossier contenant les paramètres
+  * @param {string} userOperationDirectory - Dossier contenant les opérations (chemin absolu)
+  * @param {string} userParameterDirectory - Dossier contenant les paramètres (chemin absolu)
   * @return {boolean}
   *
   */
@@ -102,14 +102,14 @@ module.exports = class operationManager  {
     LOGGER.info("Chargement des operations...");
 
     // Vérification de l'existence du dossier operations
-    let operationsDirectory = path.resolve(__dirname, userOperationDirectory);
+    let operationsDirectory = userOperationDirectory;
     if (!fs.statSync(operationsDirectory).isDirectory()) {
       LOGGER.error("Le dossier contenant la configuration des operations n'existe pas: " + operationsDirectory);
       return false;
     }
 
     // Vérification de l'existence du dossier parameters
-    let parametersDirectory = path.resolve(__dirname, userParameterDirectory);
+    let parametersDirectory = userParameterDirectory;
     if (!fs.statSync(parametersDirectory).isDirectory()) {
       LOGGER.error("Le dossier contenant la configuration des parametres n'existe pas: " + parametersDirectory);
       return false;
@@ -216,18 +216,23 @@ module.exports = class operationManager  {
       return false;
     } else {
 
+      if (!Array.isArray(operationConf.parameters)) {
+        LOGGER.error("Les parametres de l'operation ne sont pas dans un tableau");
+        return false; 
+      }
+
       if (operationConf.parameters.length !== 0) {
         // on vérifie la validité des ids de paramètre fournis
         for (let i = 0; i < operationConf.parameters.length; i++ ) {
           if (!this._parameterManager.isParameterAvailable(operationConf.parameters[i])) {
-            LOGGER.error("L'operation précise un attribut qui n'est pas disponible: " + operationConf.parameters[i]);
+            LOGGER.error("L'operation précise un parametre qui n'est pas disponible: " + operationConf.parameters[i]);
             return false;
           } else {
             // on continue
           }
         }
       } else {
-        LOGGER.error("L'operation ne contient pas d'attribut parameters valide");
+        LOGGER.error("Le tableau des parametres est vide");
         return false;
       }
 

@@ -120,6 +120,15 @@
 									"cert":
 										type: string
 										required: true
+				# Configuration des cors
+				"cors":	
+					type: object 
+					required: false
+					properties:
+						# Fichier de configuration des cors 
+						"configuration": 
+							type: string 
+							required: true
     # Configuration des projections disponibles
     "projections":
       type: object

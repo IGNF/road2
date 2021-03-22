@@ -61,19 +61,17 @@ module.exports = class baseManager {
   * @function
   * @name checkBase
   * @description Vérification de la description de la configuration à une base de données.
-  * @param{string} dbConfig - Nom du fichier contenant les informations de connexion à la base
+  * @param{string} dbConfigPath - Nom du fichier contenant les informations de connexion à la base (chemin absolu)
   *
   */
-  async checkBase(dbConfig) {
+  async checkBase(dbConfigPath) {
 
     LOGGER.info("Verification de la configuration de la base de donnees...");
-
-    let fullPath = path.resolve(__dirname, dbConfig);
 
     if (this._listOfVerifiedDbConfig.length !== 0) {
 
       for (let i = 0; i < this._listOfVerifiedDbConfig.length; i++) {
-        if (fullPath === this._listOfVerifiedDbConfig[i]) {
+        if (dbConfigPath === this._listOfVerifiedDbConfig[i]) {
           LOGGER.info("Configuration deja verifiee.")
           return true;
         }
@@ -84,13 +82,21 @@ module.exports = class baseManager {
     }
 
     try {
-      fs.accessSync(fullPath, fs.constants.R_OK);
+      fs.accessSync(dbConfigPath, fs.constants.R_OK);
     } catch (err) {
-      LOGGER.error("Le fichier " + fullPath + " ne peut etre lu.");
+      LOGGER.error("Le fichier " + dbConfigPath + " ne peut etre lu.");
       return false;
     }
 
-    let configuration = JSON.parse(fs.readFileSync(fullPath));
+    let configuration = {}; 
+    try {
+      configuration = JSON.parse(fs.readFileSync(dbConfigPath));
+    } catch (error) {
+      LOGGER.error("Impossible de lire la configuration de bdd: " + dbConfigPath);
+      LOGGER.error(error);
+      return false;
+    }
+
     const base = new Base(configuration);
 
     try {
@@ -98,12 +104,12 @@ module.exports = class baseManager {
       await base.connect();
       await base.disconnect();
     } catch (err) {
-      LOGGER.error("Connection à la base décrite dans " + fullPath + " échouée.");
+      LOGGER.error("Connection à la base décrite dans " + dbConfigPath + " échouée.");
       return false;
     }
 
     // on stocke le chemin du fichier
-    this._listOfVerifiedDbConfig.push(fullPath);
+    this._listOfVerifiedDbConfig.push(dbConfigPath);
 
     LOGGER.info("Configuration de la base de donnees valide.");
     return true;
@@ -115,26 +121,32 @@ module.exports = class baseManager {
   * @function
   * @name createBase
   * @description Création de la connexion à une base de données
-  * @param{string} dbConfig - Nom du fichier contenant les informations de connexion à la base
+  * @param{string} dbConfigPath - Nom du fichier contenant les informations de connexion à la base (chemin absolu)
   *
   */
-  createBase(dbConfig) {
+  createBase(dbConfigPath) {
 
     let base;
-    let fullPath = path.resolve(__dirname, dbConfig);
 
     // on vérifie d'abord que la base n'a pas déjà été créée
-    if (this._baseCatalog[fullPath]) {
-      return this._baseCatalog[fullPath];
+    if (this._baseCatalog[dbConfigPath]) {
+      return this._baseCatalog[dbConfigPath];
     } else {
       // la base n'existe pas, on continue
     }
 
-    let configuration = JSON.parse(fs.readFileSync(fullPath));
+    let configuration = {}; 
+    try {
+      configuration = JSON.parse(fs.readFileSync(dbConfigPath));
+    } catch (error) {
+      LOGGER.error("Impossible de lire la configuration de bdd: " + dbConfigPath);
+      LOGGER.error(error);
+      return false;
+    }
 
     base = new Base(configuration);
 
-    this._baseCatalog[fullPath] = base;
+    this._baseCatalog[dbConfigPath] = base;
 
     return base;
 

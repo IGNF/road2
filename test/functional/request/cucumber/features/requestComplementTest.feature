@@ -11,26 +11,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "bduni-idf-osrm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
-    And the response should contain an attribute "geometry"
-    And the response should contain an attribute "bbox"
-    And the response should contain an attribute "distance"
-    And the response should contain an attribute "duration"
-    And the response should contain an attribute "portions.[0]"
-    And the response should contain an attribute "portions.[0].start"
-    And the response should contain an attribute "portions.[0].end"
-    And the response should contain an attribute "portions.[0].distance"
-    And the response should contain an attribute "portions.[0].duration"
-    And the response should contain an attribute "portions.[0].steps.[0]"
-    And the response should contain an attribute "portions.[0].steps.[0].geometry"
-    And the response should contain an attribute "portions.[0].steps.[0].attributes"
-    And the response should contain an attribute "portions.[0].steps.[0].distance"
-    And the response should contain an attribute "portions.[0].steps.[0].duration"
+    And the response should contain a complete and valid road
 
   Examples:
     | method  |
@@ -43,26 +24,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "bduni-idf-pgr"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
-    And the response should contain an attribute "geometry"
-    And the response should contain an attribute "bbox"
-    And the response should contain an attribute "distance"
-    And the response should contain an attribute "duration"
-    And the response should contain an attribute "portions.[0]"
-    And the response should contain an attribute "portions.[0].start"
-    And the response should contain an attribute "portions.[0].end"
-    And the response should contain an attribute "portions.[0].distance"
-    And the response should contain an attribute "portions.[0].duration"
-    And the response should contain an attribute "portions.[0].steps.[0]"
-    And the response should contain an attribute "portions.[0].steps.[0].geometry"
-    And the response should contain an attribute "portions.[0].steps.[0].attributes"
-    And the response should contain an attribute "portions.[0].steps.[0].distance"
-    And the response should contain an attribute "portions.[0].steps.[0].duration"
+    And the response should contain a complete and valid road
 
   Examples:
     | method  |
@@ -78,6 +40,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
     And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
     And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
@@ -93,6 +56,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
     And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
     And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
@@ -138,6 +102,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes dont une invalide sur une ressource OSRM 
@@ -160,6 +125,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM 
@@ -194,6 +160,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes dont une ivalide sur une ressource OSRM
@@ -219,6 +186,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[2].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM
@@ -256,6 +224,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes dont une invalide sur une ressource pgr 
@@ -278,6 +247,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource pgr 
@@ -312,6 +282,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes dont une ivalide sur une ressource pgr
@@ -337,6 +308,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[2].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource pgr
@@ -374,6 +346,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
@@ -396,6 +369,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
@@ -418,6 +392,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
@@ -440,6 +415,7 @@ Feature: Road2-complement
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
@@ -462,6 +438,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
@@ -484,6 +461,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
@@ -497,22 +475,201 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should have an header "content-type" with value "application/json"
     And the response should contain "Parameter 'constraints' is invalid"
 
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"importance","operator":"<=","value":1}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"importance","operator":"<=","value":1}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr #2)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"importance","operator":"=","value":1}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr #2)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"importance","operator":"=","value":1}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"prefer","key":"importance","operator":">=","value":5}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"prefer","key":"importance","operator":">=","value":5}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #2)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"prefer","key":"importance","operator":">","value":5}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #2)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"prefer","key":"importance","operator":">","value":5}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #3)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"prefer","key":"importance","operator":"!=","value":6}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #3)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"prefer","key":"importance","operator":"!=","value":6}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid & numerical-pgr)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"avoid","key":"importance","operator":"<","value":2}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid & numerical-pgr)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"avoid","key":"importance","operator":"<","value":2}            |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[0].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"avoid","key":"importance","operator":"<","value":"2"}  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"avoid","key":"importance","operator":"<","value":"2"}            |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr #2)
+    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"avoid","key":"importance","operator":"<","value":"test"}  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr #2)
+    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    And with default parameters for "route-pgr"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"avoid","key":"importance","operator":"<","value":"test"}            |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
 Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
     And with default parameters for "isochrone"
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "point" with value "2.333865,48.881989"
-    And the response should contain an attribute "resource" with value "bduni-idf-pgr"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "costType" with value "time"
-    And the response should contain an attribute "costValue" 
-    And the response should contain an attribute "timeUnit" with value "second"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
-    And the response should contain an attribute "resourceVersion"
-    And the response should contain an attribute "geometry"
-    And the response should contain an attribute "direction"
+    And the response should contain a complete and valid iso
 
   Examples:
     | method  |
@@ -803,6 +960,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource pgr
@@ -814,4 +972,5 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
     And the response should contain an attribute "constraints.[0].key"

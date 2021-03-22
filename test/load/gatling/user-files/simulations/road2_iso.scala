@@ -6,7 +6,7 @@ class road2IsoLoadTest extends Simulation {
 
     val urls = ssv("./resources/road2_parameters_iso.ssv").shuffle.circular
 
-    val httpConf = http.baseUrl("http://road2-centos:8080/simple/1.0.0/isochrone?").disableCaching
+    val httpConf = http.baseUrl("http://road2:8080/simple/1.0.0/isochrone?").disableCaching
 
     val scn = scenario("road2")
     .feed(urls).repeat(1){

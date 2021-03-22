@@ -87,23 +87,23 @@
                 # Fichier permettant de calculer le coût
                 "compute":
                   type: object
-                  required: true
+                  required: false
                   properties:
                     # Stockage du fichier permettant de calculer le coût
                     "storage":
                       $ref: "#/components/schemas/storage"
-                # Configuration pour le calcul des couts 
-                "configuration":
-                  type: object 
-                  required: false 
-                  properties:
-                    # Nom du coût dans le fichier de configuration 
-                    "name":
-                      type: string 
-                      required: true
-                    # Stockage du fichier de calcul des couts. C'est un JSON. 
-                    "storage":
-                      $ref: "#/components/schemas/storage"
+                    # Configuration pour le calcul des couts 
+                    "configuration":
+                      type: object 
+                      required: true 
+                      properties:
+                        # Nom du coût dans le fichier de configuration 
+                        "name":
+                          type: string 
+                          required: true
+                        # Stockage du fichier de calcul des couts. C'est un JSON. 
+                        "storage":
+                          $ref: "#/components/schemas/storage"
     # Informations sur les opérations autorisées sur la ressource qui va être générée. 
     "availableOperations":
       type: array

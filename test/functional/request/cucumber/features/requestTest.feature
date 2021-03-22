@@ -73,26 +73,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
-    And the response should contain an attribute "geometry"
-    And the response should contain an attribute "bbox"
-    And the response should contain an attribute "distance"
-    And the response should contain an attribute "duration"
-    And the response should contain an attribute "portions.[0]"
-    And the response should contain an attribute "portions.[0].start"
-    And the response should contain an attribute "portions.[0].end"
-    And the response should contain an attribute "portions.[0].distance"
-    And the response should contain an attribute "portions.[0].duration"
-    And the response should contain an attribute "portions.[0].steps.[0]"
-    And the response should contain an attribute "portions.[0].steps.[0].geometry"
-    And the response should contain an attribute "portions.[0].steps.[0].attributes"
-    And the response should contain an attribute "portions.[0].steps.[0].distance"
-    And the response should contain an attribute "portions.[0].steps.[0].duration"
+    And the response should contain a complete and valid road
 
   Examples:
     | method  |
@@ -105,7 +86,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
+    And the response should contain a complete and valid road
 
   Examples:
     | method  |
@@ -288,6 +269,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "crs" with value "EPSG:2154"
   Examples:
     | method  |
@@ -318,12 +300,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[1]"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec plusieurs points intermediaires
@@ -335,12 +312,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[2]"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec un point intermediaire
@@ -352,12 +324,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[1]"
 
 
@@ -371,12 +338,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "resource" with value "corse-osm"
-    And the response should contain an attribute "profile" with value "car"
-    And the response should contain an attribute "optimization" with value "fastest"
-    And the response should contain an attribute "distanceUnit" with value "meter"
-    And the response should contain an attribute "timeUnit" with value "minute"
-    And the response should contain an attribute "crs" with value "EPSG:4326"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[2]"
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getSteps=true
@@ -388,6 +350,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].geometry"
   Examples:
     | method  |
@@ -456,6 +419,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes
@@ -467,6 +431,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
@@ -478,6 +443,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
@@ -490,6 +456,7 @@ Feature: Road2
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
 Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
@@ -501,6 +468,7 @@ Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes 
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
@@ -513,6 +481,7 @@ Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes 
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
 
     
@@ -525,6 +494,7 @@ Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes 
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "bbox"
 Examples:
     | method  |
@@ -570,6 +540,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "timeUnit" with value "hour"
   Examples:
     | method  |
@@ -585,6 +556,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "timeUnit" with value "minute"
   Examples:
     | method  |
@@ -600,6 +572,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "timeUnit" with value "second"
   Examples:
     | method  |
@@ -615,6 +588,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "timeUnit" with value "standard"
   Examples:
     | method  |
@@ -645,6 +619,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "distanceUnit" with value "kilometer"
   Examples:
     | method  |
@@ -660,6 +635,7 @@ Examples:
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "distanceUnit" with value "meter"
   Examples:
     | method  |
@@ -690,6 +666,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain a string attribute "geometry"
   Examples:
     | method  |
@@ -705,6 +682,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "geometry.type"
   Examples:
     | method  |
@@ -735,6 +713,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType absent)
@@ -834,6 +813,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType absent)
@@ -933,6 +913,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
   Examples:
     | method  |
     | GET     |
@@ -947,6 +928,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
   Examples:
     | method  |
     | GET     |
@@ -961,6 +943,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
   Examples:
     | method  |
     | GET     |
@@ -978,13 +961,14 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
       | getSteps       | true                                                                          |
       | getBbox        | true                                                                          |
       | distanceUnit   | meter                                                                         |
-      | timeUnit       | second                                                                        |
+      | timeUnit       | minute                                                                        |
       | crs            | EPSG:4326                                                                     |
       | waysAttributes | name                                                                          |
       | constraints    | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}|
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
 
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec des tout les paramètres 
@@ -998,7 +982,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
       | getSteps       | true                                                                          |
       | getBbox        | true                                                                          |
       | distanceUnit   | meter                                                                         |
-      | timeUnit       | second                                                                        |
+      | timeUnit       | minute                                                                        |
       | crs            | EPSG:4326                                                                     |
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -1012,6 +996,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec plusieurs fois le start 
     Given an "HTTP" "GET" request on "/simple/1.0.0/route"

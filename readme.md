@@ -10,9 +10,9 @@ Cette partie détaille l'installation sur un serveur. Pour des tests rapides sur
 
 ### Pré-recquis
 
-Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.13.0*.
+Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.18.0*.
 
-Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.23.0*.
+Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.24.0*.
 
 ### Installation des modules
 
@@ -33,8 +33,18 @@ Il est possible d'utiliser directement des images docker pour tester le serveur.
 
 Il est conseillé d'utiliser [docker-compose](./docker/readme.md) pour tester et développer ce serveur.
 
+## Développements 
+
+On trouvera une documentation dédiée aux développeurs [ici](./documentation/index.md). 
+
+## APIs
+
+Les APIs disponibles sont documentées [ici](./documentation/apis/). 
+
+Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0. 
+
 ## Versions
 
 Cette version de Road2 fonctionne avec les versions suivantes:
-- route-graph-generator 1.0.1
-- pgrouting-procedures 1.0.1
+- route-graph-generator 1.0.2-DEVELOP
+- pgrouting-procedures 1.0.2-DEVELOP
