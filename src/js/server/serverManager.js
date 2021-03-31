@@ -120,13 +120,6 @@ module.exports = class serverManager {
           // rien à faire
         }
 
-        if (config.https === "true") {
-          if (userPort !== 443) {
-            LOGGER.fatal("Le port est different de 443 pour un serveur HTTPS");
-            return false;
-          }
-        }
-
       }
     }
 
