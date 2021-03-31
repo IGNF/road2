@@ -36,5 +36,18 @@
     "sinon": "^7.2.7",
     "mock-fs": "^4.9.0",
     "cucumber": "5.1.0"
-  }
+  },
+  "bundledDependencies": [
+    "cors",
+    "express",
+    "log4js",
+    "nconf",
+    "osrm",
+    "pg",
+    "@mapbox/polyline",
+    "@turf/turf",
+    "proj4",
+    "assert",
+    "helmet"
+  ]
 }
