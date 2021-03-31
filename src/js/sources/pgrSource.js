@@ -277,7 +277,7 @@ module.exports = class pgrSource extends Source {
             LOGGER.debug("final constraints: " + constraints);
           } else {
             //TODO: que fait-on ? throw error ?
-            LOGGER.error("no final constraints");
+            LOGGER.debug("no final constraints");
           }
 
         } else {

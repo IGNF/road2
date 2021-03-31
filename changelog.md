@@ -1,5 +1,11 @@
 # 1.0.3-DEVELOP
 
+CHANGED:
+ - Le port HTTPS peut être n'import quel port
+ - Lorsqu'une erreur identifiée (par un code) est remontée, cela écrit un log debug et plus error. 
+
+FIXED:
+ - La vérification des sources est plus fine quant au type des opérations possibles (ajout de l'isochrone). 
 
 # 1.0.2-DEVELOP
 

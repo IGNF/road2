@@ -406,7 +406,7 @@ module.exports = class operationManager  {
 
     }
 
-    LOGGER.error("Operation non trouvee.")
+    LOGGER.info("Operation non trouvee.");
     return false;
   }
 
