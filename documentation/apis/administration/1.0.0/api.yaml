@@ -4,14 +4,48 @@ info:
   version: "1.0.0"
   title: "Administration du Service d'itinéraire"
   contact:
-    email: "idev@ign.fr"
+    email: "rdev@ign.fr"
 servers:
-  - url: "https://localhost"
+  - url: "https://localhost:8080/admin/1.0.0/"
     description: "Serveur de test local"
 tags:
 - name: "Administration"
   description: "Administrer le service d'itinéraire"
 paths:
+  /version:
+    get: 
+      tags: 
+      - "Administration"
+      summary: "Obtenir la version du serveur."
+      description: "Cette requête retourne la version du serveur. "
+      operationId: "version"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  version:
+                    type: "string"
+  /health:
+    get: 
+      tags: 
+      - "Administration"
+      summary: "Obtenir l'état du serveur."
+      description: "Cette requête retourne l'état du serveur. "
+      operationId: "health"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  state:
+                    type: "string"
   /server:
     get:
       tags:
@@ -31,21 +65,10 @@ paths:
                     type: "string"
                   configuration:
                     type: "object"
-            application/xml:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
         403:
           description: "Not allowed"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
   /resource:
@@ -83,25 +106,10 @@ paths:
                       type: "string"
                     configuration:
                       type: "object"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
-                    configFile:
-                      type: "string"
-                    configuration:
-                      type: "object"
         400:
           description: "Invalid parameters"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
         403:
@@ -110,16 +118,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         404:
           description: "Not found"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
     post:
@@ -134,22 +136,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/createResource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createResource"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
               schema:
                 type: "object"
                 properties:
@@ -163,25 +154,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         403:
           description: "Not allowed"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         404:
           description: "Not found"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
     put:
@@ -196,22 +178,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/createResource"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/createResource"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
-              schema:
-                type: "object"
-                properties:
-                  configFile:
-                    type: "string"
-                  configuration:
-                    type: "object"
-            application/xml:
               schema:
                 type: "object"
                 properties:
@@ -225,25 +196,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         403:
           description: "Not allowed"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         404:
           description: "Not found"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
     delete:
@@ -276,21 +238,10 @@ paths:
                   properties:
                     resourceId:
                       type: "string"
-            application/xml:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    resourceId:
-                      type: "string"
         400:
           description: "Invalid parameters"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
         403:
@@ -299,16 +250,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
         404:
           description: "Not found"
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/errorResponse"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/errorResponse"
 components:

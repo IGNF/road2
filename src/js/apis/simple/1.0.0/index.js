@@ -232,7 +232,8 @@ router.use(notFoundError);
 */
 
 function logError(err, req, res, next) {
-  LOGGER.error({
+
+  let message = {
     request: req.originalUrl,
     query: req.query,
     body: req.body,
@@ -241,7 +242,14 @@ function logError(err, req, res, next) {
       message: err.message,
       stack: err.stack
     }
-  });
+  };
+
+  if (err.status) {
+    LOGGER.debug(message);
+  } else {
+    LOGGER.error(message);
+  }
+  
   next(err);
 }
 

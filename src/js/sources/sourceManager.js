@@ -267,14 +267,22 @@ module.exports = class sourceManager {
         available = true;
         LOGGER.info("Source osrm.");
 
+        let operationFound = false;
+
         // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (!operationManager.verifyAvailabilityOperation("route")) {
-          LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
-          return false;
+        if (operationManager.verifyAvailabilityOperation("route")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite 
+          }
+        } else {
+          // on continue pour voir la suite 
         }
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-        if (!operationManager.isAvailableInTable("route", resourceOperationTable)) {
-          LOGGER.error("Le ressource ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+
+        if (!operationFound) {
+          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route), il n'est donc pas possible de charger cette source.");
           return false;
         }
 
@@ -293,14 +301,34 @@ module.exports = class sourceManager {
         available = true;
         LOGGER.info("Source pgrouting.");
 
+        let operationFound = false;
+
         // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (!operationManager.verifyAvailabilityOperation("route")) {
-          LOGGER.error("Le service ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
-          return false;
+        if (operationManager.verifyAvailabilityOperation("route")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite 
+          }
+        } else {
+          // on continue pour voir la suite 
         }
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-        if (!operationManager.isAvailableInTable("route", resourceOperationTable)) {
-          LOGGER.error("Le ressource ne propose pas l'operation 'route', il n'est donc pas possible de charger cette source.");
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (operationManager.verifyAvailabilityOperation("isochrone")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite 
+          }
+        } else {
+          // on continue pour voir la suite 
+        }
+
+        if (!operationFound) {
+          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
           return false;
         }
 

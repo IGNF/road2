@@ -577,12 +577,11 @@ Feature: Road2 configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration du serveur n'indique aucun port"
 
- Scenario: [server.json] (serveur https avec un mauvais port)
+ Scenario: [server.json] (serveur https avec un port different)
     Given a valid configuration 
     And with parameter "445" for attribute "application.network.servers.[1].port" in server configuration
     When I test the configuration
-    Then the configuration analysis should give an exit code 1
-    Then the server log should contain "Le port est different de 443 pour un serveur HTTPS"
+    Then the configuration analysis should give an exit code 0
 
   Scenario: [server.json] (serveur https sans options)
     Given a valid configuration 

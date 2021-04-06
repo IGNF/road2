@@ -3,7 +3,6 @@
 
 const express = require('express');
 const log4js = require('log4js');
-const errorManager = require('../../../utils/errorManager');
 const packageJSON = require('../../../../../package.json');
 
 var LOGGER = log4js.getLogger("ADMIN");
@@ -15,8 +14,8 @@ router.all("/", function(req, res) {
   res.send("Road2 via l'API admin 1.0.0");
 });
 
-// Route
-// Pour effectuer un calcul d'itinéraire
+// Version
+// Pour avoir la version de Road2 utilisée 
 router.route("/version")
 
   .get(async function(req, res, next) {
@@ -27,6 +26,23 @@ router.route("/version")
     res.set('content-type', 'application/json');
     res.status(200).json({
       "version": packageJSON.version
+    });
+
+  });
+
+// Health
+// Pour avoir l'état du service
+// TODO: implémenter une véritable vérification de l'état
+router.route("/health")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/health?");
+    LOGGER.debug(req.originalUrl);
+
+    res.set('content-type', 'application/json');
+    res.status(200).json({
+      "state": "green"
     });
 
   });
@@ -49,7 +65,8 @@ router.use(notFoundError);
 */
 
 function logError(err, req, res, next) {
-  LOGGER.error({
+  
+  let message = {
     request: req.originalUrl,
     query: req.query,
     body: req.body,
@@ -58,7 +75,13 @@ function logError(err, req, res, next) {
       message: err.message,
       stack: err.stack
     }
-  });
+  };
+
+  if (err.status) {
+    LOGGER.debug(message);
+  } else {
+    LOGGER.error(message);
+  }
   next(err);
 }
 
