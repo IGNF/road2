@@ -1,4 +1,4 @@
-# 1.0.3-DEVELOP
+# 1.0.3
 
 CHANGED:
  - Le port HTTPS peut être n'import quel port
@@ -7,7 +7,7 @@ CHANGED:
 FIXED:
  - La vérification des sources est plus fine quant au type des opérations possibles (ajout de l'isochrone). 
 
-# 1.0.2-DEVELOP
+# 1.0.2
 
 ADDED:
  - Modification du server.json: emplacement du fichier de configuration des CORS 
