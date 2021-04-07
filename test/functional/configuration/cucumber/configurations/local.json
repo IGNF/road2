@@ -2,5 +2,6 @@
     "defaultServerConfiguration": "/home/docker/config/road2.json",
     "road2": "/home/docker/app/src/js/road2.js",
     "tmpDirectory": "/home/docker/tmp/",
-    "defaultCLParameter": "ROAD2_CONF_FILE"
+    "defaultCLParameter": "ROAD2_CONF_FILE",
+    "cleanTmpDirectories": true
 }
