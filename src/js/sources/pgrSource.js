@@ -976,6 +976,17 @@ module.exports = class pgrSource extends Source {
 
     let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
 
+    // Cas où il n'y a pas d'isochrone car costValue trop faible
+    if (rawGeometry === null) {
+      rawGeometry = {
+        type: 'Point',
+        coordinates: [
+          isochroneRequest.point.lon,
+          isochroneRequest.point.lat
+        ]
+      };
+    }
+
     // Création d'un objet Polygon à partir du GeoJSON reçu.
     geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
 
