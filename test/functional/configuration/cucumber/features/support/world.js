@@ -32,6 +32,9 @@ class road2World {
         // Espace temporaire pour stocker les configurations de chaque test
         this._tmpDirectory = os.tmpdir();
 
+        // Nettoyage du dossier temporaire avec chaque test 
+        this._cleanTmpDirectories = true;
+
         // Parametre pour la ligne de commande par défaut
         this._defaultCLParameter = "";
 
@@ -95,6 +98,7 @@ class road2World {
         this._road2 = configuration.road2;
         this._tmpDirectory = configuration.tmpDirectory;
         this._defaultCLParameter = configuration.defaultCLParameter;
+        this._cleanTmpDirectories = configuration.cleanTmpDirectories;
 
         return true;
 
@@ -584,7 +588,7 @@ class road2World {
 
     // Analyse du code de retour de la commande 
     verifyCommandExitCode(code) {
-
+        
         if (code === this._code) {
             return true;
         } else {
@@ -606,6 +610,21 @@ class road2World {
             }
         }
 
+    }
+
+    // Nettoyage du dossier temporaire 
+    cleanTmpDirectory() {
+
+        if (this._cleanTmpDirectories) {
+
+            fs.rmdir(this._tmpDirConf, {
+                "recursive": true
+            }, (err) => { return err;});
+            
+        } else {
+
+        }
+        
     }
  
 }

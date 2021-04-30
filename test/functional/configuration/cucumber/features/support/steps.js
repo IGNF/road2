@@ -1,5 +1,9 @@
-const { Given, When, Then } = require("cucumber");
+const { Given, When, Then, After } = require("cucumber");
 const assert = require('assert');
+
+After( function () {
+    this.cleanTmpDirectory();
+});
 
 Given("I have loaded all my test configuration", function() {
     assert.equal(this.loadTestConfiguration(), true);

@@ -4,6 +4,7 @@ const ResourceParameter = require('./resourceParameter');
 const log4js = require('log4js');
 const errorManager = require('../utils/errorManager');
 const validationManager = require('../utils/validationManager');
+const mathManager = require('../utils/mathManager');
 
 
 var LOGGER = log4js.getLogger("FLOATPARAM");
@@ -36,11 +37,13 @@ module.exports = class FloatParameter extends ResourceParameter {
     /* TODO: À revoir. Pour le moment, c'est une initialisation toute bête.  */
     this._defaultValueContent = 0;
 
-    /* Valeur min. */
-    this._min = null;
 
-    /* Valeur max. */
-    this._max = null;
+    // values 
+    this._values = {};
+    // Valeur min
+    this._values.min = null;
+    // Valeur max
+    this._values.max = null;
 
   }
 
@@ -53,6 +56,16 @@ module.exports = class FloatParameter extends ResourceParameter {
   */
   get defaultValueContent () {
     return this._defaultValueContent;
+  }
+
+  /*
+  * @function
+  * @name get values
+  * @description Récupérer les valeurs possibles (quand elles sont précisées)
+  *
+  */
+  get values () {
+    return this._values;
   }
 
   /**
@@ -70,13 +83,16 @@ module.exports = class FloatParameter extends ResourceParameter {
       this._defaultValueContent = parameterConf.defaultValueContent;
     }
 
-    if (parameterConf.min) {
-      this._min = parameterConf.min;
+    if (parameterConf.values){
+      if (parameterConf.values.min) {
+        this._values.min = parameterConf.values.min;
+      }
+  
+      if (parameterConf.values.max) {
+        this._values.max = parameterConf.values.max;
+      }
     }
-
-    if (parameterConf.max) {
-      this._max = parameterConf.max;
-    }
+    
 
     return true;
 
@@ -103,7 +119,7 @@ module.exports = class FloatParameter extends ResourceParameter {
     if(typeof userValue === "string") {
 
       LOGGER.debug("user value is a string");
-      userFloat = this.filterFloat(userValue);
+      userFloat = mathManager.convertFloat(userValue);
 
     } else if (typeof userValue === "number") {
 
@@ -115,7 +131,7 @@ module.exports = class FloatParameter extends ResourceParameter {
     }
 
     if (isNaN(userFloat)) {
-      return errorManager.createErrorMessage("user value is NaN");
+      return errorManager.createErrorMessage("user value is not a number");
     } else {
       LOGGER.debug("user value is NOT NaN");
     }
@@ -127,14 +143,14 @@ module.exports = class FloatParameter extends ResourceParameter {
       LOGGER.debug("user value is NOT infinity");
     }
     
-    if (this._min && (userFloat < this._min)) {
-      return errorManager.createErrorMessage("user value is inferior to the min " + this._min);
+    if (this._values.min && (userFloat < this._values.min)) {
+      return errorManager.createErrorMessage("user value is inferior to the min " + this._values.min);
     } else {
       LOGGER.debug("user value is NOT inferior to the min");
     }
 
-    if (this._max && (userFloat > this._max)) {
-      return errorManager.createErrorMessage("user value is superior to the max " + this._max);
+    if (this._values.max && (userFloat > this._values.max)) {
+      return errorManager.createErrorMessage("user value is superior to the max " + this._values.max);
     } else {
       LOGGER.debug("user value is NOT superior to the max");
     }
@@ -148,7 +164,7 @@ module.exports = class FloatParameter extends ResourceParameter {
   * @function
   * @name specificConvertion
   * @description Convertir une valeur dans un format adapté aux requêtes
-  * @param {string} userValue - Valeur à vérifier
+  * @param {string} userValue - Valeur à convertir
   * @return {object}
   *
   */
@@ -156,26 +172,6 @@ module.exports = class FloatParameter extends ResourceParameter {
 
     return parseFloat(userValue);
 
-  }
-
-  /**
-  *
-  * @function
-  * @name filterFloat
-  * @description Convertir une valeur en float
-  * @param {string} value - Valeur à convertir
-  * @return {float}
-  *
-  */
-
-  filterFloat(value) {
-
-    if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value)) {
-      return Number(value);
-    } else {
-      return NaN;
-    }
-    
   }
 
 

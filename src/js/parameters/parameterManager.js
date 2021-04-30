@@ -539,7 +539,6 @@ module.exports = class parameterManager  {
       }
 
     } else if (serviceParameterConf.type === "float") {
-      /* TODO: Rajouter des contrôles sur les valeurs autorisées. */
 
       // Gestion des valeurs par défaut
       if (serviceParameterConf.defaultValue === "true") {
@@ -548,10 +547,42 @@ module.exports = class parameterManager  {
           LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
           return false;
         } else {
-          // TODO: vérification
+          // on vérifie qu'on a bien un float 
+          if (typeof resourceParameterJsonObject.defaultValueContent !== "number") {
+            LOGGER.error("La valeur par defaut n'est pas un nombre");
+            return false;
+          } else {
+            // c'est ok
+          }
         }
       } else {
         // il n'y a rien à faire
+      }
+
+      //on regarde si les min et max précisés sont bien des float 
+      // min et max ne sont pas obligatoires
+
+      if (resourceParameterJsonObject.values) {
+        if (resourceParameterJsonObject.values.min) {
+          if (typeof resourceParameterJsonObject.values.min !== "number") {
+            LOGGER.error("La valeur min du parametre n'est pas un nombre");
+            return false;
+          } else {
+            // c'est ok
+          }
+        }
+
+        if (resourceParameterJsonObject.values.max) {
+          if (typeof resourceParameterJsonObject.values.max !== "number") {
+            LOGGER.error("La valeur max du parametre n'est pas un nombre");
+            return false;
+          } else {
+            // c'est ok
+          }
+        }
+
+      } else {
+        // il n'y a rien à vérifier 
       }
 
     } else if (serviceParameterConf.type === "constraint") {
