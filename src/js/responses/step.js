@@ -34,6 +34,9 @@ module.exports = class Step {
     // attributes
     this._attributes = {};
 
+    // Instruction de navigation
+    this._instruction = "";
+
   }
 
   /**
@@ -156,6 +159,29 @@ module.exports = class Step {
   */
   set distance (di) {
     this._distance = di;
+  }
+
+  /**
+  *
+  * @function
+  * @name get instruction
+  * @description Récupérer l'instruction
+  *
+  */
+  get instruction () {
+    return this._instruction;
+  }
+
+  /**
+  *
+  * @function
+  * @name set instruction
+  * @description Attribuer l'instruction
+  * @param {Object} inst - instruction
+  *
+  */
+  set instruction (inst) {
+    this._instruction = inst;
   }
 
 

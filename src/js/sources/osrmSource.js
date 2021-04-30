@@ -197,14 +197,14 @@ module.exports = class osrmSource extends Source {
             if (constraint.type === "banned") {
               osrmRequest.exclude.push(constraint.field);
             } else {
-              // ce sont des contraintes non gérées donc il n'y a rien à faire 
+              // ce sont des contraintes non gérées donc il n'y a rien à faire
               LOGGER.debug("no banned contraints");
             }
 
           }
 
         } else {
-          // il n'y rien à faire car pas de contraintes 
+          // il n'y rien à faire car pas de contraintes
           LOGGER.debug("no contraints");
         }
 
@@ -255,7 +255,7 @@ module.exports = class osrmSource extends Source {
     } else {
 
       // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse
-      LOGGER.error("request operation not found"); 
+      LOGGER.error("request operation not found");
 
     }
 
@@ -413,7 +413,7 @@ module.exports = class osrmSource extends Source {
             LOGGER.debug("step geometry is converted");
           }
 
-          // Ajout de l'attribut name 
+          // Ajout de l'attribut name
           let nameAttributs;
           try {
             nameAttributs = JSON.parse(currentOsrmRouteStep.name);
@@ -427,6 +427,14 @@ module.exports = class osrmSource extends Source {
           steps[k].distance = new Distance(currentOsrmRouteStep.distance,"meter");
           steps[k].duration = new Duration(currentOsrmRouteStep.duration,"second");
 
+          steps[k].instruction = {};
+          steps[k].instruction.type = currentOsrmRouteStep.maneuver.type;
+          if (currentOsrmRouteStep.maneuver.modifier) {
+            steps[k].instruction.modifier = currentOsrmRouteStep.maneuver.modifier;
+          }
+          if (currentOsrmRouteStep.maneuver.exit) {
+            steps[k].instruction.exit = currentOsrmRouteStep.maneuver.exit;
+          }
         }
 
         portions[j].steps = steps;
