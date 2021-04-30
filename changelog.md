@@ -1,8 +1,13 @@
-# 1.0.4-DEVELOP
+# 1.0.4
 
+CHANGED:
+ - suppresion des dossiers temporaires dans les tests fonctionnels
 
+FIXED:
+ - Plus d'erreur dans l'isochrone quand la costValue est trop basse pour avoir un polygone
+ - min et max de costValue n'etaient pas dans l'objet values
 
-# 1.0.3-DEVELOP
+# 1.0.3
 
 CHANGED:
  - Le port HTTPS peut être n'import quel port
@@ -11,7 +16,7 @@ CHANGED:
 FIXED:
  - La vérification des sources est plus fine quant au type des opérations possibles (ajout de l'isochrone). 
 
-# 1.0.2-DEVELOP
+# 1.0.2
 
 ADDED:
  - Modification du server.json: emplacement du fichier de configuration des CORS 
