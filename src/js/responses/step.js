@@ -35,7 +35,7 @@ module.exports = class Step {
     this._attributes = {};
 
     // Instruction de navigation
-    this._instruction = "";
+    this._instruction = {};
 
   }
 
