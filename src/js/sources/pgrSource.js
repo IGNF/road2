@@ -406,10 +406,15 @@ module.exports = class pgrSource extends Source {
 
             if (err) {
 
-              LOGGER.error("pgr error:");
-              LOGGER.error(err);
-
-              reject(err);
+              // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé d'iso
+              if (err.code === "XX000") {
+                // Cette erreur remonte souvent quand PGR n'a pas assez de données pour créer ou calculer une iso (ex. costValue trop petit)
+                reject(errorManager.createError(" No iso found ", 404));
+              }  else {
+                LOGGER.error("pgr error:");
+                LOGGER.error(err);
+                reject(err);
+              }
 
             } else {
 

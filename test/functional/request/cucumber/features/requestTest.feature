@@ -5,11 +5,16 @@ Feature: Road2
   Background:
       Given I have loaded all my test configuration
 
-  Scenario: Route principale
-    Given an "HTTP" "GET" request on "/"
+  Scenario Outline: [<method>] Route principale
+    Given an "HTTPS" "<method>" request on "/"
     When I send the request 
     Then the server should send a response with status 200
     And the response should contain "Road2"
+  
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
 
   Scenario Outline: [<method>] Route principale en HTTPS
     Given an "HTTPS" "<method>" request on "/"

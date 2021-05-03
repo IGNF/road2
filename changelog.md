@@ -1,5 +1,14 @@
 # 1.0.5-DEVELOP
 
+FIXED:
+ - gestion d'une erreur PGR si aucun isochrone n'est trouvé. 
+
+CHANGED:
+ - log des erreurs pgr et osrm seulement si ce n'est pas un "path/iso not found"
+
+ADDED: 
+ - Gestion des proxy http pour les tests fonctionnels
+
 # 1.0.4
 
 CHANGED:

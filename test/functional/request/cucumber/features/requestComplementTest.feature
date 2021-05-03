@@ -820,6 +820,38 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | GET     |
     | POST    | 
 
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un costValue trop petit
+    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key        | value                 |
+      | costValue  | 5                     |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'costValue' is invalid"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un costValue trop grand
+    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key        | value                 |
+      | costValue  | 10000                 |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'costValue' is invalid"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sans costType 
     Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
     And with default parameters for "isochrone"

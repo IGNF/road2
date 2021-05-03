@@ -35,11 +35,25 @@ Given('with {string} at the end of the url', function (key) {
 
 When("I send the request", function(done) {
     this.sendRequest()
-    .then(() => {
+    .then((response) => {
+        this.saveResponse(response);
         done();
     })
     .catch((error) => {
-        done(error);
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            this.saveResponse(error.response);
+            done();
+        } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            done("No response received : " + error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            done("Can't send request : " + error.message);
+        }
     });
 
 });

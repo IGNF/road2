@@ -1,6 +1,7 @@
 {
     "url": "localhost",
-    "port": 8080,
+    "httpPort": 8080,
+    "httpsPort": 443,
     "defaultParameters": [
         {
             "id": "route",

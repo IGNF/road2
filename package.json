@@ -36,7 +36,9 @@
   "devDependencies": {
     "sinon": "^7.2.7",
     "mock-fs": "^4.9.0",
-    "cucumber": "5.1.0"
+    "cucumber": "5.1.0",
+    "axios": "^0.21.1",
+    "tunnel": "^0.0.6"
   },
   "bundledDependencies": [
     "cors",

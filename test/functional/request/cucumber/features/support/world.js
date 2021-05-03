@@ -1,9 +1,11 @@
 const { setWorldConstructor } = require("cucumber");
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
+const turf = require('@turf/turf');
+const axios = require('axios');
+const tunnel = require('tunnel');
 const https = require('https');
-const turf = require('@turf/turf')
+
 
 /**
 *
@@ -27,8 +29,9 @@ class road2World {
         // Url du service 
         this._url  = "";
 
-        // Port 
-        this._port = 8080;
+        // Ports
+        this._httpPort = 80;
+        this._httpsPort = 443;
 
         // Chemin du service 
         this._path = "";
@@ -68,7 +71,9 @@ class road2World {
 
         this._url = configuration.url;
 
-        this._port = configuration.port;
+        this._httpPort = configuration.httpPort;
+
+        this._httpsPort = configuration.httpsPort;
 
         this._defaultParameters = configuration.defaultParameters; 
 
@@ -153,195 +158,284 @@ class road2World {
 
     sendRequest() {
 
-        let finalOptions = {};
+        // Objet qui contient la requête
+        let finalRequest = {};
 
-        if (this._method === "GET") {
+        // Gestion du protocol 
+        let currentProtocol = this._protocol.toLowerCase();
 
-            // Traduction du body dans l'url 
-            let currentProtocol = this._protocol.toLowerCase();
-            let finalUrl = currentProtocol + "://" + this._url;
-
-            if (currentProtocol === "https") {
-                finalUrl += this._path + "?";
-            } else if (currentProtocol === "http") {
-                finalUrl += ":" + this._port + this._path + "?";
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
-            }
-
-            for(let param in this._body) {
-                finalUrl +=  "&" + param + "=" + this._body[param].toString();
-            }
-            finalUrl += this._adendumUrl;
-
-            if (currentProtocol === "https") {
-
-                let options = {
-                    rejectUnauthorized: false
-                }
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    https.get(finalUrl, options, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                });
-
-            } else if (currentProtocol === "http") {
-                
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    http.get(finalUrl, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                });
-
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
-            }
-
-        } else if (this._method === "POST") {
-
-            let currentProtocol = this._protocol.toLowerCase();
-
-            finalOptions = {
-                protocol: currentProtocol + ":",
-                host: this._url + this._adendumUrl,
-                path: this._path,
-                method: "POST",
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                rejectUnauthorized: false
-            };
-
-            if (currentProtocol === "https") {
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    let request = https.request(finalOptions, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                    // Envoie de la requête
-                    request.write(JSON.stringify(this._body));
-                    request.end();
-                    
-
-                });
-
-            } else if (currentProtocol === "http") {
-
-                finalOptions.port = this._port;
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    let request = http.request(finalOptions, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                    // Envoie de la requête
-                    request.write(JSON.stringify(this._body));
-                    request.end();
-                    
-
-                });
-
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
-            }
-            
+        // Gestion du port 
+        let currentPort;
+        if (currentProtocol === "https") {
+            currentPort = this._httpsPort;
         } else {
-            
+            currentPort = this._httpPort;
         }
 
+        // Gestion de l'url  
+        let finalUrl = currentProtocol + "://" + this._url + ":" + currentPort + this._path + "?";
+        finalRequest.url = finalUrl;
+
+        // Gestion de la méthode 
+        finalRequest.method = this._method.toLocaleLowerCase();
+
+        // Gestion des paramètres de la requête 
+        if (finalRequest.method === "get") {
+            for(let param in this._body) {
+                finalRequest.url +=  "&" + param + "=" + this._body[param].toString();
+            }
+            finalRequest.url += this._adendumUrl;
+        } else if (finalRequest.method === "post") {
+            finalRequest.data = this._body;
+            finalRequest.url += this._adendumUrl;
+            finalRequest.headers = {
+                'Content-Type': 'application/json'
+            }
+        } else {
+
+        }
+
+        // Gestion du proxy 
+        if (process.env.HTTP_PROXY === "") {
+
+            finalRequest.proxy = false;
+
+            if (currentProtocol === "https") {
+                finalRequest.httpsAgent = new https.Agent({
+                    rejectUnauthorized: false
+                });
+            } else {
+                // rien à ajouter 
+            }
+
+        } else {
+            // on a un proxy http 
+
+            // on le décompose 
+            let proxy = process.env.HTTP_PROXY.split(":");
+            let proxyHost = proxy[1].replace(/\//g,"");
+            let proxyPort = proxy[2];
+
+            if (currentProtocol === "https") {
+                // on spécifie le proxy via tunnel et pas axios 
+                finalRequest.proxy = false;
+
+                let tunnelApp = tunnel.httpsOverHttp({
+                    proxy: {
+                        host: proxyHost,
+                        port: proxyPort
+                    },
+                });
+
+                finalRequest.httpsAgent = tunnelApp;
+
+            } else {
+                // rien à ajouter car axios le prend déjà en compte 
+            }
+
+        }
+
+
+        return axios(finalRequest);
+
+        //------------------------------------------------------
+        // let finalOptions = {};
+
+        // if (this._method === "GET") {
+
+        //     // Traduction du body dans l'url 
+        //     let currentProtocol = this._protocol.toLowerCase();
+        //     let finalUrl = currentProtocol + "://" + this._url;
+
+        //     if (currentProtocol === "https") {
+        //         finalUrl += this._path + "?";
+        //     } else if (currentProtocol === "http") {
+        //         finalUrl += ":" + this._port + this._path + "?";
+        //     } else {
+        //         throw "Protocol unknown: " + currentProtocol;
+        //     }
+
+        //     for(let param in this._body) {
+        //         finalUrl +=  "&" + param + "=" + this._body[param].toString();
+        //     }
+        //     finalUrl += this._adendumUrl;
+
+        //     if (currentProtocol === "https") {
+
+        //         let options = {
+        //             rejectUnauthorized: false
+        //         }
+
+        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
+        //         return new Promise ( (resolve, reject) => {
+
+        //             https.get(finalUrl, options, (response) => {
+
+        //                 this._status = response.statusCode;
+        //                 this._header = response.headers;
+
+        //                 // il faut passer par cet objet intermédiaire
+        //                 let rawResponse = "";
+
+        //                 // Stockage progressif 
+        //                 response.on('data', (data) => {
+        //                     rawResponse += data;
+        //                 });
+
+        //                 // Stockage final
+        //                 response.on('end', () => {
+        //                     this._response = rawResponse;
+        //                     resolve();
+        //                 });
+
+        //             // Si erreur lors de la requête 
+        //             }).on('error', (err) => {
+        //                 reject(err);
+        //             });
+
+        //         });
+
+        //     } else if (currentProtocol === "http") {
+                
+        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
+        //         return new Promise ( (resolve, reject) => {
+
+        //             http.get(finalUrl, (response) => {
+
+        //                 this._status = response.statusCode;
+        //                 this._header = response.headers;
+
+        //                 // il faut passer par cet objet intermédiaire
+        //                 let rawResponse = "";
+
+        //                 // Stockage progressif 
+        //                 response.on('data', (data) => {
+        //                     rawResponse += data;
+        //                 });
+
+        //                 // Stockage final
+        //                 response.on('end', () => {
+        //                     this._response = rawResponse;
+        //                     resolve();
+        //                 });
+
+        //             // Si erreur lors de la requête 
+        //             }).on('error', (err) => {
+        //                 reject(err);
+        //             });
+
+        //         });
+
+        //     } else {
+        //         throw "Protocol unknown: " + currentProtocol;
+        //     }
+
+        // } else if (this._method === "POST") {
+
+        //     let currentProtocol = this._protocol.toLowerCase();
+
+        //     finalOptions = {
+        //         protocol: currentProtocol + ":",
+        //         host: this._url + this._adendumUrl,
+        //         path: this._path,
+        //         method: "POST",
+        //         headers: {
+        //           'Content-Type': 'application/json'
+        //         },
+        //         rejectUnauthorized: false
+        //     };
+
+        //     if (currentProtocol === "https") {
+
+        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
+        //         return new Promise ( (resolve, reject) => {
+
+        //             let request = https.request(finalOptions, (response) => {
+
+        //                 this._status = response.statusCode;
+        //                 this._header = response.headers;
+
+        //                 // il faut passer par cet objet intermédiaire
+        //                 let rawResponse = "";
+
+        //                 // Stockage progressif 
+        //                 response.on('data', (data) => {
+        //                     rawResponse += data;
+        //                 });
+
+        //                 // Stockage final
+        //                 response.on('end', () => {
+        //                     this._response = rawResponse;
+        //                     resolve();
+        //                 });
+
+        //             // Si erreur lors de la requête 
+        //             }).on('error', (err) => {
+        //                 reject(err);
+        //             });
+
+        //             // Envoie de la requête
+        //             request.write(JSON.stringify(this._body));
+        //             request.end();
+                    
+
+        //         });
+
+        //     } else if (currentProtocol === "http") {
+
+        //         finalOptions.port = this._port;
+
+        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
+        //         return new Promise ( (resolve, reject) => {
+
+        //             let request = http.request(finalOptions, (response) => {
+
+        //                 this._status = response.statusCode;
+        //                 this._header = response.headers;
+
+        //                 // il faut passer par cet objet intermédiaire
+        //                 let rawResponse = "";
+
+        //                 // Stockage progressif 
+        //                 response.on('data', (data) => {
+        //                     rawResponse += data;
+        //                 });
+
+        //                 // Stockage final
+        //                 response.on('end', () => {
+        //                     this._response = rawResponse;
+        //                     resolve();
+        //                 });
+
+        //             // Si erreur lors de la requête 
+        //             }).on('error', (err) => {
+        //                 reject(err);
+        //             });
+
+        //             // Envoie de la requête
+        //             request.write(JSON.stringify(this._body));
+        //             request.end();
+                    
+
+        //         });
+
+        //     } else {
+        //         throw "Protocol unknown: " + currentProtocol;
+        //     }
+            
+        // } else {
+            
+        // }
+
         
+
+    }
+
+    saveResponse(response) {
+
+        this._status = response.status;
+        this._header = response.headers;
+        this._response = response.data;
 
     }
 
@@ -354,7 +448,7 @@ class road2World {
     }
 
     verifyRawResponseContent(message) {
-        if (this._response.includes(message)) {
+        if (JSON.stringify(this._response).includes(message)) {
             return true;
         } else {
             return "Message is not in response: " + this._response;
@@ -380,7 +474,13 @@ class road2World {
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
 
@@ -391,6 +491,7 @@ class road2World {
                 }
 
             } catch(error) {
+                console.log(error);
                 return false;
             }
             
@@ -405,7 +506,13 @@ class road2World {
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
                 
@@ -430,7 +537,13 @@ class road2World {
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
                 
@@ -612,7 +725,13 @@ class road2World {
         let refDistanceMax = 0;
         let refDurationMin = 0;
         let refDurationMax = 0;
-        let responseJSON = JSON.parse(this._response);
+        let responseJSON = {};
+                
+        if (typeof this._response === "string") {
+            responseJSON = JSON.parse(this._response);
+        } else {
+            responseJSON = this._response;
+        }
 
         try {
             referenceRoad = JSON.parse(fs.readFileSync(path.resolve(__dirname,filePath)));
