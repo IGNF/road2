@@ -3,10 +3,10 @@ Feature: Road2 with data
   Tests fonctionnels de Road2 prenant en compte la donnée 
 
   Background:
-      Given I have loaded all my test configuration
+      Given I have loaded all my test configuration in "../../configurations/local.json"
 
   Scenario Outline: [<method>] [simple/1.0.0] Route normale 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
+    Given an "<method>" request on "/simple/1.0.0/route"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value                                         |
@@ -24,7 +24,7 @@ Feature: Road2 with data
     | POST    | 
 
   Scenario: [GET] [simple/1.0.0] Route qui doit passer sur un pont mais en interdisant les ponts
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on "/simple/1.0.0/route"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                     |

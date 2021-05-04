@@ -1,12 +1,12 @@
 const { Given, When, Then } = require("cucumber");
 const assert = require('assert');
 
-Given("I have loaded all my test configuration", function() {
-    this.loadConfiguration();
+Given("I have loaded all my test configuration in {string}", function(configurationPath) {
+    this.loadConfiguration(configurationPath);
 });
 
-Given("an {string} {string} request on {string}", function(protocol, method, path) {
-    this.createRequest(protocol, method, path);
+Given("an {string} request on {string}", function(method, path) {
+    this.createRequest(method, path);
 });
 
 Given("with default parameters for {string}", function(operation) {
@@ -49,10 +49,10 @@ When("I send the request", function(done) {
             // The request was made but no response was received
             // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
             // http.ClientRequest in node.js
-            done("No response received : " + error.request);
+            done(error.request);
         } else {
             // Something happened in setting up the request that triggered an Error
-            done("Can't send request : " + error.message);
+            done(error.message);
         }
     });
 

@@ -29,9 +29,8 @@ class road2World {
         // Url du service 
         this._url  = "";
 
-        // Ports
-        this._httpPort = 80;
-        this._httpsPort = 443;
+        // Port
+        this._port = 80;
 
         // Chemin du service 
         this._path = "";
@@ -63,25 +62,24 @@ class road2World {
 
     }
 
-    loadConfiguration() {
+    loadConfiguration(configurationPath) {
 
-        let configurationPath = path.resolve(__dirname, "../../configurations/local.json");
+        let absolutePath = path.resolve(__dirname, configurationPath);
 
-        let configuration = JSON.parse(fs.readFileSync(configurationPath));
+        let configuration = JSON.parse(fs.readFileSync(absolutePath));
 
         this._url = configuration.url;
 
-        this._httpPort = configuration.httpPort;
+        this._port = configuration.port;
 
-        this._httpsPort = configuration.httpsPort;
+        this._protocol = configuration.protocol;
 
         this._defaultParameters = configuration.defaultParameters; 
 
     }
 
-    createRequest(protocol, method, path) {
+    createRequest(method, path) {
 
-        this._protocol = protocol;
         this._method = method;
         this._path = path;
 
@@ -165,12 +163,7 @@ class road2World {
         let currentProtocol = this._protocol.toLowerCase();
 
         // Gestion du port 
-        let currentPort;
-        if (currentProtocol === "https") {
-            currentPort = this._httpsPort;
-        } else {
-            currentPort = this._httpPort;
-        }
+        let currentPort = this._port;
 
         // Gestion de l'url  
         let finalUrl = currentProtocol + "://" + this._url + ":" + currentPort + this._path + "?";

@@ -5,9 +5,11 @@ FIXED:
 
 CHANGED:
  - log des erreurs pgr et osrm seulement si ce n'est pas un "path/iso not found"
+ - les tests fonctionnels peuvent être joués en https ou http selon la configuration
+ - Tests fonctionnels: gestion de la config au début du fichier cucumber
 
 ADDED: 
- - Gestion des proxy http pour les tests fonctionnels
+ - gestion des proxy http pour les tests fonctionnels
 
 # 1.0.4
 
