@@ -6,7 +6,7 @@ Feature: Road2 with data
       Given I have loaded all my test configuration in "../../configurations/local.json"
 
   Scenario Outline: [<method>] [simple/1.0.0] Route normale 
-    Given an "<method>" request on "/simple/1.0.0/route"
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value                                         |
@@ -24,7 +24,7 @@ Feature: Road2 with data
     | POST    | 
 
   Scenario: [GET] [simple/1.0.0] Route qui doit passer sur un pont mais en interdisant les ponts
-    Given an "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                     |

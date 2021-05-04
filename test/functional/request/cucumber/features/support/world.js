@@ -32,7 +32,10 @@ class road2World {
         // Port
         this._port = 80;
 
-        // Chemin du service 
+        // Objet contenant la liste des url par api
+        this._apisUrl= {};
+
+        // Chemin de la requête
         this._path = "";
 
         // Protocole de la requête 
@@ -74,6 +77,8 @@ class road2World {
 
         this._protocol = configuration.protocol;
 
+        this._apisUrl = configuration.apisUrl;
+
         this._defaultParameters = configuration.defaultParameters; 
 
     }
@@ -82,6 +87,30 @@ class road2World {
 
         this._method = method;
         this._path = path;
+
+    }
+
+    createRequestOnApi(method, operationId, apiId, version) {
+
+        this._method = method;
+
+        if (this._apisUrl[apiId]) {
+
+            if (this._apisUrl[apiId][version]) {
+
+                if (this._apisUrl[apiId][version][operationId]) {
+                    this._path = this._apisUrl[apiId][version][operationId];
+                } else {
+                    return "operationId inconnu";
+                }
+
+            } else {
+                return "version inconnue";
+            }
+
+        } else {
+            return "apiId inconnu";
+        }
 
     }
 
@@ -228,199 +257,7 @@ class road2World {
 
         }
 
-
         return axios(finalRequest);
-
-        //------------------------------------------------------
-        // let finalOptions = {};
-
-        // if (this._method === "GET") {
-
-        //     // Traduction du body dans l'url 
-        //     let currentProtocol = this._protocol.toLowerCase();
-        //     let finalUrl = currentProtocol + "://" + this._url;
-
-        //     if (currentProtocol === "https") {
-        //         finalUrl += this._path + "?";
-        //     } else if (currentProtocol === "http") {
-        //         finalUrl += ":" + this._port + this._path + "?";
-        //     } else {
-        //         throw "Protocol unknown: " + currentProtocol;
-        //     }
-
-        //     for(let param in this._body) {
-        //         finalUrl +=  "&" + param + "=" + this._body[param].toString();
-        //     }
-        //     finalUrl += this._adendumUrl;
-
-        //     if (currentProtocol === "https") {
-
-        //         let options = {
-        //             rejectUnauthorized: false
-        //         }
-
-        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
-        //         return new Promise ( (resolve, reject) => {
-
-        //             https.get(finalUrl, options, (response) => {
-
-        //                 this._status = response.statusCode;
-        //                 this._header = response.headers;
-
-        //                 // il faut passer par cet objet intermédiaire
-        //                 let rawResponse = "";
-
-        //                 // Stockage progressif 
-        //                 response.on('data', (data) => {
-        //                     rawResponse += data;
-        //                 });
-
-        //                 // Stockage final
-        //                 response.on('end', () => {
-        //                     this._response = rawResponse;
-        //                     resolve();
-        //                 });
-
-        //             // Si erreur lors de la requête 
-        //             }).on('error', (err) => {
-        //                 reject(err);
-        //             });
-
-        //         });
-
-        //     } else if (currentProtocol === "http") {
-                
-        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
-        //         return new Promise ( (resolve, reject) => {
-
-        //             http.get(finalUrl, (response) => {
-
-        //                 this._status = response.statusCode;
-        //                 this._header = response.headers;
-
-        //                 // il faut passer par cet objet intermédiaire
-        //                 let rawResponse = "";
-
-        //                 // Stockage progressif 
-        //                 response.on('data', (data) => {
-        //                     rawResponse += data;
-        //                 });
-
-        //                 // Stockage final
-        //                 response.on('end', () => {
-        //                     this._response = rawResponse;
-        //                     resolve();
-        //                 });
-
-        //             // Si erreur lors de la requête 
-        //             }).on('error', (err) => {
-        //                 reject(err);
-        //             });
-
-        //         });
-
-        //     } else {
-        //         throw "Protocol unknown: " + currentProtocol;
-        //     }
-
-        // } else if (this._method === "POST") {
-
-        //     let currentProtocol = this._protocol.toLowerCase();
-
-        //     finalOptions = {
-        //         protocol: currentProtocol + ":",
-        //         host: this._url + this._adendumUrl,
-        //         path: this._path,
-        //         method: "POST",
-        //         headers: {
-        //           'Content-Type': 'application/json'
-        //         },
-        //         rejectUnauthorized: false
-        //     };
-
-        //     if (currentProtocol === "https") {
-
-        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
-        //         return new Promise ( (resolve, reject) => {
-
-        //             let request = https.request(finalOptions, (response) => {
-
-        //                 this._status = response.statusCode;
-        //                 this._header = response.headers;
-
-        //                 // il faut passer par cet objet intermédiaire
-        //                 let rawResponse = "";
-
-        //                 // Stockage progressif 
-        //                 response.on('data', (data) => {
-        //                     rawResponse += data;
-        //                 });
-
-        //                 // Stockage final
-        //                 response.on('end', () => {
-        //                     this._response = rawResponse;
-        //                     resolve();
-        //                 });
-
-        //             // Si erreur lors de la requête 
-        //             }).on('error', (err) => {
-        //                 reject(err);
-        //             });
-
-        //             // Envoie de la requête
-        //             request.write(JSON.stringify(this._body));
-        //             request.end();
-                    
-
-        //         });
-
-        //     } else if (currentProtocol === "http") {
-
-        //         finalOptions.port = this._port;
-
-        //         // Retour d'une promesse pour gérer l'asynchronisme du http.get
-        //         return new Promise ( (resolve, reject) => {
-
-        //             let request = http.request(finalOptions, (response) => {
-
-        //                 this._status = response.statusCode;
-        //                 this._header = response.headers;
-
-        //                 // il faut passer par cet objet intermédiaire
-        //                 let rawResponse = "";
-
-        //                 // Stockage progressif 
-        //                 response.on('data', (data) => {
-        //                     rawResponse += data;
-        //                 });
-
-        //                 // Stockage final
-        //                 response.on('end', () => {
-        //                     this._response = rawResponse;
-        //                     resolve();
-        //                 });
-
-        //             // Si erreur lors de la requête 
-        //             }).on('error', (err) => {
-        //                 reject(err);
-        //             });
-
-        //             // Envoie de la requête
-        //             request.write(JSON.stringify(this._body));
-        //             request.end();
-                    
-
-        //         });
-
-        //     } else {
-        //         throw "Protocol unknown: " + currentProtocol;
-        //     }
-            
-        // } else {
-            
-        // }
-
-        
 
     }
 

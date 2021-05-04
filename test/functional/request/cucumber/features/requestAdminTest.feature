@@ -19,13 +19,13 @@ Feature: Road2 with data
     | POST    | 
 
   Scenario: [admin/1.0.0] Version de Road2
-    Given an "GET" request on "/admin/1.0.0/version"
+    Given an "GET" request on operation "version" in api "admin" "1.0.0"
     When I send the request 
     Then the server should send a response with status 200
     And the response should contain "version"
 
   Scenario: [admin/1.0.0] Version de Road2 avec un mauvais parametre
-    Given an "GET" request on "/admin/1.0.0/version"
+    Given an "GET" request on operation "version" in api "admin" "1.0.0"
     And with query parameters:
       | key       | value           |
       | test      | other           |
@@ -34,7 +34,7 @@ Feature: Road2 with data
     And the response should contain "version"
 
   Scenario: [admin/1.0.0] Version de Road2 en POST ne marche pas
-    Given an "POST" request on "/admin/1.0.0/version"
+    Given an "POST" request on operation "version" in api "admin" "1.0.0"
     And with query parameters:
       | key       | value           |
       | test      | other           |
@@ -43,13 +43,13 @@ Feature: Road2 with data
     And the response should contain "Not found"
 
   Scenario: [admin/1.0.0] État de Road2
-    Given an "GET" request on "/admin/1.0.0/health"
+    Given an "GET" request on operation "health" in api "admin" "1.0.0"
     When I send the request 
     Then the server should send a response with status 200
     And the response should contain "state"
 
   Scenario: [admin/1.0.0] État de Road2 avec un mauvais parametre
-    Given an "GET" request on "/admin/1.0.0/health"
+    Given an "GET" request on operation "health" in api "admin" "1.0.0"
     And with query parameters:
       | key       | value           |
       | test      | other           |
@@ -58,7 +58,7 @@ Feature: Road2 with data
     And the response should contain "state"
 
   Scenario: [admin/1.0.0] État de Road2 en POST ne marche pas
-    Given an "POST" request on "/admin/1.0.0/health"
+    Given an "POST" request on operation "health" in api "admin" "1.0.0"
     And with query parameters:
       | key       | value           |
       | test      | other           |

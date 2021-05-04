@@ -2,6 +2,21 @@
     "url": "localhost",
     "port": 443,
     "protocol": "https",
+    "apisUrl": {
+        "simple": {
+            "1.0.0": {
+                "route": "/simple/1.0.0/route",
+                "isochrone": "/simple/1.0.0/isochrone",
+                "getcapabilities": "/simple/1.0.0/getcapabilities"
+            }
+        },
+        "admin": {
+            "1.0.0": {
+                "health": "/admin/1.0.0/health",
+                "version": "/admin/1.0.0/version"
+            }
+        }
+    },
     "defaultParameters": [
         {
             "id": "route",

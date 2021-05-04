@@ -9,6 +9,10 @@ Given("an {string} request on {string}", function(method, path) {
     this.createRequest(method, path);
 });
 
+Given("an {string} request on operation {string} in api {string} {string}", function(method, operationId, apiId, version) {
+    this.createRequestOnApi(method, operationId, apiId, version);
+});
+
 Given("with default parameters for {string}", function(operation) {
     assert.equal(this.useDefaultQueryParameters(operation), true);
 });
