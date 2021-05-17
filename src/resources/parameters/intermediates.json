@@ -1,7 +1,7 @@
 {
   "id": "intermediates",
   "name": "Points intermédiaires",
-  "description": "Liste des points intermédiaires pour l'itinéraire.",
+  "description": "Liste ordonnée des points de passage à emprunter par l'itinéraire",
   "required": "false",
   "defaultValue": "false",
   "example": "48.852890,2.368776|48.842891,2.367976",

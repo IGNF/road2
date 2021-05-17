@@ -28,7 +28,6 @@
         },
         {
             "id": "route-osrm",
-            "rewriteUrl": "simple/1.0.1/route",
             "parameters": {
                 "resource": "bduni-idf-osrm",
                 "start": "2.333865,48.881989",

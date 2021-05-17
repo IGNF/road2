@@ -1,7 +1,7 @@
 {
   "id": "getSteps",
   "name": "Présence des étapes",
-  "description": "Préciser si on souhaite avoir les étapes de l'itinéraire.",
+  "description": "Présence de la description des tronçons de route dans l’itinéraire retourné",
   "required": "false",
   "defaultValue": "true",
   "example": "true",

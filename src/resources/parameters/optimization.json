@@ -1,7 +1,7 @@
 {
   "id": "optimization",
   "name": "Optimisation",
-  "description": "Optimisation utilisée pour le calcul d'itinéraire.",
+  "description": "Critère d'optimisation utilisé pour le calcul (plus court, plus rapide)",
   "required": "false",
   "defaultValue": "true",
   "example": "fastest",

@@ -2,11 +2,14 @@
 
 FIXED:
  - gestion d'une erreur PGR si aucun isochrone n'est trouvé. 
+ - le min d'un paramètre peut être à 0 dans le getcapabilities
+ - la description de getsteps est complète 
 
 CHANGED:
  - log des erreurs pgr et osrm seulement si ce n'est pas un "path/iso not found"
  - les tests fonctionnels peuvent être joués en https ou http selon la configuration
  - Tests fonctionnels: gestion de la config au début du fichier cucumber
+ - descriptions modifiées des operations et parametres (fichiers json)
 
 ADDED: 
  - gestion des proxy http pour les tests fonctionnels

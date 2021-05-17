@@ -48,7 +48,7 @@ module.exports = class Parameter  {
     this._example = "";
 
     // min
-    if (this._required) {
+    if (this._required === "true") {
       this._min = 1;
     } else {
       this._min = 0;

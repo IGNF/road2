@@ -1,7 +1,7 @@
 {
   "id": "start",
   "name": "Départ",
-  "description": "Point de départ.",
+  "description": "Point de départ",
   "required": "true",
   "defaultValue": "false",
   "example": "48.849319,2.337306",
