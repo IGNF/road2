@@ -37,6 +37,21 @@ Feature: Road2
     And the response should contain an attribute "operations.[1].methods.[0]" with value "GET"
     And the response should contain an attribute "operations.[1].parameters.[1].name" with value "point"
 
+  Scenario: GetCapabilities sur l'API simple 1.0.0 sans changer le host 
+    Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "info.url" with configuration value of "url"
+
+  Scenario: GetCapabilities sur l'API simple 1.0.0 en changeant le host 
+    Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
+    And with the alternative url 
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "info.url" with configuration value of "alternativeParameters.url"
+
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route"

@@ -26,10 +26,13 @@ class road2World {
      */
     constructor() {
 
-        // Url du service 
+        // On stocke la configuration complète pour certains tests 
+        this._configuration = {};
+
+        // Url du service par défaut
         this._url  = "";
 
-        // Port
+        // Port par défaut
         this._port = 80;
 
         // Objet contenant la liste des url par api
@@ -71,6 +74,8 @@ class road2World {
 
         let configuration = JSON.parse(fs.readFileSync(absolutePath));
 
+        this._configuration = configuration;
+
         this._url = configuration.url;
 
         this._port = configuration.port;
@@ -85,8 +90,19 @@ class road2World {
 
     createRequest(method, path) {
 
+        // on réinitialise certains paramètres qui peuvent changer mais qui ont de valeurs par défaut dans la conf 
+        this._url = this._configuration.url;
+        this._port = this._configuration.port;
+        this._protocol = this._configuration.protocol;
+
         this._method = method;
         this._path = path;
+
+    }
+
+    changeUrl(url) {
+
+        this._url = url;
 
     }
 
@@ -296,6 +312,12 @@ class road2World {
                 return true;
             }
         }
+
+    }
+
+    getConfigurationValueof(key) {
+
+        return this.getJsonContentByKey(this._configuration, key);
 
     }
 

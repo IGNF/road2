@@ -13,6 +13,15 @@ Given("an {string} request on operation {string} in api {string} {string}", func
     this.createRequestOnApi(method, operationId, apiId, version);
 });
 
+Given("with {string} for the url", function(url) {
+    this.changeUrl(url);
+});
+
+Given("with the alternative url", function() {
+    url = this.getConfigurationValueof("alternativeParameters.url");
+    this.changeUrl(url);
+});
+
 Given("with default parameters for {string}", function(operation) {
     assert.equal(this.useDefaultQueryParameters(operation), true);
 });
@@ -84,6 +93,11 @@ Then("the response should have an header {string} with value {string}", function
 
 Then("the response should contain an attribute {string} with value {string}", function(key, value) {
     assert.equal(this.checkResponseContent(key, value), true);
+});
+
+Then("the response should contain an attribute {string} with configuration value of {string}", function(responseKey, configurationKey) {
+    configurationValue = this.getConfigurationValueof(configurationKey);
+    assert.equal(this.checkResponseContent(responseKey, configurationValue), true);
 });
 
 Then("the road should be similar to {string}", function(path) {
