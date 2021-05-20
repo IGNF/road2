@@ -1,18 +1,44 @@
 # Road2
 
-Road2 est un serveur de calcul d'itinéraire écrit avec NodeJS. Ce serveur propose le calcul d'itinéraires via des moteurs existants, comme OSRM ou PGRouting. Road2 est donc une interface pour moteurs de calculs d'itinéraires. Les calculs ne sont pas fait dans le code mais via l'appel à des librairies.
+## Présentation générale 
 
-Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs, pour les calculs, et de nouvelles APIs, pour accéder au service.
+Road2 est un serveur de calcul d'itinéraires et d'isochrones écrit en Javascript et conçu pour fonctionner avec NodeJS. Ce serveur propose le calcul d'itinéraires et d'isochrones via des moteurs existants comme [OSRM](https://github.com/Project-OSRM/osrm-backend) ou [PGRouting](https://pgrouting.org/). Road2 est donc une interface pour moteurs de calculs. Ces derniers ne sont pas fait dans le code de Road2 mais via des appels à ses moteurs. Cela peut se traduire par l'appel à une librairie, ou à une base de données, ou encore à un autre service web. 
 
-## Installation
+Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérénisant l'accès au service. Pour une plus longue discussion sur les concepts introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/concepts.md).
 
-Cette partie détaille l'installation sur un serveur. Pour des tests rapides sur des données déjà intégrées, utilisez les images docker de Road2 sur [Centos](./docker/centos/readme.md) ou [Debian](./docker/debian/readme.md), ou encore via [docker-compose](./docker/readme.md).
+Actuellement, Road2 propose deux moteurs, OSRM et PGRouting, via une unique API REST. 
 
-### Pré-recquis
+## Fonctionnalités disponibles 
 
-Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée est *10.18.0*.
+Road2 propose plusieurs grandes familles de fonctionnalités : 
+- Calculer des itinéraires
+- Calculer des isochrones et des isodistances 
+- Administrer le service 
+- etc... 
 
-Il est également fortement conseillé d'installer [OSRM](https://github.com/Project-OSRM/osrm-backend) sur la même machine si ce moteur sera utilisé par la suite. La version utilisée dans Road2 est *5.24.0*.
+Ces familles regroupent l'ensemble des fonctionnalités et sont détaillées [ici](./documentation/developers/functionnalities.md).
+
+## Découverte du service
+
+### Démonstrateur 
+
+L'IGN propose un démonstrateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services_betas/itineraires.html) et [l'isochrone](https://geoservices.ign.fr/documentation/services_betas/isochrones.html). Ces démonstrateurs permettent de construire des requêtes via une carte et de visualiser les résultats. 
+
+Autrement, pour une première prise en main du service en local, il est possible d'utiliser l'image [alpine](./docker/demonstration/Dockerfile) de Road2. Cela permettra d'avoir localement une instance du service et une page web permettant de le tester. Les instructions de mise en place sont données [ici](./docker/demonstration/readme.md). 
+
+### Les APIs du service 
+
+L'IGN propose également une visualisation de l'API utilisateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services_betas/swagger-itineraire.html) et [l'isochrone](https://geoservices.ign.fr/documentation/services_betas/swagger-isochrones.html). 
+
+Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/admin/1.0.0/api.yaml) YAML suivant le même formalisme. 
+
+Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./docker/demonstration/readme.md). 
+
+## Installation et utilisation de Road2 
+
+### Pré-requis
+
+Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée pendant les développements est *12.14.0*. 
 
 ### Installation des modules
 
@@ -21,30 +47,37 @@ L'installation des modules est effectuée via NPM. En se plaçant dans la racine
 npm install
 ```
 
+### Génération de données  
+
+Qu'importe la source des données, il est nécessaire de les fournir dans l'un des formats utilisables par Road2. Étant donné que ce dernier peut utiliser plusieurs moteurs les calculs, il accepte plusieurs formats de données:
+- OSRM 5.25.0 rend possible l'utilsation de données OSRM générées avec cette version. 
+- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet pgrouting-procedures (1.0.3-DEVELOP) afin que Road2 puisse communiquer avec la base. 
+
+Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet route-graph-generator (1.0.3-DEVELOP) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
+
+Pour une discussion détaillée sur les données attendues par route-graph-generator, on pourra se référer à cette [documentation](./documentation/data/readme.md). 
+
 ### Configuration
 
-Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/io/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettants l'instanciation du serveur avec des ressources.
+Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettants l'instanciation du serveur avec des ressources. 
 
-## Utilisation via Docker
+### Lancement 
 
-Il est possible d'utiliser directement des images docker pour tester le serveur. Il existe une image sous [Centos](./docker/centos/readme.md) et une autre pour [Debian](./docker/debian/readme.md).
+Une fois configuré, il est possible de lancer le serveur avec la commande: 
+```
+node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/server.json
+```
 
-## Utilisation via docker-compose
+### Pour plus de détails
 
-Il est conseillé d'utiliser [docker-compose](./docker/readme.md) pour tester et développer ce serveur.
+On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Centos 7 et Debian 10 sont disponibles. 
 
-## Développements 
+## Participer aux développements 
 
-On trouvera une documentation dédiée aux développeurs [ici](./documentation/index.md). 
+On trouvera une documentation dédiée aux développeurs [ici](./documentation/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 
-## APIs
+De plus, il est possible d'utiliser ce [docker-compose](./docker/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et des données. 
 
-Les APIs disponibles sont documentées [ici](./documentation/apis/). 
+## Utilisation en production
 
-Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0. 
-
-## Versions
-
-Cette version de Road2 fonctionne avec les versions suivantes:
-- route-graph-generator 1.0.3-DEVELOP
-- pgrouting-procedures 1.0.2-DEVELOP
+Afin d'utiliser Road2 en production, plusieurs informations sont données dans ce [document](./docker/production/readme.md). Il s'agit principalement des besoins déjà observés pour une mise en production du service couvrant l'ensemble du territoire français. 
