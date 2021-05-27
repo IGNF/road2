@@ -14,6 +14,18 @@ L'architecture type dépend, a minima, de la volumétrie des données, de la sol
 
 ## Performances 
 
+## Industrialisation 
+
+### Installation des dépendances spécifiques à chaque moteur 
+
+Par défaut, la commande `npm install` va tenter d'installer toutes les dépendances. Cependant, certaines d'entre elles sont inutiles si un moteur n'est pas utilisé. On pourra donc procéder de la manière suivante : 
+```
+# Installation des dépendances strictement nécessaires
+npm install --no-optional --no-package-lock --no-save
+# Ensuite, si on utilise un seul moteur, comme OSRM par exemple
+npm install --no-package-lock --no-save osrm
+```
+
 ## Optimisations envisageables
 
 ### Utilisation de la RAM 
@@ -44,4 +56,16 @@ tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
 
 ### Affichage des erreurs
 
-Par défaut, si Road2 rencontre une erreur, il va renvoyer au client le contenu de cette erreur. C'est un comportement adapté lors des développements. Mais en production, il est préférable de renvoyer une erreur générique. Pour cela, il suffit de lancer Road2 avec la variable `NODE_ENV` à `production`.  
+Par défaut, si Road2 rencontre une erreur, il va renvoyer au client le contenu de cette erreur. C'est un comportement adapté lors des développements. Mais en production, il est préférable de renvoyer une erreur générique. Pour cela, il suffit de lancer Road2 avec la variable `NODE_ENV` à `production`. 
+
+### Gestion des CORS
+
+Par défaut, une API ne va pas gérer les CORS. Chaque développeur doit préciser s'il souhaite utiliser les CORS au sein de l'API qu'il développe. Ainsi, il est possible de déterminer sur quelle route on souhaite utiliser quels CORS. Par exemple, on pourra autoriser toutes les origines sur certaines routes de calculs et les restreindre sur des routes d'administration.
+
+Pour appliquer des CORS, on utilise le module `cors` qui s'intègre bien à expressJS.
+
+Par défaut, il y a des options qui sont utilisées mais elles peuvent être remplacées. Si on souhaite surchargée les options, on veillera à les ajouter dans un fichier de configuration indépendant du reste de la configuration de l'application, comme cela est précisé dans le paragraphe traitant de l'ajout d'une API.  
+
+### Gestion du HTTPS
+
+Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le module `https` de NodeJS. Il est donc possible de lui fournir les options disponibles dans ce module. 

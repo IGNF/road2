@@ -10,6 +10,7 @@ CHANGED:
  - les tests fonctionnels peuvent être joués en https ou http selon la configuration
  - Tests fonctionnels: gestion de la config au début du fichier cucumber
  - descriptions modifiées des operations et parametres (fichiers json)
+ - package.json : passage des dépendances osrm et pg en optionnel
 
 ADDED: 
  - gestion des proxy http pour les tests fonctionnels
