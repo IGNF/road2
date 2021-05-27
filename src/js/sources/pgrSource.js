@@ -296,7 +296,7 @@ module.exports = class pgrSource extends Source {
       }
       // ---
 
-      const queryString = "SELECT * FROM shortest_path_pgrouting(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[],$4)";
+      const queryString = `SELECT * FROM ${this._topology.schema}.shortest_path_pgrouting(ARRAY ${JSON.stringify(coordinatesTable)},$1,$2,$3,ARRAY [${attributes}]::text[],$4)`;
 
       let SQLParametersTable;
       if (looseConstraintsArray.length === 0) {
@@ -385,7 +385,7 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("no constraints asked");
         }
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
+        const queryString = `SELECT * FROM ${this._topology.schema}.generateIsochrone(ARRAY ${JSON.stringify(point)}, $1, $2, $3, $4, $5, $6)`;
 
         const SQLParametersTable = [
           request.costValue,
