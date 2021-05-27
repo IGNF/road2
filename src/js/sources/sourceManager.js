@@ -269,6 +269,14 @@ module.exports = class sourceManager {
 
         let operationFound = false;
 
+        // On vérifie que le module osrm est disponible 
+        try {
+          let osrmTest = require('osrm');
+        } catch(error) {
+          LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
+          return false;
+        }
+
         // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
         if (operationManager.verifyAvailabilityOperation("route")) {
           // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
@@ -300,6 +308,14 @@ module.exports = class sourceManager {
       if (sourceJsonObject.type === "pgr") {
         available = true;
         LOGGER.info("Source pgrouting.");
+
+        // On vérifie que le module pg est disponible 
+        try {
+          let { poolTest } = require('pg');
+        } catch(error) {
+          LOGGER.error("Le module pg n'est pas disponible mais une source pgrouting est proposée dans la configuration.");
+          return false;
+        }
 
         let operationFound = false;
 

@@ -1,26 +1,21 @@
 # Modifications du code en pratique 
 
+Il est vivement conseillé de lire le chapitre qui traite des [concepts](./concepts.md) avant de lire celui-ci. 
 
 ## Procèdures pour certains types de modification
 
 ### Moteurs 
 
-Ajouter un moteur est relativement simple. La plupart des modifications concernent un unique fichier, celui des `sources`. 
-
-#### Modifier un moteur existant 
-
-#### Ajouter un moteur 
-
-#### Supprimer un moteur 
+Ajouter un moteur est relativement simple. Comme précisé dans les [concepts](./concepts.md), un moteur est l'équivalent d'une `source` dans Road2. On se refera donc à la partie [source](#Source) pour voir les modifications possibles sur les moteurs.
 
 ### API
 
-La gestion des APIs se fait dans le dossier `src/js/apis`. Ce dossier suit l'arborescence suivante `${apiName}/${apiVersion}/index.js`. Le fichier `index.js` contient la définition de l'API. Ce fichier correspond à la définition d'un router expressJS.
+Il est possible d'ajouter, d'enlever et de modifier une API. Toutes les APIs sont définies dans le dossier `src/js/apis`. Ce dossier suit l'arborescence suivante `${apiName}/${apiVersion}/index.js`. Le fichier `index.js` contient la définition de l'API. Ce fichier correspond à la définition d'un [router](https://expressjs.com/fr/4x/api.html#router) expressJS.
 
-L'ensemble des APIs est chargé par `src/js/utils/apisManager.js`. Ce fichier permet la lecture du dossier des APIs et leurs prises en compte dans l'application.
+L'ensemble des APIs est chargé par `src/js/apis/apisManager.js`. Ce fichier permet la lecture du dossier des APIs et leurs prises en compte dans l'application.
 
 Il est parfois utile d'effectuer des traitements lors du chargement de l'application. On voudra par exemple générer un getCapabilities. On pourra également vouloir le mettre à jour durant la vie de l'application. Un router ExpressJS ne permet pas de stocker des objets, ni d'effectuer des traitements avant la mise en place du serveur, ni pendant la vie de l'application.
-Pour gérer de telles problématiques, il est possible de créer les fichiers `init.js` et `update.js` qui seront dans dans le dossier de l'api. Ces fichiers devront être des modules NodeJS qui exportent une fonction `run(app, uid)`. C'est cette fonction qui sera appelée lors de l'initialisation de l'application et lors des mises à jours nécessaires. Le paramètre `app` est l'instance d'ExpressJS qui permet de stocker des références à des objets. Et le paramètre `uid` est un identifiant propre à chaque api qui permet de stocker des objets avec un faible risque de le perdre écrasé par un autre.
+Pour gérer de telles problématiques, il est possible de créer les fichiers `init.js` et `update.js` qui seront dans dans le dossier de l'api. Ces fichiers devront être des modules NodeJS qui exportent une fonction `run(app, uid)`. C'est cette fonction qui sera appelée lors de l'initialisation de l'application et lors des mises à jours nécessaires. Le paramètre `app` est l'instance d'ExpressJS qui permet de stocker des références à des objets. Et le paramètre `uid` est un identifiant propre à chaque api qui permet de stocker des objets avec un faible risque de le perdre en étant écrasés par un autre.
 
 #### Modifier une API existante
 
@@ -28,19 +23,15 @@ Il suffit de modifier les fichiers contenus dans le dossier `${apiName}/${apiVer
 
 #### Ajouter une API
 
-Il suffit de créer l'arborescence `${apiName}/${apiVersion}/index.js` dans le dossier `src/js/apis`.
+Il suffit de créer l'arborescence `${apiName}/${apiVersion}/index.js` dans le dossier `src/js/apis` et d'ajouter les fichiers `init.js` et `update.js`. 
 
 #### Supprimer une API
 
 Pour supprimer une API, il suffit de supprimer le dossier qui contient sa définition.
 
-#### Fichiers de configuration pour une API
-
-Si on souhaite ajouter une configuration, on veillera à les ajouter dans un fichier de configuration indépendant du reste de la configuration de l'application. Par exemple, on pourra créer un fichier `src/config/apis/${apiName}/${apiVersion}/config.json` contenant la configuration nécessaire.
-
 ### Resource
 
-Le dossier `src/js/resources` contient un manager de ressource qui permet à l'application de gérer l'ensemble de ces ressources, et la définition des ressources utilisables.
+Le dossier `src/js/resources` contient la définition des ressources utilisables et un manager de ressource qui permet à l'application de gérer l'ensemble de ces ressources. 
 
 Chaque ressource est une classe qui dérive de la classe mère `resource.js`. Cette classe définit une ressource comme l'ensemble d'un id unique à l'instance et un type.
 

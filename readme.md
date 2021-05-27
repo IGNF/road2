@@ -47,10 +47,12 @@ L'installation des modules est effectuée via NPM. En se plaçant dans la racine
 npm install
 ```
 
+NB : Il y a des dépendances optionnelles pour gérer celles de chaque moteur. Pour plus d'informations, voir ce [document](./documentation/production/readme.md).
+
 ### Génération de données  
 
 Qu'importe la source des données, il est nécessaire de les fournir dans l'un des formats utilisables par Road2. Étant donné que ce dernier peut utiliser plusieurs moteurs les calculs, il accepte plusieurs formats de données:
-- OSRM 5.25.0 rend possible l'utilsation de données OSRM générées avec cette version. 
+- OSRM 5.24.0 rend possible l'utilsation de données OSRM générées avec cette version. 
 - PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet pgrouting-procedures (1.0.3-DEVELOP) afin que Road2 puisse communiquer avec la base. 
 
 Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet route-graph-generator (1.0.3-DEVELOP) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 

@@ -81,6 +81,14 @@ module.exports = class baseManager {
       // C'est le premier, donc on continue
     }
 
+    // On vérifie que le module pg est disponible 
+    try {
+      let { poolTest } = require('pg');
+    } catch(error) {
+      LOGGER.error("Le module pg n'est pas disponible mais une base de données est proposée dans la configuration.");
+      return false;
+    }
+
     try {
       fs.accessSync(dbConfigPath, fs.constants.R_OK);
     } catch (err) {
