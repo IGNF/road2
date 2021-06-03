@@ -1,7 +1,7 @@
 {
     "id": "timeUnit",
     "name": "Unité des durées",
-    "description": "Unité demandée pour exprimer les durées",
+    "description": "Unité utilisée pour exprimer les durées",
     "required": "false",
     "defaultValue": "true",
     "example": "hour",

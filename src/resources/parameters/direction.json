@@ -1,7 +1,7 @@
 {
   "id": "direction",
-  "name": "Sens du parcours.",
-  "description": "Sens du parcours pour la génération d'isochrone.",
+  "name": "Sens du parcours",
+  "description": "Sens de déplacement utilisé pour le calcul (point de départ ou d'arrivée)",
   "required": "false",
   "defaultValue": "true",
   "example": "departure",

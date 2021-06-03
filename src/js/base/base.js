@@ -2,7 +2,12 @@
 
 const log4js = require('log4js');
 const errorManager = require('../utils/errorManager');
-const { Pool } = require('pg');
+
+try {
+  var { Pool } = require('pg');
+} catch(error) {
+  Pool = null;
+}
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("BASE");
@@ -27,7 +32,11 @@ module.exports = class Base {
   constructor(configuration) {
 
     // Pool de clients PostgreSQL
-    this._pool = new Pool(configuration);
+    if (Pool) {
+      this._pool = new Pool(configuration);
+    } else {
+      this._pool = null;
+    }
 
     // État de la connexion
     this._connected = false;
@@ -69,9 +78,13 @@ module.exports = class Base {
     LOGGER.info("Connection a la base de données");
     try {
 
-      await this._pool.connect();
-      LOGGER.info("Connecte a la base de données");
-      this._connected = true;
+      if (this._pool) {
+        await this._pool.connect();
+        LOGGER.info("Connecte a la base de données");
+        this._connected = true;
+      } else {
+        throw errorManager.createError("PG is not available");
+      }
 
     } catch (err) {
       LOGGER.error("connection error", err.stack)
@@ -90,11 +103,21 @@ module.exports = class Base {
   async disconnect() {
 
     try {
+
       LOGGER.info("Deconnection de la base...");
-      await this._pool.end(() => {
-        LOGGER.info("Deconnection du pool effectuee");
-      });
-      this._connected = false;
+
+      if (this._pool) {
+
+        await this._pool.end(() => {
+          LOGGER.info("Deconnection du pool effectuee");
+        });
+
+        this._connected = false;
+
+      } else {
+        throw errorManager.createError("PG is not available");
+      }
+      
     } catch(err) {
       throw errorManager.createError("Cannot disconnect to database");
     }

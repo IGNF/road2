@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "1.0.4",
+  "version": "1.0.5-DEVELOP",
 
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
@@ -25,18 +25,22 @@
     "express": "4.16.4",
     "log4js": "6.1.0",
     "nconf": "0.10.0",
-    "osrm": "5.24.0",
-    "pg": "7.17.1",
     "@mapbox/polyline": "1.1.1",
     "@turf/turf": "5.1.6",
     "proj4": "2.6.0",
     "assert": "2.0.0",
     "helmet": "3.21.2"
   },
+  "optionalDependencies": {
+    "osrm": "5.24.0",
+    "pg": "7.17.1"
+  },
   "devDependencies": {
     "sinon": "^7.2.7",
     "mock-fs": "^4.9.0",
-    "cucumber": "5.1.0"
+    "cucumber": "5.1.0",
+    "axios": "^0.21.1",
+    "tunnel": "^0.0.6"
   },
   "bundledDependencies": [
     "cors",

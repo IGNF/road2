@@ -1,7 +1,7 @@
 {
   "id": "costValue",
   "name": "Valeur du coût.",
-  "description": "Valeur du coût utilisé pour la génération d'isochrone.",
+  "description": "Valeur du critère utilisé pour le calcul (durée ou distance)",
   "required": "true",
   "defaultValue": "false",
   "example": "1.0",

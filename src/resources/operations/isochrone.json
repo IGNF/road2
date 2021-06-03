@@ -1,7 +1,7 @@
 {
   "id": "isochrone",
   "name": "Génération d'isochrone",
-  "description": "Générer une zone de chalandise isochrone.",
+  "description": "Calculer une zone isochrone ou isodistance",
   "parameters": [
     "resource",
     "point",

@@ -404,7 +404,7 @@ module.exports = class topologyManager {
       }
       // création de la topologie
       topology = new DbTopology(topologyJsonObject.id, topologyJsonObject.description,
-        topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.schema,
+        topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.base.schema,
         defaultAttributes, otherAttributes);
 
     } else {

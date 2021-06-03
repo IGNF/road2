@@ -1,7 +1,6 @@
 'use strict';
 
 const Source = require('./source');
-const OSRM = require("osrm");
 const RouteResponse = require('../responses/routeResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
@@ -12,6 +11,12 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
+
+try {
+  var OSRM = require("osrm");
+} catch(error) {
+  OSRM = null;
+}
 
 // Création du LOGGER
 var LOGGER = log4js.getLogger("OSRMSOURCE");
@@ -48,7 +53,7 @@ module.exports = class osrmSource extends Source {
     this._configuration = sourceJsonObject;
 
     // Objet OSRM qui permet de faire les calculs
-    this._osrm = {};
+    this._osrm = null;
 
   }
 
@@ -112,8 +117,13 @@ module.exports = class osrmSource extends Source {
       LOGGER.info("Chargement du fichier OSRM: " + osrmFile);
 
       // Chargement du fichier OSRM
-      this._osrm = new OSRM(osrmFile);
-      super.connected = true;
+      if (OSRM) {
+        this._osrm = new OSRM(osrmFile);
+        super.connected = true;
+      } else {
+        throw errorManager.createError("OSRM is not available");
+      }
+      
     } catch (err) {
       throw errorManager.createError("Cannot connect source");
     }
@@ -220,35 +230,40 @@ module.exports = class osrmSource extends Source {
         LOGGER.debug("orsmRequest:");
         LOGGER.debug(osrmRequest);
 
-        this.osrm.route(osrmRequest, (err, result) => {
+        if (this._osrm) {
+  
+          this._osrm.route(osrmRequest, (err, result) => {
 
-          if (err) {
+            if (err) {
 
-            LOGGER.error("osrm error:");
-            LOGGER.error(err);
+              if (err.message === "NoRoute" || err.message === "NoSegment") {
+                reject(errorManager.createError(" No path found ", 404));
+              } else {
+                // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
+                // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
+                LOGGER.error("osrm error:");
+                LOGGER.error(err);
+                reject("Internal OSRM error");
+              }
 
-            if (err.message === "NoRoute" || err.message === "NoSegment") {
-              reject(errorManager.createError(" No path found ", 404));
             } else {
-              // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
-              // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
-              reject("Internal OSRM error");
+
+              LOGGER.debug("osrm response:");
+              LOGGER.debug(result);
+
+              try {
+                resolve(this.writeRouteResponse(request, result));
+              } catch (error) {
+                reject(error);
+              }
+
             }
 
-          } else {
+          });
 
-            LOGGER.debug("osrm response:");
-            LOGGER.debug(result);
-
-            try {
-              resolve(this.writeRouteResponse(request, result));
-            } catch (error) {
-              reject(error);
-            }
-
-          }
-
-        });
+        } else {
+          reject(errorManager.createError(" OSRM is not available. "));
+        }
 
       });
 

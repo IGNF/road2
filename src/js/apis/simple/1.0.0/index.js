@@ -60,6 +60,22 @@ router.all("/getcapabilities", function(req, res) {
   let getCapabilities = req.app.get(uid + "-getcap");
   LOGGER.debug(getCapabilities);
 
+  // Modification si Host ou X-Forwarded-Host précisè dans l'en-tête de la requête 
+  // il est récupéré par express dans req.host
+  if (req.hostname) {
+
+    let regexpHost = /^http[s]?:\/\/[\w\d:-_\.]*\//;
+
+    try {
+      getCapabilities.info.url = getCapabilities.info.url.replace(regexpHost, req.protocol + "://" + req.hostname + "/");
+    } catch(error) {
+      // on renvoit le getcap par défaut
+    }
+
+  } else {
+    // il y a déjà une valeur par défaut
+  }
+
   res.set('content-type', 'application/json');
   res.status(200).json(getCapabilities);
 

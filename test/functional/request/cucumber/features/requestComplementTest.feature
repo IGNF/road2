@@ -3,10 +3,10 @@ Feature: Road2-complement
   Tests fonctionnels complémentaires de Road2
 
   Background:
-    Given I have loaded all my test configuration
+    Given I have loaded all my test configuration in "../../configurations/local.json"
 
  Scenario Outline: [<method>] Route sur l'API simple 1.0.0
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     When I send the request 
     Then the server should send a response with status 200
@@ -19,7 +19,7 @@ Feature: Road2-complement
     | POST    | 
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/route"
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     When I send the request 
     Then the server should send a response with status 200
@@ -32,7 +32,7 @@ Feature: Road2-complement
     | POST    | 
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route"
     And with query parameters:
       | key            | value                             |
@@ -46,7 +46,7 @@ Feature: Road2-complement
     And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route"
     And with table parameters for "waysAttributes":
       | value      |
@@ -62,7 +62,7 @@ Feature: Road2-complement
     And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route"
     And with query parameters:
       | key            | value                             |
@@ -73,7 +73,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'waysAttributes' is invalid"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route"
     And with table parameters for "waysAttributes":
       | value                       |
@@ -94,7 +94,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'waysAttributes' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource OSRM 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
@@ -106,7 +106,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes dont une invalide sur une ressource OSRM 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
@@ -117,7 +117,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource OSRM 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
@@ -129,7 +129,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
@@ -140,7 +140,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource OSRM 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
@@ -151,7 +151,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource OSRM
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -164,7 +164,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes dont une ivalide sur une ressource OSRM
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -176,7 +176,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource OSRM
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -190,7 +190,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[2].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -203,7 +203,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource OSRM
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -216,7 +216,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -228,7 +228,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes dont une invalide sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -239,7 +239,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -251,7 +251,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -262,7 +262,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -273,7 +273,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -286,7 +286,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[1].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes dont une ivalide sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -298,7 +298,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -312,7 +312,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[2].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -325,7 +325,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -338,7 +338,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -350,7 +350,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -361,7 +361,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr 
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -373,7 +373,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr 
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -384,7 +384,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -396,7 +396,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -407,7 +407,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -419,7 +419,7 @@ Feature: Road2-complement
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (prefer)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -430,7 +430,7 @@ Feature: Road2-complement
     And the response should contain "Parameter 'constraints' is invalid"
 
 Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -442,7 +442,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -453,7 +453,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -465,7 +465,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -476,7 +476,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -488,7 +488,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -500,7 +500,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr #2)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -512,7 +512,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (banned & numerical-pgr #2)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -524,7 +524,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -536,7 +536,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -548,7 +548,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #2)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -560,7 +560,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #2)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -572,7 +572,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #3)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -584,7 +584,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (prefer & numerical-pgr #3)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -596,7 +596,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid & numerical-pgr)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -608,7 +608,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr (avoid & numerical-pgr)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -620,7 +620,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -631,7 +631,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -642,7 +642,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr #2)
-    Given an "HTTP" "GET" request on "/simple/1.0.0/route"
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                           |
@@ -653,7 +653,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte spécifique pgr (avoid & numerical-pgr #2)
-    Given an "HTTP" "POST" request on "/simple/1.0.0/route"
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with table parameters of object for "constraints":
       | value                                                                               |
@@ -664,7 +664,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should contain "Parameter 'constraints' is invalid"
 
 Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     When I send the request 
     Then the server should send a response with status 200
@@ -677,7 +677,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sans ressource 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And without query parameters:
       | key       | 
@@ -693,7 +693,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec une mauvaise ressource 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key       | value                |
@@ -709,7 +709,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sans point 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And without query parameters:
       | key    | 
@@ -725,7 +725,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais point 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key    | value                |
@@ -741,7 +741,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sans costValue 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And without query parameters:
       | key        | 
@@ -757,7 +757,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais costValue (1)
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                |
@@ -773,7 +773,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais costValue (2)
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                 |
@@ -789,7 +789,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais costValue (3)
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                 |
@@ -805,7 +805,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais costValue (4)
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                 |
@@ -820,8 +820,40 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | GET     |
     | POST    | 
 
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un costValue trop petit
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key        | value                 |
+      | costValue  | 5                     |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'costValue' is invalid"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un costValue trop grand
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key        | value                 |
+      | costValue  | 10000                 |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'costValue' is invalid"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sans costType 
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And without query parameters:
       | key        | 
@@ -837,7 +869,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais costType
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                |
@@ -854,7 +886,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais profile
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                |
@@ -871,7 +903,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais direction
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key         | value                |
@@ -887,7 +919,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais geometryFormat
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key              | value                |
@@ -903,7 +935,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais distanceUnit
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key            | value                |
@@ -920,7 +952,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais timeUnit
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                |
@@ -936,7 +968,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais crs
-    Given an "HTTP" "<method>" request on "/simple/1.0.0/isochrone"
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                |
@@ -952,7 +984,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | POST    | 
 
   Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource pgr 
-    Given an "HTTP" "GET" request on "/simple/1.0.0/isochrone"
+    Given an "GET" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with query parameters:
       | key         | value                                                                           |
@@ -964,7 +996,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     And the response should contain an attribute "constraints.[0].key"
 
   Scenario: [POST] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource pgr
-    Given an "HTTP" "POST" request on "/simple/1.0.0/isochrone"
+    Given an "POST" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
     And with table parameters of object for "constraints":
       | value                                                                               |
