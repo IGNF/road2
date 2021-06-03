@@ -232,36 +232,50 @@ module.exports = class osrmSource extends Source {
 
         if (this._osrm) {
   
-          this._osrm.route(osrmRequest, (err, result) => {
+          try {
 
-            if (err) {
+            this._osrm.route(osrmRequest, (err, result) => {
 
-              if (err.message === "NoRoute" || err.message === "NoSegment") {
-                reject(errorManager.createError(" No path found ", 404));
+              // Du moment qu'OSRM a répondu, on considère que la source est joignable
+              this.state = "green";
+
+              if (err) {
+  
+                if (err.message === "NoRoute" || err.message === "NoSegment") {
+                  reject(errorManager.createError(" No path found ", 404));
+                } else {
+                  // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
+                  // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
+                  LOGGER.error("osrm error:");
+                  LOGGER.error(err);
+                  reject("Internal OSRM error");
+                }
+  
               } else {
-                // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
-                // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
-                LOGGER.error("osrm error:");
-                LOGGER.error(err);
-                reject("Internal OSRM error");
+  
+                LOGGER.debug("osrm response:");
+                LOGGER.debug(result);
+  
+                try {
+                  resolve(this.writeRouteResponse(request, result));
+                } catch (error) {
+                  reject(error);
+                }
+  
               }
+  
+            });
 
-            } else {
-
-              LOGGER.debug("osrm response:");
-              LOGGER.debug(result);
-
-              try {
-                resolve(this.writeRouteResponse(request, result));
-              } catch (error) {
-                reject(error);
-              }
-
-            }
-
-          });
+          } catch (error) {
+            // Pour une raison que l'on ignore, la source n'est plus joignable
+            this.state = "orange";
+            LOGGER.error(error);
+            reject("Internal OSRM error");
+          }
 
         } else {
+          // La source est définitivement injoignable
+          this.state = "red";
           reject(errorManager.createError(" OSRM is not available. "));
         }
 

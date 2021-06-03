@@ -1,3 +1,8 @@
+# 1.0.6-DEVELOP
+
+ADDED: 
+ - chaque source peut donner l'état de sa connexion
+
 # 1.0.5-DEVELOP
 
 FIXED:
