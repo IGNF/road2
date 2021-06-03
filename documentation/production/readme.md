@@ -1,20 +1,40 @@
 # Mise en production de Road2 
 
-## Architecture type 
+Road2 est bien évidemment utilisable en production. C'est déjà le cas à l'IGN. L'objectif de ce document est de fournir des éléments qui peuvent aider à faire certains choix d'architecture et de dimensionnement. Bien évidemment, les éléments qui vont être exposés dépendent de la sollicitation attendue et de la taille des graphes mis à disposition. 
+
+
+## Éléments d'architecture 
 
 Road2 a été codé pour pouvoir être exposé directement sur internet. Il est cependant conseillé de le considérer comme un middleware, et donc de placer un front classique, comme NGINX, devant. 
 
-Selon le ou les moteurs utilisés, il sera nécessaire d'avoir accès à une base de données. C'est le cas si l'un des moteurs employé est PGRouting. Dans ce cas, il est conseillé de considérer cette base comme un middleware et de la mettre sur une machine différente de Road2. C'est elle qui effectue le calcul des itinéraires et des isochrones. Ce calcul entraîne un usage non négligeable des CPUs. 
-
-L'architecture type dépend, a minima, de la volumétrie des données, de la sollicitation attendue et des moteurs employés. Celle que nous présentons correspond à un service couvrant la France entière et pouvant supporter une charge inférieure à 100 requêtes par seconde pour un temps de réponse inférieur à 100 millisecondes de la part du moteur OSRM. 
-
-![architecture](./documentation/production/architecture.png)
+Selon le ou les moteurs utilisés, il sera nécessaire d'avoir accès à une base de données. C'est le cas si l'un des moteurs employé est PGRouting. Dans ce cas, il est conseillé de considérer cette base comme un middleware et de la mettre sur une machine différente de Road2. En effet, c'est elle qui effectue le calcul des itinéraires et des isochrones et ce calcul entraîne un usage non négligeable des CPUs. 
 
 ## Éléments de dimensionnement 
 
+### CPU
+
+En l'état, Road2 fonctionne sur un seul thread. Une évolution est prévue pour modifier ce comportement. Cependant, cette partie du code effectue peu de calcul. Par contre, les moteurs utilisent beaucoup les CPUs en parallèle. Ce sera donc la première ressource à surveiller pour établir le dimenssionnement. Un exemple d'usage en production sera donné dans la partie [Performances](#Performances) afin d'illustrer cela. 
+
+### RAM 
+
+Road2 n'a pas vraiment besoin de RAM. Ici aussi, le besoin va dépendre des moteurs utilisés. 
+
+OSRM peut demander beaucoup de RAM (cf. [notes d'OSRM](https://github.com/Project-OSRM/osrm-backend/wiki/Disk-and-Memory-Requirements)), mais elle n'est pas nécessaire pour fonctionner. De plus, cela peut dépendre de la manière dont sont chargés les graphes en mémoire. Le binding NodeJS que nous utilisons ne charge pas l'ensemble du graphe en mémoire. Un administrateur système saura certainement comment optimiser l'usage de la RAM en fonction de la donnée traitée et des performances attendues. 
+
+PGRouting est une base de données qui a des indexes. L'usage de la RAM est géré par PostgreSQL en fonction des paramètres fournis dans la configuration de la base. Nous conseillons l'appel à un administrateur de base de données pour effectuer des optimisations.  
+
 ## Performances 
 
+Les performances dépendent directement du moteur employé, et bien évidemment de la machine utilisée pour héberger le service. C'est le calcul effectué par le moteur qui prend le plus de temps et donne l'ordre de grandeur du temps de réponse. 
+
+Les informations suivantes sont données à titre d'exemples. Si on considère un graphe qui couvre l'ensemble du territoire français (~25Go pour OSRM et 16Go pour PGRouting) et deux serveurs de 8 cpu et 32 Go de RAM, un pour Road2 (+bindings OSRM) et un pour la base PGRouting, on obtient les performances suivantes : 
+- itinéraire via OSRM < 100 ms
+- itinéraire via PGR < 2000 ms. Bien sûr, les résultats sont très variables. Par exemple, si on considère un petit itinéraire, on aura des performances < 1000 ms sans problème. 
+- isochrone via PGR ont des résultats trop variables pour être moyenné : moins d'une seconde pour des petits isochrones (<30min) et plusieurs secondes pour des plus grands. Sachant que le temps de réponse n'évolue pas linéairement à l'augmentation de la durée de l'isochrone mais quadratiquement. 
+
 ## Industrialisation 
+
+Cette partie aborde certains sujets utiles à l'industrialisation de Road2. 
 
 ### Installation des dépendances spécifiques à chaque moteur 
 
@@ -26,33 +46,11 @@ npm install --no-optional --no-package-lock --no-save
 npm install --no-package-lock --no-save osrm
 ```
 
-## Optimisations envisageables
+### Paquet
 
-### Utilisation de la RAM 
+Il est possible de faire une archive de Road2 via la commande classique `npm pack` lancée à la racine du projet GIT. Le paquet ne contiendra que le dossier `src` et le `package.json`. Si les `node_modules` sont déjà présents, alors ils sont ajoutés à l'archive. 
 
-#### Dans le cas d'OSRM 
-
-Le binaire d'OSRM  `osrm-routed` met en RAM les graphes chargés, par défaut. Mais le binding NodeJS ne le fait pas. Il peut donc être intéressant de mettre en RAM les graphes mannuellement. Et ensuite, on peut faire pointer le binding sur les fichiers déjà en RAM. 
-
-Pour cela, il suffit d'utiliser `tmpfs`. Tout d'abord en créant le dossier qui contiendra ce qui sera chargé en RAM:
-
-```
-sudo mkdir /media/virtuelram
-sudo chmod 777 /media/virtuelram
-sudo chmod 1777 /media/virtuelram
-```
-
-Puis de charger ce nouveau volume temporrairement:
-``` 
-sudo mount -t tmpfs -o size=512M tmpfs /media/virtuelram
-```
-
-Ou de manière définitive en éditant le fichier `/etc/fstab` avec le contenu suivant:
-```
-tmpfs /media/virtuelram tmpfs defaults,size=512M 0 0
-```
-
-## Autres détails 
+## Autres éléments 
 
 ### Affichage des erreurs
 
@@ -68,4 +66,4 @@ Par défaut, il y a des options qui sont utilisées mais elles peuvent être rem
 
 ### Gestion du HTTPS
 
-Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le module `https` de NodeJS. Il est donc possible de lui fournir les options disponibles dans ce module. 
+Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le module `https` de NodeJS. Il est donc possible de lui fournir les [options](https://nodejs.org/docs/latest-v12.x/api/tls.html#tls_tls_createserver_options_secureconnectionlistener) disponibles dans ce module. 

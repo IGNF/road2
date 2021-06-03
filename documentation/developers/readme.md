@@ -1,22 +1,30 @@
 # Documentation développeurs pour Road2
 
-Cette documentation présente les concepts utiles pour comprendre le code et la démarche proposée pour participer aux développements de cet outils. 
-
 ## Présentation de Road2
 
-D'un point de vue développeur, *Road2 est un service web écrit en Javascript et conçu pour fonctionner avec NodeJS*. Il propose le calcul d'itinéraires via des moteurs existants et peut donc être considéré comme une interfaces pour moteurs de calculs d'itinéraires. Ainsi, les calculs ne sont pas fait dans le code mais via l'appel à des librairies.
+D'un point de vue développeur, *Road2 est un service web écrit en Javascript et conçu pour fonctionner avec NodeJS*. Il propose divers calculs liés aux routes. On parlera d'itinéraires pour simplifier. Ces calculs sont réalisés via des moteurs qui ne sont pas codés dans Road2. Ce dernier peut donc être considéré comme une interfaces pour moteurs de calculs d'itinéraires. Ainsi, les calculs ne sont pas fait dans le code mais via l'appel à des librairies.
 
 De plus, Road2 a été codé pour qu'il soit facile d'ajouter des nouvelles APIs d'accès ou des nouveaux moteurs de calcul.
 
 ## Les concepts utiles au développeurs 
 
+Plusieurs concepts ont été utilisés lors des développements. Afin de mieux les cerner et ainsi mieux comprendre le code, une lecture des [concepts](./concepts.md) est conseillée. 
+
+## Les fonctionnalités de Road2 
+
+L'ensemble des fonctionnalités sont répertoriées à [part](./functionnalities.md) afin de faciliter la visibilité. 
+
 ## Participer aux développements 
+
+Les participations à ce projet sont encouragées. L'ajout de moteurs ou d'API, bien évidemment. Mais toutes autres fonctionnalités sont les bienvenues. Nous avons mis en place une [documentation](./modification.md) afin de faciliter des développements. 
 
 ### GIT 
 
-La gestion des branches et des versions est détaillée [ici](./version.md). 
+Comme cela aura certainement déjà été compris, ce projet utilise GIT. La gestion des branches et des versions pour les développements est détaillée [ici](./version.md). 
 
 ## Outils pour le développement
+
+Jusqu'à présent, plusieurs outils ont été utilisé pour aidé les développements. Il s'agissait surtout d'avoir un avis sur la qualité du code. Pour cela, nous avons utilisé Sonarkube. 
 
 ### Sonakube 
 

@@ -4,7 +4,7 @@
 
 Road2 est un serveur de calcul d'itinéraires et d'isochrones écrit en Javascript et conçu pour fonctionner avec NodeJS. Ce serveur propose le calcul d'itinéraires et d'isochrones via des moteurs existants comme [OSRM](https://github.com/Project-OSRM/osrm-backend) ou [PGRouting](https://pgrouting.org/). Road2 est donc une interface pour moteurs de calculs. Ces derniers ne sont pas fait dans le code de Road2 mais via des appels à ses moteurs. Cela peut se traduire par l'appel à une librairie, ou à une base de données, ou encore à un autre service web. 
 
-Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérénisant l'accès au service. Pour une plus longue discussion sur les concepts introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/concepts.md).
+Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérénisant l'accès au service. Pour une plus longue discussion sur les concepts logiciels introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/developers/concepts.md).
 
 Actuellement, Road2 propose deux moteurs, OSRM et PGRouting, via une unique API REST. 
 
@@ -57,7 +57,7 @@ Qu'importe la source des données, il est nécessaire de les fournir dans l'un d
 
 Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet route-graph-generator (1.0.3-DEVELOP) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
 
-Pour une discussion détaillée sur les données attendues par route-graph-generator, on pourra se référer à cette [documentation](./documentation/data/readme.md). 
+Pour une discussion détaillée sur les données attendues, on pourra se référer à cette [documentation](./documentation/data/readme.md). 
 
 ### Configuration
 
@@ -76,10 +76,10 @@ On trouvera dans le dossier [docker/distrubutions](./docker/distributions) diff�
 
 ## Participer aux développements 
 
-On trouvera une documentation dédiée aux développeurs [ici](./documentation/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
+On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 
-De plus, il est possible d'utiliser ce [docker-compose](./docker/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et des données. 
+De plus, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
 
 ## Utilisation en production
 
-Afin d'utiliser Road2 en production, plusieurs informations sont données dans ce [document](./docker/production/readme.md). Il s'agit principalement des besoins déjà observés pour une mise en production du service couvrant l'ensemble du territoire français. 
+Afin d'utiliser Road2 en production, plusieurs informations sont données dans ce [document](./documentation/production/readme.md). Il s'agit principalement des besoins déjà observés pour une mise en production du service couvrant l'ensemble du territoire français. 
