@@ -3,7 +3,10 @@
 ADDED: 
  - chaque source peut donner l'état de sa connexion
 
-# 1.0.5-DEVELOP
+CHANGED: 
+ - passage à OSRM 5.25.0
+
+# 1.0.5
 
 FIXED:
  - gestion d'une erreur PGR si aucun isochrone n'est trouvé. 
