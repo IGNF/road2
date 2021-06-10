@@ -80,6 +80,11 @@ module.exports = class Polygon extends Geometry {
         result = polyline.encode([geom.coordinates]);
         return result
       }
+      if (geom.type === "LineString") {
+        // Cas où l'isochrone est un simple point
+        result = polyline.encode(geom.coordinates);
+        return result
+      }
 
       // Conversion du polygone en (Multi)LineString.
       const lines = turf.polygonToLine(polygon.geometry.coordinates);
