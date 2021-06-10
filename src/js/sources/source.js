@@ -38,6 +38,11 @@ module.exports = class Source {
     // Topologie dont dérive la source
     this._topology = topology;
 
+    // État de la source (même si connectée, elle peut être disfonctionnelle)
+    // Peut être : "green" si la dernière requête a fonctionnée, "orange" si la source est connectée mais injoignable, "red" à l'initialisation ou si plus gros problème
+    // Ajouter la gestion de ce paramètre dans chaque classe fille
+    this._state = "red";
+
   }
 
   /**
@@ -83,6 +88,29 @@ module.exports = class Source {
   */
   set connected (conn) {
     this._connected = conn;
+  }
+
+  /**
+  *
+  * @function
+  * @name get state
+  * @description Récupérer l'état de connexion de la source
+  *
+  */
+   get state() {
+    return this._state;
+  }
+
+  /**
+  *
+  * @function
+  * @name set state
+  * @description Attribuer l'état de connexion de la source
+  * @param {string} st - État de la connexion
+  *
+  */
+  set state (st) {
+    this._state = st;
   }
 
   /**
@@ -136,6 +164,21 @@ module.exports = class Source {
       this.connected = true;
     } catch (err) {
       throw errorManager.createError("Cannot connect source");
+    }
+  }
+
+  /**
+  *
+  * @function
+  * @name isAvailable
+  * @description Fonction utilisée pour tester l'état de la connexion d'une source. Elle peut être ré-écrite dans chaque classe fille si besoin.
+  *
+  */
+  async isAvailable() {
+    if (!this.connected) {
+      return false;
+    } else {
+      return this.state;
     }
   }
 
