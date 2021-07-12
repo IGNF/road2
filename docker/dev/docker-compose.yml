@@ -3,8 +3,8 @@ version: "3.7"
 services:
   road2:
     build:
-      context: ..
-      dockerfile: ./docker/centos-wo-aws/Dockerfile
+      context: ../..
+      dockerfile: ./docker/demonstration/Dockerfile
     image: road2
     container_name: road2-server
     depends_on:
@@ -28,8 +28,8 @@ services:
 
   r2gg:
     build:
-      context: ../../route-graph-generator/
-      dockerfile: ./docker/centos7/Dockerfile
+      context: ../../../route-graph-generator/
+      dockerfile: ./docker/debian/Dockerfile
     image: r2gg
     container_name: r2gg
     depends_on:
@@ -48,10 +48,8 @@ services:
 
   pgrouting:
     build:
-      context: ../../pgrouting-procedures/
-      dockerfile: ./docker/centos7/Dockerfile
-      args:
-        - ipRange=${iprange}
+      context: ../../../pgrouting-procedures/
+      dockerfile: ./docker/debian/Dockerfile
     image: pgrouting
     container_name: pgrouting-server
     expose:
@@ -61,35 +59,9 @@ services:
     networks:
       - iti-network
     volumes:
-      - pgr-data-volume:/var/lib/pgsql
-      - ${procedures_path}:/home/docker/pgrouting-procedures/sql
-
-  road2-web:
-    build:
-      context: ..
-      dockerfile: ./docker/web/Dockerfile
-    image: road2-web-debian
-    container_name: road2-web-server
-    depends_on:
-      - road2
-    ports:
-      - 8081:80
-    volumes:
-      - ${road2_web_src}:/home/docker/web/www/road2
-    networks:
-      - iti-network
-
-  road2-gatling:
-    image: denvazh/gatling
-    container_name: road2-gatling
-    depends_on:
-      - road2
-    volumes:
-      - ${gatling_user_files}:/opt/gatling/user-files
-      - ${gatling_results}:/opt/gatling/results
-    networks:
-      - iti-network
-    command: "-s ${gatling_test_name}"
+      - pgr-data-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
 
 volumes:
   iti-data-volume:

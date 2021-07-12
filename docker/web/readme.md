@@ -19,19 +19,9 @@ Pour lancer le serveur web qui rend la page accessible, il suffit d'utiliser la 
 docker run --name web-road2-page --rm -d -p 8080:80 web-road2
 ```
 
-## Mode DEBUG
-```
-docker run --name web-road2-page --rm -it -p 8080:80 web-road2 /bin/bash
-```
-
 ## Pour développer en gardant le code source en local
 ```
 docker run --name web-road2-page --rm -d -p 8080:80 -v $src:/home/docker/web/www/road2 web-road2
-```
-
-## Pour débugger le mode développement avec les sources en local
-```
-docker run --name web-road2-page --rm -it -p 8080:80 -v $src:/home/docker/web/www/road2 web-road2 /bin/bash
 ```
 
 # Tester Road2
@@ -53,7 +43,7 @@ docker run --rm -d -p 8081:8080 swaggerapi/swagger-ui
 
 Une fois le docker swagger et le docker web lancés, il suffit de se rendre sur l'URL suivante: http://localhost:8081/?url=http://localhost:8080/api/api.yaml.
 
-Il est donc possible de visualiser et d'éditer la documentation. Mais pour que les changements soient pris en compte, il faut modifier le vrai fichier manuellement dans de dépôt de code. Pour le moment, Swagger ne permet pas nativement de faire de la modification de fichier en local.
+Il est donc possible de visualiser et d'éditer la documentation. Mais pour que les changements soient pris en compte, il faut modifier le vrai fichier manuellement dans de dépôt de code. 
 
 # Visualiser la documentation du code
 
@@ -64,8 +54,6 @@ Le code est documenté via des commentaires. Ces commentaires peuvent être plus
 Pour créer la documentation, il suffit de lancer la commande suivante:
 ```
 docker run --rm -v $code:/home/docker/app/documentation/code debian-road2 npm run jsdoc
-# OU
-docker run --rm -v $code:/home/docker/app/documentation/code centos-road2 npm run jsdoc
 ```
 
 La documentation sera alors accessible dans le dossier `$code`.

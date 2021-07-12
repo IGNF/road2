@@ -20,7 +20,6 @@
     },
     "resources": {
       "directories": [
-        "/home/docker/config/resources/",
         "/home/docker/data/resources/"
       ]
     },

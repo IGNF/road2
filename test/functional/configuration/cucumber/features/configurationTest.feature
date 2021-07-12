@@ -420,7 +420,7 @@ Feature: Road2 configuration
 
   Scenario: [server.json] (resources.directories contient un élément vide)
     Given a valid configuration 
-    And with parameter "" for attribute "application.resources.directories.[0]" in server configuration
+    And with parameter "" for attribute "application.resources.directories.[1]" in server configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 0
     Then the server log should contain "Mauvaise configuration: Champ 'application:resources:directories' contient un élément vide"

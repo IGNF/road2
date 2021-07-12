@@ -5,7 +5,6 @@
 ## Pré-requis
 
 Pour utiliser `docker-compose`, il suffit de :
-- télécharger le projet Road2.
 - installer `docker`.
 - se placer dans le dossier `/docker/load/` du projet Road2.
 - créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
