@@ -16,8 +16,8 @@ Pour utiliser ce `docker-compose.yml`, il suffit de :
 
 ### Proxy
 Si on utilise ces Dockerfile derrière un proxy, il faudra vérifier que docker fonctionne déjà correctement avec le proxy:
-- le fichier `/etc/systemd/system/docker.service.d/http-proxy.conf` est correctement rempli et permet à dockerd de télécharger des images sur internet. 
-- le fichier `~/.docker/config.json` est correctement rempli et permet au CLI docker de fournir le proxy à chaque image lancée par l'utilisateur.
+- le fichier `/etc/systemd/system/docker.service.d/http-proxy.conf` est correctement rempli et permet à `dockerd` de télécharger des images sur internet. 
+- le fichier `~/.docker/config.json` est correctement rempli et permet au CLI `docker` de fournir le proxy à chaque image lancée par l'utilisateur.
 
 ### DNS 
 Si on utilise ces Dockerfile avec un VPN, on vérifiera que les configurations DNS utilsées par Docker sont les bonnes: 
@@ -26,7 +26,7 @@ Si on utilise ces Dockerfile avec un VPN, on vérifiera que les configurations D
 ### IP 
 Si on utilise ces Dockerfile sur un réseau avec lequel il peut y avoir des problèmes d'IP, il sera utile de dédier à Docker une plage d'IP non utilisées:
 - L'attribut `bip` du fichier ``/etc/docker/daemon.json` permet de préciser une plage d'IP. 
-- Si bip a été rempli, on veillera à ce que ces IP soient bien ajouter à l'inferface docker0. La commande `sudo ip route add {plage_ip} dev docker0` permet de le faire. 
+- Si bip a été rempli, on veillera à ce que ces IP soient bien ajouter à l'interface `docker0`. La commande `sudo ip route add {plage_ip} dev docker0` permet de le faire. 
 
 Cette plage d'IP sera différente de celle attribuée à la stack Road2 lancée via docker-compose (eg. celui présent dans le fichier `.env`). 
 

@@ -10,7 +10,7 @@ C'est le concept de base pour comprendre le code de Road2.
 
 #### 1.1.1 Notions d'API 
 
-**Une API, pour Road2, est un ensemble de routes que le serveur reconnait et regroupe au sein d'une même appellation**. Pour chaque appellation, il y aura potentiellement plusieurs versions. Et au sein de chaque version, il y aura potentiellement plusieurs routes. 
+**Une API, pour Road2, est un ensemble de routes que le serveur reconnaît et regroupe au sein d'une même appellation**. Pour chaque appellation, il y aura potentiellement plusieurs versions. Et au sein de chaque version, il y aura potentiellement plusieurs routes. 
 
 Par exemple, si on considère une API qui s'appelle `rest` qui ne possède qu'une seule version `1.0.0`. Dans cette API, on pourrait définir une seule route `compute` qui permet de demander un itinéraire avec les paramètres `start` et `end` au minimum. On parlera alors de l'API `rest/1.0.0` qui permet à un utilisateur d'obtenir un itinéraire en faisant la requête `/rest/1.0.0/compute?start=2,48&end=2,48.1`. 
 
@@ -38,7 +38,7 @@ C'est le second concept le plus important après l'indépendance des APIs et des
 
 #### 1.2.1 Notion de graphe 
 
-Il semble utile de passer la notion de *graphe*, selon Road2, pour expliquer ce qui suit. Quand on fait du calcul d'itinéraire, on utilise un moteur qui lit un *graphe* pour générér l'itinéraire. Or, **un *graphe* est une topologie, c'est-à-dire un ensemble de noeuds et d'arcs qui forment un tout naviguable, sur laquelle il y a un unique coût**. 
+Il semble utile de passer la notion de *graphe*, selon Road2, pour expliquer ce qui suit. Quand on fait du calcul d'itinéraire, on utilise un moteur qui lit un *graphe* pour générer l'itinéraire. Or, **un *graphe* est une topologie, c'est-à-dire un ensemble de noeuds et d'arcs qui forment un tout navigable, sur laquelle il y a un unique coût**. 
 
 En effet, à chaque arc est associé au minimum un coût. Ce coût peut être la distance de l'arc ou le temps nécessaire pour le parcourir en voiture. Ainsi, chaque coût peut être vu comme le couple *profile/optimisation*, où *profile* est le moyen de transport (ex. voiture) et *optimisation* est le type de déplacement que l'on souhaite (ex. "plus rapide"). 
 
@@ -48,9 +48,9 @@ Certains graphes peuvent avoir plusieurs coûts par topologie (ex. PGRouting) et
 
 Comme précisé juste au-dessus, pour avoir un itinéraire, il est nécessaire de faire appel à un moteur et à un graphe. La *source*, dans le langage conceptuel de Road2, est l'origine du calcul. **La source contient l'appel à un moteur sur un graphe précis pour obtenir le résultat d'un calcul**. C'est le lien entre l'application et le calcul réel, comme celui d'un itinéraire par exemple. 
 
-Concrétement, une *source* regroupe deux entités : 
+Concrètement, une *source* regroupe deux entités : 
 - une classe Javascript qui fait le lien entre le reste du code et le moteur. Chaque moteur sera donc lié à Road2 par une classe fille de la classe `Source`. Cette classe fille devra contenir le code qui permet de demander au moteur un itinéraire ou autre chose (ex. isochrone, etc...). C'est ce qui concerne le développeur. 
-- chaque instance de la classe, par une configuration qui indique où se trouve le graphe que le moteur peut lire, représente donc un moteur pour un graphe réel. On a alors la possibilité de calculer concrétement un itinéraire. C'est ce qui concerne l'administrateur du service d'itinéraire par l'intérmédiaire de la configuration. Par exemple, une source instanciée sera l'appel du moteur OSRM sur un graphe, ctd une dossier, au format osrm. 
+- chaque instance de la classe, par une configuration qui indique où se trouve le graphe que le moteur peut lire, représente donc un moteur pour un graphe réel. On a alors la possibilité de calculer concrètement un itinéraire. C'est ce qui concerne l'administrateur du service d'itinéraire par l'intermédiaire de la configuration. Par exemple, une source instanciée sera l'appel du moteur OSRM sur un graphe, ctd une dossier, au format osrm. 
 
 De tout ce qui vient d'être dit, on remarque qu'ajouter un moteur revient à ajouter une classe fille de `Source`. Cela génère une indépendance entre chaque moteur. 
 
@@ -120,7 +120,7 @@ Chaque ressource contient plusieurs sources. Étant donné que plusieurs ressour
 
 Lorsque l'application est lancée, on commence par lire la configuration de l'application pour être capable d'instancier le logger. Une fois que le logger est chargé, on vérifie complètement la configuration.
 
-Après cela, on charge les ressources et les sources du service indiquées dans la configuration. C'est à ce moment que les fichiers sont lus, stockés en RAM si nécessaire, et que les connexions aux bases de données sont effecutées. 
+Après cela, on charge les ressources et les sources du service indiquées dans la configuration. C'est à ce moment que les fichiers sont lus, stockés en RAM si nécessaire, et que les connexions aux bases de données sont effectuées. 
 
 Enfin, on finit par charger les APIs exposées par le service. C'est là qu'ExpressJS crée le ou les serveurs Node et charge les routes disponibles. 
 

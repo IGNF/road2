@@ -8,7 +8,7 @@ Road2 propose un ensemble de fonctionnalités regroupées dans plusieurs groupes
 
 ### 1.1 : Définir un point de départ, un point d'arrivée et des points intermédiaires 
 
-Fonctionnalités classiques et inévitables, elles ne seront pas détaillées ici. Précision : il est possible de préciser autant de point intermédaire que l'on souhaite. 
+Fonctionnalités classiques et inévitables, elles ne seront pas détaillées ici. Précision : il est possible de préciser autant de point intermédiaire que l'on souhaite. 
 
 ### 1.2 : Définir des contraintes 
 
@@ -24,7 +24,7 @@ Il est possible de préciser quel moyen de transport, l'itinéraire concerne.
 
 ### 1.5 : Préciser l'optimisation voulue 
 
-Il est possbile de préciser l'optimisation que l'on veut appliquer lors du calcul. 
+Il est possible de préciser l'optimisation que l'on veut appliquer lors du calcul. 
 
 ### 1.6 : Ajouter des informations sur chaque tronçons 
 
@@ -34,7 +34,7 @@ Selon les données présentes dans les graphes, il est possible de choisir les i
 
 Par l'intermédiaire de plusieurs paramètres, il est possible de préciser le contenu de la réponse : 
 - La présence ou non des étapes du parcours. 
-- Le format des géméométrie dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
+- Le format des géométries dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
 - La présence ou non d'une bbox dans la réponse. 
 
 ### 1.8 : Choisir les unités de la requête et de la réponse 
@@ -75,12 +75,12 @@ Un isochrone peut se définir dans deux directions : départ ou arrivée. Il s'a
 
 ### 2.7 : Définir des contraintes 
 
-La notion de contrainte est définie dans les [concepts](./concepts.md). Elle est limitée aux interdictions, comme par exmple, l'interdiction de prendre des autoroutes. 
+La notion de contrainte est définie dans les [concepts](./concepts.md). Elle est limitée aux interdictions, comme par exemple, l'interdiction de prendre des autoroutes. 
 
 ### 2.8 : Préciser le contenu de la réponse 
 
 Par l'intermédiaire de plusieurs paramètres, un seul pour le moment, il est possible de préciser le contenu de la réponse : 
-- Le format des géméométrie dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
+- Le format des géométrie dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
 
 ### 2.9 : Choisir les unités de la requête et de la réponse 
 
@@ -119,7 +119,7 @@ Comme présenté dans les [concepts](./concepts.md), Road2 offre la possibilité
 
 Le service peut être administrer de deux manières : la configuration et une API dédiée. 
 
-### 4.1 : COnfigurer les ressources via la configuration
+### 4.1 : Configurer les ressources via la configuration
 
 Via la configuration fichier du serveur, il est possible de créer des [ressources](./concepts.md) qui se baseront sur une ou plusieurs [sources](./concepts.md).
 
@@ -133,7 +133,7 @@ Fonctionnalité explicite.
 
 ### 4.4 : Obtenir l'état de santé du serveur via l'API 
 
-Fonctionnalité en cours d'implémentation. L'objectif est de récupèrer l'état de chaque [source](./concepts.md) du serveur et d'en faire un compte-rendu. 
+Fonctionnalité en cours d'implémentation. L'objectif est de récupérer l'état de chaque [source](./concepts.md) du serveur et d'en faire un compte-rendu. 
 
 
 

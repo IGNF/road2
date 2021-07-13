@@ -13,7 +13,7 @@ Selon le ou les moteurs utilisés, il sera nécessaire d'avoir accès à une bas
 
 ### CPU
 
-En l'état, Road2 fonctionne sur un seul thread. Une évolution est prévue pour modifier ce comportement. Cependant, cette partie du code effectue peu de calcul. Par contre, les moteurs utilisent beaucoup les CPUs en parallèle. Ce sera donc la première ressource à surveiller pour établir le dimenssionnement. Un exemple d'usage en production sera donné dans la partie [Performances](#Performances) afin d'illustrer cela. 
+En l'état, Road2 fonctionne sur un seul thread. Une évolution est prévue pour modifier ce comportement. Cependant, cette partie du code effectue peu de calcul. Par contre, les moteurs utilisent beaucoup les CPUs en parallèle. Ce sera donc la première ressource à surveiller pour établir le dimensionnement. Un exemple d'usage en production sera donné dans la partie [Performances](#Performances) afin d'illustrer cela. 
 
 ### RAM 
 
@@ -30,7 +30,7 @@ Les performances dépendent directement du moteur employé, et bien évidemment 
 Les informations suivantes sont données à titre d'exemples. Si on considère un graphe qui couvre l'ensemble du territoire français (~25Go pour OSRM et 16Go pour PGRouting) et deux serveurs de 8 cpu et 32 Go de RAM, un pour Road2 (+bindings OSRM) et un pour la base PGRouting, on obtient les performances suivantes : 
 - itinéraire via OSRM < 100 ms
 - itinéraire via PGR < 2000 ms. Bien sûr, les résultats sont très variables. Par exemple, si on considère un petit itinéraire, on aura des performances < 1000 ms sans problème. 
-- isochrone via PGR ont des résultats trop variables pour être moyenné : moins d'une seconde pour des petits isochrones (<30min) et plusieurs secondes pour des plus grands. Sachant que le temps de réponse n'évolue pas linéairement à l'augmentation de la durée de l'isochrone mais quadratiquement. 
+- isochrone via PGR ont des résultats trop variables pour être moyenné : moins d'une seconde pour des petits isochrones (<30min) et plusieurs secondes pour des plus grands. Sachant que le temps de réponse ne suit pas linéairement l'augmentation de la durée de l'isochrone mais il semble plutôt avoir une évolution exponentielle. 
 
 ## Industrialisation 
 

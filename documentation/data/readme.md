@@ -21,7 +21,7 @@ Cette information est primordiale pour aboutir à des itinéraires réalistes. S
 
 #### Les non-communications 
 
-Les non-communications sont des informations qui précisent l'interdiction de prendre un arc depuis un autre selon le sens de navigation. Concrétement, ce sont la représentation informatique de certains panneaux (ex. l'interdiction de tourner à gauche). 
+Les non-communications sont des informations qui précisent l'interdiction de prendre un arc depuis un autre selon le sens de navigation. Concrètement, ce sont la représentation informatique de certains panneaux (ex. l'interdiction de tourner à gauche). 
 
 Ces informations sont également très importantes pour avoir des itinéraires réalistes. Elles sont bien gérées par les moteurs. 
 
@@ -39,7 +39,7 @@ Il est possible d'utiliser des données au format d'OSRM. La seule contrainte es
 
 ### Données PGRouting 
 
-Si des données au format PGRouting sont disponibles, il est possible de les utiliser avec Road2. A priori, il n'y a pas de fortes contraintes sur la version de PGRouting utilisée. La seule contrainte est au niveau logiciel. Il est nécessaire d'installer les procèdures du projet GIT `pgrouting-procedures` afin que Road2 puisse requếter la base qui héberge les données et les fonctions de PGRouting.
+Si des données au format PGRouting sont disponibles, il est possible de les utiliser avec Road2. A priori, il n'y a pas de fortes contraintes sur la version de PGRouting utilisée. La seule contrainte est au niveau logiciel. Il est nécessaire d'installer les procédures du projet GIT `pgrouting-procedures` afin que Road2 puisse requêter la base qui héberge les données et les fonctions de PGRouting.
 
 ### Les autres données 
 

@@ -1,6 +1,6 @@
 # Tests de Road2
 
-Ce fichier décrit l'ensemble des tests effectuables sur Road2. 
+Ce fichier décrit l'ensemble des tests réalisables sur Road2. 
 
 ## Procédures de test pour valider une nouvelle version de Road2 
 
@@ -18,6 +18,7 @@ docker volume rm iti-data-volume pgr-data-volume
 ```
 Pour la reconstruction des images, il est conseillé de les construire une par une :
 ```
+# Dans le dossier /docker/dev
 docker-compose build road2
 docker-compose build r2gg
 docker-compose build pgrouting
