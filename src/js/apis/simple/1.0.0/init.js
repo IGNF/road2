@@ -180,7 +180,7 @@ module.exports = {
       routeDescription.parameters.push(optimizationParameterDescription);
 
       // route.parameters.getSteps
-      let getStepsServiceParameter = serviceOpRoute.getParameterById("stepsSteps");
+      let getStepsServiceParameter = serviceOpRoute.getParameterById("getSteps");
       let getStepsParameterDescription = {};
       getStepsParameterDescription.name = "getSteps";
       getStepsParameterDescription.in = "query";

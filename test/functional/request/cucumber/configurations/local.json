@@ -1,6 +1,22 @@
 {
     "url": "localhost",
-    "port": 8080,
+    "port": 443,
+    "protocol": "https",
+    "apisUrl": {
+        "simple": {
+            "1.0.0": {
+                "route": "/simple/1.0.0/route",
+                "isochrone": "/simple/1.0.0/isochrone",
+                "getcapabilities": "/simple/1.0.0/getcapabilities"
+            }
+        },
+        "admin": {
+            "1.0.0": {
+                "health": "/admin/1.0.0/health",
+                "version": "/admin/1.0.0/version"
+            }
+        }
+    },
     "defaultParameters": [
         {
             "id": "route",
@@ -35,5 +51,8 @@
                 "costType": "time"
             }
         }
-    ]
+    ],
+    "alternativeParameters" : {
+        "url" : "127.0.0.1"
+    }
 }

@@ -1,7 +1,7 @@
 {
     "id": "constraints",
     "name": "Contraintes",
-    "description": "Contraintes utilisées pour le calcul.",
+    "description": "Contraintes utilisées pour le calcul",
     "required": "false",
     "defaultValue": "false",
     "example": "[{\"constraintType\":\"banned\",\"key\":\"wayType\",\"operator\":\"=\",\"value\":\"tunnel\",\"field\":\"position_par_rapport_au_sol\",\"condition\":{\"type\":\"less\",\"value\":\"0\"}}]",

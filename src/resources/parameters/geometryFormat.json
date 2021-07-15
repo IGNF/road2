@@ -1,7 +1,7 @@
 {
   "id": "geometryFormat",
   "name": "Type des géométries",
-  "description": "Type des géométries en sortie",
+  "description": "Format d'encodage de la géométrie",
   "required": "false",
   "defaultValue": "true",
   "example": "polyline",

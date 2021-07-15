@@ -1,7 +1,7 @@
 {
   "id": "route",
   "name": "Calcul d'itinéraire",
-  "description": "Calculer un itinéraire.",
+  "description": "Calculer un itinéraire",
   "parameters": [
     "resource",
     "start",

@@ -26,7 +26,7 @@ describe('Test de la classe pgrSource', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/route-graph-generator/io/costs_calculation_sample.json"
+          "file": "/home/docker/route-graph-generator/configuration/costs_calculation_sample.json"
         }
       }
     }
@@ -58,7 +58,7 @@ describe('Test de la classe pgrSource', function() {
       "optimization": "shortest",
       "compute": {
         "storage": {
-          "file": "/home/docker/route-graph-generator/io/costs_calculation_sample.json"
+          "file": "/home/docker/route-graph-generator/configuration/costs_calculation_sample.json"
         }
       }
     }

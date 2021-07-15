@@ -1,12 +1,25 @@
 const { Given, When, Then } = require("cucumber");
 const assert = require('assert');
 
-Given("I have loaded all my test configuration", function() {
-    this.loadConfiguration();
+Given("I have loaded all my test configuration in {string}", function(configurationPath) {
+    this.loadConfiguration(configurationPath);
 });
 
-Given("an {string} {string} request on {string}", function(protocol, method, path) {
-    this.createRequest(protocol, method, path);
+Given("an {string} request on {string}", function(method, path) {
+    this.createRequest(method, path);
+});
+
+Given("an {string} request on operation {string} in api {string} {string}", function(method, operationId, apiId, version) {
+    this.createRequestOnApi(method, operationId, apiId, version);
+});
+
+Given("with {string} for the url", function(url) {
+    this.changeUrl(url);
+});
+
+Given("with the alternative url", function() {
+    url = this.getConfigurationValueof("alternativeParameters.url");
+    this.changeUrl(url);
 });
 
 Given("with default parameters for {string}", function(operation) {
@@ -35,11 +48,25 @@ Given('with {string} at the end of the url', function (key) {
 
 When("I send the request", function(done) {
     this.sendRequest()
-    .then(() => {
+    .then((response) => {
+        this.saveResponse(response);
         done();
     })
     .catch((error) => {
-        done(error);
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            this.saveResponse(error.response);
+            done();
+        } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            done(error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            done(error.message);
+        }
     });
 
 });
@@ -66,6 +93,11 @@ Then("the response should have an header {string} with value {string}", function
 
 Then("the response should contain an attribute {string} with value {string}", function(key, value) {
     assert.equal(this.checkResponseContent(key, value), true);
+});
+
+Then("the response should contain an attribute {string} with configuration value of {string}", function(responseKey, configurationKey) {
+    configurationValue = this.getConfigurationValueof(configurationKey);
+    assert.equal(this.checkResponseContent(responseKey, configurationValue), true);
 });
 
 Then("the road should be similar to {string}", function(path) {

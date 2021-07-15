@@ -296,7 +296,7 @@ module.exports = class pgrSource extends Source {
       }
       // ---
 
-      const queryString = "SELECT * FROM shortest_path_pgrouting(ARRAY " + JSON.stringify(coordinatesTable) +",$1,$2,$3,ARRAY [" + attributes + "]::text[],$4)";
+      const queryString = `SELECT * FROM ${this._topology.schema}.shortest_path_pgrouting(ARRAY ${JSON.stringify(coordinatesTable)},$1,$2,$3,ARRAY [${attributes}]::text[],$4)`;
 
       let SQLParametersTable;
       if (looseConstraintsArray.length === 0) {
@@ -323,37 +323,58 @@ module.exports = class pgrSource extends Source {
         LOGGER.debug("SQLParametersTable:");
         LOGGER.debug(SQLParametersTable);
 
-        this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+        if (this._topology.base.pool) {
 
-          if (err) {
+          try {
 
-            LOGGER.error("pgr error:");
-            LOGGER.error(err);
+            this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
-            // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
-            if (err.code === "38001") {
-              reject(errorManager.createError(" No path found ", 404));
-            } else if (err.code === "42703") {
-              // cette erreur remonte quand il n'y a pas de données dans PGR
-              reject(errorManager.createError(" No data found ", 503));
-            } else {
-              reject(err);
-            }
+              this.state = "green";
+  
+              if (err) {
+  
+                LOGGER.error("pgr error:");
+                LOGGER.error(err);
+  
+                // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
+                if (err.code === "38001") {
+                  reject(errorManager.createError(" No path found ", 404));
+                } else if (err.code === "42703") {
+                  // cette erreur remonte quand il n'y a pas de données dans PGR
+                  this.state = "red";
+                  reject(errorManager.createError(" No data found ", 503));
+                } else {
+                  reject(err);
+                }
+  
+              } else {
+  
+                LOGGER.debug("pgr response:");
+                LOGGER.debug(result);
+  
+                try {
+                  resolve(this.writeRouteResponse(request, pgrRequest, result));
+                } catch (error) {
+                  reject(error);
+                }
+  
+              }
+  
+            });
 
-          } else {
-
-            LOGGER.debug("pgr response:");
-            LOGGER.debug(result);
-
-            try {
-              resolve(this.writeRouteResponse(request, pgrRequest, result));
-            } catch (error) {
-              reject(error);
-            }
-
+          } catch (error) {
+            // Pour une raison que l'on ignore, la source n'est plus joignable
+            this.state = "orange";
+            LOGGER.error(error);
+            reject("Internal PGR error");
           }
 
-        });
+          
+
+        } else {
+          this.state = "red";
+          reject(errorManager.createError(" PG is not available. "));
+        }
 
       });
 
@@ -385,7 +406,7 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("no constraints asked");
         }
 
-        const queryString = "SELECT * FROM generateIsochrone(ARRAY " + JSON.stringify(point) + ", $1, $2, $3, $4, $5, $6)";
+        const queryString = `SELECT * FROM ${this._topology.schema}.generateIsochrone(ARRAY ${JSON.stringify(point)}, $1, $2, $3, $4, $5, $6)`;
 
         const SQLParametersTable = [
           request.costValue,
@@ -402,29 +423,52 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("SQLParametersTable:");
           LOGGER.debug(SQLParametersTable);
 
-          this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+          if (this._topology.base.pool) {
 
-            if (err) {
+            try {
+              
+              this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
-              LOGGER.error("pgr error:");
-              LOGGER.error(err);
+                this.state = "green";
+  
+                if (err) {
+  
+                  // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé d'iso
+                  if (err.code === "XX000") {
+                    // Cette erreur remonte souvent quand PGR n'a pas assez de données pour créer ou calculer une iso (ex. costValue trop petit)
+                    reject(errorManager.createError(" No iso found ", 404));
+                  }  else {
+                    LOGGER.error("pgr error:");
+                    LOGGER.error(err);
+                    reject(err);
+                  }
+  
+                } else {
+  
+                  LOGGER.debug("pgr response:");
+                  LOGGER.debug(result);
+  
+                  try {
+                    resolve(this.writeIsochroneResponse(request, pgrRequest, result));
+                  } catch (error) {
+                    reject(error);
+                  }
+  
+                }
+  
+              });
 
-              reject(err);
-
-            } else {
-
-              LOGGER.debug("pgr response:");
-              LOGGER.debug(result);
-
-              try {
-                resolve(this.writeIsochroneResponse(request, pgrRequest, result));
-              } catch (error) {
-                reject(error);
-              }
-
+            } catch (error) {
+              // Pour une raison que l'on ignore, la source n'est plus joignable
+              this.state = "orange";
+              LOGGER.error(error);
+              reject("Internal PGR error");
             }
 
-          });
+          } else {
+            this.state = "red";
+            reject(errorManager.createError(" PG is not available. "));
+          }
 
         });
 

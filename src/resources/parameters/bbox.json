@@ -1,7 +1,7 @@
 {
   "id": "bbox",
   "name": "Bbox de l'itinéraire",
-  "description": "Préciser si on souhaite avoir la bbox de l'itinéraire.",
+  "description": "Présence de l'emprise de l'itinéraire dans la réponse",
   "required": "false",
   "defaultValue": "true",
   "example": "true",

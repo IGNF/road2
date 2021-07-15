@@ -1,9 +1,11 @@
 const { setWorldConstructor } = require("cucumber");
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
+const turf = require('@turf/turf');
+const axios = require('axios');
+const tunnel = require('tunnel');
 const https = require('https');
-const turf = require('@turf/turf')
+
 
 /**
 *
@@ -24,13 +26,19 @@ class road2World {
      */
     constructor() {
 
-        // Url du service 
+        // On stocke la configuration complète pour certains tests 
+        this._configuration = {};
+
+        // Url du service par défaut
         this._url  = "";
 
-        // Port 
-        this._port = 8080;
+        // Port par défaut
+        this._port = 80;
 
-        // Chemin du service 
+        // Objet contenant la liste des url par api
+        this._apisUrl= {};
+
+        // Chemin de la requête
         this._path = "";
 
         // Protocole de la requête 
@@ -60,25 +68,65 @@ class road2World {
 
     }
 
-    loadConfiguration() {
+    loadConfiguration(configurationPath) {
 
-        let configurationPath = path.resolve(__dirname, "../../configurations/local.json");
+        let absolutePath = path.resolve(__dirname, configurationPath);
 
-        let configuration = JSON.parse(fs.readFileSync(configurationPath));
+        let configuration = JSON.parse(fs.readFileSync(absolutePath));
+
+        this._configuration = configuration;
 
         this._url = configuration.url;
 
         this._port = configuration.port;
 
+        this._protocol = configuration.protocol;
+
+        this._apisUrl = configuration.apisUrl;
+
         this._defaultParameters = configuration.defaultParameters; 
 
     }
 
-    createRequest(protocol, method, path) {
+    createRequest(method, path) {
 
-        this._protocol = protocol;
+        // on réinitialise certains paramètres qui peuvent changer mais qui ont de valeurs par défaut dans la conf 
+        this._url = this._configuration.url;
+        this._port = this._configuration.port;
+        this._protocol = this._configuration.protocol;
+
         this._method = method;
         this._path = path;
+
+    }
+
+    changeUrl(url) {
+
+        this._url = url;
+
+    }
+
+    createRequestOnApi(method, operationId, apiId, version) {
+
+        this._method = method;
+
+        if (this._apisUrl[apiId]) {
+
+            if (this._apisUrl[apiId][version]) {
+
+                if (this._apisUrl[apiId][version][operationId]) {
+                    this._path = this._apisUrl[apiId][version][operationId];
+                } else {
+                    return "operationId inconnu";
+                }
+
+            } else {
+                return "version inconnue";
+            }
+
+        } else {
+            return "apiId inconnu";
+        }
 
     }
 
@@ -153,195 +201,87 @@ class road2World {
 
     sendRequest() {
 
-        let finalOptions = {};
+        // Objet qui contient la requête
+        let finalRequest = {};
 
-        if (this._method === "GET") {
+        // Gestion du protocol 
+        let currentProtocol = this._protocol.toLowerCase();
 
-            // Traduction du body dans l'url 
-            let currentProtocol = this._protocol.toLowerCase();
-            let finalUrl = currentProtocol + "://" + this._url;
+        // Gestion du port 
+        let currentPort = this._port;
 
-            if (currentProtocol === "https") {
-                finalUrl += this._path + "?";
-            } else if (currentProtocol === "http") {
-                finalUrl += ":" + this._port + this._path + "?";
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
-            }
+        // Gestion de l'url  
+        let finalUrl = currentProtocol + "://" + this._url + ":" + currentPort + this._path + "?";
+        finalRequest.url = finalUrl;
 
+        // Gestion de la méthode 
+        finalRequest.method = this._method.toLocaleLowerCase();
+
+        // Gestion des paramètres de la requête 
+        if (finalRequest.method === "get") {
             for(let param in this._body) {
-                finalUrl +=  "&" + param + "=" + this._body[param].toString();
+                finalRequest.url +=  "&" + param + "=" + this._body[param].toString();
             }
-            finalUrl += this._adendumUrl;
-
-            if (currentProtocol === "https") {
-
-                let options = {
-                    rejectUnauthorized: false
-                }
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    https.get(finalUrl, options, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                });
-
-            } else if (currentProtocol === "http") {
-                
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    http.get(finalUrl, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                });
-
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
+            finalRequest.url += this._adendumUrl;
+        } else if (finalRequest.method === "post") {
+            finalRequest.data = this._body;
+            finalRequest.url += this._adendumUrl;
+            finalRequest.headers = {
+                'Content-Type': 'application/json'
             }
-
-        } else if (this._method === "POST") {
-
-            let currentProtocol = this._protocol.toLowerCase();
-
-            finalOptions = {
-                protocol: currentProtocol + ":",
-                host: this._url + this._adendumUrl,
-                path: this._path,
-                method: "POST",
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                rejectUnauthorized: false
-            };
-
-            if (currentProtocol === "https") {
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    let request = https.request(finalOptions, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                    // Envoie de la requête
-                    request.write(JSON.stringify(this._body));
-                    request.end();
-                    
-
-                });
-
-            } else if (currentProtocol === "http") {
-
-                finalOptions.port = this._port;
-
-                // Retour d'une promesse pour gérer l'asynchronisme du http.get
-                return new Promise ( (resolve, reject) => {
-
-                    let request = http.request(finalOptions, (response) => {
-
-                        this._status = response.statusCode;
-                        this._header = response.headers;
-
-                        // il faut passer par cet objet intermédiaire
-                        let rawResponse = "";
-
-                        // Stockage progressif 
-                        response.on('data', (data) => {
-                            rawResponse += data;
-                        });
-
-                        // Stockage final
-                        response.on('end', () => {
-                            this._response = rawResponse;
-                            resolve();
-                        });
-
-                    // Si erreur lors de la requête 
-                    }).on('error', (err) => {
-                        reject(err);
-                    });
-
-                    // Envoie de la requête
-                    request.write(JSON.stringify(this._body));
-                    request.end();
-                    
-
-                });
-
-            } else {
-                throw "Protocol unknown: " + currentProtocol;
-            }
-            
         } else {
-            
+
         }
 
-        
+        // Gestion du proxy 
+        if (process.env.HTTP_PROXY === "") {
+
+            finalRequest.proxy = false;
+
+            if (currentProtocol === "https") {
+                finalRequest.httpsAgent = new https.Agent({
+                    rejectUnauthorized: false
+                });
+            } else {
+                // rien à ajouter 
+            }
+
+        } else {
+            // on a un proxy http 
+
+            // on le décompose 
+            let proxy = process.env.HTTP_PROXY.split(":");
+            let proxyHost = proxy[1].replace(/\//g,"");
+            let proxyPort = proxy[2];
+
+            if (currentProtocol === "https") {
+                // on spécifie le proxy via tunnel et pas axios 
+                finalRequest.proxy = false;
+
+                let tunnelApp = tunnel.httpsOverHttp({
+                    proxy: {
+                        host: proxyHost,
+                        port: proxyPort
+                    },
+                });
+
+                finalRequest.httpsAgent = tunnelApp;
+
+            } else {
+                // rien à ajouter car axios le prend déjà en compte 
+            }
+
+        }
+
+        return axios(finalRequest);
+
+    }
+
+    saveResponse(response) {
+
+        this._status = response.status;
+        this._header = response.headers;
+        this._response = response.data;
 
     }
 
@@ -354,7 +294,7 @@ class road2World {
     }
 
     verifyRawResponseContent(message) {
-        if (this._response.includes(message)) {
+        if (JSON.stringify(this._response).includes(message)) {
             return true;
         } else {
             return "Message is not in response: " + this._response;
@@ -375,12 +315,24 @@ class road2World {
 
     }
 
+    getConfigurationValueof(key) {
+
+        return this.getJsonContentByKey(this._configuration, key);
+
+    }
+
     checkResponseContent(key, value) {
 
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
 
@@ -391,6 +343,7 @@ class road2World {
                 }
 
             } catch(error) {
+                console.log(error);
                 return false;
             }
             
@@ -405,7 +358,13 @@ class road2World {
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
                 
@@ -430,7 +389,13 @@ class road2World {
         if (this.checkHeaderContent("content-type","application/json")) {
             try {
 
-                let responseJSON = JSON.parse(this._response);
+                let responseJSON = {};
+                
+                if (typeof this._response === "string") {
+                    responseJSON = JSON.parse(this._response);
+                } else {
+                    responseJSON = this._response;
+                }
 
                 let jsonValue = this.getJsonContentByKey(responseJSON, key);
                 
@@ -612,7 +577,13 @@ class road2World {
         let refDistanceMax = 0;
         let refDurationMin = 0;
         let refDurationMax = 0;
-        let responseJSON = JSON.parse(this._response);
+        let responseJSON = {};
+                
+        if (typeof this._response === "string") {
+            responseJSON = JSON.parse(this._response);
+        } else {
+            responseJSON = this._response;
+        }
 
         try {
             referenceRoad = JSON.parse(fs.readFileSync(path.resolve(__dirname,filePath)));

@@ -4,7 +4,7 @@ Ce document permet d'expliquer la démarche à suivre pour tenir à jour les bra
 
 ## Présentation 
 
-De part sa nature, le projet Road2 a un `package.json` qui contient une version. Cependant, ce projet ne fonctionne pas seul. Il y a des projets qui le complétent en ayant des rôles différents: 
+De part sa nature, le projet Road2 a un `package.json` qui contient une version. Cependant, ce projet ne fonctionne pas seul. Il y a des projets qui le complètent en ayant des rôles différents: 
 - Route Grap Generator permet de générer des données utilisables par Road2
 - PGRouting Procedures permet d'avoir les procédures utilisées en BDD par Road2
 
@@ -18,7 +18,7 @@ On veillera à partir de `develop` et de créer une branche du type `feature-*` 
 
 ## Versions et tags
 
-On part du principe que les versions sont gérés sur les branches master et develop des différents projets. Et c'est pour ces branches que nous allons expliquer comment maintenir les versions et les tags. 
+On part du principe que les versions sont gérés sur les branches `master` et `develop` des différents projets. Et c'est pour ces branches que nous allons expliquer comment maintenir les versions et les tags. 
 
 ### Généralités 
 

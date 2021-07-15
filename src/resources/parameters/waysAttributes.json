@@ -1,7 +1,7 @@
 {
   "id": "waysAttributes",
   "name": "Attributs des routes",
-  "description": "Préciser les attributs de chaque route que l'on souhaite avoir dans la réponse.",
+  "description": "Caractéristiques des tronçons de route à afficher dans la réponse",
   "required": "false",
   "defaultValue": "false",
   "example": "name",

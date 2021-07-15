@@ -18,7 +18,7 @@ describe('Test de la classe SourceManager', function() {
         "corse-latest.osrm": "",
         "corse-latest.osm.pbf": "",
       },
-      "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles": {
+      "/usr/local/share/osrm/profiles": {
         "car.lua": "",
       },
     });
@@ -43,7 +43,7 @@ describe('Test de la classe SourceManager', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles/car.lua"
+          "file": "/usr/local/share/osrm/profiles/car.lua"
         }
       }
     }
@@ -158,7 +158,7 @@ describe('Test de la classe SourceManager', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles/car.lua"
+          "file": "/usr/local/share/osrm/profiles/car.lua"
         }
       }
     }
