@@ -571,13 +571,17 @@ components:
                       format: "float"
                     geometry:
                       type: "string"
-                    instructions:
-                      type: "array"
-                      items:
-                        type: "object"
-                        properties:
-                          message:
-                            type: "string"
+                    instruction:
+                      type: "object"
+                      properties:
+                        type:
+                          type: "string"
+                        modifyer:
+                          type: "string"
+                          required: false
+                        exit:
+                          type: "string"
+                          required: false
                     alerts:
                       type: "array"
                       items:
