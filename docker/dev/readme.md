@@ -9,10 +9,10 @@ Road2 est un service de calcul d'itinéraires. Pour fonctionner, il doit avoir a
 ### Généralités 
 
 Pour utiliser ce `docker-compose.yml`, il suffit de :
-- télécharger les trois projets dans le même dossier.
-- installer `docker`.
-- se placer dans le dossier `/docker/` du projet Road2.
-- créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
+- Installer `docker` et `docker-compose`.
+- Récupérer les sources des outils utiles pour développer. Cela se fait via les submodules GIT : `git submodule update --init` à la racine du projet Road2.
+- Se placer dans le dossier `/docker/dev/` du projet Road2.
+- Créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
 
 ### Proxy
 Si on utilise ces Dockerfile derrière un proxy, il faudra vérifier que docker fonctionne déjà correctement avec le proxy:

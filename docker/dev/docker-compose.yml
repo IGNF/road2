@@ -28,7 +28,7 @@ services:
 
   r2gg:
     build:
-      context: ../../../route-graph-generator/
+      context: ../route-graph-generator/
       dockerfile: ./docker/debian/Dockerfile
     image: r2gg
     container_name: r2gg
@@ -48,7 +48,7 @@ services:
 
   pgrouting:
     build:
-      context: ../../../pgrouting-procedures/
+      context: ../motors/pgrouting-procedures/
       dockerfile: ./docker/debian/Dockerfile
     image: pgrouting
     container_name: pgrouting-server

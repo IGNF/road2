@@ -1,14 +1,14 @@
 # Gestion des branches et des versions
 
-Ce document permet d'expliquer la démarche à suivre pour tenir à jour les branches et versions dans Road2 et les différents projets associés. 
+Ce document permet d'expliquer la démarche à suivre pour tenir à jour les branches et versions dans Road2, et dans les différents projets associés. 
 
 ## Présentation 
 
 De part sa nature, le projet Road2 a un `package.json` qui contient une version. Cependant, ce projet ne fonctionne pas seul. Il y a des projets qui le complètent en ayant des rôles différents: 
-- Route Grap Generator permet de générer des données utilisables par Road2
-- PGRouting Procedures permet d'avoir les procédures utilisées en BDD par Road2
+- Route Graph Generator permet de générer des données utilisables par Road2
+- PGRouting Procedures permet d'avoir les procédures utilisées en BDD par Road2 si on utilise le moteur PGRouting. 
 
-Route Graph Generator et PGRouting Procedures sont indépendants. 
+Route Graph Generator et PGRouting Procedures sont indépendants en tant que projets GIT. Cependant, ils peuvent être rapatrié dans le projet Road2 par les submodules de GIT (`git submodule update --init` à la racine du projet Road2).
 
 ## Les branches
 
@@ -32,9 +32,9 @@ On veillera à tagger les commits de chaque projet avec les bonnes versions. Et 
 - On doit être capable d'identifier, par les tags, les versions du code utilisées en production. 
 - On doit pouvoir faire fonctionner tous les projets ensemble à partir des tags sur `master` et `develop`. 
 
-### PGRouting Procedures et ROute Graph Generator
+### PGRouting Procedures et Route Graph Generator
 
-Il est conseillé de commencer par gérer les versions de ces deux là. 
+Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui suit décrit le processus de mise à jour des projets, mais sans passer par les submodules de GIT*. Si on souhaite passer par les submodules, on pourra se référer à la documentation [proposée par GIT](https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules).
 
 État initiale pour chaque projet: 
 
