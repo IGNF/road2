@@ -1,15 +1,16 @@
 # 1.0.6-DEVELOP
 
-ADDED: 
+ADDED:
  - chaque source peut donner l'état de sa connexion
+ - Attribut `instruction` dans les `step`. Vide pour les sources PGR, rempli pour les sources osrm avec la norme OSRM : http://project-osrm.org/docs/v5.5.1/api/#stepmaneuver-object
 
-CHANGED: 
+CHANGED:
  - passage à OSRM 5.25.0
 
 # 1.0.5
 
 FIXED:
- - gestion d'une erreur PGR si aucun isochrone n'est trouvé. 
+ - gestion d'une erreur PGR si aucun isochrone n'est trouvé.
  - le min d'un paramètre peut être à 0 dans le getcapabilities
  - la description de getsteps est complète dans le getcapabilities
 
@@ -20,7 +21,7 @@ CHANGED:
  - descriptions modifiées des operations et parametres (fichiers json)
  - package.json : passage des dépendances osrm et pg en optionnel
 
-ADDED: 
+ADDED:
  - gestion des proxy http pour les tests fonctionnels
  - lecture du hostname dans la request et adaptation du getcapabilities
 
