@@ -18,6 +18,10 @@ Road2 propose plusieurs grandes familles de fonctionnalités :
 
 Ces familles regroupent l'ensemble des fonctionnalités et sont détaillées [ici](./documentation/developers/functionnalities.md).
 
+## Licence 
+
+Road2 est diffusé sous la licence GPL v3. 
+
 ## Découverte du service
 
 ### Démonstrateur 
