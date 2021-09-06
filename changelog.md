@@ -7,6 +7,9 @@ ADDED:
 CHANGED:
  - passage à OSRM 5.25.0
 
+FIXED:
+ - géométrie des itinéraires invalide lorsqu'après être passé par un point intermédiaire, l'itinéraire doit reprendre le même tronçon en sens inverse
+
 # 1.0.5
 
 FIXED:
