@@ -10,7 +10,7 @@ Il est possible d'installer OSRM, et plus particulièrement le binding NodeJS, d
 6. Compiler et installer gcc 6.2.0 pour compiler OSRM 
 7. Compiler et installer boost 1.65.1
 8. Compiler et installer lua 5.2.4
-9. Compiler et installer OSRM 5.24.0 (cf Dockerfile)
+9. Compiler et installer OSRM 5.25.0 (cf Dockerfile)
 10. Ajouter la variable LD_LIBRARY_PATH=/opt/gcc-6/home/docker/gcc/objdir/lib64:$LD_LIBRARY_PATH pour que les binaires trouvent les librairies utilisées lors de la compilation. 
 11. Créer le module NodeJS d'OSRM (cf. Dockerfile)
 

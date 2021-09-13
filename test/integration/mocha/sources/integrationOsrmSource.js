@@ -41,7 +41,7 @@ describe('Test de la classe osrmSource', function() {
         "corse-latest.osrm.turn_penalties_index": "",
         "corse-latest.osrm.turn_weight_penalties": "",
       },
-      "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles": {
+      "/usr/local/share/osrm/profiles": {
         "car.lua": "",
         "car-2.lua": "",
       },
@@ -63,7 +63,7 @@ describe('Test de la classe osrmSource', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles/car.lua"
+          "file": "/usr/local/share/osrm/profiles/car.lua"
         }
       }
     }
@@ -92,7 +92,7 @@ describe('Test de la classe osrmSource', function() {
       "optimization": "fastest",
       "compute": {
         "storage": {
-          "file": "/home/docker/osrm/osrm-backend/osrm-backend-5.24.0/profiles/car-2.lua"
+          "file": "/usr/local/share/osrm/profiles/car-2.lua"
         }
       }
     }

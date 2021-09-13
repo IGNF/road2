@@ -6,7 +6,7 @@ Il est vivement conseillé de lire le chapitre qui traite des [concepts](./conce
 
 Le principe le plus important pour Road2 est la modularité. Ce principe peut être vu comme un objectif à atteindre lors des développements. 
 
-## Procèdures pour certains types de modification
+## Procédures pour certains types de modifications
 
 ### Moteurs 
 

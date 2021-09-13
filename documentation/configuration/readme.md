@@ -12,7 +12,7 @@ On peut trouver un [exemple](../../docker/config/road2.json) de ce fichier et le
 
 ## log4js.json
 
-Ce fichier permet de spécificier le niveau des logs, l'emplacement des fichiers et le format de leur contenu. Il ne suit pas strictement la syntaxe des JSON employés pour configurer [log4js](https://log4js-node.github.io/log4js-node/).
+Ce fichier permet de spécifier le niveau des logs, l'emplacement des fichiers et le format de leur contenu. Il ne suit pas strictement la syntaxe des JSON employés pour configurer [log4js](https://log4js-node.github.io/log4js-node/).
 Le format est celui d'un JSON qui contient deux objets `mainConf` et `httpConf`. Ces deux objets doivent être présents. 
 
 Le contenu de `mainConf` est un objet de configuration log4js. Le contenu de `httpConf` est un attribut `level` reprenant les niveaux proposés par log4js et un attribut `format` reprenant la syntaxe disponible pour log4js. Ces deux attributs doivent être présents. 
@@ -38,7 +38,7 @@ On peut trouver un [exemple](../../docker/config/resources/corse.resource) de ce
 
 ### Les lua et les json des sources 
 
-Chaque source d'une ressource est rattaché à un profile et une optimisation. Cela détermine un coût pour chaque tronçon du graphe. Pour calculer ces coût, nous utilisons un fichier spécifique qui contient les régles de passage des attributs d'un tronçon à son coût. Ce fichier est un json géré dans le projet route-graph-generator. Cer dernier contient donc au moins un exemple. 
+Chaque source d'une ressource est rattaché à un profile et une optimisation. Cela détermine un coût pour chaque tronçon du graphe. Pour calculer ces coût, nous utilisons un fichier spécifique qui contient les règles de passage des attributs d'un tronçon à son coût. Ce fichier est un json géré dans le projet route-graph-generator. Cer dernier contient donc au moins un exemple. 
 À partir de ce json, un lua est créé pour OSRM. Ce fichier lua est aussi dans le projet route-graph-generator. 
 
 Ces deux fichiers ne sont pas obligatoires dans la configuration mais ils sont fournis pour que l'on puisse retrouver les informations de création des graphes. Il est donc utile de les avoir. Ils devraient être fournis par route-graph-generator lors d'une génération. 

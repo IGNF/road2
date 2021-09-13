@@ -26,11 +26,11 @@ Comme cela aura certainement déjà été compris, ce projet utilise GIT. La ges
 
 Jusqu'à présent, plusieurs outils ont été utilisé pour aidé les développements. Il s'agissait surtout d'avoir un avis sur la qualité du code. Pour cela, nous avons utilisé Sonarkube. 
 
-### Sonakube 
+### Sonaqube 
 
 #### Avec docker
 
-Il est possible d'analyser régulièrement le code avec Sonarkube. On pourra utiliser les containers proposés par Sonarqube. 
+Il est possible d'analyser régulièrement le code avec Sonarqube. On pourra utiliser les containers proposés par Sonarqube. 
 
 La commande suivante lance un serveur Sonarqube qui permettra de visualiser les résultats:
 
@@ -48,7 +48,7 @@ docker run --rm -e SONAR_HOST_URL="http://${SONARQUBE_URL}" -e SONAR_LOGIN="myAu
 
 #### Avec une autre installation
 
-Il est possible d'utiliser un serveur Sonarkube tiers et d'y charger les données d'analyse via le binaire de Sonarqube. 
+Il est possible d'utiliser un serveur Sonarqube tiers et d'y charger les données d'analyse via le binaire de Sonarqube. 
 
 #### Sonarlint 
 

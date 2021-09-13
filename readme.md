@@ -4,7 +4,7 @@
 
 Road2 est un serveur de calcul d'itinéraires et d'isochrones écrit en Javascript et conçu pour fonctionner avec NodeJS. Ce serveur propose le calcul d'itinéraires et d'isochrones via des moteurs existants comme [OSRM](https://github.com/Project-OSRM/osrm-backend) ou [PGRouting](https://pgrouting.org/). Road2 est donc une interface pour moteurs de calculs. Ces derniers ne sont pas fait dans le code de Road2 mais via des appels à ses moteurs. Cela peut se traduire par l'appel à une librairie, ou à une base de données, ou encore à un autre service web. 
 
-Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérénisant l'accès au service. Pour une plus longue discussion sur les concepts logiciels introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/developers/concepts.md).
+Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérennisant l'accès au service. Pour une plus longue discussion sur les concepts logiciels introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/developers/concepts.md).
 
 Actuellement, Road2 propose deux moteurs, OSRM et PGRouting, via une unique API REST. 
 
@@ -17,6 +17,10 @@ Road2 propose plusieurs grandes familles de fonctionnalités :
 - etc... 
 
 Ces familles regroupent l'ensemble des fonctionnalités et sont détaillées [ici](./documentation/developers/functionnalities.md).
+
+## Licence 
+
+Road2 est diffusé sous la licence GPL v3. 
 
 ## Découverte du service
 
@@ -52,8 +56,8 @@ NB : Il y a des dépendances optionnelles pour gérer celles de chaque moteur. P
 ### Génération de données  
 
 Qu'importe la source des données, il est nécessaire de les fournir dans l'un des formats utilisables par Road2. Étant donné que ce dernier peut utiliser plusieurs moteurs les calculs, il accepte plusieurs formats de données:
-- OSRM 5.24.0 rend possible l'utilsation de données OSRM générées avec cette version. 
-- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet pgrouting-procedures (1.0.2) afin que Road2 puisse communiquer avec la base. 
+- OSRM 5.25.0 rend possible l'utilisation de données OSRM générées avec cette version. 
+- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet pgrouting-procedures (1.0.3-DEVELOP) afin que Road2 puisse communiquer avec la base. 
 
 Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet route-graph-generator (1.0.3) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
 
@@ -61,7 +65,7 @@ Pour une discussion détaillée sur les données attendues, on pourra se référ
 
 ### Configuration
 
-Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettants l'instanciation du serveur avec des ressources. 
+Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettant l'instanciation du serveur avec des ressources. 
 
 ### Lancement 
 

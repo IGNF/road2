@@ -63,10 +63,10 @@ RUN wget http://www.lua.org/ftp/lua-5.2.4.tar.gz && tar zxf lua-5.2.4.tar.gz && 
 # https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
 # https://developers.redhat.com/blog/2015/02/05/gcc5-and-the-c11-abi/
 WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.24.0.zip && unzip v5.24.0.zip -d ./osrm-backend && \
-    cd /home/docker/osrm/osrm-backend/osrm-backend-5.24.0/ && \
+RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.25.0.zip && unzip v5.25.0.zip -d ./osrm-backend && \
+    cd /home/docker/osrm/osrm-backend/osrm-backend-5.25.0/ && \
     npm install --production && \
-    mkdir build && cd /home/docker/osrm/osrm-backend/osrm-backend-5.24.0/build && \
+    mkdir build && cd /home/docker/osrm/osrm-backend/osrm-backend-5.25.0/build && \
     export CC=/opt/gcc-6/home/docker/gcc/objdir/bin/gcc && export CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" && \ 
     cmake3 .. -DCMAKE_BUILD_TYPE=Release -DENABLE_MASON=OFF -DCMAKE_CXX_COMPILER=/opt/gcc-6/home/docker/gcc/objdir/bin/g++ -DENABLE_NODE_BINDINGS=ON && \ 
     make -j4 && make install
@@ -76,11 +76,11 @@ ENV LD_LIBRARY_PATH=/opt/gcc-6/home/docker/gcc/objdir/lib64:$LD_LIBRARY_PATH
 ### Creation du binding NodeJS d'OSRM
 WORKDIR /home/docker/osrm/nodejs-binding/
 # Création du module node osrm et petit nettoyage de ce qui n'est plus utile 
-RUN mkdir -p osrm-5.24.0/lib && mkdir -p osrm-5.24.0/node_modules && cp -r ../osrm-backend/osrm-backend-5.24.0/lib/* osrm-5.24.0/lib/ && \
-    cp /usr/lib64/libtbb* osrm-5.24.0/lib/binding/ && cp -r ../osrm-backend/osrm-backend-5.24.0/node_modules/* osrm-5.24.0/node_modules && \
-    cp ../osrm-backend/osrm-backend-5.24.0/package* osrm-5.24.0/ && cp ../osrm-backend/osrm-backend-5.24.0/taginfo.json osrm-5.24.0/ && \
-    tar -cvzf osrm-5.24.0.tgz osrm-5.24.0/ && \
-    cd .. && rm -rf v5.24.0.zip osrm-backend nodejs-binding/osrm-5.24.0
+RUN mkdir -p osrm-5.25.0/lib && mkdir -p osrm-5.25.0/node_modules && cp -r ../osrm-backend/osrm-backend-5.25.0/lib/* osrm-5.25.0/lib/ && \
+    cp /usr/lib64/libtbb* osrm-5.25.0/lib/binding/ && cp -r ../osrm-backend/osrm-backend-5.25.0/node_modules/* osrm-5.25.0/node_modules && \
+    cp ../osrm-backend/osrm-backend-5.25.0/package* osrm-5.25.0/ && cp ../osrm-backend/osrm-backend-5.25.0/taginfo.json osrm-5.25.0/ && \
+    tar -cvzf osrm-5.25.0.tgz osrm-5.25.0/ && \
+    cd .. && rm -rf v5.25.0.zip osrm-backend nodejs-binding/osrm-5.25.0
 
 ### Dossier des données
 WORKDIR /home/docker/internal

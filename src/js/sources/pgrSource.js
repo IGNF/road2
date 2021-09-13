@@ -330,12 +330,12 @@ module.exports = class pgrSource extends Source {
             this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
               this.state = "green";
-  
+
               if (err) {
-  
+
                 LOGGER.error("pgr error:");
                 LOGGER.error(err);
-  
+
                 // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
                 if (err.code === "38001") {
                   reject(errorManager.createError(" No path found ", 404));
@@ -346,20 +346,20 @@ module.exports = class pgrSource extends Source {
                 } else {
                   reject(err);
                 }
-  
+
               } else {
-  
+
                 LOGGER.debug("pgr response:");
                 LOGGER.debug(result);
-  
+
                 try {
                   resolve(this.writeRouteResponse(request, pgrRequest, result));
                 } catch (error) {
                   reject(error);
                 }
-  
+
               }
-  
+
             });
 
           } catch (error) {
@@ -369,7 +369,7 @@ module.exports = class pgrSource extends Source {
             reject("Internal PGR error");
           }
 
-          
+
 
         } else {
           this.state = "red";
@@ -426,13 +426,13 @@ module.exports = class pgrSource extends Source {
           if (this._topology.base.pool) {
 
             try {
-              
+
               this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
                 this.state = "green";
-  
+
                 if (err) {
-  
+
                   // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé d'iso
                   if (err.code === "XX000") {
                     // Cette erreur remonte souvent quand PGR n'a pas assez de données pour créer ou calculer une iso (ex. costValue trop petit)
@@ -442,20 +442,20 @@ module.exports = class pgrSource extends Source {
                     LOGGER.error(err);
                     reject(err);
                   }
-  
+
                 } else {
-  
+
                   LOGGER.debug("pgr response:");
                   LOGGER.debug(result);
-  
+
                   try {
                     resolve(this.writeIsochroneResponse(request, pgrRequest, result));
                   } catch (error) {
                     reject(error);
                   }
-  
+
                 }
-  
+
               });
 
             } catch (error) {
@@ -618,6 +618,10 @@ module.exports = class pgrSource extends Source {
         // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourue (pour faire le lien)
         // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
         if (response.routes[0].legs.length > 1 && currentGeom) {
+          // Si le tronçon doit être repris dans l'autre sens, il faut reverse l'ordre des coordonnées: voir #36883
+          if (!gisManager.arraysEquals(currentGeom.coordinates[currentGeom.coordinates.length - 1 ], JSON.parse(row.geom_json).coordinates[0])) {
+            currentGeom.coordinates = currentGeom.coordinates.reverse();
+          }
           response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );
           response.routes[0].legs.slice(-1)[0].steps.push(
             {

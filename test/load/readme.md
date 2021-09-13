@@ -18,7 +18,7 @@ Pour utiliser le `docker-compose` avec d'autres données, il suffira de modifier
 Il s'agit d'un script R qui permet de générer des ssv pour les tests de charges. Il suffit de lancer de la manière suivante:
 `R -f routeGenerator.R --args "/home/user/out.ssv" 100 "bduni" 8 41 9 42`
 
-L'option `-f` indique le script à exécuter. Ce qui suit `--args` sont les options du script. Les arguments doivent être dans le bon ordre:
+L'option `-f` indique le script à exécuter. Chaque élément ce qui suit `--args` est une options du script. Ces derniers doivent être dans le bon ordre:
 - fichier de sortie ssv
 - nombre de lignes 
 - ressource Road2 testée 
@@ -32,7 +32,7 @@ L'option `-f` indique le script à exécuter. Ce qui suit `--args` sont les opti
 Il s'agit d'un script R qui permet de générer des ssv pour les tests de charges sur le calcul d'isochrone. Il suffit de lancer de la manière suivante:
 `R -f isoGenerator.R --args "/home/user/out.ssv" 100 "bduni" 8 41 9 42`
 
-L'option `-f` indique le script à exécuter. Ce qui suit `--args` sont les options du script. Les arguments doivent être dans le bon ordre:
+L'option `-f` indique le script à exécuter. Chaque élément ce qui suit `--args` est une options du script. Ces derniers doivent être dans le bon ordre:
 - fichier de sortie ssv
 - nombre de lignes 
 - ressource Road2 testée 

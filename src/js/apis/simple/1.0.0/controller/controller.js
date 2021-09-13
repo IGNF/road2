@@ -224,7 +224,7 @@ module.exports = {
         finalIntermediates = parameters.intermediates;
       }
       // --
-      
+
 
       // Vérification de la validité des coordonnées fournies
       let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection);
@@ -391,7 +391,7 @@ module.exports = {
         LOGGER.debug("timeUnit valide");
         routeRequest.timeUnit = parameters.timeUnit;
       }
-      
+
     } else {
 
       // On met la valeur par défaut issue de la configuration
@@ -505,7 +505,7 @@ module.exports = {
     let timeUnit;
     let distanceUnit;
 
-    // Paramètre 'resource'. 
+    // Paramètre 'resource'.
     if (!parameters.resource) {
         throw errorManager.createError("Parameter 'resource' not found.", 400);
     } else {
@@ -555,7 +555,7 @@ module.exports = {
       // TODO: que faire s'il n'y a pas de valeur par défaut ?
       askedProjection = isochroneOperation.getParameterById("projection").defaultValueContent;
       LOGGER.debug("default crs: " + askedProjection);
-      
+
     }
 
     /* Paramètre 'point'. */
@@ -573,7 +573,7 @@ module.exports = {
       } else {
 
         LOGGER.debug("point valide");
-        //TODO: passer par la classe Point 
+        //TODO: passer par la classe Point
         const tmpStringCoordinates = parameters.point.split(",");
         point.lon = Number(tmpStringCoordinates[0]);
         point.lat = Number(tmpStringCoordinates[1]);
@@ -632,7 +632,7 @@ module.exports = {
               timeUnit = parameters.timeUnit;
               LOGGER.debug("timeUnit valide");
             }
-            
+
           } else {
             timeUnit = isochroneOperation.getParameterById("timeUnit").defaultValueContent;
             LOGGER.debug("default timeUnit: " + timeUnit);
@@ -662,7 +662,7 @@ module.exports = {
               distanceUnit = parameters.distanceUnit;
               LOGGER.debug("distanceUnit valide");
             }
-            
+
           } else {
             distanceUnit = isochroneOperation.getParameterById("distanceUnit").defaultValueContent;
             LOGGER.debug("default distanceUnit: " + distanceUnit);
@@ -1000,6 +1000,9 @@ module.exports = {
             currentStep.duration = route.portions[i].steps[j].duration.value;
           }
 
+          // instructions
+          currentStep.instruction = route.portions[i].steps[j].instruction;
+
           currentPortion.steps.push(currentStep);
 
         }
@@ -1074,7 +1077,7 @@ module.exports = {
       }
 
     } else {
-      // cela ne devrait pas arriver 
+      // cela ne devrait pas arriver
       LOGGER.debug("costType is unknown: " + userResponse.costType);
       throw errorManager.createError(" costType of motor response is unknown ");
     }
@@ -1146,7 +1149,7 @@ module.exports = {
       }
     } else {
       // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET
-      LOGGER.debug("nothing to do for this parameter"); 
+      LOGGER.debug("nothing to do for this parameter");
       return userParameter;
     }
 

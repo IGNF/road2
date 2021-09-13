@@ -4,7 +4,7 @@ services:
   load-road2-generation:
     build:
       context: ../..
-      dockerfile: ./docker/load/Dockerfile
+      dockerfile: ./docker/test/Dockerfile
       args:
         - dnsIP=${dns_ip}
         - dnsHost=${dns_host}
@@ -19,8 +19,9 @@ services:
     image: denvazh/gatling
     container_name: load-road2-launch
     volumes:
-      - iti-load-data-volume:/opt/gatling/user-files
+      - iti-load-data-volume:/home/docker/data
       - ${gatling_results}:/opt/gatling/results
+      - ${gatling_user-files}:/opt/gatling/user-files
     command: "-s road2LoadTest"
 
 volumes:
