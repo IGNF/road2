@@ -14,8 +14,7 @@ const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 const wkt = require('wkt');
-const got = require('got');
-const HttpsProxyAgent = require('https-proxy-agent');
+const httpQuery = require('../utils/httpQuery');
 
 
 // Création du LOGGER
@@ -53,16 +52,8 @@ module.exports = class smartroutingSource extends Source {
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
-    // paramètres de base des requêtes
-    this._requestOptions = {
-      prefixUrl: this._configuration.storage.url,
-      headers: {
-        "Referer": "road2"
-      }
-    };
-    if (process.env.HTTP_PROXY) {
-      this._requestOptions.agent = {https: new HttpsProxyAgent(process.env.HTTP_PROXY)}
-    }
+    // Opérateur pour les requêtes http
+    this._httpQuery = new httpQuery({prefixUrl: this._configuration.storage.url});
 
     //projection de la topologie
     this._topologyProjection = "EPSG:4326";
@@ -219,7 +210,7 @@ module.exports = class smartroutingSource extends Source {
         const mapProfiles = {
           car: "Voiture",
           pedestrian: "Pieton"
-        };
+        };this._httpQuery
         smartroutingRequest.graphName = mapProfiles[request.profile];
 
         // valeur du cout
@@ -284,7 +275,7 @@ module.exports = class smartroutingSource extends Source {
     var self = this;
     LOGGER.debug("smartrouting query:");
     LOGGER.debug(query);
-    return got(query, this._requestOptions).then( (response) => {
+    return this._httpQuery.get(query, this._requestOptions).then( (response) => {
       const result = JSON.parse(response.body);
       if( request.operation === "route" ) {
         return self.writeRouteResponse(request, result);
@@ -363,9 +354,6 @@ module.exports = class smartroutingSource extends Source {
     // On récupère la distance et la durée
     route.distance = new Distance(smartroutingResponse.distance,"meter");
     route.duration = new Duration(smartroutingResponse.duration,"second");
-
-    // ICI
-    // https://wxs.ign.fr/jhyvi0fgmnuxvfv0zjzorvdn/itineraire/rest/route.json?graphName=Voiture&method=time&origin=2.2721099853515625,48.825853283448254&destination=2.3737335205078125,48.824045038861925&waypoints=&exclusions=&srs=EPSG:4326
 
     // On va gérer les portions qui sont des parties de l'itinéraire entre deux points intermédiaires
     let routeDistance = 0;
