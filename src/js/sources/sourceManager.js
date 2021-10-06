@@ -642,7 +642,8 @@ module.exports = class sourceManager {
     } else if (sourceJsonObject.type === "pgr") {
       source = new pgrSource(sourceJsonObject, topology);
     } else if (sourceJsonObject.type === "smartrouting") {
-      source = new smartroutingSource(sourceJsonObject, topology);
+      // smartrouting n'utilise pas la topologie définie dans la conf
+      source = new smartroutingSource(sourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
     }

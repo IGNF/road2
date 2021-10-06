@@ -37,13 +37,12 @@ module.exports = class smartroutingSource extends Source {
   * @name constructor
   * @description Constructeur de la classe osrmSource
   * @param {json} sourceJsonObject - Description de la source en json
-  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject, topology) {
+  constructor(sourceJsonObject) {
 
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type, topology);
+    super(sourceJsonObject.id,sourceJsonObject.type, undefined);
 
     // Ajout des opérations possibles sur ce type de source
     this.availableOperations.push("route");
@@ -54,9 +53,6 @@ module.exports = class smartroutingSource extends Source {
 
     // Opérateur pour les requêtes http
     this._httpQuery = new httpQuery({prefixUrl: this._configuration.storage.url});
-
-    //projection de la topologie
-    this._topologyProjection = "EPSG:4326";
   }
 
   /**
@@ -107,7 +103,6 @@ module.exports = class smartroutingSource extends Source {
   * @function
   * @name computeRequest
   * @description Traiter une requête.
-  * Ce traitement est placé ici car c'est la source qui sait quel moteur est concernée par la requête.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
   * @return {Promise}
   *
@@ -178,7 +173,8 @@ module.exports = class smartroutingSource extends Source {
         }
 
         // projection
-        smartroutingRequest.srs = request.crs? request.crs : this._topologyProjection;
+        // projection demandée dans la requête
+        smartroutingRequest.srs = request.start.projection;
 
         // query
         query = "itineraire/rest/route.json?"+Object.keys(smartroutingRequest).map(function (key) { return key + '=' + smartroutingRequest[key]}).join('&');
@@ -254,7 +250,7 @@ module.exports = class smartroutingSource extends Source {
         }
 
         // projection
-        smartroutingRequest.srs = request.crs? request.crs : this._topologyProjection;
+        smartroutingRequest.srs = request.askedProjection;
 
         // query
         query = "isochrone/isochrone.json?"+Object.keys(smartroutingRequest).map(function (key) { return key + '=' + smartroutingRequest[key]}).join('&');
@@ -275,7 +271,7 @@ module.exports = class smartroutingSource extends Source {
     var self = this;
     LOGGER.debug("smartrouting query:");
     LOGGER.debug(query);
-    return this._httpQuery.get(query, this._requestOptions).then( (response) => {
+    return this._httpQuery.get(query).then( (response) => {
       const result = JSON.parse(response.body);
       if( request.operation === "route" ) {
         return self.writeRouteResponse(request, result);
@@ -295,9 +291,6 @@ module.exports = class smartroutingSource extends Source {
   * @function
   * @name writeRouteResponse
   * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
-  * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
-  * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
-  * au proxy, on considère qu'elle est correcte.
   * @param {Request} routeRequest - Objet Request ou dérivant de la classe Request
   * @param {smartroutingResponse} smartroutingResponse - Objet smartroutingResponse
   *
@@ -324,22 +317,19 @@ module.exports = class smartroutingSource extends Source {
 
     // optimization
     optimization = routeRequest.optimization;
+
+    // projection
+    let askedProjection = routeRequest.start.projection;
+    // pas de reprojections à faire: contrairement à ce qui est dit dans la doc, les géometries retournées par le service sont dans le système demandé
     // ---
 
     // convertion de la geometry
     const wayGeojson = wkt.parse(smartroutingResponse.geometryWkt);
-    let way = new Line(wayGeojson, 'geojson', this._topologyProjection);
-    if (routeRequest.crs && routeRequest.crs !== this._topologyProjection && !way.transform(routeRequest.crs)) {
-      throw errorManager.createError(" Error during reprojection of way geometry. ");
-    } else {
-      LOGGER.debug("way geometry in asked projection:");
-      LOGGER.debug(way);
-    }
-    const wayGeom = way.getGeoJSON();
+    let way = new Line(wayGeojson, 'geojson', askedProjection);
 
     // start et end
-    start = new Point(wayGeom.coordinates[0][0], wayGeom.coordinates[0][1], wayGeom.projection);
-    end = new Point(wayGeom.coordinates[wayGeom.coordinates.length-1][0], wayGeom.coordinates[wayGeom.coordinates.length-1][1], wayGeom.projection);
+    start = new Point(wayGeojson.coordinates[0][0], wayGeojson.coordinates[0][1], askedProjection);
+    end = new Point(wayGeojson.coordinates[wayGeojson.coordinates.length-1][0], wayGeojson.coordinates[wayGeojson.coordinates.length-1][1], askedProjection);
 
     // construction objet reponse
     let routeResponse = new RouteResponse(resource, start, end, profile, optimization);
@@ -366,22 +356,10 @@ module.exports = class smartroutingSource extends Source {
       const firstPoint = currentRouteLeg.steps[0].points[0];
 
       if (currentRouteLeg.steps[0].points.length > 0) {
-        let legStart = new Point(firstPoint[0], firstPoint[1], this._topologyProjection);
-        if (routeRequest.crs && routeRequest.crs !== this._topologyProjection && !legStart.transform(routeRequest.crs)) {
-          throw errorManager.createError(" Error during reprojection of leg start in SMART ROUTING response. ");
-        } else {
-          LOGGER.debug("portion start in asked projection:");
-          LOGGER.debug(legStart);
-        }
+        let legStart = new Point(firstPoint[0], firstPoint[1], askedProjection);
   
         const lastPoint = currentRouteLeg.steps[currentRouteLeg.steps.length-1].points[currentRouteLeg.steps[currentRouteLeg.steps.length-1].points.length-1];
-        let legEnd = new Point( lastPoint[0], lasPoint[1], this._topologyProjection);
-        if (routeRequest.crs && routeRequest.crs !== this._topologyProjection && !legEnd.transform(routeRequest.crs)) {
-          throw errorManager.createError(" Error during reprojection of leg end in SMART ROUTING response. ");
-        } else {
-          LOGGER.debug("portion end in asked projection:");
-          LOGGER.debug(legEnd);
-        }
+        let legEnd = new Point( lastPoint[0], lasPoint[1], askedProjection);
   
         portions[j] = new Portion(legStart, legEnd);
   
@@ -402,13 +380,8 @@ module.exports = class smartroutingSource extends Source {
             type: "linestring",
             coordinates: currentRouteStep.points
           }
-          steps[k] = new Step( new Line(stepGeometry, "geojson", this._topologyProjection) );
-          if (routeRequest.crs && routeRequest.crs !== this._topologyProjection && !steps[k].geometry.transform(routeRequest.crs)) {
-            throw errorManager.createError(" Error during reprojection of step's geometry in SMART ROUTING response. ");
-          } else {
-            LOGGER.debug("step geometry is converted");
-          }
-  
+          steps[k] = new Step( new Line(stepGeometry, "geojson", askedProjection) );
+          
           // Ajout de l'attribut name
           steps[k].setAttributById("name", currentRouteStep.name);
 
@@ -441,9 +414,6 @@ module.exports = class smartroutingSource extends Source {
   * @function
   * @name writeIsochroneResponse
   * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
-  * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
-  * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
-  * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
   * @param {smartroutingResponse} smartroutingResponse - Objet smartroutingResponse
   *
@@ -453,12 +423,13 @@ module.exports = class smartroutingSource extends Source {
     let location = {};
     let geometry = {};
 
+    // projection
+    const projection = smartroutingResponse.srs;
+    // pas de reprojection à faire. Le service répond dans le système demandé.
+
     // Location
     var locationCoords = JSON.parse("[" + smartroutingResponse.location + "]");
-    location = new Point(locationCoords[0], locationCoords[1], this._topologyProjection);
-    if (isochroneRequest.crs && isochroneRequest.crs !== this._topologyProjection && !location.transform(isochroneRequest.crs)) {
-      throw errorManager.createError(" Error during reprojection of location in SMART ROUTING response. ");
-    }
+    location = new Point(locationCoords[0], locationCoords[1], projection);
 
     // Geometrie
     const rawGeometry = wkt.parse(smartroutingResponse.wktGeometry);
@@ -472,10 +443,7 @@ module.exports = class smartroutingSource extends Source {
     }
 
     // Création d'un objet Polygon à partir du GeoJSON reçu.
-    geometry = new Polygon(rawGeometry, "geojson", this._topologyProjection);
-    if (isochroneRequest.crs && isochroneRequest.crs !== this._topologyProjection && !geometry.transform(isochroneRequest.crs)) {
-      throw errorManager.createError(" Error during reprojection of geometry in SMART ROUTING response. ");
-    }
+    geometry = new Polygon(rawGeometry, "geojson", projection);
 
     /* Envoi de la réponse au proxy. */
     return new IsochroneResponse(
@@ -486,7 +454,7 @@ module.exports = class smartroutingSource extends Source {
       geometry,
       isochroneRequest.profile,
       isochroneRequest.direction,
-      isochroneRequest.crs || this._topologyProjection,
+      projection,
       isochroneRequest.timeUnit,
       isochroneRequest.distanceUnit
     );
