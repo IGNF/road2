@@ -396,7 +396,7 @@ module.exports = class sourceManager {
         }
 
         if (!this.checkSourceSmartrouting(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source pgr.");
+          LOGGER.error("Erreur lors de la verification de la source smartrouting.");
           return false;
         } else {
           // il n'y a eu aucun problème, la ressource est correctement configurée.
