@@ -151,7 +151,8 @@ module.exports = class smartroutingSource extends Source {
         // constraints
         const mapConstraintValues = {
           tunnel: "Tunnel",
-          autoroute: "Toll"
+          autoroute: "Toll",
+          pont: "Bridge"
         };
         if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
           let constraints = [];
@@ -232,7 +233,8 @@ module.exports = class smartroutingSource extends Source {
         // constraints
         const mapConstraintValues = {
           tunnel: "Tunnel",
-          autoroute: "Toll"
+          autoroute: "Toll",
+          pont: "Bridge"
         };
         if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
           let constraints = [];
