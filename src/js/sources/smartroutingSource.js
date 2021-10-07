@@ -151,22 +151,26 @@ module.exports = class smartroutingSource extends Source {
         // constraints
         const mapConstraintValues = {
           tunnel: "Tunnel",
-          toll: "Toll"
+          autoroute: "Toll"
         };
         if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
           let constraints = [];
 
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
-              LOGGER.error("constraint " + request.constraints[i].type + " not allowed for this source");
+              LOGGER.error("constraint type " + request.constraints[i].type + " not allowed for this source");
             } else if (request.constraints[i].type === "banned") {
-              constraints.push(mapConstraintValues[constraint.field]);
+              if (mapConstraintValues[request.constraints[i].value]) {
+                constraints.push(mapConstraintValues[request.constraints[i].value]);
+              } else {
+                LOGGER.error("constraint value " + request.constraints[i].value + " not allowed for this source");
+              }
             } else {
               LOGGER.debug("constraint type is unknown");
             }
           }
 
-          smartroutingRequest.exclusions = constraints.joint(";");
+          smartroutingRequest.exclusions = constraints.join(";");
         } else {
           // il n'y rien à faire car pas de contraintes
           LOGGER.debug("no contraints");
@@ -206,7 +210,7 @@ module.exports = class smartroutingSource extends Source {
         const mapProfiles = {
           car: "Voiture",
           pedestrian: "Pieton"
-        };this._httpQuery
+        };
         smartroutingRequest.graphName = mapProfiles[request.profile];
 
         // valeur du cout
@@ -228,7 +232,7 @@ module.exports = class smartroutingSource extends Source {
         // constraints
         const mapConstraintValues = {
           tunnel: "Tunnel",
-          toll: "Toll"
+          autoroute: "Toll"
         };
         if (request.constraints && Array.isArray(request.constraints) && request.constraints.length > 0) {
           let constraints = [];
@@ -237,13 +241,17 @@ module.exports = class smartroutingSource extends Source {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
               LOGGER.error("constraint " + request.constraints[i].type + " not allowed for this source");
             } else if (request.constraints[i].type === "banned") {
-              constraints.push(mapConstraintValues[constraint.field]);
+              if (mapConstraintValues[request.constraints[i].value]) {
+                constraints.push(mapConstraintValues[request.constraints[i].value]);
+              } else {
+                LOGGER.error("constraint value " + request.constraints[i].value + " not allowed for this source");
+              }
             } else {
               LOGGER.debug("constraint type is unknown");
             }
           }
 
-          smartroutingRequest.exclusions = constraints.joint(";");
+          smartroutingRequest.exclusions = constraints.join(";");
         } else {
           // il n'y rien à faire car pas de contraintes
           LOGGER.debug("no contraints");
@@ -359,7 +367,7 @@ module.exports = class smartroutingSource extends Source {
         let legStart = new Point(firstPoint[0], firstPoint[1], askedProjection);
   
         const lastPoint = currentRouteLeg.steps[currentRouteLeg.steps.length-1].points[currentRouteLeg.steps[currentRouteLeg.steps.length-1].points.length-1];
-        let legEnd = new Point( lastPoint[0], lasPoint[1], askedProjection);
+        let legEnd = new Point( lastPoint[0], lastPoint[1], askedProjection);
   
         portions[j] = new Portion(legStart, legEnd);
   

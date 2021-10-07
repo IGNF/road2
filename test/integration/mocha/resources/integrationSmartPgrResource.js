@@ -99,12 +99,12 @@ describe('Test de la classe SmartpgrResource', function() {
     request.timeUnit = "second";
 
     it('getSourceIdFromRequest()_1', function() {
-      request.costValue = 831;
+      request.costValue = 830;
       assert.equal(resource.getSourceIdFromRequest(request), "test-car-fastest");
     });
 
     it('getSourceIdFromRequest()_2', function() {
-      request.costValue = 830;
+      request.costValue = 831;
       assert.equal(resource.getSourceIdFromRequest(request), "test-smartrouting");
     });
 
