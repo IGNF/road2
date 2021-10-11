@@ -416,7 +416,7 @@ components:
           $ref: "#/components/schemas/coordinates"
         profile:
           type: "string"
-        optmization:
+        optimization:
           type: "string"
         constraints:
           type: "array"
