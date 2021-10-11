@@ -241,7 +241,7 @@ module.exports = class smartroutingSource extends Source {
 
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
-              LOGGER.error("constraint " + request.constraints[i].type + " not allowed for this source");
+              LOGGER.error("constraint type " + request.constraints[i].type + " not allowed for this source");
             } else if (request.constraints[i].type === "banned") {
               if (mapConstraintValues[request.constraints[i].value]) {
                 constraints.push(mapConstraintValues[request.constraints[i].value]);
@@ -438,7 +438,7 @@ module.exports = class smartroutingSource extends Source {
     // pas de reprojection à faire. Le service répond dans le système demandé.
 
     // Location
-    var locationCoords = JSON.parse("[" + smartroutingResponse.location + "]");
+    const locationCoords = JSON.parse("[" + smartroutingResponse.location + "]");
     location = new Point(locationCoords[0], locationCoords[1], projection);
 
     // Geometrie

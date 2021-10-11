@@ -125,19 +125,19 @@ module.exports = class smartpgrResource extends Resource {
     const currentOperation = request.operation;
     let source = "";
 
-    /* TODO: Pour le moment, c'est un contrôle en dur sur le type de l'opération. Il serait mieux de revoir cette façon de voir (avoir peut-être un catalogue de correspondance ? Maybe..). */
+    /*TODO: Pour le moment, c'est un contrôle en dur sur le type de l'opération. Il serait mieux de revoir cette façon de voir (avoir peut-être un catalogue de correspondance ? Maybe..). */
     if (currentOperation === "isochrone") {
       
       let useSmartrouting = false;
       if (request.costType === 'distance') {
         // Note costValue est déjà en metres
-        useSmartrouting = request.costValue < this._distThreshold;
+        useSmartrouting = request.costValue > this._distThreshold;
       } else if (request.costType === 'time') {
         // Note costValue est déjà en secondes
         if (request.profile === 'car') {
-          useSmartrouting = request.costValue < this._timeThresholdCar
+          useSmartrouting = request.costValue > this._timeThresholdCar
         } else if (request.profile === 'pedestrian') {
-          useSmartrouting = request.costValue < this._timeThresholdPedestrian
+          useSmartrouting = request.costValue > this._timeThresholdPedestrian
         }
       }
       
