@@ -159,12 +159,12 @@ module.exports = class smartroutingSource extends Source {
 
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
-              LOGGER.error("constraint type " + request.constraints[i].type + " not allowed for this source");
+              LOGGER.debug("constraint type " + request.constraints[i].type + " not allowed for this source");
             } else if (request.constraints[i].type === "banned") {
               if (mapConstraintValues[request.constraints[i].value]) {
                 constraints.push(mapConstraintValues[request.constraints[i].value]);
               } else {
-                LOGGER.error("constraint value " + request.constraints[i].value + " not allowed for this source");
+                LOGGER.debug("constraint value " + request.constraints[i].value + " not allowed for this source");
               }
             } else {
               LOGGER.debug("constraint type is unknown");
@@ -241,12 +241,12 @@ module.exports = class smartroutingSource extends Source {
 
           for (let i = 0; i < request.constraints.length; i++) {
             if (request.constraints[i].type === 'avoid' || request.constraints[i].type === 'prefer') {
-              LOGGER.error("constraint type " + request.constraints[i].type + " not allowed for this source");
+              LOGGER.debug("constraint type " + request.constraints[i].type + " not allowed for this source");
             } else if (request.constraints[i].type === "banned") {
               if (mapConstraintValues[request.constraints[i].value]) {
                 constraints.push(mapConstraintValues[request.constraints[i].value]);
               } else {
-                LOGGER.error("constraint value " + request.constraints[i].value + " not allowed for this source");
+                LOGGER.debug("constraint value " + request.constraints[i].value + " not allowed for this source");
               }
             } else {
               LOGGER.debug("constraint type is unknown");
@@ -285,14 +285,13 @@ module.exports = class smartroutingSource extends Source {
       const result = JSON.parse(response.body);
       if( request.operation === "route" ) {
         return self.writeRouteResponse(request, result);
-      } else if ( request.operation === "isochrone" ) {
+      }
+      if ( request.operation === "isochrone" ) {
         return self.writeIsochroneResponse(request, result);
-      } else {
-        return Promise.reject("request operation not found");
       }
     }).catch( (error) => {
-      LOGGER.error(error);
-      return Promise.reject(errorManager.createError(error , 503));
+      LOGGER.debug(error);
+      return Promise.reject(errorManager.createError("SmartRouting http query fail" , 503));
     });
   }
 
