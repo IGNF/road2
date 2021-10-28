@@ -124,7 +124,7 @@ module.exports = class PointParameter extends ResourceParameter {
   * @param {string} userProjection - Projection dans laquelle sont exprimées les coordonnées de l'utilisateur
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
-  *  
+  *
   */
   specificCheck(userValue, userProjection) {
 
@@ -136,7 +136,7 @@ module.exports = class PointParameter extends ResourceParameter {
       LOGGER.debug("user value is a string");
     }
 
-    let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)/g);
+    let tmpStringCoordinates = userValue.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*)$/g);
 
     if (!tmpStringCoordinates) {
       return errorManager.createErrorMessage("user value is NOT like 'float,float'");
