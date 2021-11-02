@@ -33,7 +33,7 @@ Feature: Road2-complement
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                             |
       | waysAttributes | name \| nature \| importance      |
@@ -47,7 +47,7 @@ Feature: Road2-complement
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value      |
       | name       |
@@ -63,7 +63,7 @@ Feature: Road2-complement
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                             |
       | waysAttributes | name \| nature \| importance \| cleabs \| urbain \| access_pieton \| cpx_numero \| largeur_de_chaussee \| position_par_rapport_au_sol \| restriction_de_hauteur \| sens_de_circulation   |
@@ -74,7 +74,7 @@ Feature: Road2-complement
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value                       |
       | name                        |
@@ -841,7 +841,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     And with default parameters for "isochrone"
     And with query parameters:
       | key        | value                 |
-      | costValue  | 10000                 |
+      | costValue  | 30000                 |
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"

@@ -1,7 +1,7 @@
 {
     "url": "localhost",
-    "port": 443,
-    "protocol": "https",
+    "port": 8080,
+    "protocol": "http",
     "apisUrl": {
         "simple": {
             "1.0.0": {
@@ -18,14 +18,6 @@
         }
     },
     "defaultParameters": [
-        {
-            "id": "route",
-            "parameters": {
-                "resource": "corse-osm",
-                "start": "9.449347257614134,42.563930726519345",
-                "end": "9.448360204696655,42.567660375593306"
-            }
-        },
         {
             "id": "route-osrm",
             "parameters": {
