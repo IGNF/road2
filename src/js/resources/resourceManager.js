@@ -2,6 +2,7 @@
 
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
+const smartpgrResource = require('../resources/smartpgrResource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -143,7 +144,8 @@ module.exports = class resourceManager {
       }
       //------ OSRM
       //------ PGR
-      if (resourceJsonObject.resource.type === "pgr") {
+      let pgrStyleResources = ["pgr", "smartpgr"];
+      if (pgrStyleResources.includes(resourceJsonObject.resource.type)) {
         available = true;
         LOGGER.info("Ressource pgrouting.");
         if (!this.checkResourcePgr(resourceJsonObject.resource)) {
@@ -349,6 +351,8 @@ module.exports = class resourceManager {
       resource = new osrmResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "pgr") {
       resource = new pgrResource(resourceJsonObject, resourceOperationHash);
+    } else if (resourceJsonObject.resource.type === "smartpgr") {
+      resource = new smartpgrResource(resourceJsonObject, resourceOperationHash);
     } else {
       // On va voir si c'est un autre type.
     }
