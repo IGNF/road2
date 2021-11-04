@@ -123,7 +123,7 @@ module.exports = class osrmSource extends Source {
       } else {
         throw errorManager.createError("OSRM is not available");
       }
-      
+
     } catch (err) {
       throw errorManager.createError("Cannot connect source");
     }
@@ -231,7 +231,7 @@ module.exports = class osrmSource extends Source {
         LOGGER.debug(osrmRequest);
 
         if (this._osrm) {
-  
+
           try {
 
             this._osrm.route(osrmRequest, (err, result) => {
@@ -240,7 +240,7 @@ module.exports = class osrmSource extends Source {
               this.state = "green";
 
               if (err) {
-  
+
                 if (err.message === "NoRoute" || err.message === "NoSegment") {
                   reject(errorManager.createError(" No path found ", 404));
                 } else {
@@ -250,20 +250,20 @@ module.exports = class osrmSource extends Source {
                   LOGGER.error(err);
                   reject("Internal OSRM error");
                 }
-  
+
               } else {
-  
+
                 LOGGER.debug("osrm response:");
                 LOGGER.debug(result);
-  
+
                 try {
                   resolve(this.writeRouteResponse(request, result));
                 } catch (error) {
                   reject(error);
                 }
-  
+
               }
-  
+
             });
 
           } catch (error) {
