@@ -282,7 +282,7 @@ function computeOtherRoad(request) {
   "&location=" + request.finalPoint +
   "&reverse=" + otherRequest.finalReverse +
   "&exclusions=" + otherRequest.finalConstraint +
-  "&srs=EPSG:4326&smoothing=true&holes=true";
+  "&srs=EPSG:4326&smoothing=true&holes=false";
 
   if (otherRequest.finalMethod === "time") {
     requestStr = requestStr + "&time=" + request.finalCostValue;
