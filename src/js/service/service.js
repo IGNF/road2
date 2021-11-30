@@ -825,8 +825,9 @@ module.exports = class Service {
         }
 
         // On crée la source
+        // TODO: a revoir -> cas ou plusieurs datasources utilisant des topologies différentes
         let currentSource = this._sourceManager.createSource(sourceDescriptions[sourceId], topology);
-
+        
         // On vérifie que le source peut bien être chargée ou connectée
         try {
           await this._sourceManager.connectSource(currentSource);

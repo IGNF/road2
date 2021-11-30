@@ -54,7 +54,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -67,7 +67,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 sans ressource 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And without query parameters:
       | key       | 
       | resource  |
@@ -82,7 +82,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvaise ressource 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key       | value           |
       | resource  | corse-osm-2     |
@@ -97,7 +97,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 sans start 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And without query parameters:
       | key       | 
       | start     |
@@ -112,7 +112,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais start 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value           |
       | start  | -9,-410         |
@@ -127,7 +127,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais start (string)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value           |
       | start  | test            |
@@ -142,7 +142,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 sans end 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And without query parameters:
       | key       | 
       | end       |
@@ -157,7 +157,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais end 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value           |
       | end    | -9,-410         |
@@ -172,7 +172,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais end (string)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key    | value           |
       | end    | test            |
@@ -187,7 +187,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais profile 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key       | value           |
       | profile   | test            |
@@ -202,7 +202,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvaise optimisation
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value           |
       | optimization   | test            |
@@ -217,12 +217,12 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec un autre crs
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value           |
       | crs            | EPSG:2154       |
-      | start          | 1231119,6124145 |
-      | end            | 1231019,6124045 |
+      | start          | 651475,6826145  |
+      | end            | 651475,6826140  |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -235,7 +235,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais crs
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value           |
       | crs            | EPSG:4325       |
@@ -250,10 +250,10 @@ Feature: Road2
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec un point intermediaire
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                  |
-      | intermediates  | 8.732901,41.928823     |
+      | intermediates  | 2.333865,48.881        |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -262,10 +262,10 @@ Feature: Road2
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec plusieurs points intermediaires
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                                     |
-      | intermediates  | 8.732901,41.928823\|8.732701,41.927823    |
+      | intermediates  | 2.333865,48.882989\|2.333885,48.881989    |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -274,10 +274,10 @@ Feature: Road2
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec un point intermediaire
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "intermediates":
       | value                  |
-      | 8.732901,41.928823     |
+      | 2.333865,48.882989     |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -287,11 +287,11 @@ Feature: Road2
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec deux points intermediaires
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "intermediates":
       | value                  |
-      | 8.732901,41.928823     |
-      | 8.734901,41.928823     |
+      | 2.334865,48.891989     |
+      | 2.333875,48.883989     |
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -300,7 +300,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getSteps=true
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key           | value    |
       | getSteps      | true     |
@@ -316,7 +316,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getSteps=false
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key           | value    |
       | getSteps      | false    |
@@ -331,7 +331,7 @@ Feature: Road2
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais getSteps
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key             | value      |
       | getSteps        | test       |
@@ -346,7 +346,7 @@ Feature: Road2
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec mauvais waysAttributes
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value      |
       | waysAttributes | test       |
@@ -357,7 +357,7 @@ Feature: Road2
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec mauvais waysAttributes
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value     |
       | test      |
@@ -369,7 +369,7 @@ Feature: Road2
     
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value      |
       | waysAttributes | name       |
@@ -381,7 +381,7 @@ Feature: Road2
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value     |
       | name      |
@@ -393,7 +393,7 @@ Feature: Road2
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value             |
       | waysAttributes | name \| name      |
@@ -405,7 +405,7 @@ Feature: Road2
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value     |
       | name      |
@@ -418,7 +418,7 @@ Feature: Road2
 
 Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value             |
       | waysAttributes | name \| test      |
@@ -430,7 +430,7 @@ Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes 
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "waysAttributes":
       | value     |
       | name      |
@@ -444,7 +444,7 @@ Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes 
     
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getBbox=true
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value    |
       | getBbox      | true     |
@@ -460,7 +460,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec getBbox=false
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value    |
       | getBbox      | false    |
@@ -475,7 +475,7 @@ Examples:
   
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais getBbox
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value      |
       | getBbox        | test       |
@@ -490,7 +490,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec timeUnit=hour
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value    |
       | timeUnit     | hour     |
@@ -506,7 +506,7 @@ Examples:
   
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec timeUnit=minute
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value      |
       | timeUnit     | minute     |
@@ -522,7 +522,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec timeUnit=second
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value      |
       | timeUnit     | second     |
@@ -538,7 +538,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec timeUnit=standard
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value        |
       | timeUnit     | standard     |
@@ -554,7 +554,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais timeUnit
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value      |
       | timeUnit       | test       |
@@ -569,7 +569,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec distanceUnit=kilometer
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value         |
       | distanceUnit | kilometer     |
@@ -585,7 +585,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec distanceUnit=meter
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key          | value         |
       | distanceUnit | meter         |
@@ -601,7 +601,7 @@ Examples:
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais distanceUnit
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value      |
       | distanceUnit   | test       |
@@ -616,7 +616,7 @@ Examples:
 
 Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=polyline
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value            |
       | geometryFormat | polyline         |
@@ -632,7 +632,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=geojson 
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value            |
       | geometryFormat | geojson          |
@@ -648,7 +648,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais geometryFormat
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key              | value      |
       | geometryFormat   | test       |
@@ -663,7 +663,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                           |
       | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}  |
@@ -675,7 +675,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType absent)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                               |
       | constraints | {"key":"waytype","operator":"=","value":"autoroute"}|
@@ -686,7 +686,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType mauvais)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                       |
       | constraints | {"constraintType":"test","key":"waytype","operator":"=","value":"autoroute"}|
@@ -697,7 +697,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (key absent)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                         |
       | constraints | {"constraintType":"banned","operator":"=","value":"autoroute"}|
@@ -708,7 +708,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (key mauvais)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                      |
       | constraints | {"constraintType":"banned","key":"test","operator":"=","value":"autoroute"}|
@@ -719,7 +719,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (operator absent)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                          |
       | constraints | {"constraintType":"banned","key":"waytype","value":"autoroute"}|
@@ -730,7 +730,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (operator mauvais)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                            |
       | constraints | {"constraintType":"banned","key":"waytype","operator":"test","value":"autoroute"}|
@@ -741,7 +741,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (value absent)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                     |
       | constraints | {"constraintType":"banned","key":"waytype","operator":"="}|
@@ -752,7 +752,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (value mauvais)
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key         | value                                                                    |
       | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}|
@@ -763,7 +763,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une contrainte 
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                               |
       | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}      |
@@ -775,7 +775,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType absent)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                               |
       | {"key":"waytype","operator":"=","value":"autoroute"}|
@@ -786,7 +786,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (constraintType mauvais)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                       |
       | {"constraintType":"test","key":"waytype","operator":"=","value":"autoroute"}|
@@ -797,7 +797,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (key absent)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                         |
       | {"constraintType":"banned","operator":"=","value":"autoroute"}|
@@ -808,7 +808,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (key mauvais)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                      |
       | {"constraintType":"banned","key":"test","operator":"=","value":"autoroute"}|
@@ -819,7 +819,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (operator absent)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                          |
       | {"constraintType":"banned","key":"waytype","value":"autoroute"}|
@@ -830,7 +830,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (operator mauvais)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                           |
       | {"constraintType":"banned","key":"waytype","operator":"test","value":"autoroute"}|
@@ -841,7 +841,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (value absent)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                     |
       | {"constraintType":"banned","key":"waytype","operator":"="}|
@@ -852,7 +852,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec une mauvaise contrainte (value mauvais)
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters of object for "constraints":
       | value                                                                    |
       | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}|
@@ -863,7 +863,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec des paramètres qui n'existent pas (ressource)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key        | value           |
       | ressource  | corse-osm-2     |
@@ -878,7 +878,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec des paramètres qui n'existent pas (point)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key        | value    |
       | point      | 9,42     |
@@ -893,7 +893,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec des paramètres qui n'existent pas (test)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key       | value    |
       | test      | 1        |
@@ -908,12 +908,12 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec des tout les paramètres 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                                                                         |
       | profile        | car                                                                           |
       | optimization   | fastest                                                                       |
-      | intermediates  | 9.448360204696855,42.567660375593106                                          |
+      | intermediates  | 2.343865,48.881989                                                            |
       | geometryFormat | geojson                                                                       |
       | getSteps       | true                                                                          |
       | getBbox        | true                                                                          |
@@ -930,7 +930,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec des tout les paramètres 
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with query parameters:
       | key            | value                                                                         |
       | profile        | car                                                                           |
@@ -946,7 +946,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
       | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}      |
     And with table parameters for "intermediates":
       | value                  |
-      | 8.732901,41.928823     |
+      | 2.333865,48.891989     |
     And with table parameters for "waysAttributes":
       | value                  |
       | name                   |                                                                 
@@ -957,7 +957,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [GET] Route sur l'API simple 1.0.0 avec plusieurs fois le start 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with "&start=9.449347257614130,42.563930726519340" at the end of the url
     When I send the request 
     Then the server should send a response with status 400
@@ -966,7 +966,7 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
 
   Scenario: [POST] Route sur l'API simple 1.0.0 avec plusieurs fois le start 
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route"
+    And with default parameters for "route-osrm"
     And with table parameters for "start":
       | value                                    |
       | 9.449347257614130,42.563930726519340     |

@@ -5,6 +5,7 @@ const storageManager = require('../utils/storageManager');
 const errorManager = require('../utils/errorManager');
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
+const smartroutingSource = require('../sources/smartroutingSource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -358,6 +359,52 @@ module.exports = class sourceManager {
         // On va voir si c'est un autre type.
       }
       //------ PGR
+      //------ SMARTROUTING
+      if (sourceJsonObject.type === "smartrouting") {
+        available = true;
+        LOGGER.info("Source smartrouting.");
+
+        let operationFound = false;
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (operationManager.verifyAvailabilityOperation("route")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite 
+          }
+        } else {
+          // on continue pour voir la suite 
+        }
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (operationManager.verifyAvailabilityOperation("isochrone")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite 
+          }
+        } else {
+          // on continue pour voir la suite 
+        }
+
+        if (!operationFound) {
+          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+
+        if (!this.checkSourceSmartrouting(sourceJsonObject)) {
+          LOGGER.error("Erreur lors de la verification de la source smartrouting.");
+          return false;
+        } else {
+          // il n'y a eu aucun problème, la ressource est correctement configurée.
+        }
+      } else {
+        // On va voir si c'est un autre type.
+      }
+      //------ SMARTROUTING
 
       // Si ce n'est aucun type valide, on renvoie une erreur.
       if (!available) {
@@ -514,6 +561,37 @@ module.exports = class sourceManager {
   /**
   *
   * @function
+  * @name checkSourceSmartrouting
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source pgr.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+
+   checkSourceSmartrouting(sourceJsonObject) {
+
+    LOGGER.info("Verification de la source smartrouting...");
+  
+    // Storage
+    if (!sourceJsonObject.storage) {
+      LOGGER.error("La ressource contient une source sans stockage.");
+      return false;
+    } else {
+      if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
+        LOGGER.error("Stockage de la source incorrect.");
+        return false;
+      } else {
+        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+      }
+    }
+  
+    LOGGER.info("Fin de la verification de la source smartrouting.");
+    return true;
+  }
+
+  /**
+  *
+  * @function
   * @name checkDuplicationSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
@@ -563,6 +641,9 @@ module.exports = class sourceManager {
       source = new osrmSource(sourceJsonObject, topology);
     } else if (sourceJsonObject.type === "pgr") {
       source = new pgrSource(sourceJsonObject, topology);
+    } else if (sourceJsonObject.type === "smartrouting") {
+      // smartrouting n'utilise pas la topologie définie dans la conf
+      source = new smartroutingSource(sourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
     }

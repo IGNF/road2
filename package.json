@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "1.0.9",
+  "version": "1.0.10",
 
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
@@ -21,15 +21,18 @@
     "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
   },
   "dependencies": {
-    "cors": "2.8.5",
-    "express": "4.16.4",
-    "log4js": "6.1.0",
-    "nconf": "0.10.0",
     "@mapbox/polyline": "1.1.1",
     "@turf/turf": "5.1.6",
-    "proj4": "2.6.0",
     "assert": "2.0.0",
-    "helmet": "3.21.2"
+    "cors": "2.8.5",
+    "express": "4.16.4",
+    "got": "11.8.2",
+    "helmet": "3.21.2",
+    "https-proxy-agent": "5.0.0",
+    "log4js": "6.1.0",
+    "nconf": "0.10.0",
+    "proj4": "2.6.0",
+    "wkt": "0.1.1"
   },
   "optionalDependencies": {
     "osrm": "5.25.0",

@@ -1,4 +1,8 @@
-# 1.0.6-DEVELOP
+# 1.0.10
+ADDED:
+  - Ressource hybride smartrouting / pgr pour l'isochrone
+
+# 1.0.6
 
 ADDED:
  - chaque source peut donner l'état de sa connexion

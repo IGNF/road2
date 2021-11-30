@@ -44,6 +44,9 @@ module.exports = {
     } else if (jsonStorage.rcostColumn) {
       // TODO: Pas trop possible de vérifier sans requête
       storageFound = true;
+    } else if (jsonStorage.url) {
+      // TODO: Pas trop possible de vérifier sans requête
+      storageFound = true;
     } else {
       // on va tester d'autres types
     }
