@@ -56,6 +56,7 @@
     "@turf/turf",
     "proj4",
     "assert",
-    "helmet"
+    "helmet",
+    "wkt"
   ]
 }
