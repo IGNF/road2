@@ -1,3 +1,12 @@
+# 1.O.12
+FIXED:
+  - got dans bundledDependencies
+  - http-proxy-agent dans bundledDependencies
+
+# 1.0.11
+FIXED:
+  - wkt dans bundledDependencies
+
 # 1.0.10
 ADDED:
   - Ressource hybride smartrouting / pgr pour l'isochrone

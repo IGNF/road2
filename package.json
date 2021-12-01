@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "1.0.11",
+  "version": "1.0.12",
 
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
@@ -57,6 +57,8 @@
     "proj4",
     "assert",
     "helmet",
-    "wkt"
+    "wkt",
+    "got",
+    "http-proxy-agent"
   ]
 }
