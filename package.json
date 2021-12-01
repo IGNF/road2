@@ -57,6 +57,8 @@
     "proj4",
     "assert",
     "helmet",
-    "wkt"
+    "wkt",
+    "got",
+    "http-proxy-agent"
   ]
 }
