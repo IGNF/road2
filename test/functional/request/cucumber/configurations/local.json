@@ -7,6 +7,7 @@
             "1.0.0": {
                 "route": "/simple/1.0.0/route",
                 "isochrone": "/simple/1.0.0/isochrone",
+                "nearest": "/simple/1.0.0/nearest",
                 "getcapabilities": "/simple/1.0.0/getcapabilities"
             }
         },
@@ -48,6 +49,13 @@
             "parameters": {
                 "resource": "bduni-idf-smartpgr",
                 "point": "2.333865,48.881989"
+            }
+        },
+        {
+            "id": "nearest-osrm",
+            "parameters": {
+                "resource": "bduni-idf-osrm",
+                "coordinates": "2.333865,48.881989"
             }
         }
     ],

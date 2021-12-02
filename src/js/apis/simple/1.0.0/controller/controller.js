@@ -2,13 +2,13 @@
 
 const errorManager = require('../../../../utils/errorManager');
 const RouteRequest = require('../../../../requests/routeRequest');
+const NearestRequest = require('../../../../requests/nearestRequest');
 const IsochroneRequest = require('../../../../requests/isochroneRequest');
 const Point = require('../../../../geometry/point');
 const Turf = require('@turf/turf');
 const Duration = require('../../../../time/duration');
 const Distance = require('../../../../geography/distance');
 const log4js = require('log4js');
-const validationManager = require('../../../../utils/validationManager');
 
 var LOGGER = log4js.getLogger("CONTROLLER");
 
@@ -476,6 +476,148 @@ module.exports = {
     }
 
     return routeRequest;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name checkNearestParameters
+  * @description Vérification des paramètres d'une requête sur /nearest
+  * @param {object} parameters - ensemble des paramètres de la requête
+  * @param {object} service - Instance de la classe Service
+  * @param {string} method - Méthode de la requête
+  * @return {object} NearestRequest - Instance de la classe NearestRequest
+  *
+  */
+
+   checkNearestParameters: function(parameters, service, method) {
+
+    let resource;
+    let coordinates = {};
+    let askedProjection;
+
+    LOGGER.debug("checkNearestParameters()");
+
+    // Resource
+    if (!parameters.resource) {
+        throw errorManager.createError(" Parameter 'resource' not found ", 400);
+    } else {
+
+      LOGGER.debug("user resource:");
+      LOGGER.debug(parameters.resource);
+
+      // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
+      if (!service.verifyResourceExistenceById(parameters.resource)) {
+        throw errorManager.createError(" Parameter 'resource' is invalid: it does not exist on this service ", 400);
+      } else {
+
+        resource = service.getResourceById(parameters.resource);
+        // On vérifie que la ressource peut accepter cette opération
+        if (!resource.verifyAvailabilityOperation("nearest")){
+          throw errorManager.createError(" Operation 'nearest' is not permitted on this resource ", 400);
+        } else {
+          LOGGER.debug("operation nearest valide on this resource");
+        }
+
+      }
+
+    }
+
+    // On récupère l'opération nearest pour faire des vérifications
+    let nearestOperation = resource.getOperationById("nearest");
+
+    // Projection
+    if (parameters.crs) {
+
+      LOGGER.debug("user crs:");
+      LOGGER.debug(parameters.crs);
+
+      // Vérification de la validité des coordonnées fournies
+      let validity = nearestOperation.getParameterById("projection").check(parameters.crs);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'crs' is invalid: " + validity.message, 400);
+      } else {
+        askedProjection = parameters.crs;
+        LOGGER.debug("user crs valide");
+      }
+
+    } else {
+
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      askedProjection = nearestOperation.getParameterById("projection").defaultValueContent;
+      LOGGER.debug("default crs: " + askedProjection);
+
+    }
+
+    // Coordinates
+    if (!parameters.coordinates) {
+        throw errorManager.createError(" Parameter 'coordinates' not found ", 400);
+    } else {
+
+      LOGGER.debug("user coordinates:");
+      LOGGER.debug(parameters.coordinates);
+
+      // Vérification de la validité des coordonnées fournies
+      let validity = nearestOperation.getParameterById("coordinates").check(parameters.coordinates, askedProjection);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'coordinates' is invalid: " + validity.message, 400);
+      } else {
+
+        LOGGER.debug("user coordinates valide")
+        let tmpStringCoordinates = parameters.coordinates.split(",");
+        coordinates = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
+        LOGGER.debug("user coordinates in road2' object:");
+        LOGGER.debug(coordinates);
+
+      }
+
+    }
+
+
+    // On définit la nearestRequest avec les paramètres obligatoires
+    let nearestRequest = new NearestRequest(parameters.resource, coordinates);
+
+    LOGGER.debug(nearestRequest);
+
+
+    // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet NearestRequest
+
+    // getSteps
+    // ---
+    if (parameters.nbPoints) {
+
+      LOGGER.debug("user nbPoints:");
+      LOGGER.debug(parameters.nbPoints);
+
+      // Vérification de la validité du nombre fourni
+      let validity = nearestOperation.getParameterById("number").check(parameters.nbPoints);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'nbPoints' is invalid: " + validity.message, 400);
+      } else {
+
+        nearestRequest.number = nearestOperation.getParameterById("number").specificConvertion(parameters.nbPoints)
+        if (nearestRequest.computeSteps === null) {
+          throw errorManager.createError(" Parameter 'nbPoints' is invalid ", 400);
+        } else {
+          LOGGER.debug("converted nbPoints: " + nearestRequest.computeSteps);
+        }
+
+      }
+
+    } else {
+
+      // On met la valeur par défaut issue de la configuration
+      // TODO: que faire s'il n'y a pas de valeur par défaut ?
+      nearestRequest.number = nearestOperation.getParameterById("number").defaultValueContent;
+      LOGGER.debug("default nbPoints: " + nearestRequest.computeSteps);
+
+    }
+    // ---
+
+
+
+    return nearestRequest;
 
   },
 
@@ -1115,6 +1257,55 @@ module.exports = {
       LOGGER.debug("no constraints asked by user");
     }
 
+
+    return userResponse;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name writeNearestResponse
+  * @description Ré-écriture de la réponse d'un moteur pour une requête sur /nearest
+  * @param {object} NearestRequest - Instance de la classe NearestRequest
+  * @param {object} NearestResponse - Instance de la classe NearestResponse
+  * @param {object} Service - Instance de la classe Service
+  * @return {object} userResponse - Réponse envoyée à l'utilisateur
+  *
+  */
+
+  writeNearestResponse: function(nearestRequest, nearestResponse, service) {
+
+    LOGGER.debug("writeNearestResponse()");
+
+    let userResponse = {};
+
+    // resource
+    userResponse.resource = nearestResponse.resource;
+
+    // resourceVersion
+    userResponse.resourceVersion = service.getResourceById(nearestResponse.resource).version;
+    LOGGER.debug("resourceVersion: " + userResponse.resourceVersion);
+
+    // coordinates
+    userResponse.coordinates = nearestResponse.coordinates.toString();
+
+    // crs
+    userResponse.crs = nearestResponse.coordinates.projection;
+
+    // Liste des points les plus proches 
+    userResponse.points = new Array();
+
+    for (let p=0; p < nearestResponse.points.length; p++) {
+
+      let curPoint = {};
+      curPoint.id = nearestResponse.points[p].id;
+      curPoint.geometry = nearestResponse.points[p].geometry.toString();
+      curPoint.distance = nearestResponse.points[p].distance;
+
+      userResponse.points.push(curPoint);
+
+    }
 
     return userResponse;
 

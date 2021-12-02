@@ -42,6 +42,11 @@ module.exports = class osrmResource extends Resource {
 
     }
 
+    // id de la source utilisée pour l'opération nearest
+    // on prend la première de la configuration 
+    // TODO : à voir si on rend cela plus configurable
+    this._nearestSource = this._configuration.sources[0].id;
+
     // Attribut des voies
     // Par défaut, OSRM ne renvoit que le nom des voies empruntées.
     this._waysAttributes = new Array();
@@ -119,11 +124,19 @@ module.exports = class osrmResource extends Resource {
   */
   getSourceIdFromRequest (request) {
 
-    if (this._linkedSource[request.profile+request.optimization]) {
-      return this._linkedSource[request.profile+request.optimization];
+    const currentOperation = request.operation;
+
+    if (currentOperation === "nearest") {
+      return this._nearestSource;
     } else {
-      return null;
+      if (this._linkedSource[request.profile+request.optimization]) {
+        return this._linkedSource[request.profile+request.optimization];
+      } else {
+        return null;
+      }
     }
+
+    
 
   }
 

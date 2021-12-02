@@ -7,6 +7,7 @@ const BoolParameter = require('../parameters/boolParameter');
 const EnumParameter = require('../parameters/enumParameter');
 const PointParameter = require('../parameters/pointParameter');
 const FloatParameter = require('../parameters/floatParameter');
+const IntParameter = require('../parameters/intParameter');
 const ConstraintParameter = require('../parameters/constraintParameter');
 
 // Création du LOGGER
@@ -244,6 +245,7 @@ module.exports = class parameterManager  {
         && parameterConf.type !== "enumeration"
         && parameterConf.type !== "point"
         && parameterConf.type !== "float"
+        && parameterConf.type !== "integer"
         && parameterConf.type !== "constraint") {
         LOGGER.error("Le type du parametre est incorrect");
         return false;
@@ -538,7 +540,7 @@ module.exports = class parameterManager  {
         // il n'y a rien à faire
       }
 
-    } else if (serviceParameterConf.type === "float") {
+    } else if (serviceParameterConf.type === "float" || serviceParameterConf.type === "integer") {
 
       // Gestion des valeurs par défaut
       if (serviceParameterConf.defaultValue === "true") {
@@ -809,6 +811,8 @@ module.exports = class parameterManager  {
         curResParam = new PointParameter(curSerParam);
       } else if (curSerParamConf.type === "float") {
         curResParam = new FloatParameter(curSerParam);
+      } else if (curSerParamConf.type === "integer") {
+        curResParam = new IntParameter(curSerParam);
       } else if (curSerParamConf.type === "constraint") {
         curResParam = new ConstraintParameter(curSerParam);
       } else{

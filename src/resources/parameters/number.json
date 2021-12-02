@@ -1,0 +1,9 @@
+{
+    "id": "number",
+    "name": "Nombre",
+    "description": "Nombre de points voulu en retour",
+    "required": "false",
+    "defaultValue": "true",
+    "example": "1",
+    "type": "integer"
+  }

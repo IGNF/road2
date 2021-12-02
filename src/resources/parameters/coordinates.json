@@ -1,0 +1,10 @@
+{
+    "id": "coordinates",
+    "name": "Coordonnées",
+    "description": "Coordonnées utilisées pour le calcul",
+    "required": "true",
+    "defaultValue": "false",
+    "example": "48.849319,2.337306",
+    "type": "point"
+  }
+  

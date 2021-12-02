@@ -67,14 +67,6 @@ getCapabilities:
 	        schema:
 	          type: "enumeration"
 	        example: "fastest"
-	      - name: "format"
-	        in: "query"
-	        description: "Format de la réponse."
-	        required: false
-	        default: true
-	        schema:
-	          type: "enumeration"
-	        example: "application/json"
 	      - name: "constraints"
 	        in: "query"
 	        description: "Contraintes pour le calcul."
@@ -101,14 +93,6 @@ getCapabilities:
 	        schema:
 	          type: "boolean"
 	        example: true
-	      - name: "getInstructions"
-	        in: "query"
-	        description: "Présence des instructions de navigation dans la réponse."
-	        required: false
-	        default: true
-	        schema:
-	          type: "boolean"
-	        example: false
 	      - name: "distanceUnit"
 	        in: "query"
 	        description: "Unité des distances renvoyées."
@@ -150,54 +134,38 @@ getCapabilities:
 		  	- "POST"
 		  parameters:
 		  	- name: "resource"
-	          in: "query"
-	          description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans la partie ressources du GetCapabilities."
-	          required: true
-	          default: false
-	          schema:
-	            type: "string"
-	          example: "bduni"
-		  	- name: "point"
-	          in: "query"
-	          description: "Point utilisé pour trouver un noeud."
-	          required: true
-	          default: false
-	          schema:
-	            type: "string"
-	          example: "48.849319,2.337306"
-	        - name: "format"
-	          in: "query"
-	          description: "Format de la réponse."
-	          required: false
-	          default: true
-	          schema:
-	            type: "enumeration"
-	          example: "application/json"
-	        - name: "number"
-	          in: "query"
-	          description: "Nombre de points retournés."
-	          required: false
-	          default: true
-	          schema:
-	            type: "number"
-	            format: "integer"
-	          example: "5"
-	        - name: "getId"
-	          in: "query"
-	          description: "Préciser si on souhaite avoir l'id des éléments retournés."
-	          required: false
-	          default: true
-	          schema:
-	            type: "boolean"
-	          example: "false"
-	        - name: "type"
-	          in: "query"
-	          description: "Préciser le type des données que l'on veut: noeuds et/ou arcs."
-	          required: false
-	          default: true
-	          schema:
-	            type: "enumeration"
-	          example: "all"
+					in: "query"
+					description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans la partie ressources du GetCapabilities."
+					required: true
+					default: false
+					schema:
+						type: "string"
+					example: "bduni"
+				- name: "coordinates"
+					in: "query"
+					description: "Point utilisé pour trouver un ou des noeuds."
+					required: true
+					default: false
+					schema:
+						type: "string"
+					example: "48.849319,2.337306"
+				- name: "nbPoints"
+					in: "query"
+					description: "Nombre de points retournés."
+					required: false
+					default: true
+					schema:
+						type: "number"
+						format: "integer"
+					example: "5"
+				- name: "crs"
+					in: "query"
+					description: "Projection des géometries."
+					required: false
+					default: true
+					schema:
+						type: "enumeration"
+					example: "EPSG:4326"
 	    - id: "isochrone"
 		  description: "Calculer une isochrone ou une isodistance."
 		  url: "/isochrone?"
@@ -254,14 +222,6 @@ getCapabilities:
 	        schema:
 	          type: "enumeration"
 	        example: "départ"
-	      - name: "format"
-	        in: "query"
-	        description: "Format de la réponse."
-	        required: false
-	        default: true
-	        schema:
-	          type: "enumeration"
-	        example: "application/json"
 	      - name: "constraints"
 	        in: "query"
 	        description: "Contraintes pour le calcul."
@@ -316,7 +276,6 @@ getCapabilities:
 		  	  	  values:
 		  	  	  	bbox: "-90,-180,90,180"
 		  	  	  	projection: "EPSG:4326"
-		  	  	  maxItems: 10
 		  	  	- id: "profile"
 		  	  	  default: "car"
 		  	  	  values: {"car"}
@@ -324,7 +283,6 @@ getCapabilities:
 		  	  	  default: "fastest"
 		  	  	  values: {"fastest","shortest"}
 		  	  	- id: "constraints"
-		  	  	  maxItems: 2
 		  	  	  values:
 		  	  	  	keys:
 		  	  	  	  - key: "road_type" #à cause du type osrm
@@ -390,7 +348,6 @@ getCapabilities:
 		  	  	  values:
 		  	  	    bbox: "0,6000000,1300000,7200000"
 		  	  	    projection: "EPSG:2154"
-		  	  	  maxItems: 5
 		  	  	- id: "profile"
 		  	  	  values: {"car","bike"}
 		  	  	- id: "optimization"
@@ -400,7 +357,6 @@ getCapabilities:
 		  	  	  default: "application/json"
 		  	  	  values: {"application/json","application/xml"}
 		  	  	- id: "constraints"
-		  	  	  maxItems: 2
 		  	  	  values:
 		  	  	  	keys:
 		  	  	  	  - key: "id" #automatique

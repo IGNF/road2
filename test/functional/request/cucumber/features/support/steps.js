@@ -83,6 +83,10 @@ Then("the response should contain a complete and valid road", function() {
     assert.equal(this.checkCompleteRoad(), true);
 });
 
+Then("the response should contain a complete and valid nearest response", function() {
+    assert.equal(this.checkCompleteNearest(), true);
+});
+
 Then("the response should contain a complete and valid iso", function() {
     assert.equal(this.checkCompleteIso(), true);
 });

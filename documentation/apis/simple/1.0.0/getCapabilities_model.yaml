@@ -158,8 +158,4 @@
 											"default":
 												type: "schema"
 												required: false
-											# Nombre max de valeurs possible si c'est un tableau.
-											"maxItems":
-												type: number
-												format: integer
-												required: false
+

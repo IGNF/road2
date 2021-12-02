@@ -1,0 +1,11 @@
+{
+  "id": "nearest",
+  "name": "Plus proche",
+  "description": "Trouver les points du graphe le plus proche",
+  "parameters": [
+    "resource",
+    "coordinates",
+    "number",
+    "projection"
+  ]
+}

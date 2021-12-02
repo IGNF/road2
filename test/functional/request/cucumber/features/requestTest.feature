@@ -975,3 +975,154 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
     And the response should contain an attribute "error.message" with value "Parameter 'start' is invalid"
+
+Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid nearest response
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+
+Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0 sans ressource 
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And without query parameters:
+      | key       | 
+      | resource  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'resource' not found"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0 avec mauvaise ressource 
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key       | value           |
+      | resource  | corse-osm-2     |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'resource' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+Scenario Outline: [<method>] Route sur l'API simple 1.0.0 sans coordinates 
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And without query parameters:
+      | key             | 
+      | coordinates     |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'coordinates' not found"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais coordinates 
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key          | value           |
+      | coordinates  | -9,-410         |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'coordinates' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais coordinates (string)
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key          | value           |
+      | coordinates  | test            |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'coordinates' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais nbPoints 
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key       | value         |
+      | nbPoints  | 50000         |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'nbPoints' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais nbPoints (string)
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key       | value           |
+      | nbPoints  | test            |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'nbPoints' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0 avec un autre crs
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:2154       |
+      | coordinates    | 651475,6826145  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid nearest response
+    And the response should contain an attribute "crs" with value "EPSG:2154"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0 avec mauvais crs
+    Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"
+    And with default parameters for "nearest-osrm"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:4325       |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'crs' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
