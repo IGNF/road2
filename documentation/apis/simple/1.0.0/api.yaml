@@ -715,7 +715,9 @@ components:
               id:
                 type: "string"
               geometry:
-                type: "string"
+                type: "array"
+                items:
+                  type: "number"
               distance:
                 type: "number"
     isochrone:

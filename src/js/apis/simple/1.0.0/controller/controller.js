@@ -1300,7 +1300,7 @@ module.exports = {
 
       let curPoint = {};
       curPoint.id = nearestResponse.points[p].id;
-      curPoint.geometry = nearestResponse.points[p].geometry.toString();
+      curPoint.geometry = [nearestResponse.points[p].geometry.x,nearestResponse.points[p].geometry.y];
       curPoint.distance = nearestResponse.points[p].distance;
 
       userResponse.points.push(curPoint);
