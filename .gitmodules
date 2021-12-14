@@ -1,8 +1,8 @@
 [submodule "docker/route-graph-generator"]
 	path = docker/route-graph-generator
 	url = https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/route-graph-generator.git
-	branch = develop
+	branch = master
 [submodule "docker/motors/pgrouting-procedures"]
 	path = docker/motors/pgrouting-procedures
 	url = https://gitlab.ul.geoportail.rie.gouv.fr/ign/pgie/pgrouting-procedures.git
-	branch = develop
+	branch = master
