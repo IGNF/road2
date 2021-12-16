@@ -1,3 +1,11 @@
+# 1.O.14
+FIXED:
+  - Mauvaise ligne pour un log
+
+# 1.O.13
+ADDED:
+  - Pas d'erreur si certificat auto-signé ou périmé
+
 # 1.O.12
 FIXED:
   - got dans bundledDependencies
