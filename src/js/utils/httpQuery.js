@@ -46,9 +46,9 @@ module.exports = class httpQuery {
 
         LOGGER.debug("http query :");
         LOGGER.debug(query);
+        const _options = {...this._options, ...options};
         LOGGER.debug("with options :");
         LOGGER.debug(_options);
-        const _options = {...this._options, ...options};
         return got(query, _options);
     }
 
