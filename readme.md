@@ -30,11 +30,13 @@ L'IGN propose un démonstrateur pour [l'itinéraire](https://geoservices.ign.fr/
 
 Autrement, pour une première prise en main du service en local, il est possible d'utiliser l'image [alpine](./docker/demonstration/Dockerfile) de Road2. Cela permettra d'avoir localement une instance du service et une page web permettant de le tester. Les instructions de mise en place sont données [ici](./docker/demonstration/readme.md). 
 
-### Les APIs du service 
+### Découvrir et tester les APIs du service 
 
-L'IGN propose également une visualisation de l'API utilisateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services_betas/swagger-itineraire.html) et [l'isochrone](https://geoservices.ign.fr/documentation/services_betas/swagger-isochrones.html). 
+L'IGN propose une visualisation de l'API utilisateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires/api) et [l'isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api). 
 
-Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/admin/1.0.0/api.yaml) YAML suivant le même formalisme. 
+L'IGN propose également des pages pour tester une instance du service sur l'ensemble de la France, avec une visualisation cartographique. Il y a une page pour l'[itinéraire](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires) et une page pour l'[isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrones).
+
+Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/administration/1.0.0/api.yaml) YAML suivant le même formalisme. 
 
 Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./docker/demonstration/readme.md). 
 
@@ -57,9 +59,9 @@ NB : Il y a des dépendances optionnelles pour gérer celles de chaque moteur. P
 
 Qu'importe la source des données, il est nécessaire de les fournir dans l'un des formats utilisables par Road2. Étant donné que ce dernier peut utiliser plusieurs moteurs les calculs, il accepte plusieurs formats de données:
 - OSRM 5.25.0 rend possible l'utilisation de données OSRM générées avec cette version. 
-- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet pgrouting-procedures afin que Road2 puisse communiquer avec la base. 
+- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet [pgrouting-procedures](https://github.com/IGNF/pgrouting-procedures) afin que Road2 puisse communiquer avec la base. 
 
-Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet route-graph-generator propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
+Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet [route-graph-generator](https://github.com/IGNF/route-graph-generator) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
 
 Pour une discussion détaillée sur les données attendues, on pourra se référer à cette [documentation](./documentation/data/readme.md). 
 

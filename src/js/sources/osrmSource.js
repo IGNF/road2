@@ -2,6 +2,7 @@
 
 const Source = require('./source');
 const RouteResponse = require('../responses/routeResponse');
+const NearestResponse = require('../responses/nearestResponse');
 const Route = require('../responses/route');
 const Portion = require('../responses/portion');
 const Line = require('../geometry/line');
@@ -227,7 +228,7 @@ module.exports = class osrmSource extends Source {
 
       return new Promise ( (resolve, reject) => {
 
-        LOGGER.debug("orsmRequest:");
+        LOGGER.debug("orsmRequest for route :");
         LOGGER.debug(osrmRequest);
 
         if (this._osrm) {
@@ -246,18 +247,81 @@ module.exports = class osrmSource extends Source {
                 } else {
                   // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
                   // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
-                  LOGGER.error("osrm error:");
+                  LOGGER.error("osrm error for route :");
                   LOGGER.error(err);
                   reject("Internal OSRM error");
                 }
 
               } else {
 
-                LOGGER.debug("osrm response:");
+                LOGGER.debug("osrm response for route :");
                 LOGGER.debug(result);
 
                 try {
                   resolve(this.writeRouteResponse(request, result));
+                } catch (error) {
+                  reject(error);
+                }
+
+              }
+
+            });
+
+          } catch (error) {
+            // Pour une raison que l'on ignore, la source n'est plus joignable
+            this.state = "orange";
+            LOGGER.error(error);
+            reject("Internal OSRM error");
+          }
+
+        } else {
+          // La source est définitivement injoignable
+          this.state = "red";
+          reject(errorManager.createError(" OSRM is not available. "));
+        }
+
+      });
+
+    } else if (request.operation === "nearest") {
+
+      // Construction de l'objet pour la requête OSRM
+      // Cette construction dépend du type de la requête fournie
+      // ---
+      let osrmRequest = {};
+
+      osrmRequest.coordinates = [request.coordinates.getCoordinatesIn(this.topology.projection)];
+      osrmRequest.number = request.number;
+      // ---
+
+      return new Promise ( (resolve, reject) => {
+
+        LOGGER.debug("orsmRequest for nearest :");
+        LOGGER.debug(osrmRequest);
+
+        if (this._osrm) {
+
+          try {
+
+            this._osrm.nearest(osrmRequest, (err, result) => {
+
+              // Du moment qu'OSRM a répondu, on considère que la source est joignable
+              this.state = "green";
+
+              if (err) {
+
+                // les erreurs (InvalidUrl, InvalidService, InvalidVersion, InvalidOptions, InvalidQuery, InvalidValue, TooBig) ne doivent pas arriver donc on renvoit 500
+                // mais on ne renvoie pas l'erreur d'OSRM à l'utilisateur
+                LOGGER.error("osrm error for nearest :");
+                LOGGER.error(err);
+                reject("Internal OSRM error");
+                
+              } else {
+
+                LOGGER.debug("osrm response for nearest :");
+                LOGGER.debug(result);
+
+                try {
+                  resolve(this.writeNearestResponse(request, result));
                 } catch (error) {
                   reject(error);
                 }
@@ -477,6 +541,71 @@ module.exports = class osrmSource extends Source {
     routeResponse.routes = routes;
 
     return routeResponse;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name writeNearestResponse
+  * @description Pour traiter la réponse du moteur et la ré-écrire pour le proxy.
+  * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
+  * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
+  * au proxy, on considère qu'elle est correcte.
+  * @param {nearestRequest} nearestRequest - Objet nearestRequest 
+  * @param {osrmResponse} osrmResponse - Objet osrmResponse, réponse renvoyée par osrm
+  *
+  */
+  writeNearestResponse (nearestRequest, osrmResponse) {
+
+    LOGGER.debug("writeNearestResponse()");
+
+    // projection demandée dans la requête
+    let askedProjection = nearestRequest.coordinates.projection;
+    LOGGER.debug("asked projection: " + askedProjection);
+
+    LOGGER.debug("topology projection: " + this.topology.projection);
+
+    // Création de la réponse
+    let nearestResponse = new NearestResponse(nearestRequest.resource, nearestRequest.coordinates);
+
+    // Récupération de l'ensemble des points de la réponse d'OSRM 
+    if (osrmResponse.waypoints) {
+      console.log(osrmResponse);
+      if (osrmResponse.waypoints.length < 1) {
+        throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 1. ");
+      } else {
+        
+        for (let i=0; i < osrmResponse.waypoints.length; i++) {
+
+          if (osrmResponse.waypoints[i].location) {
+
+            let pointGeom = new Point(osrmResponse.waypoints[i].location[0], osrmResponse.waypoints[i].location[1], this.topology.projection);
+            if (!pointGeom.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of a point in OSRM response. ");
+            } else {
+              LOGGER.debug("point in asked projection:");
+              LOGGER.debug(pointGeom);
+            }
+
+            let point = {};
+            point.id = i.toString(10);
+            point.geometry = pointGeom;
+            point.distance = osrmResponse.waypoints[i].distance;
+            nearestResponse.points.push(point);
+
+          } else {
+            throw errorManager.createError(" OSRM response is invalid: one waypoint doesn't have location. ");
+          }
+
+        }
+
+      }
+    } else {
+      throw errorManager.createError(" OSRM response is invalid: no waypoints. ");
+    }
+    
+    return nearestResponse;
 
   }
 

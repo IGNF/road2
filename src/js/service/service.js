@@ -1010,6 +1010,7 @@ module.exports = class Service {
     let sourceId = resource.getSourceIdFromRequest(request);
 
     // La source est dans le catalogue du service
+    // TODO : vérifier que la source existe toujours
     let source = this._sourceCatalog[sourceId];
     // ---
 

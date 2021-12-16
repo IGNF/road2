@@ -210,6 +210,104 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+  /nearest:
+    get:
+      tags:
+      - "Utilisation"
+      summary: "Récupérer les points les plus proche d'une paire de coordonnées."
+      description: "Trouver les points les plus proche d'une paire de coordonnées fournie. Plusieurs options peuvent être fournies."
+      operationId: "nearestItineraire-get"
+      parameters:
+      - name: "resource"
+        in: "query"
+        description: "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver l'itinéraire le plus court pour une voiture. "
+        required: true
+        schema:
+          type: "string"
+        example: "bdtopo-osrm"
+      - name: "coordinates"
+        in: "query"
+        description: "Point de référence dont on cherche les points du graphe les plus proche. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities)."
+        required: true
+        schema:
+          $ref: "#/components/schemas/point"
+        example: "2.337306,48.849319"
+      - name: "crs"
+        in: "query"
+        description: "Projection des géometries. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        required: false
+        schema:
+          type: "string"
+        example: "EPSG:4326"
+      - name: "nbPoints"
+        in: "query"
+        description: "Nombre de points que l'on souhaite récupérer. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities."
+        required: false
+        schema:
+          type: "string"
+        example: "EPSG:4326"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/nearest"
+        400:
+          description: "Invalid parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        403:
+          description: "Not allowed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+    post:
+      tags:
+      - "Utilisation"
+      summary: "Récupérer les points les plus proche d'une paire de coordonnées."
+      description: "Trouver les points les plus proche d'une paire de coordonnées fournie. Plusieurs options peuvent être fournies. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête."
+      operationId: "nearestItineraire-post"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/nearestBody"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/nearest"
+        400:
+          description: "Invalid parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        403:
+          description: "Not allowed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
   /isochrone:
     get:
       tags:
@@ -439,6 +537,17 @@ components:
           type: "array"
           items:
             type: "string"
+    nearestBody:
+      type: "object"
+      properties:
+        resource:
+          type: "string"
+        coordinates:
+          $ref: "#/components/schemas/point"
+        nbPoints:
+          type: "integer"
+        crs:
+          type: "string"
     isochroneBody:
       type: "object"
       properties:
@@ -578,10 +687,8 @@ components:
                           type: "string"
                         modifyer:
                           type: "string"
-                          required: false
                         exit:
                           type: "string"
-                          required: false
                     alerts:
                       type: "array"
                       items:
@@ -589,6 +696,30 @@ components:
                         properties:
                           message:
                             type: "string"
+    nearest:
+      type: "object"
+      properties:
+        resource:
+          type: "string"
+        resourceVersion:
+          type: "string"
+        coordinates:
+          $ref: "#/components/schemas/point"
+        crs:
+          type: "string"
+        points:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              geometry:
+                type: "array"
+                items:
+                  type: "number"
+              distance:
+                type: "number"
     isochrone:
       type: "object"
       properties:

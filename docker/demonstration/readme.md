@@ -4,7 +4,7 @@ Ce fichier décrit les instructions à suivre pour avoir une démonstration loca
 
 ## Principe 
 
-Nous proposons des images docker qui permettent de tester le service en local. Ces images pourront bientôt être récupérées sur DockerHub. 
+Nous proposons des images docker qui permettent de tester le service en local. Nous prévoyons de mettre ces images sur DockerHub. 
 
 ## Utilisation des images pré-construites et disponibles sur DockerHub
 
@@ -29,3 +29,9 @@ On pourra lancer l'application avec la commande suivante :
 ```
 docker run --rm road2-demonstration
 ```
+
+## Documentation 
+
+### APIs 
+
+TODO

@@ -150,6 +150,39 @@
           ]
         }
       ]
+    },
+    {
+      "id": "nearest",
+      "parameters": [
+        {
+          "id": "resource",
+          "values": [
+            "corse-osm"
+          ]
+        },
+        {
+          "id": "coordinates",
+          "values": {
+            "bbox": "-90,-180,90,180",
+            "projection": "EPSG:4326"
+          }
+        },
+        {
+          "id": "number",
+          "values": {
+            "min": 1,
+            "max": 10
+          }
+        },
+        {
+          "id": "projection",
+          "defaultValueContent": "EPSG:4326",
+          "values": [
+            "EPSG:4326",
+            "EPSG:2154"
+          ]
+        }
+      ]
     }
   ]
   }

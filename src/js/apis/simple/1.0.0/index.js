@@ -160,6 +160,87 @@ router.route("/route")
 
   });
 
+// Nearest
+// Pour trouver les points du graphe les plus proche d'un autre 
+router.route("/nearest")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /simple/1.0.0/nearest?");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance de Service pour faire les calculs
+    let service = req.app.get("service");
+
+    // on vérifie que l'on peut faire cette opération sur l'instance du service
+    if (!service.verifyAvailabilityOperation("nearest")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.query;
+    LOGGER.debug(parameters);
+
+    try {
+
+      // Vérification des paramètres de la requête
+      const nearestRequest = controller.checkNearestParameters(parameters, service, "GET");
+      LOGGER.debug(nearestRequest);
+      // Envoie au service et récupération de l'objet réponse
+      const nearestResponse = await service.computeRequest(nearestRequest);
+      LOGGER.debug(nearestResponse);
+      // Formattage de la réponse
+      const userResponse = controller.writeNearestResponse(nearestRequest, nearestResponse, service);
+      LOGGER.debug(userResponse);
+
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+
+  })
+  
+  .post(async function(req, res, next) {
+    
+    LOGGER.debug("requete POST sur /simple/1.0.0/nearest?");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance de Service pour faire les calculs
+    let service = req.app.get("service");
+
+    // on vérifie que l'on peut faire cette opération sur l'instance du service
+    if (!service.verifyAvailabilityOperation("nearest")) {
+      return next(errorManager.createError(" Operation not permitted on this service ", 400));
+    }
+
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.body;
+    LOGGER.debug(parameters);
+
+    try {
+
+      // Vérification des paramètres de la requête
+      const nearestRequest = controller.checkNearestParameters(parameters, service, "POST");
+      LOGGER.debug(nearestRequest);
+      // Envoie au service et récupération de l'objet réponse
+      const nearestResponse = await service.computeRequest(nearestRequest);
+      LOGGER.debug(nearestResponse);
+      // Formattage de la réponse
+      const userResponse = controller.writeNearestResponse(nearestRequest, nearestResponse, service);
+      LOGGER.debug(userResponse);
+
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+    
+    
+  });
+
 /* Génération d'isochrone. */
 router.route("/isochrone")
 

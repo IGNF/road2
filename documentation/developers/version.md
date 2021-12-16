@@ -69,3 +69,13 @@ Démarche à suivre pour Road2:
 5. Faire des tests sur `master` avec les `master` des autres projets, et corriger si nécessaire.
 6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.
 7. S'il n'y a pas eu de corrections sur `master`, et qu'on a bien les `master` et les `develop` des trois projets qui fonctionnent ensemble, alors tagger `master` et `develop` avec les versions, sur chaque projet.
+
+### Gestion des sous-modules 
+
+Actuellement, Road2 fait appel à PGRouting Procedures et Route Graph Generator pour construire les différentes images docker qui permettent de tester et développer le service. La version utilisée dans Road2 sur sa branche `master` et `develop` est correspond à *un commit spécifique* de la `master` de chaque sous-module. 
+
+Pour pointer sur un commit plus récent, on suivra la procédure suivante : 
+- se placer sur la branche `develop` de Road2
+- à la racine du projet, lancer la commande `git submodule update --remote`
+- faire le commit de ce changement de référence
+- merger `develop` sur `master`

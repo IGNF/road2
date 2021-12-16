@@ -570,6 +570,34 @@ class road2World {
 
     }
 
+    checkCompleteNearest() {
+
+        if (!this.checkResponseAttribut("resource")) {
+            return "no resource";
+        }
+        if (!this.checkResponseAttribut("resourceVersion")) {
+            return "no resourceVersion";
+        }
+        if (!this.checkResponseAttribut("coordinates")) {
+            return "no coordinates";
+        }
+        if (!this.checkResponseAttribut("points")) {
+            return "no points";
+        }
+        if (!this.checkResponseAttribut("points.[0].id")) {
+            return "no points.[0].id";
+        }
+        if (!this.checkResponseAttribut("points.[0].geometry")) {
+            return "no points.[0].geometry";
+        }
+        if (!this.checkResponseAttribut("points.[0].distance")) {
+            return "no points.[0].distance";
+        }
+
+        return true;
+
+    }
+
     checkRoadContent(filePath) {
 
         let referenceRoad = {};
