@@ -151,6 +151,11 @@ Fonctionnalité explicite.
 
 Les exclusions sont les contraintes classiques comme l'interdiction d'emprunter certains type de voies (ex. autoroutes). Ce sont les seuls contraintes disponibles via OSRM. 
 
+### 5.4 : Déterminer le point du graphe le plus proche
+
+Pour un point donnée, OSRM peut renovyer les points les plus proches du graphe. 
+
+
 
 ## Groupe de fonctionnalités 6 : Fonctionnalités spécifiques à PGRouting
 
