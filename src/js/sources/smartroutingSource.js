@@ -119,7 +119,7 @@ module.exports = class smartroutingSource extends Source {
       // Construction de l'objet pour la requête smart routing
       if (request.type === "routeRequest") {
         LOGGER.debug("type of request is routeRequest");
-        
+
         // Coordonnées
         // start
         smartroutingRequest.origin = request.start.x + "," + request.start.y;
@@ -188,14 +188,14 @@ module.exports = class smartroutingSource extends Source {
         // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse
         LOGGER.error("type of request not found");
       }
-      
+
     } else if (request.operation === "isochrone") {
       LOGGER.debug("operation request is isochrone");
 
       // Construction de l'objet pour la requête smart routing
       if (request.type === "isochroneRequest") {
         LOGGER.debug("type of request is isochroneRequest");
-        
+
         // Coordonnées
         // location
         smartroutingRequest.location = request.point.lon + "," + request.point.lat;
@@ -366,37 +366,37 @@ module.exports = class smartroutingSource extends Source {
 
       if (currentRouteLeg.steps[0].points.length > 0) {
         let legStart = new Point(firstPoint[0], firstPoint[1], askedProjection);
-  
+
         const lastPoint = currentRouteLeg.steps[currentRouteLeg.steps.length-1].points[currentRouteLeg.steps[currentRouteLeg.steps.length-1].points.length-1];
         let legEnd = new Point( lastPoint[0], lastPoint[1], askedProjection);
-  
+
         portions[j] = new Portion(legStart, legEnd);
-  
+
         // On récupère la distance et la durée
         // Note : distanceMeters et durationSeconds ne sont pas dans la doc
         portions[j].distance = new Distance(currentRouteLeg.distanceMeters, "meter");
         portions[j].duration = new Duration(currentRouteLeg.durationSeconds, "second");
-  
+
         // Steps
         let steps = new Array();
-  
+
         // On va associer les étapes à la portion concernée
         for (let k=0; k < currentRouteLeg.steps.length; k++) {
           LOGGER.debug("Step number " + k + " of portion number " + j);
-  
+
           let currentRouteStep = currentRouteLeg.steps[k];
           const stepGeometry = {
             type: "linestring",
             coordinates: currentRouteStep.points
           }
           steps[k] = new Step( new Line(stepGeometry, "geojson", askedProjection) );
-          
+
           // Ajout de l'attribut name
           steps[k].setAttributById("name", currentRouteStep.name);
 
           // instruction de navigation
           steps[k].instruction = currentRouteStep.navInstruction;
-  
+
           // On récupère la distance et la durée
           steps[k].distance = new Distance(Math.round(currentRouteStep.distanceMeters * 10) / 10, "meter");
           steps[k].duration = new Duration(Math.round(currentRouteStep.durationSeconds * 10) / 10, "second");
@@ -428,6 +428,11 @@ module.exports = class smartroutingSource extends Source {
   *
   */
    writeIsochroneResponse(isochroneRequest, smartroutingResponse) {
+
+    LOGGER.debug("writeIsochroneResponse()");
+
+    LOGGER.debug("smartroutingResponse :");
+    LOGGER.debug(smartroutingResponse);
 
     let location = {};
     let geometry = {};

@@ -18,6 +18,10 @@ module.exports = class httpQuery {
         const defaultOptions = {
             headers: {
                 "Referer": "road2"
+            },
+            /* TODO: à voir si on peut remplacer par autre chose ? à tester sur l'infra */
+            https: {
+              rejectUnauthorized: false
             }
         };
 
@@ -39,6 +43,11 @@ module.exports = class httpQuery {
     *
     */
     get(query, options) {
+
+        LOGGER.debug("http query :");
+        LOGGER.debug(query);
+        LOGGER.debug("with options :");
+        LOGGER.debug(_options);
         const _options = {...this._options, ...options};
         return got(query, _options);
     }
