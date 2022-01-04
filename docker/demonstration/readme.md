@@ -34,4 +34,7 @@ docker run --rm road2-demonstration
 
 ### APIs 
 
-TODO
+Il est possible de visualiser les documentations des APIs en local. On lancera la commande suivante :
+```
+docker run --rm -p 8083:8080 -e SWAGGER_JSON=/api.yaml -v {path/to/yaml/directory}/api.yaml:/api.yaml swaggerapi/swagger-ui
+```
