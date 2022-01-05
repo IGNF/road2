@@ -499,6 +499,91 @@ module.exports = {
     }
     // -- end isochrone
 
+    // nearest
+
+    // On vérifie que l'opération nearest est disponible et on l'intégre seulement si elle est
+    if (service.verifyAvailabilityOperation("nearest")) {
+
+      // récupération de l'opération nearest du service
+      let serviceOpNearest = service.getOperationById("nearest");
+
+      let nearestDescription = {};
+      // nearest.id
+      nearestDescription.id = "nearest";
+      // nearest.description
+      nearestDescription.description = serviceOpNearest.description;
+      // nearest.url
+      nearestDescription.url = "/nearest?";
+      // nearest.methods
+      nearestDescription.methods = new Array();
+      nearestDescription.methods.push("GET");
+      nearestDescription.methods.push("POST");
+
+      // -- nearest.parameters
+      nearestDescription.parameters = new Array();
+
+      // TODO: refactorer tout ce code. Une fonction qui prend en argument un paramètre et créer l'objet getCap
+      // nearest.parameters.resource
+      let resourceServiceParameter = serviceOpNearest.getParameterById("resource");
+      let resourceParameterDescription = {};
+      resourceParameterDescription.name = "resource";
+      resourceParameterDescription.in = "query";
+      resourceParameterDescription.description = resourceServiceParameter.description;
+      resourceParameterDescription.required = resourceServiceParameter.required;
+      resourceParameterDescription.default = resourceServiceParameter.defaultValue;
+      resourceParameterDescription.schema = {};
+      resourceParameterDescription.schema.type = "string";
+      resourceParameterDescription.example = "bduni";
+      nearestDescription.parameters.push(resourceParameterDescription);
+
+      // nearest.parameters.coordinates
+      let coordinatesServiceParameter = serviceOpNearest.getParameterById("coordinates");
+      let coordinatesParameterDescription = {};
+      coordinatesParameterDescription.name = "coordinates";
+      coordinatesParameterDescription.in = "query";
+      coordinatesParameterDescription.description = coordinatesServiceParameter.description;
+      coordinatesParameterDescription.required = coordinatesServiceParameter.required;
+      coordinatesParameterDescription.default = coordinatesServiceParameter.defaultValue;
+      coordinatesParameterDescription.schema = {};
+      coordinatesParameterDescription.schema.type = "string";
+      coordinatesParameterDescription.example = "2.337306,48.849319";
+      nearestDescription.parameters.push(coordinatesParameterDescription);
+
+      // nearest.parameters.number
+      let numbersServiceParameter = serviceOpNearest.getParameterById("number");
+      let numberParameterDescription = {};
+      numberParameterDescription.name = "nbPoints";
+      numberParameterDescription.in = "query";
+      numberParameterDescription.description = numbersServiceParameter.description;
+      numberParameterDescription.required = numbersServiceParameter.required;
+      numberParameterDescription.default = numbersServiceParameter.defaultValue;
+      numberParameterDescription.schema = {};
+      numberParameterDescription.schema.type = "integer";
+      numberParameterDescription.example = 1;
+      nearestDescription.parameters.push(numberParameterDescription);
+
+      // nearest.parameters.crs
+      let projectionServiceParameter = serviceOpNearest.getParameterById("projection");
+      let crsParameterDescription = {};
+      crsParameterDescription.name = "crs";
+      crsParameterDescription.in = "query";
+      crsParameterDescription.description = projectionServiceParameter.description;
+      crsParameterDescription.required = projectionServiceParameter.required;
+      crsParameterDescription.default = projectionServiceParameter.defaultValue;
+      crsParameterDescription.schema = {};
+      crsParameterDescription.schema.type = "enumeration";
+      crsParameterDescription.example = "EPSG:4326";
+      nearestDescription.parameters.push(crsParameterDescription);
+
+      
+
+      // -- end nearest.parameters
+
+      getCapabilities.operations.push(nearestDescription);
+
+    }
+    // --- end nearest
+
     // --- end operations
 
     // --- resources
@@ -814,7 +899,70 @@ module.exports = {
         }
 
       }
-      // - end route
+      // - end isochrone
+
+      // - nearest
+
+      // On vérifie que l'opération nearest est disponible et on l'intégre seulement si elle est
+      if (service.verifyAvailabilityOperation("nearest")) {
+
+        // on vérifie qu'elle est disponible sur la ressource
+        if (localResource.verifyAvailabilityOperation("nearest")) {
+
+
+          // on récupère l'opération de ressource
+          let resourceOperation = localResource.getOperationById("nearest");
+
+          let nearestAvailableOperation = {};
+          nearestAvailableOperation.id = "nearest";
+          nearestAvailableOperation.availableParameters = new Array();
+
+          // nearest.resource
+          let resourceParameter = resourceOperation.getParameterById("resource");
+          let nearestResource = {};
+          nearestResource.id = "resource";
+          nearestResource.values = resourceParameter.values;
+          if (resourceParameter.serviceParameter.defaultValue === "true") {
+            nearestResource.defaultValue = resourceParameter.defaultValueContent;
+          }
+          nearestAvailableOperation.availableParameters.push(nearestResource);
+
+          // nearest.coordinates
+          let coordinatesParameter = resourceOperation.getParameterById("coordinates");
+          let nearestCoordinates = {};
+          nearestCoordinates.id = "coordinates";
+          nearestCoordinates.values = coordinatesParameter.values;
+          if (coordinatesParameter.serviceParameter.defaultValue === "true") {
+            nearestCoordinates.defaultValue = coordinatesParameter.defaultValueContent;
+          }
+          nearestAvailableOperation.availableParameters.push(nearestCoordinates);
+
+          // nearest.number
+          let numberParameter = resourceOperation.getParameterById("number");
+          let nearestNumber = {};
+          nearestNumber.id = "nbPoints";
+          nearestNumber.values = numberParameter.values;
+          if (numberParameter.serviceParameter.defaultValue === "true") {
+            nearestNumber.defaultValue = numberParameter.defaultValueContent;
+          }
+          nearestAvailableOperation.availableParameters.push(nearestNumber);
+
+          // nearest.crs
+          let projectionParameter = resourceOperation.getParameterById("projection");
+          let nearestCrs = {};
+          nearestCrs.id = "crs";
+          nearestCrs.values = projectionParameter.values;
+          if (projectionParameter.serviceParameter.defaultValue === "true") {
+            nearestCrs.defaultValue = projectionParameter.defaultValueContent;
+          }
+          nearestAvailableOperation.availableParameters.push(nearestCrs);
+
+          resourceDescription.availableOperations.push(nearestAvailableOperation);
+
+        }
+
+      }
+      // - end nearest
 
       // -- end resource.availableOperations
 
