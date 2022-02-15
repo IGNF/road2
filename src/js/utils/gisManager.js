@@ -126,7 +126,7 @@ module.exports = {
     }
     // fin TODO
 
-    if (firstLine.indexOf(common_point) === 0) {
+    if (firstLine.findIndex( elem => this.arraysEquals(elem, common_point)) === 0) {
       firstLine.reverse();
     }
     dissolvedCoords.push(...firstLine);
