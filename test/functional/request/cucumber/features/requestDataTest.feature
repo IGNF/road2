@@ -38,7 +38,7 @@ Feature: Road2 with data
 
   Scenario Outline: [<method>] [simple/1.0.0] Route avec point intermediaire qui provoque un demi-tour (voir ticket #36883)
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route-osrm"
+    And with default parameters for "route-pgr"
     And with query parameters:
       | key           | value                                                                             |
       | start         | 3.818431,49.081335                                                                |
@@ -49,6 +49,24 @@ Feature: Road2 with data
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
     And the road should be similar to "../../data/2.json"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    |
+
+  Scenario Outline: [<method>] [simple/1.0.0] Route commençant sur une raquette (voir ticket #37674)
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key           | value                                                                             |
+      | start         | 3.3378517,43.310043                                                               |
+      | end           | 3.3390372,43.310542                                                               |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the road should be similar to "../../data/3.json"
 
   Examples:
     | method  |
