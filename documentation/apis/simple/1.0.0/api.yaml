@@ -4,10 +4,12 @@ info:
   version: "1.0.0"
   title: "Service d'itinéraire"
   contact:
-    email: "idev@ign.fr"
+    email: "contact.geoservices@ign.fr"
 servers:
-  - url: "https://itineraire.ign.fr/simple/1.0.0/"
-    description: "Serveur de test IGN"
+  - url: "https://wxs.ign.fr/calcul/geoportail/itineraire/rest/1.0.0/"
+    description: "Serveur de test IGN pour l'itinéraire"
+  - url: "https://wxs.ign.fr/calcul/geoportail/isochrone/rest/1.0.0/"
+    description: "Serveur de test IGN pour l'isochrone"
   - url: "http://localhost:8080/simple/1.0.0/"
     description: "Serveur de test local"
 tags:
