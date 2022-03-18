@@ -12,7 +12,7 @@ describe('Test du storageManager', function() {
   describe('Test de la fonction checkJsonStorage()', function() {
 
     let json = {
-      "file": "/home/docker/internal/corse-latest.osrm"
+      "file": "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"
     };
 
     let jsonNoFile = {

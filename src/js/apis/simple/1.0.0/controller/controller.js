@@ -218,7 +218,7 @@ module.exports = {
 
         finalIntermediates = this.convertPostArrayToGetParameters(parameters.intermediates, routeOperation.getParameterById("intermediates").serviceParameter, "intermediates");
         LOGGER.debug("POST intermediates:");
-        LOGGER.debug(parameters.intermediates);
+        LOGGER.debug(finalIntermediates);
 
       } else {
         finalIntermediates = parameters.intermediates;
