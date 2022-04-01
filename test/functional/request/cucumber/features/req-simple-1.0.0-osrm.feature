@@ -1,56 +1,10 @@
-# Tests fonctionnels de Road2
-Feature: Road2
-  Tests fonctionnels de Road2
+# Tests fonctionnels complémentaires de Road2
+Feature: Road2-Osrm
+  Tests fonctionnels complémentaires de Road2 sur OSRM
 
   Background:
-      Given I have loaded all my test configuration in "../../configurations/local.json"
+    Given I have loaded all my test configuration in "../../configurations/local.json"
 
-  Scenario Outline: [<method>] Route principale
-    Given an "<method>" request on "/"
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should contain "Road2"
-  
-  Examples:
-    | method  |
-    | GET     |
-    | POST    | 
-
-  Scenario: API simple 1.0.0
-    Given an "GET" request on "/simple/1.0.0/"
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should contain "Road2 via l'API simple 1.0.0"
-
-  Scenario: GetCapabilities sur l'API simple 1.0.0
-    Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "info.name" with value "Road2"
-    And the response should contain an attribute "api.name" with value "simple"
-    And the response should contain an attribute "api.version" with value "1.0.0"
-    And the response should contain an attribute "operations.[0].id" with value "route"
-    And the response should contain an attribute "operations.[0].methods.[1]" with value "POST"
-    And the response should contain an attribute "operations.[0].parameters.[0].name" with value "resource"
-    And the response should contain an attribute "operations.[1].id" with value "isochrone"
-    And the response should contain an attribute "operations.[1].methods.[0]" with value "GET"
-    And the response should contain an attribute "operations.[1].parameters.[1].name" with value "point"
-
-  Scenario: GetCapabilities sur l'API simple 1.0.0 sans changer le host 
-    Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "info.url" with configuration value of "url"
-
-  Scenario: GetCapabilities sur l'API simple 1.0.0 en changeant le host 
-    Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
-    And with the alternative url 
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain an attribute "info.url" with configuration value of "alternativeParameters.url"
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
@@ -975,6 +929,204 @@ Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=po
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
     And the response should contain an attribute "error.message" with value "Parameter 'start' is invalid"
+
+
+ Scenario Outline: [<method>] Route sur l'API simple 1.0.0
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key            | value                             |
+      | waysAttributes | name \| nature \| importance      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters for "waysAttributes":
+      | value      |
+      | name       |
+      | nature     |
+      | importance |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.name"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nature"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.importance"
+
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key            | value                             |
+      | waysAttributes | name \| nature \| importance \| cleabs \| urbain \| access_pieton \| cpx_numero \| largeur_de_chaussee \| position_par_rapport_au_sol \| restriction_de_hauteur \| sens_de_circulation   |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'waysAttributes' is invalid"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec plusieurs waysAttributes 
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters for "waysAttributes":
+      | value                       |
+      | name                        |
+      | nature                      |
+      | importance                  |
+      | cleabs                      |
+      | urbain                      |
+      | access_pieton               |
+      | cpx_numero                  |
+      | largeur_de_chaussee         |
+      | position_par_rapport_au_sol |
+      | restriction_de_hauteur      |
+      | sens_de_circulation         |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'waysAttributes' is invalid"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource OSRM 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[1].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes dont une invalide sur une ressource OSRM 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource OSRM 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[1].key"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [GET] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource OSRM 
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with query parameters:
+      | key         | value                                                                           |
+      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"test1"}\|{"constraintType":"test2","key":"waytype","operator":"=","value":"tunnel"}\|{"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}  |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource OSRM
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}      |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}         |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[1].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec deux contraintes dont une ivalide sur une ressource OSRM
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}      |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}         |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes sur une ressource OSRM
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}      |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}         |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}           |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "constraints.[2].key"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont une invalide sur une ressource OSRM
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"test"}           |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"tunnel"}         |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}           |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
+
+  Scenario: [POST] Route sur l'API simple 1.0.0 avec trois contraintes dont deux invalides sur une ressource OSRM
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-osrm"
+    And with table parameters of object for "constraints":
+      | value                                                                               |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"test1"}          |
+      | {"constraintType":"test2","key":"waytype","operator":"=","value":"tunnel"}          |
+      | {"constraintType":"banned","key":"waytype","operator":"=","value":"pont"}           |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Parameter 'constraints' is invalid"
 
 Scenario Outline: [<method>] Nearest sur l'API simple 1.0.0
     Given an "<method>" request on operation "nearest" in api "simple" "1.0.0"

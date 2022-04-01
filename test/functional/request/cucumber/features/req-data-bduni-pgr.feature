@@ -1,13 +1,12 @@
-# Tests fonctionnels de Road2 prenant en compte la donnée
-Feature: Road2 with data
-  Tests fonctionnels de Road2 prenant en compte la donnée
+Feature: Road2 with Bduni data via PGR 
+  Tests fonctionnels de Road2 prenant en compte la donnée Bduni via PGR 
 
   Background:
       Given I have loaded all my test configuration in "../../configurations/local.json"
 
   Scenario Outline: [<method>] [simple/1.0.0] Route normale
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route-osrm"
+    And with default parameters for "route-pgr"
     And with query parameters:
       | key    | value                                         |
       | start  | 2.3420083522796626,48.845718486262086         |
@@ -16,7 +15,7 @@ Feature: Road2 with data
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the road should be similar to "../../data/1.json"
+    And the road should be similar to "../../data/bduni/common/normale.json"
 
   Examples:
     | method  |
@@ -25,7 +24,7 @@ Feature: Road2 with data
 
   Scenario: [GET] [simple/1.0.0] Route qui doit passer sur un pont mais en interdisant les ponts
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
-    And with default parameters for "route-osrm"
+    And with default parameters for "route-pgr"
     And with query parameters:
       | key         | value                                                                     |
       | start       | 2.3491859436035156,48.857111116502665                                     |
@@ -36,7 +35,7 @@ Feature: Road2 with data
     And the response should have an header "content-type" with value "application/json"
     And the response should contain an attribute "error.message" with value "No path found"
 
-  Scenario: [GET] [simple/1.0.0] Route avec point intermediaire qui provoque un demi-tour (voir ticket #36883)
+  Scenario: [GET] [simple/1.0.0] Route avec point intermediaire qui provoque un demi-tour 
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
@@ -48,9 +47,9 @@ Feature: Road2 with data
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the road should be similar to "../../data/2.json"
+    And the road should be similar to "../../data/bduni/pgr/1.json"
 
-  Scenario: [POST] [simple/1.0.0] Route avec point intermediaire qui provoque un demi-tour (voir ticket #36883)
+  Scenario: [POST] [simple/1.0.0] Route avec point intermediaire qui provoque un demi-tour
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
@@ -64,10 +63,10 @@ Feature: Road2 with data
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the road should be similar to "../../data/2.json"
+    And the road should be similar to "../../data/bduni/pgr/1.json"
 
 
-  Scenario Outline: [<method>] [simple/1.0.0] Route commençant sur une raquette (voir ticket #37674)
+  Scenario Outline: [<method>] [simple/1.0.0] Route commençant sur une raquette
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
     And with query parameters:
@@ -78,7 +77,7 @@ Feature: Road2 with data
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the road should be similar to "../../data/3.json"
+    And the road should be similar to "../../data/bduni/pgr/2.json"
 
   Examples:
     | method  |

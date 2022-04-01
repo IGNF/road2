@@ -608,12 +608,6 @@ components:
           format: "float"
         bbox:
           type: "string"
-        departure:
-          type: "string"
-          format: "date"
-        arrival:
-          type: "string"
-          format: "date"
         resource:
           type: "string"
         resourceVersion:
@@ -652,12 +646,6 @@ components:
                 format: "float"
               bbox:
                 type: "string"
-              departure:
-                type: "string"
-                format: "date"
-              arrival:
-                type: "string"
-                format: "date"
               steps:
                 type: "array"
                 items:
@@ -745,12 +733,6 @@ components:
           type: "string"
         geometry:
           type: "string"
-        departure:
-          type: "string"
-          format: "date"
-        arrival:
-          type: "string"
-          format: "date"
         alerts:
           type: "array"
           items:
