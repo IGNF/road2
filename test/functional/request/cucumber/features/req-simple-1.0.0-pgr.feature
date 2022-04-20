@@ -1,6 +1,5 @@
-# Tests fonctionnels complémentaires de Road2
-Feature: Road2-complement
-  Tests fonctionnels complémentaires de Road2
+Feature: Road2-PGR
+  Tests fonctionnels complémentaires de Road2 via PGRouting
 
   Background:
     Given I have loaded all my test configuration in "../../configurations/local.json"
@@ -737,6 +736,21 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | GET     |
     | POST    | 
 
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un geometryFormat polyline
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key              | value                    |
+      | geometryFormat   | polyline                 |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un mauvais distanceUnit
     Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
@@ -810,64 +824,3 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     And the response should contain a complete and valid iso
     And the response should contain an attribute "constraints.[0].key"
 
-  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sur une ressource smartpgr avec appel à la source smartrouting
-    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
-    And with default parameters for "isochrone-smartpgr"
-    And with query parameters:
-      | key         | value     |
-      | costType    | distance  |
-      | costValue   | 31000     |
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain a complete and valid iso
-
-  Examples:
-    | method  |
-    | GET     |
-    | POST    | 
-
-  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sur une ressource smartpgr avec appel à la source pgr
-    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
-    And with default parameters for "isochrone-smartpgr"
-    And with query parameters:
-      | key         | value     |
-      | costType    | distance  |
-      | costValue   | 1000      |
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain a complete and valid iso
-
-  Examples:
-    | method  |
-    | GET     |
-    | POST    | 
-
-  Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource smartpgr avec appel à la source smartrouting
-    Given an "GET" request on operation "isochrone" in api "simple" "1.0.0"
-    And with default parameters for "isochrone-smartpgr"
-    And with query parameters:
-      | key         | value                                                                           |
-      | costType    | distance                                                                        |
-      | costValue   | 1000                                                                            |
-      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}  |
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain a complete and valid iso
-    And the response should contain an attribute "constraints.[0].key"
-
-  Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource smartpgr avec appel à la source pgr
-    Given an "GET" request on operation "isochrone" in api "simple" "1.0.0"
-    And with default parameters for "isochrone-smartpgr"
-    And with query parameters:
-      | key         | value                                                                           |
-      | costType    | distance                                                                        |
-      | costValue   | 31000                                                                           |
-      | constraints | {"constraintType":"banned","key":"waytype","operator":"=","value":"autoroute"}  |
-    When I send the request 
-    Then the server should send a response with status 200
-    And the response should have an header "content-type" with value "application/json"
-    And the response should contain a complete and valid iso
-    And the response should contain an attribute "constraints.[0].key"

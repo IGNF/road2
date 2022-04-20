@@ -1,5 +1,4 @@
-# Tests fonctionnels complémentaires de Road2
-Feature: Road2-Osrm
+Feature: Road2-OSRM
   Tests fonctionnels complémentaires de Road2 sur OSRM
 
   Background:

@@ -65,44 +65,48 @@ module.exports = class Polygon extends Geometry {
   *
   */
   _convertGeometry (geom, srcFormat, outFormat) {
-    // Création d'un objet Polygon depuis les coordonées reçues.
-    const polygon = turf.polygon(geom);
 
     if (srcFormat === outFormat) {
       return geom;
     } else if (srcFormat === "polyline" && outFormat === "geojson") {
-      return polyline.toGeoJSON(polygon); // À tester..
+      let tmpPolygon = polyline.toGeoJSON(geom);
+      tmpPolygon.type = "Polygon";
+      return tmpPolygon;
     } else if (srcFormat === "geojson" && outFormat === "polyline") {
+
       let result = [];
 
       if (geom.type === "Point") {
         // Cas où l'isochrone est un simple point
         result = polyline.encode([geom.coordinates]);
         return result
-      }
-      if (geom.type === "LineString") {
-        // Cas où l'isochrone est un simple point
+      } else if (geom.type === "LineString") {
+        // Cas où l'isochrone est une line
         result = polyline.encode(geom.coordinates);
         return result
+      } else {
+
+        // Conversion du polygone en (Multi)LineString.
+        let polygon = turf.polygon(geom.coordinates);
+        const lines = turf.polygonToLine(polygon);
+
+        if (lines.geometry.type === "LineString") {
+          // Une seule ligne, nous convertissons donc directement.
+          result = polyline.fromGeoJSON(lines);
+        } else if (lines.geometry.type === "MultiLineString") {
+          // Plusieurs lignes, convertion ligne par ligne.
+          lines.geometry.coordinates.forEach( function(element) {
+            result.push(polyline.fromGeoJSON({
+              "type": "LineString",
+              "coordinates": element
+            }));
+          });
+        }
+
+        return result;
+
       }
 
-      // Conversion du polygone en (Multi)LineString.
-      const lines = turf.polygonToLine(polygon.geometry.coordinates);
-
-      if (lines.geometry.type === "LineString") {
-        // Une seule ligne, nous convertissons donc directement.
-        result = polyline.fromGeoJSON(lines);
-      } else if (lines.geometry.type === "MultiLineString") {
-        // Plusieurs lignes, convertion ligne par ligne.
-        lines.geometry.coordinates.forEach( function(element) {
-           result.push(polyline.fromGeoJSON({
-            "type": "LineString",
-            "coordinates": element
-           }));
-         });
-      }
-
-      return result;
     } else {
       //TODO: voir si on peut remplacer ce throw par un return {}
       throw errorManager.createError("Unsupported geometry conversion");
