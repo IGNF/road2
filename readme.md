@@ -84,6 +84,8 @@ On trouvera dans le dossier [docker/distrubutions](./docker/distributions) diff�
 
 On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 
+Pour en savoir plus sur notre roadmap, vous pouvez regarder ce [document](./documentation/developers/roadmap.md). 
+
 De plus, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
 
 ## Utilisation en production
