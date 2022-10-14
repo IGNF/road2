@@ -988,6 +988,11 @@ module.exports = class pgrSource extends Source {
 
       currentPgrRoute.geometry.coordinates = newRouteGeomCoords;
       routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", this._topology.projection);
+      if (!routes[i].geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
+      } else {
+        LOGGER.debug("step geometry is converted");
+      }
       routes[i].portions = portions;
 
     }
