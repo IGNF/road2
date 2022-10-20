@@ -43,11 +43,7 @@ module.exports = class pgrSource extends Source {
 
     // Constructeur parent
     super(sourceJsonObject.id, "pgr", topology);
-
-    // Ajout des opérations possibles sur ce type de source
-    this.availableOperations.push("route");
-    this.availableOperations.push("isochrone");
-
+    
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 

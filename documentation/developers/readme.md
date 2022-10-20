@@ -16,11 +16,17 @@ L'ensemble des fonctionnalités sont répertoriées à [part](./functionnalities
 
 ## Participer aux développements 
 
-Les participations à ce projet sont encouragées. L'ajout de moteurs ou d'API, bien évidemment. Mais toutes autres fonctionnalités sont les bienvenues. Nous avons mis en place une [documentation](./modification.md) afin de faciliter des développements. 
+Les participations à ce projet sont encouragées. L'ajout de moteurs ou d'API, bien évidemment. Mais toutes autres fonctionnalités sont les bienvenues. 
+
+### Prise en main du projet
+
+Nous avons mis en place une [documentation](./modification.md) afin de faciliter la prise en main du projet. 
 
 ### GIT 
 
-Comme cela aura certainement déjà été compris, ce projet utilise GIT. La gestion des branches et des versions pour les développements est détaillée [ici](./version.md). 
+Afin de pousser des développements sur le projet, ces derniers doivent être fournis par l'intermédiaire de `Pull Request` depuis votre branche vers la branche `develop` du projet. 
+
+Plus généralement, la gestion des branches et des versions pour les développements est détaillée [ici](./version.md). 
 
 ## Outils pour le développement
 

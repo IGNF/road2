@@ -2,7 +2,7 @@ Feature: Road2-SMARTROUTING
   Tests fonctionnels complémentaires de Road2 via SmartRouting
 
   Background:
-    Given I have loaded all my test configuration in "../../configurations/local.json"
+    Given I have loaded all my test configuration in "../../configurations/local-service.json"
 
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sur une ressource smartpgr avec appel à la source smartrouting
     Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"

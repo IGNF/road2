@@ -11,10 +11,10 @@
     "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "itest": "mocha --recursive './test/integration/mocha/**/*.js'",
     "rtest": "HTTP_PROXY='' ./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/req*.feature",
-    "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configuration*.feature",
+    "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/conf*.feature",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
-    "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
+    "debug": "env NODE_ENV=debug node --inspect=0.0.0.0:9229 ./src/js/road2.js"
   },
   "dependencies": {
     "@mapbox/polyline": "1.1.1",

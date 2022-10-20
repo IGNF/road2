@@ -22,29 +22,53 @@ module.exports = class sourceManager {
   */
   constructor() {
 
-    // Liste des ids des sources gérées par le manager
-    this._listOfSourceIds = new Array();
+    // Liste des ids des sources chargées par le manager
+    this._loadedSourceId = new Array();
 
-    // Description des sources conservées de manière unique dans _listOfSourceIds
-    this._sourceDescriptions = {};
+    // Liste des ids des sources vérifiées par le manager
+    this._checkedSourceId = new Array();
+
+    // Catalogue des sources du manager
+    this._source = {};
+
+    // Descriptions des sources chargées par le manager
+    this._loadedSourceConfiguration = {};
+
+    // Descriptions des sources vérifiées par le manager
+    this._checkedSourceConfiguration = {};
 
     // Correspondance entre l'id d'une source et l'id de la topologie dont elle dérive
     this._sourceTopology = {};
 
-    // Correspondance entre l'id d'une source et l'id des ressources où elle est utilisée
-    this._sourceUsage = {};
+    // Correspondance entre les sources et les opérations possibles 
+    this._operationsByType = {
+      "osrm": ["nearest", "route"],
+      "pgr": ["route", "isochrone"],
+      "smartrouting": ["route", "isochrone"]
+    };
 
   }
 
   /**
   *
   * @function
-  * @name get listOfSourceIds
-  * @description Récupérer l'ensemble des ids de sources
+  * @name get loadedSourceId
+  * @description Récupérer l'ensemble des ids de sources chargées
   *
   */
-  get listOfSourceIds() {
-    return this._listOfSourceIds;
+  get loadedSourceId() {
+    return this._loadedSourceId;
+  }
+
+  /**
+  *
+  * @function
+  * @name get source
+  * @description Récupérer l'ensemble des ids de sources chargées
+  *
+  */
+  get source() {
+    return this._source;
   }
 
   /**
@@ -61,164 +85,37 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name get sourceDescriptions
-  * @description Récupérer l'ensemble des descriptions des sources conservées
+  * @name get operationsByType
+  * @description Récupérer l'ensemble des opérations possibles par type de source
   *
   */
-  get sourceDescriptions() {
-    return this._sourceDescriptions;
+   get operationsByType() {
+    return this._operationsByType;
   }
 
   /**
   *
   * @function
-  * @name get sourceUsage
-  * @description Récupérer l'ensemble des correspondances de sources
-  *
-  */
-  get sourceUsage() {
-    return this._sourceUsage;
-  }
-
-  /**
-  *
-  * @function
-  * @name listOfUsage
-  * @description Récupérer l'ensemble des id de ressources utilisant une source
-  * @param {string} id - Id de la source 
-  * @return {table} Liste des id de ressource 
-  *
-  */
-  listOfUsage(id) {
-    return this._sourceUsage[id];
-  }
-
-  /**
-  *
-  * @function
-  * @name removeSource
-  * @description Supprimer une source
-  * @param {string} id - Id de la source 
-  * @return {boolean} 
-  *
-  */
-  removeSource(id) {
-
-    let index = this._listOfSourceIds.indexOf(id);
-    if (index !== -1) {
-      this._listOfSourceIds.splice(index,1);
-    } else {
-      return false;
-    }
-    
-    if (!delete this._sourceDescriptions[id]) {
-      return false;
-    }
-    if (!delete this._sourceTopology[id]) {
-      return false;
-    }
-    if (!delete this._sourceUsage[id]) {
-      return false;
-    }
-
-    return true;
-  }
-
-    /**
-  *
-  * @function
-  * @name addUsage
-  * @description Ajouter l'usage, via l'id, d'une ressource pour une source
-  * @param {string} sourceId - Id de la source 
-  * @param {string} resourceId - Id de la ressource 
-  * @return {boolean} 
-  *
-  */
-  addUsage(sourceId, resourceId) {
-    if (!this._sourceUsage[sourceId]) {
-      this._sourceUsage[sourceId] = new Array();
-    } 
-    if (!Array.isArray(this._sourceUsage[sourceId])) {
-      return false;
-    }
-    this._sourceUsage[sourceId].push(resourceId);
-    return true;
-  }
-
-  /**
-  *
-  * @function
-  * @name set listOfSourceIds
+  * @name set loadedSourceId
   * @description Attribuer l'ensemble des ids de sources
   * @param {table} list - État de la connexion
   *
   */
-  set listOfSourceIds(list) {
-    this._listOfSourceIds = list;
+  set loadedSourceId(list) {
+    this._loadedSourceId = list;
   }
 
   /**
   *
   * @function
-  * @name set sourceDescriptions
-  * @description Attribuer l'ensemble des descriptions des sources conservées
-  * @param {object} descriptions - Objet contenant les descriptions
-  *
-  */
-  set sourceDescriptions(descriptions) {
-    this._sourceDescriptions = descriptions;
-  }
-
-  /**
-  *
-  * @function
-  * @name getSourceDescriptionById
-  * @description Récupérer la description de la source indiquée par son id
-  * @param {string} id - Id de la source
-  *
-  */
-  getSourceDescriptionById(id) {
-    if (this._sourceDescriptions[id]) {
-      return this._sourceDescriptions[id];
-    } else {
-      return {};
-    }
-
-  }
-
-  /**
-  *
-  * @function
-  * @name getSourceTopology
-  * @description Récupérer l'id de la topologie dont dérive une source
-  * @param {string} sourceId - Id de la source
-  * @return {string} Id d'une topologie
-  *
-  */
-
-  getSourceTopology(sourceId) {
-
-    if(this._sourceTopology[sourceId]) {
-      return this._sourceTopology[sourceId];
-    } else {
-      return "";
-    }
-
-  }
-
-  /**
-  *
-  * @function
-  * @name checkSource
+  * @name checkSourceConfiguration
   * @description Fonction utilisée pour vérifier la partie source d'un fichier de description d'une ressource.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @param {object} operationManager - Le manager des opérations du service
-  * @param {table} resourceOperationTable - Tableau contenant l'ensemble des id d'opérations disponibles pour cette ressource
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
-  checkSource(sourceJsonObject, operationManager, resourceOperationTable) {
+  checkSourceConfiguration(sourceJsonObject) {
 
     LOGGER.info("Verification de la source...");
 
@@ -227,17 +124,14 @@ module.exports = class sourceManager {
       LOGGER.error("La ressource contient une source sans id.");
       return false;
     } else {
-      // On vérifie que l'id n'est pas déjà pris.
-      if (this._listOfSourceIds.length !== 0) {
+      // On vérifie que l'id n'est pas déjà chargé.
+      if (this._loadedSourceId.length !== 0) {
 
-        let present = false;
-
-        for (let i = 0; i < this._listOfSourceIds.length; i++ ) {
-          if (this._listOfSourceIds[i] === sourceJsonObject.id) {
-            LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja referencee.");
+        for (let i = 0; i < this._loadedSourceId.length; i++ ) {
+          if (this._loadedSourceId[i] === sourceJsonObject.id) {
+            LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja chargée.");
             // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
-            if (this.checkDuplicationSource(sourceJsonObject)) {
-              present = true;
+            if (this.checkDuplicationLoadedSource(sourceJsonObject)) {
               break;
             } else {
               LOGGER.error("La source contenant l'id " + sourceJsonObject.id + " n'est pas identique à la source deja identifiee.");
@@ -252,6 +146,30 @@ module.exports = class sourceManager {
       } else {
         // C'est la première source.
       }
+
+      // On vérifie que l'id n'est pas déjà vérifié.
+      if (this._checkedSourceId.length !== 0) {
+
+        for (let i = 0; i < this._checkedSourceId.length; i++ ) {
+          if (this._checkedSourceId[i] === sourceJsonObject.id) {
+            LOGGER.info("La source contenant l'id " + sourceJsonObject.id + " est deja vérifiée.");
+            // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
+            if (this.checkDuplicationCheckedSource(sourceJsonObject)) {
+              break;
+            } else {
+              LOGGER.error("La source contenant l'id " + sourceJsonObject.id + " n'est pas identique à la source deja identifiee.");
+              return false;
+            }
+
+          } else {
+            // on continue la boucle de vérification
+          }
+        }
+
+      } else {
+        // C'est la première source.
+      }
+
     }
 
     // Type
@@ -268,8 +186,6 @@ module.exports = class sourceManager {
         available = true;
         LOGGER.info("Source osrm.");
 
-        let operationFound = false;
-
         // On vérifie que le module osrm est disponible 
         try {
           let osrmTest = require('osrm');
@@ -278,28 +194,11 @@ module.exports = class sourceManager {
           return false;
         }
 
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("route")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite 
-          }
-        } else {
-          // on continue pour voir la suite 
-        }
-
-        if (!operationFound) {
-          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route), il n'est donc pas possible de charger cette source.");
-          return false;
-        }
-
         if (!this.checkSourceOsrm(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source osrm.");
           return false;
         } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
+          // il n'y a eu aucun problème, la source est correctement configurée.
         }
       } else {
         // On va voir si c'est un autre type.
@@ -318,37 +217,6 @@ module.exports = class sourceManager {
           return false;
         }
 
-        let operationFound = false;
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("route")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite 
-          }
-        } else {
-          // on continue pour voir la suite 
-        }
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("isochrone")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite 
-          }
-        } else {
-          // on continue pour voir la suite 
-        }
-
-        if (!operationFound) {
-          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
-          return false;
-        }
-
         if (!this.checkSourcePgr(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source pgr.");
           return false;
@@ -363,37 +231,6 @@ module.exports = class sourceManager {
       if (sourceJsonObject.type === "smartrouting") {
         available = true;
         LOGGER.info("Source smartrouting.");
-
-        let operationFound = false;
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("route")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite 
-          }
-        } else {
-          // on continue pour voir la suite 
-        }
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("isochrone")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite 
-          }
-        } else {
-          // on continue pour voir la suite 
-        }
-
-        if (!operationFound) {
-          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
-          return false;
-        }
 
         if (!this.checkSourceSmartrouting(sourceJsonObject)) {
           LOGGER.error("Erreur lors de la verification de la source smartrouting.");
@@ -412,9 +249,6 @@ module.exports = class sourceManager {
         return false;
       }
     }
-
-    this._listOfSourceIds.push(sourceJsonObject.id);
-    this._sourceDescriptions[sourceJsonObject.id] = sourceJsonObject;
 
     LOGGER.info("Fin de la verification de la source.");
     return true;
@@ -592,19 +426,19 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name checkDuplicationSource
+  * @name checkDuplicationLoadedSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
-  checkDuplicationSource(sourceJsonObject) {
+  checkDuplicationLoadedSource(sourceJsonObject) {
 
     LOGGER.info("Comparaison des deux sources identifiees et devant etre identiques...");
 
     // On récupère la description de la source faisant office de référence car lue la première.
-    let referenceSource = this._sourceDescriptions[sourceJsonObject.id];
+    let referenceSource = this._loadedSourceConfiguration[sourceJsonObject.id];
 
     // On compare les deux objets
     try {
@@ -623,19 +457,84 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name createSource
-  * @description Fonction utilisée pour créer une source.
+  * @name checkDuplicationCheckedSource
+  * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @param {Topology} topology - Instance de la classe Topology
-  * @return {Source} Source créée
+  * @return {boolean} 
   *
   */
 
-  createSource(sourceJsonObject, topology) {
+   checkDuplicationCheckedSource(sourceJsonObject) {
+
+    LOGGER.info("Comparaison des deux sources identifiees et devant etre identiques...");
+
+    // On récupère la description de la source faisant office de référence car lue la première.
+    let referenceSource = this._checkedSourceConfiguration[sourceJsonObject.id];
+
+    // On compare les deux objets
+    try {
+      assert.deepStrictEqual(sourceJsonObject, referenceSource);
+    } catch (err) {
+      LOGGER.error("Les deux sources ne sont pas identiques.");
+      LOGGER.debug(err);
+      return false;
+    }
+
+    LOGGER.info("Les deux sources sont identiques.");
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name saveCheckedSource
+  * @description Sauvegarder l'id de la source vérifié
+  * @param {object} configuration - Id de la source que l'on veut sauvegarder
+  *
+  */
+   saveCheckedSource(configuration) {
+
+    this._checkedSourceId.push(configuration.id);
+    this._checkedSourceConfiguration[configuration.id] = configuration;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name flushCheckedSource
+  * @description Vider la liste des source déjà vérifiées 
+  *
+  */
+  flushCheckedSource() {
+
+    this._checkedSourceId = new Array();
+    this._checkedSourceConfiguration = {};
+    
+  }
+
+  /**
+  *
+  * @function
+  * @name loadSourceConfiguration
+  * @description Fonction utilisée pour créer une source.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @param {Topology} topology - Instance de la classe Topology
+  * @return {boolean}
+  *
+  */
+
+  loadSourceConfiguration(sourceJsonObject, topology) {
 
     LOGGER.info("Creation de la source: " + sourceJsonObject.id);
 
     let source;
+
+    if (this._source[sourceJsonObject.id]) {
+      LOGGER.info("La source " + sourceJsonObject.id + " existe déjà");
+      return true;
+    }
 
     if (sourceJsonObject.type === "osrm") {
       source = new osrmSource(sourceJsonObject, topology);
@@ -646,47 +545,102 @@ module.exports = class sourceManager {
       source = new smartroutingSource(sourceJsonObject);
     } else {
       // On va voir si c'est un autre type.
+      LOGGER.error("Le type de la source est inconnu");
+      return false;
     }
-    return source;
+
+    this._loadedSourceId.push(sourceJsonObject.id);
+    this._loadedSourceConfiguration[sourceJsonObject.id] = sourceJsonObject;
+    this._source[sourceJsonObject.id] = source;
+
+    return true;
+
   }
 
   /**
   *
   * @function
   * @name connectSource
-  * @description Fonction utilisée pour connecter une source.
-  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @description Fonction utilisée pour connecter une source. 
+  * On la sépare volontairement du load de la source car on veut pouvoir gérer ces actions de manière indépendante. 
+  * @param {string} sourceId - Id de la source que l'on veut connecter
   *
   */
-  async connectSource(source) {
+  async connectSource(sourceId) {
 
-    LOGGER.info("Connexion a la source: " + source.id);
+    LOGGER.info("Connexion a la source: " + sourceId);
+
     try {
-      await source.connect();
+
+      await this._source[sourceId].connect();
       LOGGER.info("Source connectee.");
+      return true;
+
     } catch (err) {
+
       LOGGER.error("Impossible de connecter la source.", err);
-      throw errorManager.createError("Impossible de connecter la source.");
+      return false;
+
     }
+
   }
 
   /**
   *
   * @function
-  * @name disconnectSource
-  * @description Fonction utilisée pour déconnecter une source.
-  * @param {Source} source - Objet Source ou hérité de la classe Source
+  * @name connectAllSources
+  * @description Connecter l'ensemble des sources disponibles dans le manager
   *
   */
-  async disconnectSource(source) {
-    LOGGER.info("Déconnection de la source: " + source.id);
-    try {
-      await source.disconnect();
-      LOGGER.info("Source déconnectee.");
-    } catch (err) {
-      LOGGER.error("Impossible de déconnecter la source.", err);
-      throw errorManager.createError("Impossible de déconnecter la source.");
+  async connectAllSources() {
+
+    LOGGER.info("Connexion de l'ensemble des sources...");
+
+    if (this._loadedSourceId.length === 0) {
+      LOGGER.error("Aucune source n'est disponible");
+      return false;
     }
+
+    try {
+      assert.deepStrictEqual(this._loadedSourceConfiguration, {});
+      LOGGER.error("Aucune source n'a été préalablement chargée");
+      return false;
+    } catch (err) {
+      // tout va bien
+    }
+
+    let nbSourceConnected = 0;
+
+    for (let i = 0; i < this._loadedSourceId.length; i++) {
+      
+      LOGGER.info("Source : " + this._loadedSourceId[i]);
+
+      if (!(await this.connectSource(this._loadedSourceId[i]))) {
+
+        LOGGER.error("Source " + this._loadedSourceId[i] + " non connectée");
+        // TODO : on continue de connecter les autres sources et on gère après coup la MAJ des ressources, du getcap, etc... 
+        // Pour le moment, s'il y a une source qui ne fonctionne pas, on arrête le serveur 
+        return false;
+
+      } else {
+
+        LOGGER.info("Source " + this._loadedSourceId[i] + " connectée");
+        nbSourceConnected++;
+        
+      }
+      
+    }
+
+    LOGGER.info("Les démarrages se sont bien déroulés.");
+
+    if (nbSourceConnected === 0) {
+      LOGGER.error("Aucune source n'a pu être connectée");
+      return false;
+    } else {
+      LOGGER.info("Au moins une source a été connectée");
+      return true;
+    }
+
   }
 
 }

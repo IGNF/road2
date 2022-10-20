@@ -71,7 +71,7 @@ Afin que le serveur fonctionne, il est nécessaire de le [configurer](./document
 
 ### Lancement 
 
-Une fois configuré, il est possible de lancer le serveur avec la commande: 
+Une fois configuré, il est possible de lancer une instance de Road2 avec la commande: 
 ```
 node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/server.json
 ```

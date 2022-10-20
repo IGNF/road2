@@ -2,7 +2,7 @@ Feature: Road2 with Bduni data via OSRM
   Tests fonctionnels de Road2 prenant en compte la donnée Bduni via le moteur OSRM
 
   Background:
-      Given I have loaded all my test configuration in "../../configurations/local.json"
+      Given I have loaded all my test configuration in "../../configurations/local-service.json"
 
   Scenario Outline: [<method>] [simple/1.0.0] Route normale
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"

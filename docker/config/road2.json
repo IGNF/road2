@@ -1,53 +1,27 @@
 {
-  "application": {
-    "name": "Road2",
-    "title": "Service de calcul d'itinéraire",
-    "description": "Ce service permet de calculer des itinéraires sur les données du Géoportail.",
-    "url": "https://localhost/",
-    "provider": {
-      "name": "IGN",
-      "site": "www.ign.fr",
-      "mail": "sav@ign.fr"
+  "administration":{
+    "api" : {
+      "name" : "admin",
+      "version" : "1.0.0"
+    },
+    "services": [
+      {
+        "id": "main",
+        "configuration": "/home/docker/config/service.json",
+        "onStart": "true",
+        "creationType": "newProcess" 
+      }
+    ],
+    "network" : {
+      "server" : {
+        "id": "administrator",
+        "https": "false",
+        "host": "0.0.0.0",
+        "port": "8079"
+      }
     },
     "logs": {
-      "configuration": "/home/docker/config/log4js.json"
-    },
-    "operations":{
-      "directory": "/home/docker/app/src/resources/operations",
-      "parameters": {
-        "directory": "/home/docker/app/src/resources/parameters"
-      }
-    },
-    "resources": {
-      "directories": [
-        "/home/docker/data/resources/"
-      ]
-    },
-    "network": {
-      "servers": [
-        {
-          "id": "internalServer",
-          "https": "false",
-          "host": "0.0.0.0",
-          "port": "8080"
-        },
-        {
-          "id": "externalServer",
-          "https": "true",
-          "host": "0.0.0.0",
-          "port": "443",
-          "options": {
-            "key": "/run/secrets/key",
-            "cert": "/run/secrets/cert"
-          }
-        }
-      ],
-      "cors": {
-        "configuration": "/home/docker/config/cors.json"
-      }
-    }, 
-    "projections": {
-      "directory": "/home/docker/config/projections/"
+      "configuration": "/home/docker/config/log4js-administration.json"
     }
   }
 }

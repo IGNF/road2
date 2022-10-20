@@ -31,10 +31,10 @@ describe('Test de la classe ApisManager', function() {
 
   });
 
-  describe('Test de la fonction loadAPISDirectory()', function() {
+  describe('Test de la fonction loadApiDirectory()', function() {
 
-    it('loadAPISDirectory() avec les bons parametres', function() {
-      assert.equal(apisManager.loadAPISDirectory(app, "../../../test/integration/mocha/config/apis/", ""), true);
+    it('loadApiDirectory() avec les bons parametres', function() {
+      assert.equal(apisManager.loadApiDirectory(app, "../../../test/integration/mocha/config/apis/", ""), true);
     });
 
   });

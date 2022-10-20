@@ -3,7 +3,7 @@ Feature: Road2 with data
   Tests fonctionnels de Road2 prenant en compte la donnée 
 
   Background:
-      Given I have loaded all my test configuration in "../../configurations/local.json"
+      Given I have loaded all my test configuration in "../../configurations/local-admin.json"
 
   Scenario Outline: [admin/1.0.0] Une route qui n'existe pas 
     Given an "<method>" request on "/admin/1.0.0/test"

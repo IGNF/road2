@@ -2,7 +2,7 @@ Feature: Road2
   Tests fonctionnels de Road2 sur les requêtes de l'API simple 1.0.0
 
   Background:
-      Given I have loaded all my test configuration in "../../configurations/local.json"
+      Given I have loaded all my test configuration in "../../configurations/local-service.json"
 
   Scenario Outline: [<method>] Route principale
     Given an "<method>" request on "/"

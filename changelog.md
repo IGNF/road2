@@ -1,3 +1,13 @@
+# 2.0.0
+
+ADDED:
+  - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
+  - Cette classe est configurée par un nouveau fichier de configuration. 
+
+CHANGED:
+  - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement. 
+  - Le fichier server.json permet maintenant de configurer l'administrateur et donc n'a plus le même contenu. Ce dernier est dans service.json. 
+
 # 1.O.14
 FIXED:
   - Mauvaise ligne pour un log

@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const log4js = require('log4js');
 const ParameterManager = require('../parameters/parameterManager');
 const Operation = require('../operations/operation');
@@ -30,8 +29,11 @@ module.exports = class operationManager  {
   */
   constructor() {
 
+    // Liste des ids appartenant aux opérations chargées par le manager
+    this._loadedOperationId = new Array();
+
     // Liste des ids appartenant aux opérations vérifiées par le manager
-    this._listOfVerifiedOperationId = new Array();
+    this._checkedOperationId = new Array();
 
     // Parameter manager
     this._parameterManager = new ParameterManager();
@@ -40,19 +42,27 @@ module.exports = class operationManager  {
     this._operationCatalog = {};
 
     // Catalogue des configurations des opérations disponibles
-    this._operationConfigurationCatalog = {};
+    this._checkedOperationConfiguration = {};
 
   }
 
   /**
   *
   * @function
-  * @name get listOfVerifiedOperationId
-  * @description Récupérer l'ensemble des ids appartenant aux opérations vérifiées par le manager
+  * @name verifyCheckedOperation
+  * @description Savoir si une opération est vérifiée sur le service
+  * @param {string} operationId - Id de l'opération
   *
   */
-  get listOfVerifiedOperationId() {
-    return this._listOfVerifiedOperationId;
+  verifyCheckedOperation(operationId) {
+
+    for (let i = 0; i < this._checkedOperationId.length; i++) {
+      if (this._checkedOperationId[i] === operationId) {
+        return true;
+      }
+    }
+    return false;
+
   }
 
   /**
@@ -90,87 +100,72 @@ module.exports = class operationManager  {
   /**
   *
   * @function
-  * @name loadOperationDirectory
-  * @description Charger les opérations du dossier
-  * @param {string} userOperationDirectory - Dossier contenant les opérations (chemin absolu)
-  * @param {string} userParameterDirectory - Dossier contenant les paramètres (chemin absolu)
-  * @return {boolean}
+  * @name get checkOperationDirectory
+  * @description Vérifier les configurations d'opération d'un dossier 
+  * @param {string} directory - Dossier qui contient les configurations d'opération à vérifier
   *
   */
-  loadOperationDirectory(userOperationDirectory, userParameterDirectory) {
+  checkOperationDirectory(directory) {
 
-    LOGGER.info("Chargement des operations...");
+    LOGGER.info("Vérification du dossier d'opération...");
 
-    // Vérification de l'existence du dossier operations
-    let operationsDirectory = userOperationDirectory;
-    if (!fs.statSync(operationsDirectory).isDirectory()) {
-      LOGGER.error("Le dossier contenant la configuration des operations n'existe pas: " + operationsDirectory);
+    if (!fs.existsSync(directory)) {
+      LOGGER.error("Le dossier" + directory + "n'existe pas");
       return false;
     }
 
-    // Vérification de l'existence du dossier parameters
-    let parametersDirectory = userParameterDirectory;
-    if (!fs.statSync(parametersDirectory).isDirectory()) {
-      LOGGER.error("Le dossier contenant la configuration des parametres n'existe pas: " + parametersDirectory);
-      return false;
-    }
+    // On vérifie que l'application peut lire les fichiers du dossier
+    if (!fs.readdirSync(directory).every(operation => {
 
-    // Chargement des paramètres
-    // C'est le parameterManager qui s'en charge
-    if (!this._parameterManager.loadParameterDirectory(parametersDirectory)) {
-      LOGGER.error("Erreur lors du chargement des parametres");
-      return false;
-    } else {
-      LOGGER.info("Chargement des parametres ok");
-    }
+      let operationFile = "";
 
-    // Chargement des opérations
-    fs.readdirSync(operationsDirectory).forEach(operationConfFileName => {
-
-      let operationConfFile = operationsDirectory + "/" + operationConfFileName;
-
-      if (fs.statSync(operationConfFile).isFile()) {
-
-        // on récupère le contenu du fichier puis on le vérifie
-        let operationConf = JSON.parse(fs.readFileSync(operationConfFile));
-
-        if (this.checkOperationConf(operationConf)) {
-          // on stocke l'id si tout va bien
-          this._listOfVerifiedOperationId.push(operationConf.id);
-          // on crée l'opération et on l'ajoute au catalogue
-          // pour créer l'opération, il faut d'abord créer les paramètres
-          let parametersTable = this._parameterManager.createParameters(operationConf);
-          this._operationConfigurationCatalog[operationConf.id] = operationConf;
-          this._operationCatalog[operationConf.id] = new Operation(operationConf.id, operationConf.name, operationConf.description, parametersTable);
-
-        } else {
-          LOGGER.error("La configuration d'une operation est incorrecte: " + operationConfFile);
-          return false;
-        }
-
-      } else {
-        // On ne fait rien
+      try {
+        operationFile = directory + "/" + operation;
+        fs.accessSync(operationFile, fs.constants.R_OK);
+      } catch (err) {
+        LOGGER.error("Le fichier d'operation ne peut etre lu: " + operationFile);
       }
 
-    });
+      let fileContent = {};
+      try {
+        // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+        fileContent = JSON.parse(fs.readFileSync(operationFile));
+      } catch (error) {
+        LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier d'operation: " + operationFile);
+        LOGGER.error(error);
+        return false;
+      }
 
-    LOGGER.info("Operations chargees.");
+      if (!this.checkOperationConfiguration(fileContent)) {
+        LOGGER.error("Operation mal configurée");
+        return false;
+      } else {
+        this._checkedOperationId.push(fileContent.id);
+        this._checkedOperationConfiguration[fileContent.id] = fileContent;
+        LOGGER.info("Operation bien configurée");
+        return true;
+      }
+
+    })
+    ) {
+      LOGGER.error("Une des opérations est mal configurée");
+      return false;
+    }
 
     return true;
-
+    
   }
-
 
   /**
   *
   * @function
-  * @name checkOperationConf
+  * @name checkOperationConfiguration
   * @description Vérifier la configuration d'une opération
   * @param {json} operationConf - Configuration d'une opération de service
   * @return {boolean}
   *
   */
-  checkOperationConf(operationConf) {
+   checkOperationConfiguration(operationConf) {
 
     LOGGER.info("Verification de l'operation");
 
@@ -180,12 +175,28 @@ module.exports = class operationManager  {
       return false;
     } else {
 
-      // On vérifie que l'id n'est pas déjà pris.
-      if (this._listOfVerifiedOperationId.length !== 0) {
+      // On vérifie que l'id n'est pas déjà chargé.
+      if (this._loadedOperationId.length !== 0) {
 
-        for (let i = 0; i < this._listOfVerifiedOperationId.length; i++ ) {
-          if (this._listOfVerifiedOperationId[i] === operationConf.id) {
-            LOGGER.info("L'operation contenant l'id " + operationConf.id + " est deja referencee.");
+        for (let i = 0; i < this._loadedOperationId.length; i++ ) {
+          if (this._loadedOperationId[i] === operationConf.id) {
+            LOGGER.info("L'operation contenant l'id " + operationConf.id + " est deja chargée.");
+            return false;
+          } else {
+            // on continue de vérifier
+          }
+        }
+
+      } else {
+        // C'est la première operation. On ne fait rien, on continue la vérification
+      }
+
+      // On vérifie que l'id n'est pas déjà vérifié.
+      if (this._checkedOperationId.length !== 0) {
+
+        for (let i = 0; i < this._checkedOperationId.length; i++ ) {
+          if (this._checkedOperationId[i] === operationConf.id) {
+            LOGGER.info("L'operation contenant l'id " + operationConf.id + " est deja vérifié.");
             return false;
           } else {
             // on continue de vérifier
@@ -224,7 +235,7 @@ module.exports = class operationManager  {
       if (operationConf.parameters.length !== 0) {
         // on vérifie la validité des ids de paramètre fournis
         for (let i = 0; i < operationConf.parameters.length; i++ ) {
-          if (!this._parameterManager.isParameterAvailable(operationConf.parameters[i])) {
+          if (!this._parameterManager.isParameterChecked(operationConf.parameters[i])) {
             LOGGER.error("L'operation précise un parametre qui n'est pas disponible: " + operationConf.parameters[i]);
             return false;
           } else {
@@ -245,15 +256,150 @@ module.exports = class operationManager  {
   /**
   *
   * @function
-  * @name checkResourceOperationConf
+  * @name flushCheckedOperation
+  * @description Vider la liste des opérations et paramètres déjà vérifiés 
+  *
+  */
+  flushCheckedOperation() {
+
+    this._checkedOperationId = new Array();
+    this._checkedOperationConfiguration = {};
+    this._parameterManager.flushCheckedParameter();
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkParameterDirectory
+  * @description Vérifier les configurations de paramètre d'un dossier 
+  * @param {string} directory - Dossier qui contient les configurations de paramètre à vérifier
+  *
+  */
+  checkParameterDirectory(directory) {
+
+    return this._parameterManager.checkParameterDirectory(directory);
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadParameterDirectory
+  * @description Charger les configurations de paramètre d'un dossier 
+  * @param {string} directory - Dossier qui contient les configurations de paramètre à charger
+  *
+  */
+  loadParameterDirectory(directory) {
+
+    return this._parameterManager.loadParameterDirectory(directory);
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadOperationDirectory
+  * @description Charger les opérations du dossier
+  * @param {string} operationsDirectory - Dossier contenant les opérations (chemin absolu)
+  * @return {boolean}
+  *
+  */
+  loadOperationDirectory(operationsDirectory) {
+
+    LOGGER.info("Chargement des operations d'un dossier...");
+
+    // Vérification de l'existence du dossier operations
+    if (!fs.statSync(operationsDirectory).isDirectory()) {
+      LOGGER.error("Le dossier contenant la configuration des operations n'existe pas: " + operationsDirectory);
+      return false;
+    }
+
+    // Chargement des opérations
+    if (!fs.readdirSync(operationsDirectory).every(operationConfFileName => {
+
+      let operationConfFile = operationsDirectory + "/" + operationConfFileName;
+
+      if (fs.statSync(operationConfFile).isFile()) {
+
+        // on récupère le contenu du fichier puis on le vérifie
+        let operationConf = {};
+        try {
+          operationConf = JSON.parse(fs.readFileSync(operationConfFile));
+        } catch(error) {
+          LOGGER.error("Impossible de lire la configuration de l'opération dans le fichier " + operationConfFile);
+          return false;
+        }
+        
+        if (!this.loadOperationConfiguration(operationConf)) {
+          LOGGER.error("Impossible de charger l'opération configurée dans le fichier " + operationConfFile);
+          return false;
+        }
+
+      } else {
+        // On ne fait rien
+      }
+      
+      return true;
+
+    })
+    ) {
+      LOGGER.error("Une des opérations n'a pas pu être chargée");
+      return false;
+    }
+
+    LOGGER.info("Operations chargees.");
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadOperationConfiguration
+  * @description Charger une opération à partir de sa configuration
+  * @param {object} operationConf - Configuration de l'opération
+  * @return {boolean}
+  *
+  */
+  loadOperationConfiguration(operationConf) {
+
+    // on crée l'opération et on l'ajoute au catalogue
+    // pour créer l'opération, il faut d'abord récupérer les paramètres
+    let parametersTable = this._parameterManager.getParameters(operationConf);
+
+    if (parametersTable === null) {
+      LOGGER.error("Impossible de récuperer l'ensemble des parametres pour créer l'opération");
+      return false;
+    } else {
+      if (parametersTable.length === 0) {
+        LOGGER.error("Impossible de récuperer les parametres pour créer l'opération");
+        return false;
+      } else {
+        this._operationCatalog[operationConf.id] = new Operation(operationConf.id, operationConf.name, operationConf.description, parametersTable);
+      }
+    }
+    
+    // on stocke l'id si tout va bien
+    this._loadedOperationId.push(operationConf.id);
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkResourceOperationConfiguration
   * @description Vérifier la configuration d'une opération de ressource
   * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
   * @return {boolean}
   *
   */
-  checkResourceOperationConf(resourceOperationJsonObject) {
+  checkResourceOperationConfiguration(resourceOperationJsonObject) {
 
-    LOGGER.info("Verification de l'operation de la ressource");
+    LOGGER.info("Verification de l'operation de la ressource...");
 
     // on regarde d'abord la taille du tableau donné en entrée
     if (resourceOperationJsonObject.length === 0) {
@@ -273,7 +419,7 @@ module.exports = class operationManager  {
           LOGGER.info(currentOperationConf.id);
 
           // on vérifie qu'elle est bien disponible pour cette instance du service
-          if (!this.verifyAvailabilityOperation(currentOperationConf.id)) {
+          if (!this.verifyCheckedOperation(currentOperationConf.id)) {
             LOGGER.error("L'operation indiquee n'est pas disponible");
             // TODO: remplacer ce return par un continue pour affiner le chargement des ressources
             // par exemple, si la ressource indique une opération non disponible mais qu'on veuille quand même la charger pour les opérations disponibles
@@ -301,7 +447,7 @@ module.exports = class operationManager  {
 
           // On prend la liste des paramètres censé être là et on vérifie qu'ils sont bien présents et valides
           // On compare le nombre de paramètres attendus au nombre de paramètres présents et on compare pour être certain qu'il n'y en ait pas trop
-          let wantedParameters = this._operationConfigurationCatalog[currentOperationConf.id].parameters;
+          let wantedParameters = this._checkedOperationConfiguration[currentOperationConf.id].parameters;
 
           if (wantedParameters.length !== currentOperationConf.parameters.length) {
             LOGGER.error("Le nombre de parametres presents n'est pas celui attendu");
@@ -311,7 +457,7 @@ module.exports = class operationManager  {
           for(let j = 0; j < currentOperationConf.parameters.length; j++) {
             let currentParameterConf = currentOperationConf.parameters[j];
 
-            if (!this._parameterManager.checkResourceParameterConf(currentParameterConf)) {
+            if (!this._parameterManager.checkResourceParameterConfiguration(currentParameterConf)) {
               LOGGER.error("L'objet representant un parametre est mal configure");
               return false;
             } else {
@@ -319,55 +465,7 @@ module.exports = class operationManager  {
             }
           }
 
-        }
-
-      }
-
-    }
-
-    return true;
-
-  }
-
-  /**
-  *
-  * @function
-  * @name getResourceOperationConf
-  * @description Récupérer la liste des opérations disponibles sur une ressource
-  * @param {json} resourceOperationJsonObject - Configuration d'une opération de ressource
-  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
-  * @return {boolean}
-  *
-  */
-  getResourceOperationConf(resourceOperationJsonObject, operationTable) {
-
-    LOGGER.info("Recuperation des operations de la ressource");
-
-    // on regarde d'abord la taille du tableau donné en entrée
-    if (resourceOperationJsonObject.length === 0) {
-      LOGGER.error("Il n'y aucune operation decrite");
-      return false;
-    } else {
-
-      // on vérifie les opérations unes à une
-      for (let i = 0; i < resourceOperationJsonObject.length; i++) {
-        let currentOperationConf = resourceOperationJsonObject[i];
-
-        if (!currentOperationConf.id) {
-          LOGGER.error("L'objet representant l'operation n'a pas d'id");
-          return false;
-        } else {
-
-          LOGGER.info(currentOperationConf.id);
-
-          // on vérifie qu'elle est bien disponible pour cette instance du service
-          if (!this.verifyAvailabilityOperation(currentOperationConf.id)) {
-            LOGGER.error("L'operation indiquee n'est pas disponible");
-            return false;
-          } else {
-            // on le stocke
-            operationTable.push(currentOperationConf.id);
-          }
+          LOGGER.info("Operation de ressource bien configurée");
 
         }
 
@@ -382,53 +480,19 @@ module.exports = class operationManager  {
   /**
   *
   * @function
-  * @name isAvailableInTable
-  * @description Savoir si une opération est disponible dans une liste d'opérations de ressource
-  * @param {string} operationId - Id de l'opération de ressource recherchée
-  * @param {table} operationTable - Tableau contenant les ids d'opérations de ressource
-  * @return {boolean}
-  *
-  */
-
-  isAvailableInTable (operationId, resourceOperationTable) {
-
-    if (resourceOperationTable.length === 0) {
-      LOGGER.error("Le tableau d'operations est vide.")
-      return false;
-    } else {
-
-      for (let i = 0; i < resourceOperationTable.length; i++) {
-        LOGGER.info(resourceOperationTable[i]);
-        if (operationId === resourceOperationTable[i]) {
-          return true;
-        }
-      }
-
-    }
-
-    LOGGER.info("Operation non trouvee.");
-    return false;
-  }
-
-  /**
-  *
-  * @function
-  * @name createResourceOperation
+  * @name loadResourceOperationConfiguration
   * @description Créer l'ensemble des opérations d'une ressource
   * @param {object} resourceOperationHash - Objet contenant les opérations de ressource
   * @param {json} resourceJsonObject - Configuration d'une opération de ressource
   * @return {boolean}
   *
   */
-  createResourceOperation(resourceOperationHash, resourceJsonObject) {
+  loadResourceOperationConfiguration(resourceOperationHash, resourceJsonObject) {
 
     LOGGER.info("Creation des operations de la ressource");
 
     // on crée les opérations unes à une
     for (let i = 0; i < resourceJsonObject.resource.availableOperations.length; i++) {
-
-      // TODO: tester à nouveau si l'opération est bien disponible sur le service
-      // cela permet de ne charger que les opérations disponibles
       
       // on isole la conf de l'opération
       let currentOperationConf = resourceJsonObject.resource.availableOperations[i];
@@ -437,7 +501,7 @@ module.exports = class operationManager  {
       // création des paramètres de l'opération de ressource
       let resourceParameterHash = {};
 
-      if (!this._parameterManager.createResourceParameter(resourceParameterHash, currentOperationConf)) {
+      if (!this._parameterManager.loadResourceParameterConfiguration(resourceParameterHash, currentOperationConf)) {
         LOGGER.error("Erreur lors de la creation des parametres de l'operation");
         return false;
       }

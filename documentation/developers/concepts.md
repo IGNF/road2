@@ -112,7 +112,23 @@ Cette partie décrit l'application de ces concepts dans le code au cours d'une e
 
 ### 2.1 Au lancement de l'application
 
-Road2 est un serveur web. Son point d'entrée est le fichier `src/js/road2.js`. Ce fichier va générer une instance de la classe `Service`. 
+Le projet Road2 propose deux serveurs web, un service et un administrateur. Il donc possède deux points d'entrée selon l'usage que l'on souhaite en faire. On peut lancer uniquement le service et cela fonctionnera très bien. Et on peut aussi lancer un administrateur uniquement. Celui-ci lancera un service quand on le lui demandera. Enfin, on peut lancer les deux d'un coup.  
+
+#### 2.1.1 Lancement de l'administrateur 
+
+Le premier point d'entrée possible est le fichier `src/js/road2.js`. Ce fichier va générer une instance de la classe `Administrator`.
+
+Cet administrateur permet plusieurs choses : 
+- On peut le lancer uniquement pour vérifier la bonne configuration de l'administrateur et des services associés. Dans ce cas là, le processus s'éteint après la vérification et renvoie un code d'erreur permettant de déterminer s'il y a eu un problème et son type. 
+- On peut le lancer en mode serveur pour administrer un ou plusieurs services via une API HTTP(S). Dans ce cas là, il est possible de lui demander de lancer les service à son démarrage. Il sera aussi possible de les démarrer plus tard. 
+
+Un administrateur a été créé pour réaliser des tâches qui auraient gêné la bonne exécution du service. 
+
+L'administrateur a donc été créé pour être indépendant du service. Si l'administrateur a des tâches fastidieuses, cela n'impacte pas le service. Si l'un tombe, l'autre non. 
+
+#### 2.1.2 Lancement d'un service 
+
+Le point d'entrée historique est le fichier `src/js/service/main.js`. Ce fichier va générer une instance de la classe `Service`. 
 
 Ce service est l'objet qui permet de gérer les ressources proposées par l'instance en cours. Il contient donc un catalogue de ressources et un manager de ressources.
 
@@ -122,7 +138,25 @@ Lorsque l'application est lancée, on commence par lire la configuration de l'ap
 
 Après cela, on charge les ressources et les sources du service indiquées dans la configuration. C'est à ce moment que les fichiers sont lus, stockés en RAM si nécessaire, et que les connexions aux bases de données sont effectuées. 
 
-Enfin, on finit par charger les APIs exposées par le service. C'est là qu'ExpressJS crée le ou les serveurs Node et charge les routes disponibles. 
+Enfin, on finit par charger les APIs exposées par le service. C'est là qu'ExpressJS crée le ou les serveurs Node et charge les routes disponibles.  
+
+#### 2.1.3 Zoom sur la vérification de la configuration 
+
+Que ce soit un administrateur ou un service, la configuration sera vérifiée. 
+
+Cela passe généralement par des managers. 
+
+##### Les managers
+
+La plupart des classes ont un manager. Ce manager permet comme précisé juste avant de vérifier les configurations. Mais il permet aussi de créer les instances des classes concernées. Enfin, il garde aussi un trace des différentes instances et permet donc de les gérer. 
+
+Les managers sont conçus pour être utilisés de la manière suivante : on le crée sans configuration. Par contre, il peut avoir d'autres managers en paramètre. 
+Une fois créé, ce manager peut être utilisé pour vérifier une configuration. On peut lui donner la configuration d'un objet ou on peut parfois lui donner un ensemble de configuration. Dans ce deuxième cas, il y aura généralement une cohérence à vérifier entre chaque configuration. 
+Ensuite, on pourra charger des objets à partir de leur configuration. Il est important de faire un check avant un load. Car les load présupposent la validité de la configuration. Ce qui est connu par un check. De la même manière, on pourra parfois en charger plusieurs par un seul appel au manager. Le fait de charger une seule fois une configuration présente en divers endroits sera géré dans le manager.  
+
+Pour bien fonctionner, le manager aura donc deux listes. Une liste plutôt éphémère qui gardera une trace des configurations déjà vérifiées. Elle servira à vérifier la cohérence de l'ensemble des configurations. Cette liste devra être vidée quand les vérifications seront terminées. 
+La deuxième liste sera une liste des configurations déjà chargées. Cette liste est persistante et indique l'état du manager. Elle sert à s'assurer que l'on charge une seule fois chaque configuration même si elle est demandée plusieurs fois. 
+Aussi, quand on souhaitera modifier la configuration durant la vie de l'application, c'est cette liste qui sera considérée la première pour vérifier la cohérence. La première liste ne sera réutilisée que si c'est un ensemble censé être cohérent que l'on vérifie. 
 
 ### 2.2 : A la réception d'une requête
 

@@ -1,4 +1,4 @@
-# Description d'un fichier de configuration de l'application Road4
+# Description d'un fichier de configuration de service
 
 # Une application est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
 "application":
@@ -138,3 +138,18 @@
         "directory":
           type: string
           required: true
+		# Indication des apis utilisées pour cette instance. Cela doit correspondre avec un dossier présent dans les APIs du projet
+		"apis":
+			required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+					# Nom de l'api
+					"name":
+						type: string
+						required: true
+					# Version de l'api
+					"version":
+						type: string
+						required: true

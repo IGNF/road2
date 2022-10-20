@@ -86,10 +86,14 @@ module.exports = class Base {
         throw errorManager.createError("PG is not available");
       }
 
+      // TODO : supprimer le return si pas utile
+      // return new Promise();
+
     } catch (err) {
       LOGGER.error("connection error", err.stack)
       throw errorManager.createError("Cannot connect to database");
     }
+
 
   }
 

@@ -3,7 +3,6 @@
 const Server = require('./server');
 const log4js = require('log4js');
 const fs = require('fs');
-const path = require('path');
 const assert = require('assert');
 
 // Création du LOGGER
@@ -29,22 +28,32 @@ module.exports = class serverManager {
   */
   constructor() {
 
+    // Liste des serveurs chargés
+    this._loadedServerId = new Array();
+
+    // Liste des serveurs vérifiés
+    this._checkedServerId = new Array();
+
     // Catalogue de serveurs
     this._serverCatalog = {};
 
     // Description des serveurs
-    this._serverDescriptions = new Array();
+    this._loadedServerDescription = {};
+
+    // Description des serveurs
+    this._checkedServerDescription = {};
 
   }
 
   /**
   *
   * @function
-  * @name checkConfiguration
+  * @name checkServerConfiguration
   * @description Vérifier la configuration d'un serveur
+  * @param {object} config - Configuration à vérifier
   *
   */
-  checkConfiguration(config) {
+   checkServerConfiguration(config) {
 
     if (!config) {
       LOGGER.error("Aucune configuration n'a ete fournie");
@@ -57,7 +66,27 @@ module.exports = class serverManager {
       LOGGER.error("La configuration du serveur n'indique aucun id");
       return false;
     } else {
-      // TODO: Vérification
+      
+      // On vérifie que l'id n'est pas déjà chargé
+      if (this._loadedServerId.length !== 0) {
+        for (let i = 0; i < this._loadedServerId.length; i++) {
+          if (config.id === this._loadedServerId[i]) {
+            LOGGER.error("Un serveur contenant l'id " + config.id + " est deja chargé.");
+            return false;
+          }
+        }
+      }
+
+      // On vérifie que l'id n'est pas déjà pris par le check courant
+      if (this._checkedServerId.length !== 0) {
+        for (let i = 0; i < this._checkedServerId.length; i++) {
+          if (config.id === this._checkedServerId[i]) {
+            LOGGER.error("Un serveur contenant l'id " + config.id + " est déjà verifié.");
+            return false;
+          }
+        }
+      }
+
     }
 
     if (!config.https) {
@@ -176,53 +205,49 @@ module.exports = class serverManager {
 
     }
 
-    // Stockage de la description
-    this._serverDescriptions.push(config);
-
     return true;
 
   }
 
-  /**
-  *
-  * @function
-  * @name createServer
-  * @description Créer un serveur
-  *
-  */
-  createServer(app, config) {
+  saveServerConfiguration(config) {
 
-    if (config.https === "true") {
-      return new Server(config.id, app, config.host, config.port, "true", config.options);
-    } else {
-      return new Server(config.id, app, config.host, config.port, "false", config.options);
-    }
+    this._checkedServerId.push(config.id);
+    this._checkedServerDescription[config.id] = config;
 
   }
 
   /**
   *
   * @function
-  * @name createAllServer
-  * @description Créer l'ensemble des serveurs disponibles dans le manager
+  * @name loadServerConfiguration
+  * @description Créer un serveur
+  * @param {object} app - Instance d'ExpressJS
+  * @param {object} config - Configuration du serveur
   *
   */
-  createAllServer(app) {
+   loadServerConfiguration(app, config) {
 
-    if (this._serverDescriptions.length === 0) {
-      LOGGER.error("Aucun serveur n'est disponible.");
-      return false;
-    }
+    LOGGER.info("Chargement du serveur : " + config.id);
 
-    for(let i = 0; i < this._serverDescriptions.length; i++) {
-      let configuration = this._serverDescriptions[i];
-      try {
-        this._serverCatalog[configuration.id] = this.createServer(app, configuration);
-      } catch (err) {
-        return false;
+    // On vérifie que l'id n'est pas déjà chargé
+    if (this._loadedServerId.length !== 0) {
+      for (let i = 0; i < this._loadedServerId.length; i++) {
+        if (config.id === this._loadedServerId[i]) {
+          LOGGER.info("Un serveur contenant l'id " + config.id + " est deja chargé.");
+          return true;
+        }
       }
     }
 
+    if (config.https === "true") {
+      this._serverCatalog[config.id] = new Server(config.id, app, config.host, config.port, "true", config.options);
+    } else {
+      this._serverCatalog[config.id] = new Server(config.id, app, config.host, config.port, "false", config.options);
+    }
+
+    this._loadedServerId.push(config.id);
+    this._loadedServerDescription[config.id] = config;
+
     return true;
 
   }
@@ -230,15 +255,29 @@ module.exports = class serverManager {
   /**
   *
   * @function
-  * @name startAllServer
-  * @description Démarer l'ensemble des serveurs disponibles dans le manager
+  * @name flushCheckedServer
+  * @description Vider la liste des serveurs déjà vérifiées 
   *
   */
-  startAllServer() {
+   flushCheckedServer() {
+
+    this._checkedServerId = new Array();
+    this._checkedServerDescription = {};
+
+  }
+
+  /**
+  *
+  * @function
+  * @name startAllServers
+  * @description Démarrer l'ensemble des serveurs disponibles dans le manager
+  *
+  */
+  startAllServers() {
 
     LOGGER.info("Demarrage de l'ensemble des serveurs.");
 
-    if (this._serverDescriptions.length === 0) {
+    if (this._loadedServerId.length === 0) {
       LOGGER.error("Aucun serveur n'est disponible.");
       return false;
     }
@@ -276,7 +315,7 @@ module.exports = class serverManager {
 
     LOGGER.info("Arret de l'ensemble des serveurs.");
 
-    if (this._serverDescriptions.length === 0) {
+    if (this._loadedServerId.length === 0) {
       LOGGER.warn("Aucun serveur n'est disponible.");
       return true;
     }

@@ -18,8 +18,8 @@ describe('Test de la classe BaseManager', function() {
 
   describe('Test du constructeur et des getters/setters', function() {
 
-    it('Get listOfVerifiedDbConfig', function() {
-      assert.deepEqual(baseManager.listOfVerifiedDbConfig, new Array());
+    it('Get loadedBaseConfiguration', function() {
+      assert.deepEqual(baseManager.loadedBaseConfiguration, new Array());
     });
 
     it('Get baseCatalog', function() {
@@ -30,17 +30,22 @@ describe('Test de la classe BaseManager', function() {
 
   describe('Verifications des configurations', function() {
 
-    it('checkBase()', function() {
-      assert.equal(baseManager.checkBase(configuration), true);
-      assert.deepEqual(baseManager.listOfVerifiedDbConfig, [configuration]);
+    it('checkBaseConfiguration()', async function() {
+      let response = await baseManager.checkBaseConfiguration(configuration);
+      assert.equal(response, true);
+    });
+
+    it('saveCheckedBaseConfiguration()', function() {
+      baseManager.saveCheckedBaseConfiguration(configuration);
+      assert.deepEqual(baseManager._checkedBaseConfiguration, [configuration]);
     });
 
   });
 
   describe('Creation d\'une base', function() {
 
-    it('createBase()', function() {
-      let newBase = baseManager.createBase(configuration);
+    it('loadBaseConfiguration()', function() {
+      let newBase = baseManager.loadBaseConfiguration(configuration);
       // TODO: comprendre pourquoi le assert qui suit ne marche pas 
       // assert.deepEqual(baseManager.baseCatalog[configuration], referenceBase);
       assert.equal(newBase.connected, false);

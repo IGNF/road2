@@ -18,11 +18,11 @@ module.exports = {
 
   shutdown: function(error) {
 
-    LOGGER.info("Extinction du serveur.")
-
-    log4js.shutdown(function(){
-      process.exit(error);
-    });
+    LOGGER.info("Extinction du processus");
+    // TODO : à voir si on en a besoin
+    // log4js.shutdown(() => {});
+    // setTimeout(() => {process.exit(error);},"1000");
+    process.exit(error);
 
   }
 

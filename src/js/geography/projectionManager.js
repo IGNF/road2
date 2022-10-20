@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const proj4 = require('proj4');
 const log4js = require('log4js');
 
@@ -28,45 +27,261 @@ module.exports = class ProjectionManager {
   */
   constructor() {
 
-    // Liste des ids de projections disponibles
-    this._listOfProjectionId = new Array();
+    // Liste des ids de projections disponibles car déjà chargées dans proj4
+    this._loadedProjectionId = new Array();
+
+    // Liste des ids des projections déjà vérifiées et qui doivent être cohérentes avec les prochaines qui seront vérifiés
+    // Cet objet doit être vidé quand l'ensemble des configurations a été vérifié
+    this._checkedProjectionId = new Array();
 
   }
 
   /**
   *
   * @function
-  * @name get listOfProjectionId
+  * @name get loadedProjectionId
   * @description Récupérer la liste des ids de projections disponibles
   *
   */
-  get listOfProjectionId () {
-    return this._listOfProjectionId;
+  get loadedProjectionId () {
+    return this._loadedProjectionId;
   }
 
   /**
   *
   * @function
-  * @name isAvailableById
-  * @description Savoir si une projection est disponible
+  * @name isAvailable
+  * @description Savoir si une projection est disponible dans l'instance de proj4
+  * @param {string} id - ID de la projection 
   *
   */
-  isAvailableById (id) {
+  isAvailable (id) {
 
     if (!id) {
       return false;
     }
-    if (this._listOfProjectionId.length === 0) {
+    if (this._loadedProjectionId.length === 0) {
       return false;
     }
 
-    for (let i = 0; i < this._listOfProjectionId.length; i++) {
-      if (id === this._listOfProjectionId[i]) {
+    for (let i = 0; i < this._loadedProjectionId.length; i++) {
+      if (id === this._loadedProjectionId[i]) {
         return true;
       }
     }
 
     return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name isChecked
+  * @description Savoir si une projection a été validé durant l'étape de vérification
+  * @param {string} id - ID de la projection 
+  *
+  */
+   isChecked (id) {
+
+    if (!id) {
+      return false;
+    }
+    if (this._checkedProjectionId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._checkedProjectionId.length; i++) {
+      if (id === this._checkedProjectionId[i]) {
+        return true;
+      }
+    }
+
+    return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkProjectionDirectory
+  * @description Vérifier les projections d'un dossier
+  * @param {string} projectionDirectory - Chemin absolu d'un dossier de projections 
+  *
+  */
+  checkProjectionDirectory(projectionDirectory) {
+
+    LOGGER.info("Vérification du dossier de projections...");
+
+    if (fs.existsSync(projectionDirectory)) {
+
+      try {
+
+        // On vérifie que l'application peut lire les fichiers du dossier
+        if (!fs.readdirSync(projectionDirectory).every(projectionName => {
+
+          let projectionFile = projectionDirectory + "/" + projectionName;
+
+          if (!this.checkProjectionFile(projectionFile)) {
+            LOGGER.error("Le fichier " + projectionFile + " est mal configuré");
+            return false;
+          } else {
+            LOGGER.info("Le fichier " + projectionFile + " est bien configuré");
+            return true;
+          }
+
+          })
+        ) {
+          LOGGER.error("Un des fichiers de projection est mal configuré");
+          return false;
+        }
+
+      } catch(error) {
+        LOGGER.error("Impossible de lire le dossier");
+        return false;
+      }
+
+      return true;
+
+    } else {
+      LOGGER.fatal("Mauvaise configuration: Dossier de projections inexistant : " + projectionDirectory);
+      return false; 
+    }
+
+  }
+
+
+  /**
+  *
+  * @function
+  * @name checkProjectionFile
+  * @description Vérifier les projections d'un fichier
+  * @param {string} projectionFile - Chemin absolu d'un fichier de projections 
+  *
+  */
+  checkProjectionFile(projectionFile) {
+
+    LOGGER.info("Vérification du fichier de projections : " + projectionFile);
+
+    try {
+      fs.accessSync(projectionFile, fs.constants.R_OK);
+    } catch (err) {
+      LOGGER.error("Le fichier de projection ne peut etre lu: " + projectionFile);
+      return false;
+    }
+
+    let fileContent = {};
+    try {
+      fileContent = JSON.parse(fs.readFileSync(projectionFile));
+    } catch (error) {
+      LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de projection: " + projectionFile);
+      LOGGER.error(error);
+      return false;
+    }
+
+    if (!fileContent.projectionsList) {
+      LOGGER.error("La fichier des projections ne contient pas de liste");
+      return false;
+    }
+
+    if (!Array.isArray(fileContent.projectionsList)) {
+      LOGGER.error("L'attribut projectionsList de la configuration n'est pas un tableau.");
+      return false;
+    }
+
+    if (fileContent.projectionsList.length === 0) {
+      LOGGER.error("L'attribut projectionsList de la configuration est un tableau vide.");
+      return false;
+    }
+
+    for (let i = 0; i < fileContent.projectionsList.length; i++) {
+      if (!this.checkProjectionConfiguration(fileContent.projectionsList[i])) {
+        LOGGER.error("Mauvaise configuration d'une projection dans le fichier.");
+        return false;
+      } else {
+        this._checkedProjectionId.push(fileContent.projectionsList[i].id);
+      }
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkProjectionConfiguration
+  * @description Vérifier les projections d'un fichier
+  * @param {object} configuration - Configuration d'une projection
+  *
+  */
+  checkProjectionConfiguration(configuration) {
+
+    LOGGER.info("Vérification d'une projection");
+
+    // id de la projection
+    if (!configuration) {
+      LOGGER.error("La configuration de la projection est vide");
+      return false;
+    } 
+
+    // id de la projection
+    if (!configuration.id) {
+      LOGGER.error("La configuration de la projection n'a pas d'id");
+      return false;
+    } else {
+      LOGGER.debug("Projection id : " + configuration.id);
+    }
+
+    // Parametres de la projection
+    if (!configuration.parameters) {
+      LOGGER.error("La configuration de la projection n'a pas de parametres");
+      return false;
+    } else {
+      
+      if (typeof configuration.parameters !== "string") {
+        LOGGER.error("Les parametres de la projection ne sont pas une string");
+        return false;
+      } else {
+        LOGGER.debug("Projection parameters : " + configuration.parameters);
+      }
+
+    }
+
+    // On vérifie que l'id n'est pas déjà chargé
+    if (this._loadedProjectionId.length !== 0) {
+      for (let i = 0; i < this._loadedProjectionId.length; i++) {
+        if (configuration.id === this._loadedProjectionId[i]) {
+          LOGGER.error("Une projection contenant l'id " + configuration.id + " est deja chargee.");
+          return false;
+        }
+      }
+    }
+
+    // On vérifie que l'id n'est pas déjà pris par le check courant
+    if (this._checkedProjectionId.length !== 0) {
+      for (let i = 0; i < this._checkedProjectionId.length; i++) {
+        if (configuration.id === this._checkedProjectionId[i]) {
+          LOGGER.error("Une projection contenant l'id " + configuration.id + " est deja verifiee.");
+          return false;
+        }
+      }
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name flushCheckedProjection
+  * @description Vider la liste des projections déjà vérifiées 
+  *
+  */
+  flushCheckedProjection() {
+
+    this._checkedProjectionId = new Array();
 
   }
 
@@ -137,7 +352,7 @@ module.exports = class ProjectionManager {
       LOGGER.error("Pas de fichier");
       return false;
     } else {
-      LOGGER.info(file);
+      LOGGER.debug(file);
     }
 
     let pathFile = file;
@@ -174,7 +389,7 @@ module.exports = class ProjectionManager {
     }
 
     for (let i = 0; i < fileContent.projectionsList.length; i++) {
-      if (!this.loadProjection(fileContent.projectionsList[i])) {
+      if (!this.loadProjectionConfiguration(fileContent.projectionsList[i])) {
         LOGGER.error("Erreur lors du chargement d'une projection du fichier.");
         return false;
       }
@@ -188,12 +403,12 @@ module.exports = class ProjectionManager {
   /**
   *
   * @function
-  * @name loadProjection
+  * @name loadProjectionConfiguration
   * @description Charger la projection décrite via sa configuration
   * @param {json} configuration - configuration de la projection
   *
   */
-  loadProjection (configuration) {
+  loadProjectionConfiguration (configuration) {
 
     LOGGER.info("Chargement d'une projection");
 
@@ -208,7 +423,7 @@ module.exports = class ProjectionManager {
       LOGGER.error("La configuration de la projection n'a pas d'id");
       return false;
     } else {
-      LOGGER.info(configuration.id);
+      LOGGER.debug(configuration.id);
     }
 
     // Parametres de la projection
@@ -216,13 +431,14 @@ module.exports = class ProjectionManager {
       LOGGER.error("La configuration de la projection n'a pas de parametres");
       return false;
     } else {
-      // TODO: vérification des parametres ?
+      // On ne vérifie pas les paramètres car c'est fait dans le check
+      LOGGER.debug(configuration.parameters);
     }
 
     // On vérifie que l'id n'est pas déjà pris
-    if (this._listOfProjectionId.length !== 0) {
-      for (let i = 0; i < this._listOfProjectionId.length; i++) {
-        if (configuration.id === this._listOfProjectionId[i]) {
+    if (this._loadedProjectionId.length !== 0) {
+      for (let i = 0; i < this._loadedProjectionId.length; i++) {
+        if (configuration.id === this._loadedProjectionId[i]) {
           LOGGER.error("Une projection contenant l'id " + configuration.id + " est deja referencee.");
           return false;
         }
@@ -234,7 +450,7 @@ module.exports = class ProjectionManager {
 
       proj4.defs(configuration.id, configuration.parameters);
       // On stocke l'id
-      this._listOfProjectionId.push(configuration.id);
+      this._loadedProjectionId.push(configuration.id);
 
     } catch(error) {
       LOGGER.error("Impossible de charger la projection dans proj4: ");

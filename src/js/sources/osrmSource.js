@@ -39,16 +39,13 @@ module.exports = class osrmSource extends Source {
   * @name constructor
   * @description Constructeur de la classe osrmSource
   * @param {json} sourceJsonObject - Description de la source en json
-  * @param{topology} topology -  Instance de la classe Topology
+  * @param {topology} topology -  Instance de la classe Topology
   *
   */
   constructor(sourceJsonObject, topology) {
 
     // Constructeur parent
     super(sourceJsonObject.id,sourceJsonObject.type, topology);
-
-    // Ajout des opérations possibles sur ce type de source
-    this.availableOperations.push("route");
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;

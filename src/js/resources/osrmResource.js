@@ -140,30 +140,4 @@ module.exports = class osrmResource extends Resource {
 
   }
 
-  /**
-  *
-  * @function
-  * @name removeSource
-  * @description Supprimer les references à une source au sein de la ressource
-  * @param {string} sourceId - Id de la source 
-  * @return {boolean} 
-  *
-  */
-  removeSource (sourceId) {
-
-    let keysToDelete = new Array();
-    for (let key in this._linkedSource) {
-      if (this._linkedSource[key] === sourceId) {
-        keysToDelete.push(key);
-      }
-    }
-    if(keysToDelete.length !== 0) {
-      for (let i = 0; i < keysToDelete.length; i++) {
-        delete this._linkedSource[keysToDelete[i]];
-      }
-    }
-    
-    return true;
-  }
-
 }

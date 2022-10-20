@@ -2,13 +2,33 @@
 
 ## Vue globale 
 
-Pour instancier Road2, il est nécessaire de lui fournir un certain nombre d'informations. Pour cela, il y a un unique point d'entrée qui est le *server.json*. Ce fichier va indiquer l'emplacement des autres: *log4js.json* pour les logs, le *cors.json* si on souhaite spécifier une politique de CORS, le dossier des *projections* et les dossiers des *ressources*. 
+Pour instancier Road2, il est nécessaire de lui fournir un certain nombre d'informations. Pour cela, il y a différents JSON. Les fichiers que l'on va remplir vont dépendre de l'usage que l'on veut en faire. Nous allons présenter un usage complet. Ce dernier permettra de comprendre les autres usages. 
 
-## server.json
+Un usage complet des possibilités offertes par le projet Road2 est le suivant : on veut instancier, dès le démarrage, un administrateur et son service. 
+
+Dans ce cas là, nous aurons pour point d'entrée, le fichier *administration.json*. 
+
+Ce fichier va indiquer plusieurs informations et deux éléments : 
+- l'emplacement de la configuration des services : un *service.json* par services associés. 
+- un *log4js.json* pour les logs de l'administrateur
+
+Chaque *service.json* va indiquer les éléments suivants : 
+- un *log4js.json* pour les logs de l'administrateur et un par service, 
+- un *cors.json* par service si on souhaite spécifier une politique de CORS, 
+- le dossier des *projections*, 
+- les dossiers des *ressources*. 
+
+## administration.json
+
+Ce fichier indique quelques informations générales liées à l'instance d'administration. Son principal objectif est l'indication des logs et des services gérés. 
+
+On peut trouver un [exemple](../../docker/config/road2.json) de ce fichier et le [modèle](./admin_model.yaml) au format YAML. 
+
+## service.json
 
 Ce fichier indique quelques informations générales liées à l'instance de Road2. Son principal objectif est l'indication des logs et des ressources du serveur. Néanmoins, il permet de préciser beaucoup plus d'informations, comme les opérations ou les projections disponibles sur l'instance. 
 
-On peut trouver un [exemple](../../docker/config/road2.json) de ce fichier et le [modèle](./configuration_model.yaml) au format YAML. 
+On peut trouver un [exemple](../../docker/config/service.json) de ce fichier et le [modèle](./service_model.yaml) au format YAML. 
 
 ## log4js.json
 
@@ -17,7 +37,7 @@ Le format est celui d'un JSON qui contient deux objets `mainConf` et `httpConf`.
 
 Le contenu de `mainConf` est un objet de configuration log4js. Le contenu de `httpConf` est un attribut `level` reprenant les niveaux proposés par log4js et un attribut `format` reprenant la syntaxe disponible pour log4js. Ces deux attributs doivent être présents. 
 
-On peut trouver un [exemple](../../docker/config/log4js.json) de ce fichier au format JSON. C'est celui qui est utilisé dans les images docker.  
+On peut trouver un [exemple](../../docker/config/log4js-service.json) de ce fichier au format JSON. C'est celui qui est utilisé dans les images docker.  
 
 ## cors.json 
 

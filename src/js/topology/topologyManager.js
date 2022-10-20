@@ -28,14 +28,20 @@ module.exports = class topologyManager {
   */
   constructor(baseManager, projectionManager) {
 
-    // Liste des descriptions de topologies vérifiées et validées par le manager
-    this._listOfTopologyIds = new Array();
+    // Liste des descriptions de topologies chargées par le manager
+    this._loadedTopologyId = new Array();
 
-    // Descriptions des topologies vérifiées et validées par le manager
-    this._topologyDescriptions = {};
+    // Liste des descriptions de topologies vérifiées et validées par le manager
+    this._checkedTopologyId = new Array();
+
+    // Descriptions des topologies chargées par le manager
+    this._loadedTopologyConfiguration = {};
+
+    // Descriptions des topologies vérifiées par le manager
+    this._checkedTopologyConfiguration = {};
 
     // Le catalogue des topologies créées par le manager
-    this._topologiesCatalog = {};
+    this._topologyCatalog = {};
 
     // Manager de bases
     this._baseManager = baseManager;
@@ -48,25 +54,25 @@ module.exports = class topologyManager {
   /**
   *
   * @function
-  * @name get topologiesCatalog
+  * @name get topologyCatalog
   * @description Récupérer le catalogue des topologies
   *
   */
-  get topologiesCatalog() {
-    return this._topologiesCatalog;
+  get topologyCatalog() {
+    return this._topologyCatalog;
   }
 
   /**
   *
   * @function
-  * @name getTopologyById
+  * @name getTopology
   * @description Récupérer une topologie via son id
-  * @param{string} id - Id de la topologie
+  * @param {string} id - Id de la topologie
   *
   */
-  getTopologyById(id) {
-    if (this._topologiesCatalog[id]) {
-      return this._topologiesCatalog[id];
+  getTopology(id) {
+    if (this._topologyCatalog[id]) {
+      return this._topologyCatalog[id];
     } else {
       return {};
     }
@@ -76,26 +82,28 @@ module.exports = class topologyManager {
   /**
   *
   * @function
-  * @name checkTopology
+  * @name checkTopologyConfiguration
   * @description Vérification de la description d'une topologie
   * @param{json} topologyJsonDescription - JSON décrivant une topologie
   *
   */
-  async checkTopology(topologyJsonDescription) {
+  async checkTopologyConfiguration(topologyJsonDescription) {
 
     // Id de la topologie
     if (!topologyJsonDescription.id) {
       LOGGER.error("La topologie ne contient pas d'id.");
       return false;
     } else {
-      // On vérifie que l'id n'est pas déjà pris.
-      if (this._listOfTopologyIds.length !== 0) {
 
-        for (let i = 0; i < this._listOfTopologyIds.length; i++ ) {
-          if (this._listOfTopologyIds[i] === topologyJsonDescription.id) {
-            LOGGER.info("La topologie contenant l'id " + topologyJsonDescription.id + " est deja referencee.");
-            // On vérifie que la source décrite et celle déjà identifiée soient exactement les mêmes
-            if (this.checkDuplicationTopology(topologyJsonDescription)) {
+      // On vérifie que l'id n'est pas déjà chargés.
+      if (this._loadedTopologyId.length !== 0) {
+
+        for (let i = 0; i < this._loadedTopologyId.length; i++ ) {
+          if (this._loadedTopologyId[i] === topologyJsonDescription.id) {
+
+            LOGGER.info("La topologie contenant l'id " + topologyJsonDescription.id + " est deja chargée.");
+            // On vérifie que la topology décrite et celle déjà identifiée soient exactement les mêmes
+            if (this.checkDuplicationLoadedTopology(topologyJsonDescription)) {
               LOGGER.info("La topologie contenant l'id " + topologyJsonDescription.id + " est identique à la topologie deja identifiee.");
               return true;
             } else {
@@ -103,14 +111,29 @@ module.exports = class topologyManager {
               return false;
             }
 
-          } else {
-            // on continue de vérifier
           }
         }
-
-      } else {
-        // C'est la première source, on continue la vérification
       }
+
+      // On vérifie que l'id n'est pas déjà vérifiés.
+      if (this._checkedTopologyId.length !== 0) {
+
+        for (let i = 0; i < this._checkedTopologyId.length; i++ ) {
+          if (this._checkedTopologyId[i] === topologyJsonDescription.id) {
+            
+            LOGGER.info("La topologie contenant l'id " + topologyJsonDescription.id + " est deja vérifiée.");
+            // On vérifie que la topology décrite et celle déjà identifiée soient exactement les mêmes
+            if (this.checkDuplicationCheckedTopology(topologyJsonDescription)) {
+              LOGGER.info("La topologie contenant l'id " + topologyJsonDescription.id + " est identique à la topologie deja identifiee.");
+              return true;
+            } else {
+              LOGGER.error("La topologie contenant l'id " + topologyJsonDescription.id + " n'est pas identique à la topologie deja identifiee.");
+              return false;
+            }
+            
+          } 
+        }
+      } 
     }
 
     // Description de la topologie
@@ -127,7 +150,7 @@ module.exports = class topologyManager {
       return false;
     } else {
       // Vérification de la projection
-      if (!this._projectionManager.isAvailableById(topologyJsonDescription.projection)) {
+      if (!this._projectionManager.isChecked(topologyJsonDescription.projection)) {
         LOGGER.error("La topologie indique une projection non disponible sur le service: " + topologyJsonDescription.projection);
         return false;
       }
@@ -162,10 +185,6 @@ module.exports = class topologyManager {
       }
 
     }
-
-    // on sauvegarde l'id de la topologie pour savoir qu'elle a déjà été vérifiée et que sa description est valide
-    this._listOfTopologyIds.push(topologyJsonDescription.id);
-    this._topologyDescriptions[topologyJsonDescription.id] = topologyJsonDescription;
 
     return true;
 
@@ -224,9 +243,11 @@ module.exports = class topologyManager {
       LOGGER.error("La ressource ne contient pas de parametre 'topology.storage.dbConfig'.");
       return false;
     } else {
-      if (!(await this._baseManager.checkBase(topologyJsonDescription.storage.base.dbConfig))) {
+      if (!(await this._baseManager.checkBaseConfiguration(topologyJsonDescription.storage.base.dbConfig))) {
         LOGGER.error("La ressource contient un parametre 'topology.storage.dbConfig' incorrect.");
         return false;
+      } else {
+        this._baseManager.saveCheckedBaseConfiguration(topologyJsonDescription.storage.base.dbConfig);
       }
     }
 
@@ -322,19 +343,19 @@ module.exports = class topologyManager {
   /**
   *
   * @function
-  * @name checkDuplicationTopology
+  * @name checkDuplicationLoadedTopology
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} topologyJsonDescription - Description JSON de la topologie
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
   */
 
-  checkDuplicationTopology(topologyJsonDescription) {
+  checkDuplicationLoadedTopology(topologyJsonDescription) {
 
     LOGGER.info("Comparaison des deux topologies identifiees et devant etre identiques...");
 
     // On récupère la description de la topologie faisant office de référence car lue la première.
-    let referenceTopology = this._topologyDescriptions[topologyJsonDescription.id];
+    let referenceTopology = this._loadedTopologyConfiguration[topologyJsonDescription.id];
 
     // On compare les deux objets
     try {
@@ -353,22 +374,83 @@ module.exports = class topologyManager {
   /**
   *
   * @function
-  * @name createTopology
+  * @name checkDuplicationCheckedTopology
+  * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
+  * @param {json} topologyJsonDescription - Description JSON de la topologie
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+
+  checkDuplicationCheckedTopology(topologyJsonDescription) {
+
+    LOGGER.info("Comparaison des deux topologies identifiees et devant etre identiques...");
+
+    // On récupère la description de la topologie faisant office de référence car lue la première.
+    let referenceTopology = this._checkedTopologyConfiguration[topologyJsonDescription.id];
+
+    // On compare les deux objets
+    try {
+      assert.deepStrictEqual(topologyJsonDescription, referenceTopology);
+    } catch (err) {
+      LOGGER.error("Les deux topologies ne sont pas identiques.");
+      LOGGER.error(err);
+      return false;
+    }
+
+    LOGGER.info("Les deux topologies sont identiques.");
+    return true;
+  
+  }
+
+  /**
+  *
+  * @function
+  * @name saveCheckedTopology
+  * @description Sauvegarder l'id de la topology vérifié
+  * @param {object} configuration - Id de la topology que l'on veut sauvegarder
+  *
+  */
+  saveCheckedTopology(configuration) {
+
+    this._checkedTopologyId.push(configuration.id);
+    this._checkedTopologyConfiguration[configuration.id] = configuration;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name flushCheckedTopology
+  * @description Vider la liste des topology déjà vérifiées 
+  *
+  */
+  flushCheckedTopology() {
+
+    this._checkedTopologyId = new Array();
+    this._checkedTopologyConfiguration = {};
+    
+  }
+
+  /**
+  *
+  * @function
+  * @name loadTopologyConfiguration
   * @description Fonction utilisée pour créer une source.
   * @param {json} topologyJsonObject - Description JSON de la topologie
   * @return {Topology} Topologie créée - Instance d'une classe fille de Topology
   *
   */
 
-  createTopology(topologyJsonObject) {
+  loadTopologyConfiguration(topologyJsonObject) {
 
     LOGGER.info("Creation de la topologie: " + topologyJsonObject.id);
 
     let topology;
 
     // on vérifie d'abord que la topologie n'a pas déjà été créée
-    if (this._topologiesCatalog[topologyJsonObject.id]) {
-      return this._topologiesCatalog[topologyJsonObject.id];
+    if (this._topologyCatalog[topologyJsonObject.id]) {
+      LOGGER.info("La topologie " + topologyJsonObject.id + " existe déjà");
+      return true;
     } else {
       // la topologie n'existe pas, on continue
     }
@@ -388,7 +470,14 @@ module.exports = class topologyManager {
     } else if (topologyJsonObject.type === "db") {
 
       // récupération de la base
-      let base = this._baseManager.createBase(topologyJsonObject.storage.base.dbConfig);
+      let base = {};
+      if (!this._baseManager.loadBaseConfiguration(topologyJsonObject.storage.base.dbConfig)) {
+        LOGGER.error("Impossible de charger la base configurée dans " + topologyJsonObject.storage.base.dbConfig);
+        return false;
+      } else {
+        base = this._baseManager.getBase(topologyJsonObject.storage.base.dbConfig);
+      }
+
       // création des tableaux d'attributs
       let defaultAttributes = new Array();
       let otherAttributes = new Array();
@@ -402,6 +491,7 @@ module.exports = class topologyManager {
           // cela ne doit pas arriver
         }
       }
+      
       // création de la topologie
       topology = new DbTopology(topologyJsonObject.id, topologyJsonObject.description,
         topologyJsonObject.projection, topologyJsonObject.bbox, base, topologyJsonObject.storage.base.schema,
@@ -409,38 +499,14 @@ module.exports = class topologyManager {
 
     } else {
       // On va voir si c'est un autre type.
-    }
-
-    this._topologiesCatalog[topologyJsonObject.id] = topology;
-
-    return topology;
-  }
-
-  /**
-  *
-  * @function
-  * @name loadAllTopologies
-  * @description Fonction utilisée pour créer une source.
-  *
-  */
-
-  loadAllTopologies() {
-
-    if (this._listOfTopologyIds.length === 0) {
-      LOGGER.error("Aucune topologie a charger.");
+      LOGGER.error("Type de la topology inconnu");
       return false;
-    } else {
-      // on continue
     }
 
-    for (let i = 0; i < this._listOfTopologyIds.length; i++) {
-
-      let id = this._listOfTopologyIds[i];
-      let configuration = this._topologyDescriptions[id];
-
-      this._topologiesCatalog[id] = this.createTopology(configuration);
-
-    }
+    // on sauvegarde l'id de la topologie pour savoir qu'elle a déjà été vérifiée et que sa description est valide
+    this._loadedTopologyId.push(topologyJsonObject.id);
+    this._loadedTopologyConfiguration[topologyJsonObject.id] = topologyJsonObject;    
+    this._topologyCatalog[topologyJsonObject.id] = topology;
 
     return true;
 

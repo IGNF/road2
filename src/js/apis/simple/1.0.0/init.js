@@ -588,7 +588,7 @@ module.exports = {
 
     // --- resources
     getCapabilities.resources = new Array();
-    let resources = service.resourceCatalog;
+    let resources = service.getResources();
 
     for(let resourceId in resources) {
 

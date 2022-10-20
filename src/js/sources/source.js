@@ -32,9 +32,6 @@ module.exports = class Source {
     // État de la connexion de la source
     this._connected = false;
 
-    // Liste d'opérations possibles sur la source
-    this._availableOperations = new Array();
-
     // Topologie dont dérive la source
     this._topology = topology;
 
@@ -116,40 +113,12 @@ module.exports = class Source {
   /**
   *
   * @function
-  * @name get availableOperations
-  * @description Récupérer la liste des opérations possibles sur la source
-  *
-  */
-  get availableOperations () {
-    return this._availableOperations;
-  }
-
-  /**
-  *
-  * @function
   * @name get topology
   * @description Récupérer la topologie de la source
   *
   */
   get topology () {
     return this._topology;
-  }
-
-  /**
-  *
-  * @function
-  * @name isOperationAvailable
-  * @description Savoir si une opération est disponible sur la source
-  * @param {string} operationId - Id de l'opération
-  *
-  */
-  isOperationAvailable (operationId) {
-    for (let i = 0; i < this._availableOperations.length; i++ ) {
-      if (this._availableOperations[i] === operationId) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

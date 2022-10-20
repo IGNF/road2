@@ -101,22 +101,6 @@ module.exports = class Resource {
   /**
   *
   * @function
-  * @name removeSource
-  * @description Supprimer les references à une source au sein de la ressource
-  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
-  * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
-  * dans chacune des classes filles.
-  * @param {string} sourceId - Id de la source 
-  * @return {boolean} 
-  *
-  */
-  removeSource (sourceId) {
-    return true;
-  }
-
-  /**
-  *
-  * @function
   * @name verifyAvailabilityOperation
   * @description Savoir si une opération est disponible sur la ressource
   * @param {string} id - Id de l'opération

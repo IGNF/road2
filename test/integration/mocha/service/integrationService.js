@@ -82,7 +82,7 @@ describe('Test de la classe Service', function() {
 
   describe('Test de createServer() et stopServer()', function() {
     const apisManager = sinon.mock(ApisManager);
-    apisManager.loadAPISDirectory = sinon.stub().returns(true);
+    apisManager.loadApiDirectory = sinon.stub().returns(true);
     service._apisManager = apisManager;
 
     const serverManager = sinon.mock(ServerManager);

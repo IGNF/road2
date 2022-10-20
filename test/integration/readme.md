@@ -9,7 +9,7 @@ docker-compose exec road2 npm run itest
 C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les classes qui dépendent d'une autre pour fonctionner. On testera donc les classes suivantes dans l'ordre indiqué:
 
 - Premier niveau:
-    - apiManager (ExpressJS, api, log4js)
+    - apisManager (ExpressJS, api, log4js)
     - baseManager (base, log4js)
     - looseConstraint (constraint)
     - line (geometry, proj4, polyline)
@@ -60,7 +60,7 @@ Huitième niveau:
     - resourceManager (osrmResource, pgrResource, sourceManager, operationManager, log4js)
 
 Neuvième niveau: 
-    - service (apiManager, resourceManager, sourceManager, operationManager, baseManager, topologyManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
+    - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, topologyManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
 
 Autres: 
     - road2.js

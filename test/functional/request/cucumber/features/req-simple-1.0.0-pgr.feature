@@ -2,7 +2,7 @@ Feature: Road2-PGR
   Tests fonctionnels complémentaires de Road2 via PGRouting
 
   Background:
-    Given I have loaded all my test configuration in "../../configurations/local.json"
+    Given I have loaded all my test configuration in "../../configurations/local-service.json"
 
   Scenario Outline: [<method>] Route sur l'API simple 1.0.0
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"
