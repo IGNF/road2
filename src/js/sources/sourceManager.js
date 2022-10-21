@@ -6,6 +6,7 @@ const errorManager = require('../utils/errorManager');
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
 const smartroutingSource = require('../sources/smartroutingSource');
+const valhallaSource = require('../sources/valhallaSource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -209,7 +210,7 @@ module.exports = class sourceManager {
         available = true;
         LOGGER.info("Source pgrouting.");
 
-        // On vérifie que le module pg est disponible 
+        // On vérifie que le module pg est disponible
         try {
           let { poolTest } = require('pg');
         } catch(error) {
@@ -242,6 +243,52 @@ module.exports = class sourceManager {
         // On va voir si c'est un autre type.
       }
       //------ SMARTROUTING
+      //------ VALHALLA
+      if (sourceJsonObject.type === "valhalla") {
+        available = true;
+        LOGGER.info("Source valhalla.");
+
+        let operationFound = false;
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (operationManager.verifyAvailabilityOperation("route")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite
+          }
+        } else {
+          // on continue pour voir la suite
+        }
+
+        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
+        if (operationManager.verifyAvailabilityOperation("isochrone")) {
+          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
+          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
+            operationFound = true;
+          } else {
+            // on continue pour voir la suite
+          }
+        } else {
+          // on continue pour voir la suite
+        }
+
+        if (!operationFound) {
+          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
+          return false;
+        }
+
+        if (!this.checkSourceValhalla(sourceJsonObject)) {
+          LOGGER.error("Erreur lors de la verification de la source valhalla.");
+          return false;
+        } else {
+          // il n'y a eu aucun problème, la ressource est correctement configurée.
+        }
+      } else {
+        // On va voir si c'est un autre type.
+      }
+      //------ VALHALLA
 
       // Si ce n'est aucun type valide, on renvoie une erreur.
       if (!available) {
@@ -396,7 +443,7 @@ module.exports = class sourceManager {
   *
   * @function
   * @name checkSourceSmartrouting
-  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source pgr.
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source smartrouting.
   * @param {json} sourceJsonObject - Description JSON de la source
   * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
   *
@@ -405,7 +452,7 @@ module.exports = class sourceManager {
    checkSourceSmartrouting(sourceJsonObject) {
 
     LOGGER.info("Verification de la source smartrouting...");
-  
+
     // Storage
     if (!sourceJsonObject.storage) {
       LOGGER.error("La ressource contient une source sans stockage.");
@@ -418,7 +465,38 @@ module.exports = class sourceManager {
         // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
       }
     }
-  
+
+    LOGGER.info("Fin de la verification de la source smartrouting.");
+    return true;
+  }
+
+  /**
+  *
+  * @function
+  * @name checkSourceValhalla
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source valhalla.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  *
+  */
+
+   checkSourceValhalla(sourceJsonObject) {
+
+    LOGGER.info("Verification de la source smartrouting...");
+
+    // Storage
+    if (!sourceJsonObject.storage) {
+      LOGGER.error("La ressource contient une source sans stockage.");
+      return false;
+    } else {
+      if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
+        LOGGER.error("Stockage de la source incorrect.");
+        return false;
+      } else {
+        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+      }
+    }
+
     LOGGER.info("Fin de la verification de la source smartrouting.");
     return true;
   }
@@ -543,6 +621,8 @@ module.exports = class sourceManager {
     } else if (sourceJsonObject.type === "smartrouting") {
       // smartrouting n'utilise pas la topologie définie dans la conf
       source = new smartroutingSource(sourceJsonObject);
+    } else if (sourceJsonObject.type === "valhalla") {
+      source = new valhallaSource(sourceJsonObject, topology);
     } else {
       // On va voir si c'est un autre type.
       LOGGER.error("Le type de la source est inconnu");

@@ -51,6 +51,21 @@
                 "resource": "bduni-idf-osrm",
                 "coordinates": "2.333865,48.881989"
             }
+        },
+        {
+            "id": "isochrone-valhalla",
+            "parameters": {
+                "resource": "bduni-idf-valhalla",
+                "point": "2.333865,48.881989"
+          }
+        },
+        {
+            "id": "route-valhalla",
+            "parameters": {
+                "resource": "bduni-idf-valhalla",
+                "start": "2.333865,48.881989",
+                "end": "2.344851,48.872393"
+          }
         }
     ],
     "alternativeParameters" : {

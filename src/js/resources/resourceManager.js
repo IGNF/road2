@@ -5,6 +5,7 @@ const path = require('path');
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
 const smartpgrResource = require('../resources/smartpgrResource');
+const valhallaResource = require('../resources/valhallaResource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -31,7 +32,7 @@ module.exports = class resourceManager {
     this._resource = {};
 
     // Liste des types de ressource gérées par le manager
-    this._availableResourceTypes = ["pgr", "smartpgr","osrm"];
+    this._availableResourceTypes = ["pgr", "smartpgr","osrm","valhalla"];
 
     // Manager de topology 
     this._topologyManager = topologyManager;
@@ -417,6 +418,8 @@ module.exports = class resourceManager {
       resource = new pgrResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "smartpgr") {
       resource = new smartpgrResource(resourceJsonObject, resourceOperationHash);
+    } else if (resourceJsonObject.resource.type === "valhalla") {
+      resource = new valhallaResource(resourceJsonObject, resourceOperationHash);
     } else {
       LOGGER.error("Type de la ressource inconnue");
       return false;

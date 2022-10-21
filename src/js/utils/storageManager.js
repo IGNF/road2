@@ -37,7 +37,34 @@ module.exports = {
         LOGGER.error("Le fichier " + jsonStorage.file + " n'existe pas.");
         return false;
       }
-
+    } else if (jsonStorage.tar || jsonStorage.config) {
+      // Vérification que le fichier existe et peut être lu.
+      if (fs.existsSync(jsonStorage.tar)) {
+        try {
+          fs.accessSync(jsonStorage.tar, fs.constants.R_OK);
+        } catch (err) {
+          LOGGER.error("Le fichier " + jsonStorage.tar + " ne peut etre lu.");
+          return false;
+        }
+        storageFound = true;
+      } else {
+        LOGGER.error("Le fichier " + jsonStorage.tar + " n'existe pas.");
+        return false;
+      }
+    } else if (jsonStorage.config) {
+      // Vérification que le fichier existe et peut être lu.
+      if (fs.existsSync(jsonStorage.config)) {
+        try {
+          fs.accessSync(jsonStorage.config, fs.constants.R_OK);
+        } catch (err) {
+          LOGGER.error("Le fichier " + jsonStorage.config + " ne peut etre lu.");
+          return false;
+        }
+        storageFound = true;
+      } else {
+        LOGGER.error("Le fichier " + jsonStorage.config + " n'existe pas.");
+        return false;
+      }
     } else if (jsonStorage.costColumn) {
       // TODO: Pas trop possible de vérifier sans requête
       storageFound = true;

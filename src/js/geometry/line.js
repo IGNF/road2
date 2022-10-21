@@ -25,9 +25,10 @@ module.exports = class Line extends Geometry {
   * @param {object} geom - Géométrie
   * @param {string} format - Format de la geom (geojson, polyline)
   * @param {string} projection - Id de la projection utilisée (EPSG:4326)
+  * @param {integer} polylinePrecision - Précision de l'encodage en polyline en entrée (défaut : 5)
   *
   */
-  constructor(geom, format, projection) {
+  constructor(geom, format, projection, polylinePrecision = 5) {
 
     super("polyline", projection);
 
@@ -37,6 +38,9 @@ module.exports = class Line extends Geometry {
     // Format de géométrie (geojson, polyline...)
     this._format = format;
 
+    if (polylinePrecision != 5) {
+      this._geom = polyline.encode(polyline.decode(geom, polylinePrecision));
+    }
   }
 
   /**
@@ -131,11 +135,11 @@ module.exports = class Line extends Geometry {
 
         this._geom = tmpGeom;
         this.projection = projection;
-        
+
         return true;
 
       }
-      
+
     } else {
       // il n'y a rien à faire
       return true;
@@ -167,7 +171,7 @@ module.exports = class Line extends Geometry {
       return {};
     }
 
-    // reprojection 
+    // reprojection
     let reprojectedCoordinates = new Array();
 
     for (let i = 0; i < geojson.coordinates.length; i++) {
