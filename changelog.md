@@ -3,10 +3,26 @@
 ADDED:
   - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
   - Cette classe est configurée par un nouveau fichier de configuration. 
+  - Ajout du moteur Valhalla pour les itinéraires et les isochrones
 
 CHANGED:
   - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement. 
   - Le fichier server.json permet maintenant de configurer l'administrateur et donc n'a plus le même contenu. Ce dernier est dans service.json. 
+
+# 1.1.2
+
+FIXED:
+  - Géométries reprojetées pour les requêtes sur PGRouting
+
+# 1.1.1
+
+FIXED:
+  - Géométrie étrange quand on est dans une raquette
+
+# 1.1.0
+
+ADDED:
+  - Ajout de la fonctionnalité nearest via OSRM
 
 # 1.O.14
 FIXED:
