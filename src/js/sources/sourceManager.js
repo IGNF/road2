@@ -21,7 +21,7 @@ module.exports = class sourceManager {
   * @description Constructeur de la classe sourceManager
   *
   */
-  constructor() {
+  constructor(projectionManager) {
 
     // Liste des ids des sources chargées par le manager
     this._loadedSourceId = new Array();
@@ -38,27 +38,17 @@ module.exports = class sourceManager {
     // Descriptions des sources vérifiées par le manager
     this._checkedSourceConfiguration = {};
 
-    // Correspondance entre l'id d'une source et l'id de la topologie dont elle dérive
-    this._sourceTopology = {};
+    // Manager des projections 
+    this._projectionManager = projectionManager;
 
     // Correspondance entre les sources et les opérations possibles 
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "smartrouting": ["route", "isochrone"]
+      "smartrouting": ["route", "isochrone"],
+      "valhalla": ["route", "isochrone"]
     };
 
-  }
-
-  /**
-  *
-  * @function
-  * @name get loadedSourceId
-  * @description Récupérer l'ensemble des ids de sources chargées
-  *
-  */
-  get loadedSourceId() {
-    return this._loadedSourceId;
   }
 
   /**
@@ -75,17 +65,6 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name get sourceTopology
-  * @description Récupérer la correspondance source/topologie
-  *
-  */
-  get sourceTopology() {
-    return this._sourceTopology;
-  }
-
-  /**
-  *
-  * @function
   * @name get operationsByType
   * @description Récupérer l'ensemble des opérations possibles par type de source
   *
@@ -97,20 +76,129 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name set loadedSourceId
-  * @description Attribuer l'ensemble des ids de sources
-  * @param {table} list - État de la connexion
+  * @name isCheckedSourceAvailable
+  * @description Fonction utilisée pour vérifier si une source a été vérifiée
+  * @param {string} id - Id de la source
+  * @return {boolean} 
   *
   */
-  set loadedSourceId(list) {
-    this._loadedSourceId = list;
+
+  isCheckedSourceAvailable(id) {
+
+    if (this._checkedSourceId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._checkedSourceId.length; i++) {
+      if (this._checkedSourceId[i] === id) {
+        return true;
+      }
+    }
+    return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name isLoadedSourceAvailable
+  * @description Fonction utilisée pour vérifier si une source a été chargée
+  * @param {string} id - Id de la source
+  * @return {boolean} 
+  *
+  */
+
+   isLoadedSourceAvailable(id) {
+
+    if (this._loadedSourceId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._loadedSourceId.length; i++) {
+      if (this._loadedSourceId[i] === id) {
+        return true;
+      }
+    }
+    return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkSourceDirectory
+  * @description Fonction utilisée pour vérifier un dossier contenant des sources.
+  * @param {string} directory - Dossier qui contient les configurations des ressources
+  * @return {boolean} 
+  *
+  */
+
+  checkSourceDirectory(directory) {
+
+    LOGGER.info("Vérification d'un dossier de sources...");
+    LOGGER.info("Nom du dossier: " + directory);
+
+    if (fs.existsSync(directory)) {
+
+      let fileList = new Array();
+      try {
+        fileList = fs.readdirSync(directory);
+      } catch(error) {
+        LOGGER.error("Impossible de lire le dossier :");
+        LOGGER.error(error);
+        return false;
+      }
+
+      if (fileList.length === 0) {
+        LOGGER.warn("Le dossier " + directory + " est vide");
+        return false;
+      }
+
+      for (let i = 0; i < fileList.length; i++) {
+
+        let source = fileList[i];
+        let sourceFile = "";
+        try {
+          sourceFile = directory + "/" + source;
+          fs.accessSync(sourceFile, fs.constants.R_OK);
+        } catch (err) {
+          LOGGER.error("Le fichier de source ne peut etre lu: " + sourceFile);
+        }
+
+        let sourceConf = {};
+        try {
+          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+          sourceConf = JSON.parse(fs.readFileSync(sourceFile));
+        } catch (error) {
+          LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de source: " + sourceFile);
+          LOGGER.error(error);
+          return false;
+        }
+
+        if (!(await this.checkSourceConfiguration(sourceConf))) {
+          LOGGER.error("La source décrite dans le fichier " + sourceFile + " est mal configuée");
+          return false;
+        } else {
+          this._checkedSourceId.push(sourceConf.source.id);
+        }
+
+      }
+
+      LOGGER.info("Vérification du dossier de sources terminée");
+      return true;
+
+    } else {
+      LOGGER.error("Mauvaise configuration: Le dossier n'existe pas: " + directory );
+      return false;
+    }
+
   }
 
   /**
   *
   * @function
   * @name checkSourceConfiguration
-  * @description Fonction utilisée pour vérifier la partie source d'un fichier de description d'une ressource.
+  * @description Fonction utilisée pour vérifier la configuration d'une source.
   * @param {json} sourceJsonObject - Description JSON de la source
   * @return {boolean} 
   *
@@ -122,7 +210,7 @@ module.exports = class sourceManager {
 
     // ID
     if (!sourceJsonObject.id) {
-      LOGGER.error("La ressource contient une source sans id.");
+      LOGGER.error("Mauvaise configuration: source.id absent");
       return false;
     } else {
       // On vérifie que l'id n'est pas déjà chargé.
@@ -175,127 +263,69 @@ module.exports = class sourceManager {
 
     // Type
     if (!sourceJsonObject.type) {
-      LOGGER.error("La ressource contient une source sans type.");
+      LOGGER.error("Mauvaise configuration: source.type absent");
       return false;
     } else {
+
+      LOGGER.debug("Type présent");
+
       // Vérification que le type est valide puis vérification spécifique à chaque type
-      let available = false;
-      // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
-      // Il ne reste plus qu'à créer la fonction de vérification correspondante.
-      //------ OSRM
+
+      if (!Object.keys(this._operationsByType).includes(sourceJsonObject.type)) {
+        LOGGER.error("La source indique un type non disponible : " + sourceJsonObject.type);
+        return false;
+      } else {
+        LOGGER.debug("Le type présent est disponible : " + sourceJsonObject.type);
+      }
+
+      let validation = false;
+
       if (sourceJsonObject.type === "osrm") {
-        available = true;
-        LOGGER.info("Source osrm.");
-
-        // On vérifie que le module osrm est disponible 
-        try {
-          let osrmTest = require('osrm');
-        } catch(error) {
-          LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
-          return false;
-        }
-
-        if (!this.checkSourceOsrm(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source osrm.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la source est correctement configurée.
-        }
+        validation = this.checkSourceOsrm(sourceJsonObject);
+      } else if (sourceJsonObject.type === "pgr") {
+        validation = this.checkSourcePgr(sourceJsonObject);
+      } else if (sourceJsonObject.type === "valhalla") {
+        validation = this.checkSourceValhalla(sourceJsonObject);
+      } else if (sourceJsonObject.type === "smartrouting") {
+        validation = this.checkSourceSmartrouting(sourceJsonObject);
       } else {
-        // On va voir si c'est un autre type.
+        LOGGER.error("La source indique un type invalide : " + sourceJsonObject.type);
+        return false;
       }
-      //------ OSRM
-      //------ PGR
-      if (sourceJsonObject.type === "pgr") {
-        available = true;
-        LOGGER.info("Source pgrouting.");
 
-        // On vérifie que le module pg est disponible
-        try {
-          let { poolTest } = require('pg');
-        } catch(error) {
-          LOGGER.error("Le module pg n'est pas disponible mais une source pgrouting est proposée dans la configuration.");
-          return false;
-        }
-
-        if (!this.checkSourcePgr(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source pgr.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
+      if (!validation) {
+        LOGGER.error("Erreur lors de la verification de la source");
+        return false;
       } else {
-        // On va voir si c'est un autre type.
+        LOGGER.debug("Aucune erreur lors de la vérification de la source");
       }
-      //------ PGR
-      //------ SMARTROUTING
-      if (sourceJsonObject.type === "smartrouting") {
-        available = true;
-        LOGGER.info("Source smartrouting.");
 
-        if (!this.checkSourceSmartrouting(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source smartrouting.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
-      } else {
-        // On va voir si c'est un autre type.
-      }
-      //------ SMARTROUTING
-      //------ VALHALLA
-      if (sourceJsonObject.type === "valhalla") {
-        available = true;
-        LOGGER.info("Source valhalla.");
+    }
 
-        let operationFound = false;
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("route")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite
-          }
-        } else {
-          // on continue pour voir la suite
-        }
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("isochrone")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite
-          }
-        } else {
-          // on continue pour voir la suite
-        }
-
-        if (!operationFound) {
-          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
-          return false;
-        }
-
-        if (!this.checkSourceValhalla(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source valhalla.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
-      } else {
-        // On va voir si c'est un autre type.
-      }
-      //------ VALHALLA
-
-      // Si ce n'est aucun type valide, on renvoie une erreur.
-      if (!available) {
-        LOGGER.error("La source indique un type invalide: " + sourceJsonObject.type);
+    // Projection 
+    if (!sourceJsonObject.projection) {
+      LOGGER.error("Mauvaise configuration: source.projection absent");
+      return false;
+    } else {
+      // Vérification de la projection
+      if (!this._projectionManager.isProjectionChecked(sourceJsonObject.projection)) {
+        LOGGER.error("La source indique une projection non disponible sur le service: " + topologyJsonDescription.projection);
         return false;
       }
     }
+
+    // Bbox 
+    if (!sourceJsonObject.bbox) {
+      LOGGER.error("Mauvaise configuration: source.bbox absent");
+      return false;
+    } else {
+      // Vérification de la bbox
+      if (!this._projectionManager.checkBboxConfiguration(sourceJsonObject.bbox, sourceJsonObject.projection)) {
+        LOGGER.error("La source indique une projection non disponible sur le service: " + topologyJsonDescription.projection);
+        return false;
+      }
+    }
+
 
     LOGGER.info("Fin de la verification de la source.");
     return true;
@@ -315,6 +345,14 @@ module.exports = class sourceManager {
   checkSourceOsrm(sourceJsonObject) {
 
     LOGGER.info("Verification de la source osrm...");
+
+    // On vérifie que le module osrm est disponible 
+    try {
+      let osrmTest = require('osrm');
+    } catch(error) {
+      LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
+      return false;
+    }
 
     // Storage
     if (!sourceJsonObject.storage) {
@@ -383,6 +421,14 @@ module.exports = class sourceManager {
  checkSourcePgr(sourceJsonObject) {
 
   LOGGER.info("Verification de la source pgr...");
+
+  // On vérifie que le module pg est disponible
+  try {
+    let { poolTest } = require('pg');
+  } catch(error) {
+    LOGGER.error("Le module pg n'est pas disponible mais une source pgrouting est proposée dans la configuration.");
+    return false;
+  }
 
   // Storage
   if (!sourceJsonObject.storage) {
@@ -595,15 +641,58 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name loadSourceConfiguration
-  * @description Fonction utilisée pour créer une source.
-  * @param {json} sourceJsonObject - Description JSON de la source
-  * @param {Topology} topology - Instance de la classe Topology
+  * @name loadSourceDirectory
+  * @description Fonction utilisée pour créer les sources contenues dans un dossier.
+  * @param {string} directory - Dossier qui contient les configurations des ressources
   * @return {boolean}
   *
   */
 
-  loadSourceConfiguration(sourceJsonObject, topology) {
+  loadSourceDirectory(directory) {
+
+    // Pour chaque fichier du dossier des sources, on crée une source
+    let files = fs.readdirSync(directory).filter( (file) => {
+      return path.extname(file).toLowerCase() === ".source";
+    });
+
+    for (let fileName of files) {
+
+      let sourceFile = directory + "/" + fileName;
+      LOGGER.info("Chargement de la source : " + sourceFile);
+
+      // Récupération du contenu en objet pour vérification puis création de la source
+      let sourceContent = {};
+      try {
+        sourceContent = JSON.parse(fs.readFileSync(sourceFile));
+      } catch (error) {
+        LOGGER.error(error);
+        LOGGER.error("Erreur lors de la lecture de la source: " + sourceFile);
+      }
+
+      // Création de la ressource
+      if (!this.loadSourceConfiguration(sourceContent)) {
+        LOGGER.error("La source configurée dans le fichier " + sourceFile + " n'a pas pu être chargée");
+      } else {
+        LOGGER.info("Source chargée : " + sourceFile);
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadSourceConfiguration
+  * @description Fonction utilisée pour créer une source.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean}
+  *
+  */
+
+  loadSourceConfiguration(sourceJsonObject) {
 
     LOGGER.info("Creation de la source: " + sourceJsonObject.id);
 

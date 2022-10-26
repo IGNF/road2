@@ -23,6 +23,11 @@
         "/home/docker/data/resources/"
       ]
     },
+    "sources": {
+      "directories": [
+        "/home/docker/data/sources/"
+      ]
+    },
     "network": {
       "servers": [
         {

@@ -236,20 +236,13 @@ module.exports = class resourceManager {
 
       for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
 
-        let sourceJsonObject = resourceJsonObject.resource.sources[i];
-        if (!this._sourceManager.checkSourceConfiguration(sourceJsonObject)) {
-          LOGGER.error("La ressource contient une source invalide.");
+        let sourceId = resourceJsonObject.resource.sources[i];
+        if (!this._sourceManager.isCheckedSourceAvailable(sourceId)) {
+          LOGGER.error("La ressource contient une source non disponible.");
           return false;
         } else {
-          // on stocke l'id de la ressource pour cette source donnée
-          this._sourceManager.saveCheckedSource(sourceJsonObject);
+          // TODO : on stocke l'id de la ressource pour cette source donnée
         }
-
-        // Lien avec la topologie
-        // TODO: vérifier que le type de la topologie soit cohérent avec le type de la source
-
-        // On stocke la correspondance entre une source et la topologie dont elle dérive
-        this._sourceManager.sourceTopology[sourceJsonObject.id] = resourceJsonObject.resource.topology.id;
 
       }
     }
@@ -396,10 +389,10 @@ module.exports = class resourceManager {
     }
 
     // Création des sources associées
-    LOGGER.info("Chargement des sources associées...");
+    LOGGER.info("Vérification du chargement des sources associées...");
     for (let i = 0; i < resourceJsonObject.resource.sources.length; i++) {
-      if (!this._sourceManager.loadSourceConfiguration(resourceJsonObject.resource.sources[i], currentTopology)) {
-        LOGGER.error("Impossible de créer la source associée à la ressource : " + resourceJsonObject.resource.sources[i].id);
+      if (!this._sourceManager.isLoadedSourceAvailable(resourceJsonObject.resource.sources[i])) {
+        LOGGER.error("La source associée à la ressource n'est pas chargée : " + resourceJsonObject.resource.sources[i].id);
         return false;
       }
     }

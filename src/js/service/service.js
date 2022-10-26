@@ -52,7 +52,7 @@ module.exports = class Service {
     this._topologyManager = new TopologyManager(this._baseManager, this._projectionManager);
 
     // Manager des sources du service.
-    this._sourceManager = new SourceManager();
+    this._sourceManager = new SourceManager(this._projectionManager);
 
     // Manager des ressources du service.
     this._resourceManager = new ResourceManager(this._sourceManager, this._operationManager, this._topologyManager);
@@ -426,6 +426,63 @@ module.exports = class Service {
 
     }
 
+    // Information sur les sources 
+    LOGGER.debug("Vérification des informations sur les sources");
+
+    if (!userConfiguration.application.sources) {
+      LOGGER.fatal("Mauvaise configuration: Objet 'application:sources' manquant !");
+      return false;
+    } else {
+      // Dossier contenant les fichiers de sources
+      if (!userConfiguration.application.sources.directories) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:sources:directories' manquant !");
+        return false;
+      } else {
+
+        let sourcesDirectories = userConfiguration.application.sources.directories;
+        // On vérifie que c'est un tableau non vide
+        if (!Array.isArray(sourcesDirectories)) {
+          LOGGER.error("Mauvaise configuration: Champ 'application:sources:directories' n'est pas un tableau !");
+          return false;
+        }
+        if (sourcesDirectories.length === 0) {
+          LOGGER.error("Mauvaise configuration: Champ 'application:sources:directories' est un tableau vide !");
+          return false;
+        }
+
+        let oneValidDir = false;
+
+        for (let i = 0; i < sourcesDirectories.length; i++) {
+
+          // On vérifie que le dossier existe et qu'il contient des fichiers de description des ressources
+          if (sourcesDirectories[i] === "") {
+            LOGGER.warn("Mauvaise configuration: Champ 'application:sources:directories' contient un élément vide");
+            continue;
+          } else {
+
+            let directory =  path.resolve(path.dirname(userConfigurationPath), sourcesDirectories[i]);
+            
+            if (!(await this._sourceManager.checkSourceDirectory(directory))) {
+              LOGGER.error("Le dossier " + directory + " contient des sources dont la vérification a échoué");
+              return false;
+            } else {
+              LOGGER.info("Le dossier " + directory + " est vérifié et suffisamment validé pour continuer");
+              oneValidDir = true;
+            }
+
+          }
+          
+        }
+
+        if (!oneValidDir) {
+          LOGGER.error("Aucun dossier de source n'a été validé");
+          return false;
+        }
+
+      }
+      
+    } 
+
     // Information sur les ressources
 
     LOGGER.debug("Vérification des informations sur les ressources");
@@ -680,6 +737,36 @@ module.exports = class Service {
     
     if (!this._projectionManager.loadProjectionDirectory(projectionsDirectory)) {
       LOGGER.error("Erreur lors du chargement des projections.");
+      return false;
+    }
+
+    // Chargement des sources 
+    LOGGER.info("Chargement des sources...");
+
+    for (let i = 0; i < this._configuration.application.sources.directories.length; i++) {
+
+      let sourceDirectory = "";
+
+      try {
+        sourceDirectory = path.resolve(path.dirname(this._configurationPath), this._configuration.application.sources.directories[i]);
+        LOGGER.info("Dossier de sources : " + sourceDirectory);
+      } catch (error) {
+        LOGGER.error("Impossible d'obtenir le chemin absolu du dossier de sources: " + this._configuration.application.sources.directories[i]);
+        LOGGER.error(error);
+        continue;
+      }
+      
+      if (!this._sourceManager.loadSourceDirectory(sourceDirectory)) {
+        LOGGER.error("Impossible de charger correctement le dossier de sources " + sourceDirectory);
+      } else {
+        // On va continuer 
+        LOGGER.info("Les sources du dossier " + sourceDirectory + " sont chargées dans la mesure du possible")
+      }
+
+    }
+
+    if (this._sourceManager.source.length === 0) {
+      LOGGER.fatal("Aucune ressource n'a pu etre chargee");
       return false;
     }
 

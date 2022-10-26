@@ -150,7 +150,7 @@ module.exports = class topologyManager {
       return false;
     } else {
       // Vérification de la projection
-      if (!this._projectionManager.isChecked(topologyJsonDescription.projection)) {
+      if (!this._projectionManager.isProjectionChecked(topologyJsonDescription.projection)) {
         LOGGER.error("La topologie indique une projection non disponible sur le service: " + topologyJsonDescription.projection);
         return false;
       }

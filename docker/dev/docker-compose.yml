@@ -11,7 +11,7 @@ services:
       - pgrouting
     environment:
       - NODE_ENV=debug
-    command : "npm run debug -- --ROAD2_CONF_FILE=../config/road2.json"
+    command : "sleep 60000"
     ports:
       - 8080:8080
       - 9229:9229

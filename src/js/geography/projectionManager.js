@@ -50,12 +50,12 @@ module.exports = class ProjectionManager {
   /**
   *
   * @function
-  * @name isAvailable
+  * @name isProjectionLoaded
   * @description Savoir si une projection est disponible dans l'instance de proj4
   * @param {string} id - ID de la projection 
   *
   */
-  isAvailable (id) {
+  isProjectionLoaded (id) {
 
     if (!id) {
       return false;
@@ -77,12 +77,12 @@ module.exports = class ProjectionManager {
   /**
   *
   * @function
-  * @name isChecked
+  * @name isProjectionChecked
   * @description Savoir si une projection a été validé durant l'étape de vérification
   * @param {string} id - ID de la projection 
   *
   */
-   isChecked (id) {
+   isProjectionChecked (id) {
 
     if (!id) {
       return false;
@@ -98,6 +98,61 @@ module.exports = class ProjectionManager {
     }
 
     return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkBboxConfiguration
+  * @description Savoir si une bbox est valide dans une projection donnée
+  * @param {string} bbox - Bbox à vérifier
+  * @param {string} projectionId - ID de la projection 
+  *
+  */
+  checkBboxConfiguration (bbox, projectionId) {
+
+    LOGGER.info("Vérification d'une bbox...");
+
+    if (!bbox) {
+      LOGGER.error("Aucune bbox fournie");
+      return false;
+    }
+
+    if (typeof(bbox) !== "string") {
+      LOGGER.error("La bbox fournie n'est pas une chaine de caracteres");
+      return false;
+    }
+
+    let regex = new RegExp("^(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)$");
+    if (!regex.test(bbox)) {
+      LOGGER.error("La bbox n'est pas correctement formattée");
+      return false;
+    }
+
+    let bboxArray = new Array(4);
+    try {
+      bboxArray = regex.exec(bbox);
+    } catch(error) {
+      LOGGER.error("Impossible d'analyser la bbox");
+      LOGGER.error(error);
+      return false;
+    }
+
+    if (bboxArray[0] >= bboxArray[2]) {
+      LOGGER.error("Mauvaise configuration : Xmin est supérieur ou égal à Xmax");
+      return false;
+    }
+
+    if (bboxArray[1] >= bboxArray[3]) {
+      LOGGER.error("Mauvaise configuration : Ymin est supérieur ou égal à Ymax");
+      return false;
+    }
+
+    // TODO : vérifier la cohérence avec la projection indiquée
+
+    LOGGER.info("Vérification de la bbox terminée");
+    return true;
 
   }
 
