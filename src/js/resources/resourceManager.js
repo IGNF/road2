@@ -20,7 +20,7 @@ module.exports = class resourceManager {
   * @description Constructeur de la classe resourceManager
   *
   */
-  constructor(sourceManager, operationManager, topologyManager) {
+  constructor(sourceManager, operationManager) {
 
     // Liste des ids des ressources chargées par le manager
     this._loadedResourceId = new Array();
@@ -33,9 +33,6 @@ module.exports = class resourceManager {
 
     // Liste des types de ressource gérées par le manager
     this._availableResourceTypes = ["pgr", "smartpgr","osrm","valhalla"];
-
-    // Manager de topology 
-    this._topologyManager = topologyManager;
 
     // Manager de source
     this._sourceManager = sourceManager;
@@ -66,7 +63,7 @@ module.exports = class resourceManager {
   *
   */
 
-  async checkResourceDirectory(directory) {
+  checkResourceDirectory(directory) {
 
     LOGGER.info("Vérification d'un dossier de ressources...");
     LOGGER.info("Nom du dossier: " + directory);
@@ -108,7 +105,7 @@ module.exports = class resourceManager {
           return false;
         }
 
-        if (!(await this.checkResourceConfiguration(resourceConf))) {
+        if (!this.checkResourceConfiguration(resourceConf)) {
           LOGGER.error("La ressource décrite dans le fichier " + resourceFile + " est mal configuée");
           return false;
         } else {
@@ -137,7 +134,7 @@ module.exports = class resourceManager {
   *
   */
 
-  async checkResourceConfiguration(resourceJsonObject) {
+  checkResourceConfiguration(resourceJsonObject) {
 
     LOGGER.info("Verification de la configuration d'une ressource...");
 
@@ -212,19 +209,6 @@ module.exports = class resourceManager {
       LOGGER.error("La ressource ne contient pas de description.");
       return false;
     } 
-
-    // Topology
-    if (!resourceJsonObject.resource.topology) {
-      LOGGER.error("La ressource ne contient pas de topologie.");
-      return false;
-    } else {
-      if (!(await this._topologyManager.checkTopologyConfiguration(resourceJsonObject.resource.topology))) {
-        LOGGER.error("La ressource contient une topologie incorrecte.");
-        return false;
-      } else {
-        this._topologyManager.saveCheckedTopology(resourceJsonObject.resource.topology);
-      }
-    }
 
     // Sources
     if (!resourceJsonObject.resource.sources) {
@@ -378,17 +362,7 @@ module.exports = class resourceManager {
       // C'est la première ressource créée
     }
 
-    // Création de la topology associée 
-    LOGGER.info("Chargement de la topology associé...");
-    let currentTopology = {};
-    if (!this._topologyManager.loadTopologyConfiguration(resourceJsonObject.resource.topology)) {
-      LOGGER.error("Impossible de créer la topology associée à la ressource");
-      return false;
-    } else {
-      currentTopology = this._topologyManager.getTopology(resourceJsonObject.resource.topology.id);
-    }
-
-    // Création des sources associées
+    // Vérification des sources associées
     LOGGER.info("Vérification du chargement des sources associées...");
     for (let i = 0; i < resourceJsonObject.resource.sources.length; i++) {
       if (!this._sourceManager.isLoadedSourceAvailable(resourceJsonObject.resource.sources[i])) {

@@ -36,25 +36,64 @@ module.exports = class pgrSource extends Source {
   * @name constructor
   * @description Constructeur de la classe pgrSource
   * @param{json} sourceJsonObject - Description de la source
-  * @param{topology} topology -  Instance de la classe Topology
+  * @param{Base} base - Instance de Base pour permettre les requêtes vers le serveur PGRouting
   *
   */
-  constructor(sourceJsonObject, topology) {
+  constructor(sourceJsonObject, base) {
 
     // Constructeur parent
-    super(sourceJsonObject.id, "pgr", topology);
+    super(sourceJsonObject.id, "pgr", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
     
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
-    // Coût
-    this._cost = sourceJsonObject.storage.costColumn;
+    // Base de données PGRouting
+    this._base = base;
 
-    // Coût inverse
-    this._reverseCost = sourceJsonObject.storage.rcostColumn;
+    // Schéma contenant les données dans la base 
+    this._schema = sourceJsonObject.storage.base.schema;
 
-    // Profil
-    this._profile = sourceJsonObject.cost.profile;
+    // Attributs par défaut sur les voies dans la base 
+    this._defaultAttributes = new Array();
+
+    // Attributs disponibles sur les voies dans la base 
+    this._otherAttributes = new Array();
+
+    // Création des tableaux d'attributs
+    for (let i = 0; i < sourceJsonObject.storage.base.attributes.length; i++) {
+      let curAttribute = sourceJsonObject.storage.base.attributes[i];
+      if (curAttribute.default === "true") {
+        this._defaultAttributes.push(curAttribute);
+      } else if (curAttribute.default === "false") {
+        this._otherAttributes.push(curAttribute);
+      } else {
+        // cela ne doit pas arriver
+      }
+    }
+
+    // stockage des attributs dans des tableaux pour le traitement des requêtes
+    this._defaultAttributesTable = new Array();
+    this._defaultAttributesKeyTable = new Array();
+    for (let i = 0; i < this._defaultAttributes.length; i++) {
+      this._defaultAttributesTable.push("'" + this._defaultAttributes[i].column + "'");
+      this._defaultAttributesKeyTable.push(this._defaultAttributes[i].key);
+    }
+
+    // stockage des attributs par défaut en une chaîne de caractères pour le traitement des requêtes
+    this._defaultAttributesString = this._defaultAttributesTable.join(",");
+
+    // Coûts disponibles 
+    this._costs = {};
+
+    // Initialisation des coûts disponibles 
+    for (let i = 0; i < sourceJsonObject.costs.length; i++) {
+      Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].optimization, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "costColumn", { value: sourceJsonObject.costs[i].costColumn, configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "rcostColumn", { value: sourceJsonObject.costs[i].rcostColumn, configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "costColumn", { value: sourceJsonObject.costs[i].costColumn, configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "rcostColumn", { value: sourceJsonObject.costs[i].rcostColumn, configurable: true, enumerable: true, writable: true });
+    }
 
   }
 
@@ -90,12 +129,12 @@ module.exports = class pgrSource extends Source {
   */
   async connect() {
 
-    if (!this._topology.base.connected) {
+    if (!this._base.connected) {
 
       // Connection à la base de données
       try {
 
-        await this._topology.base.connect();
+        await this._base.connect();
         this._connected = true;
 
       } catch (err) {
@@ -124,11 +163,11 @@ module.exports = class pgrSource extends Source {
 
     LOGGER.info("Tentative de deconnection de la base...");
 
-    if (this._topology.base.connected) {
+    if (this._base.connected) {
 
       try {
 
-        await this._topology.base.disconnect();
+        await this._base.disconnect();
         LOGGER.info("Deconnection de la base effectuee");
         this._connected = false;
 
@@ -181,15 +220,15 @@ module.exports = class pgrSource extends Source {
 
         // Coordonnées
         // start
-        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.start.getCoordinatesIn(super.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(super.projection));
           }
         }
         // end
-        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.end.getCoordinatesIn(super.projection));
 
         LOGGER.debug("coordinates:");
         LOGGER.debug(coordinatesTable);
@@ -198,11 +237,12 @@ module.exports = class pgrSource extends Source {
 
         // --- waysAttributes
         // attributes est déjà vide, on met les attributs par défaut
-        attributes = this._topology.defaultAttributesString;
+        attributes = this._defaultAttributesString;
 
         LOGGER.debug("default attributes: " + attributes);
 
         // on complète avec les attributs demandés
+        // TODO : refaire cette partie, et donc la manière dont l'info est stockée dans la classe
         if (request.waysAttributes.length !== 0) {
           let requestedAttributes = new Array();
 
@@ -210,17 +250,17 @@ module.exports = class pgrSource extends Source {
             // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
             let isDefault = false;
 
-            for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
-              if (request.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+            for (let j = 0; j < this._defaultAttributes.length; j++) {
+              if (request.waysAttributes[i] === this._defaultAttributes[j].key) {
                 isDefault = true;
                 break;
               }
             }
 
             if (!isDefault) {
-              for (let j = 0; j < this._topology.otherAttributes.length; j++) {
-                if (request.waysAttributes[i] === this._topology.otherAttributes[j].key) {
-                  requestedAttributes.push("'" + this._topology.otherAttributes[j].column + "'");
+              for (let j = 0; j < this._otherAttributes.length; j++) {
+                if (request.waysAttributes[i] === this._otherAttributes[j].key) {
+                  requestedAttributes.push("'" + this._otherAttributes[j].column + "'");
                   break;
                 }
               }
@@ -292,20 +332,20 @@ module.exports = class pgrSource extends Source {
       }
       // ---
 
-      const queryString = `SELECT * FROM ${this._topology.schema}.shortest_path_pgrouting(ARRAY ${JSON.stringify(coordinatesTable)},$1,$2,$3,ARRAY [${attributes}]::text[],$4)`;
+      const queryString = `SELECT * FROM ${this._schema}.shortest_path_pgrouting(ARRAY ${JSON.stringify(coordinatesTable)},$1,$2,$3,ARRAY [${attributes}]::text[],$4)`;
 
       let SQLParametersTable;
       if (looseConstraintsArray.length === 0) {
         SQLParametersTable = [
-          this._profile,
-          this._cost,
-          this._reverseCost,
+          request.profile,
+          this._costs[request.profile][request.optimization].costColumn,
+          this._costs[request.profile][request.optimization].rcostColumn,
           constraints
         ];
       } else {
-        let onTheFlyCosts = LooseConstraint.looseConstraintsToSQL(looseConstraintsArray, this._cost, this._reverseCost);
+        let onTheFlyCosts = LooseConstraint.looseConstraintsToSQL(looseConstraintsArray, this._costs[request.profile][request.optimization].costColumn, this._costs[request.profile][request.optimization].rcostColumn);
         SQLParametersTable = [
-          this._profile,
+          request.profile,
           onTheFlyCosts[0],
           onTheFlyCosts[1],
           constraints
@@ -319,11 +359,11 @@ module.exports = class pgrSource extends Source {
         LOGGER.debug("SQLParametersTable:");
         LOGGER.debug(SQLParametersTable);
 
-        if (this._topology.base.pool) {
+        if (this._base.pool) {
 
           try {
 
-            this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+            this._base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
               this.state = "green";
 
@@ -402,14 +442,14 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("no constraints asked");
         }
 
-        const queryString = `SELECT * FROM ${this._topology.schema}.generateIsochrone(ARRAY ${JSON.stringify(point)}, $1, $2, $3, $4, $5, $6)`;
+        const queryString = `SELECT * FROM ${this._schema}.generateIsochrone(ARRAY ${JSON.stringify(point)}, $1, $2, $3, $4, $5, $6)`;
 
         const SQLParametersTable = [
           request.costValue,
           request.direction,
           parseInt(request.askedProjection.split(':')[1]), // e.g. Transformer "EPSG:4326" en 4326 (pour PostGIS).
-          this._configuration.storage.costColumn,
-          this._configuration.storage.rcostColumn,
+          this._costs[request.profile][request.costType].costColumn,
+          this._costs[request.profile][request.costType].rcostColumn,
           constraints
         ];
 
@@ -419,11 +459,11 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("SQLParametersTable:");
           LOGGER.debug(SQLParametersTable);
 
-          if (this._topology.base.pool) {
+          if (this._base.pool) {
 
             try {
 
-              this._topology.base.pool.query(queryString, SQLParametersTable, (err, result) => {
+              this._base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
                 this.state = "green";
 
@@ -548,10 +588,10 @@ module.exports = class pgrSource extends Source {
 
     LOGGER.debug("attributes management");
     // On fait la liste des attributs par défaut
-    if (this._topology.defaultAttributesKeyTable.length !== 0) {
-      for (let i = 0; i < this._topology.defaultAttributesKeyTable.length; i++) {
-        finalAttributesKey.push(this._topology.defaultAttributesKeyTable[i]);
-        LOGGER.debug(this._topology.defaultAttributesKeyTable[i] + " added");
+    if (this._defaultAttributesKeyTable.length !== 0) {
+      for (let i = 0; i < this._defaultAttributesKeyTable.length; i++) {
+        finalAttributesKey.push(this._defaultAttributesKeyTable[i]);
+        LOGGER.debug(this._defaultAttributesKeyTable[i] + " added");
       }
     } else {
       // il n'y a aucun attribut par défaut
@@ -564,18 +604,18 @@ module.exports = class pgrSource extends Source {
         // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
         let isDefault = false;
 
-        for (let j = 0; j < this._topology.defaultAttributes.length; j++) {
-          if (routeRequest.waysAttributes[i] === this._topology.defaultAttributes[j].key) {
+        for (let j = 0; j < this._defaultAttributes.length; j++) {
+          if (routeRequest.waysAttributes[i] === this._defaultAttributes[j].key) {
             isDefault = true;
             break;
           }
         }
 
         if (!isDefault) {
-          for (let j = 0; j < this._topology.otherAttributes.length; j++) {
-            if (routeRequest.waysAttributes[i] === this._topology.otherAttributes[j].key) {
-              finalAttributesKey.push(this._topology.otherAttributes[j].key);
-              LOGGER.debug(this._topology.otherAttributes[j].key + " added");
+          for (let j = 0; j < this._otherAttributes.length; j++) {
+            if (routeRequest.waysAttributes[i] === this._otherAttributes[j].key) {
+              finalAttributesKey.push(this._otherAttributes[j].key);
+              LOGGER.debug(this._otherAttributes[j].key + " added");
               break;
             }
           }
@@ -742,7 +782,7 @@ module.exports = class pgrSource extends Source {
     let askedProjection = routeRequest.start.projection;
 
     // start
-    start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], this.topology.projection);
+    start = new Point(response.waypoints[0].location[0], response.waypoints[0].location[1], super.projection);
     if (!start.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of start in PGR response. ");
     } else {
@@ -751,7 +791,7 @@ module.exports = class pgrSource extends Source {
     }
 
     // end
-    end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], this.topology.projection);
+    end = new Point(response.waypoints[response.waypoints.length-1].location[0], response.waypoints[response.waypoints.length-1].location[1], super.projection);
     if (!end.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of end in PGR response. ");
     } else {
@@ -779,7 +819,7 @@ module.exports = class pgrSource extends Source {
       let currentPgrRoute = response.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", this._topology.projection) );
+      routes[i] = new Route( new Line(currentPgrRoute.geometry, "geojson", super.projection) );
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of geometry in PGR response. ");
       } else {
@@ -798,7 +838,7 @@ module.exports = class pgrSource extends Source {
         let portionDuration = 0;
         let currentPgrRouteLeg = currentPgrRoute.legs[j];
 
-        let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], this.topology.projection);
+        let legStart = new Point(response.waypoints[j].location[0], response.waypoints[j].location[1], super.projection);
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         } else {
@@ -807,7 +847,7 @@ module.exports = class pgrSource extends Source {
         }
 
 
-        let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], this.topology.projection);
+        let legEnd = new Point(response.waypoints[j+1].location[0], response.waypoints[j+1].location[1], super.projection);
         if (!legEnd.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         } else {
@@ -940,7 +980,7 @@ module.exports = class pgrSource extends Source {
 
           newPortionGeomCoords.push(currentPgrRouteStep.geometry.coordinates);
 
-          steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", this._topology.projection) );
+          steps[k] = new Step( new Line(currentPgrRouteStep.geometry, "geojson", super.projection) );
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
           } else {
@@ -983,7 +1023,7 @@ module.exports = class pgrSource extends Source {
       routes[i].duration = new Duration(Math.round(routeDuration * 10) / 10,"second");
 
       currentPgrRoute.geometry.coordinates = newRouteGeomCoords;
-      routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", this._topology.projection);
+      routes[i].geometry = new Line(currentPgrRoute.geometry, "geojson", super.projection);
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of step's geometry in PGR response. ");
       } else {
@@ -1021,7 +1061,7 @@ module.exports = class pgrSource extends Source {
     }
 
     // Création d'un objet Point (utile plus tard).
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
+    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, super.projection);
 
     let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
 
@@ -1037,7 +1077,7 @@ module.exports = class pgrSource extends Source {
     }
 
     // Création d'un objet Polygon à partir du GeoJSON reçu.
-    geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
+    geometry = new Polygon(rawGeometry, "geojson", super.projection);
 
     /* Envoi de la réponse au proxy. */
     return new IsochroneResponse(

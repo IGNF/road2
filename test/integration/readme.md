@@ -20,8 +20,6 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - routeRequest (request)
     - isochroneRequest (request)
     - serverManager (server, ExpressJS, log4js)
-    - osmTopology (topology)
-    - dbTopology (topology, base)
     
 - Deuxième niveau: 
     - resourceOperation (resourceParameter)
@@ -32,8 +30,7 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - constraintParameter (resourceParameter, constraint, looseConstraint)
     - isochroneResponse (response, point, geometry)
     - step (line, duration, distance)
-    - topologyManager (osmTopology, dbTopology, storageManager, baseManager, projectionManager, log4js)
-    - source (osmTopology, bdTopology, )
+    - source (baseManager, projectionManager)
 
 - Troisième niveau: 
     - parameterManager (parameter, boolParameter, enumParameter, floatParameter, pointParameter, constraintParameter, log4js)
@@ -50,17 +47,17 @@ Cinquième niveau:
     - routeResponse (response, point, route)
 
 Sixième niveau: 
-    - osrmSource (source, osrm, osmTopology, routeResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
-    - pgrSource (source, dbTopology, routeResponse, isochroneResponse, route, portion, line, point, polygon, step, distance, duration, errorManager, gisManager, copyManager, simplify, turf, looseConstraint, log4js)
+    - osrmSource (source, osrm, routeResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
+    - pgrSource (source, routeResponse, isochroneResponse, route, portion, line, point, polygon, step, distance, duration, errorManager, gisManager, copyManager, simplify, turf, looseConstraint, log4js)
 
 Septième niveau: 
-    - sourceManager (osrmSource, pgrSource, errorManager, storageManager, operationManager, osmTopology, dbTopology, log4js)
+    - sourceManager (osrmSource, pgrSource, errorManager, storageManager, operationManager, log4js)
 
 Huitième niveau: 
     - resourceManager (osrmResource, pgrResource, sourceManager, operationManager, log4js)
 
 Neuvième niveau: 
-    - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, topologyManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
+    - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
 
 Autres: 
     - road2.js

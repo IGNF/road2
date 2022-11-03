@@ -10,7 +10,6 @@ const ResourceManager = require('../resources/resourceManager');
 const SourceManager = require('../sources/sourceManager');
 const OperationManager = require('../operations/operationManager');
 const BaseManager = require('../base/baseManager');
-const TopologyManager = require('../topology/topologyManager');
 const ProjectionManager = require('../geography/projectionManager');
 const ServerManager = require('../server/serverManager');
 const LogManager = require('../utils/logManager');
@@ -48,14 +47,11 @@ module.exports = class Service {
     // Manager des projections
     this._projectionManager = new ProjectionManager();
 
-    // Manager des topologies du service
-    this._topologyManager = new TopologyManager(this._baseManager, this._projectionManager);
-
     // Manager des sources du service.
-    this._sourceManager = new SourceManager(this._projectionManager);
+    this._sourceManager = new SourceManager(this._projectionManager, this._baseManager);
 
     // Manager des ressources du service.
-    this._resourceManager = new ResourceManager(this._sourceManager, this._operationManager, this._topologyManager);
+    this._resourceManager = new ResourceManager(this._sourceManager, this._operationManager);
 
     // Manager des apis du service
     this._apisManager = new ApisManager();
@@ -520,7 +516,7 @@ module.exports = class Service {
 
             let directory =  path.resolve(path.dirname(userConfigurationPath), resourcesDirectories[i]);
             
-            if (!(await this._resourceManager.checkResourceDirectory(directory))) {
+            if (!this._resourceManager.checkResourceDirectory(directory)) {
               LOGGER.error("Le dossier " + directory + " contient des ressources dont la vérification a échoué");
               return false;
             } else {
@@ -654,7 +650,6 @@ module.exports = class Service {
     this._operationManager.flushCheckedOperation();
     this._resourceManager.flushCheckedResource();
     this._sourceManager.flushCheckedSource();
-    this._topologyManager.flushCheckedTopology();
     this._serverManager.flushCheckedServer();
 
     LOGGER.info("Verification terminee.");
