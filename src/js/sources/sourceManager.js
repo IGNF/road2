@@ -102,6 +102,26 @@ module.exports = class sourceManager {
   /**
   *
   * @function
+  * @name getSourceById
+  * @description Fonction utilisée pour récupérer une source
+  * @param {string} id - Id de la source
+  * @return {source} source - Instance fille de la classe Source
+  *
+  */
+
+  getSourceById(id) {
+
+    if (this.isLoadedSourceAvailable(id)) {
+      return this._source[id];
+    } else {
+      return null;
+    }
+
+  }
+
+  /**
+  *
+  * @function
   * @name isLoadedSourceAvailable
   * @description Fonction utilisée pour vérifier si une source a été chargée
   * @param {string} id - Id de la source

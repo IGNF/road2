@@ -101,6 +101,38 @@ module.exports = class Resource {
   /**
   *
   * @function
+  * @name checkSourceAvailibilityFromRequest
+  * @description Savoir s'il y a une source disponible pour répondre à la requête. Par exemple, pour un itinéraire, il s'agira de savoir si un couple profile/optimization est disponible.
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
+  * dans chacune des classes filles.
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
+  * @return {boolean} 
+  *
+  */
+   checkSourceAvailibilityFromRequest (request) {
+    return false;
+  }
+
+  /**
+  *
+  * @function
+  * @name initResource
+  * @description Créer les liens entre divers éléments d'une ressource et les sources associées
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
+  * dans chacune des classes filles.
+  * @param {SourceManager} sourceManager - Manager des sources du service 
+  * @return {boolean} 
+  *
+  */
+   initResource (sourceManager) {
+    return false;
+  }
+
+  /**
+  *
+  * @function
   * @name verifyAvailabilityOperation
   * @description Savoir si une opération est disponible sur la ressource
   * @param {string} id - Id de l'opération

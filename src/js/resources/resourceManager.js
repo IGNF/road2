@@ -216,7 +216,17 @@ module.exports = class resourceManager {
       return false;
     } else {
 
-      LOGGER.info("Verification des sources...")
+      LOGGER.info("Verification des sources...");
+
+      if (Array.isArray(resourceJsonObject.resource.sources)) {
+        LOGGER.error("Mauvaise configuration: 'resource.sources' n'est pas un tableau");
+        return false;
+      }
+
+      if (resourceJsonObject.resource.sources.length === 0) {
+        LOGGER.error("Mauvaise configuration: 'resource.sources' est un tableau vide");
+        return false;
+      }
 
       for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
 
@@ -389,6 +399,12 @@ module.exports = class resourceManager {
       resource = new valhallaResource(resourceJsonObject, resourceOperationHash);
     } else {
       LOGGER.error("Type de la ressource inconnue");
+      return false;
+    }
+
+    // Initialisation de la correspondance entre ressource et sources 
+    if (!resource.initResource(this._sourceManager)) {
+      LOGGER.error("Impossible d'instancier les liens avec les sources");
       return false;
     }
 

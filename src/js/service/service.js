@@ -178,34 +178,6 @@ module.exports = class Service {
   /**
   *
   * @function
-  * @name getSourceById
-  * @description Récupérer une source par son id
-  * @param {string} id - Id de la source
-  *
-  */
-  getSourceById(id) {
-    return this._sourceManager.source[id];
-  }
-
-  /**
-  *
-  * @function
-  * @name verifySourceExistenceById
-  * @description Savoir si une source existe à partir de son id
-  * @param {string} id - Id de la source
-  *
-  */
-  verifySourceExistenceById(id) {
-    if (this._sourceManager.source[id]) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-  *
-  * @function
   * @name get apisManager
   * @description Récupérer le manager d'apis
   *
