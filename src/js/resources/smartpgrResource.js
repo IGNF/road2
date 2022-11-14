@@ -95,8 +95,6 @@ module.exports = class smartpgrResource extends Resource {
 
         } else if (source.type === 'pgr') {
 
-          console.log(source);
-
           for (let j = 0; j < source.configuration.costs.length; j++) {
 
             let linkedIdRoute = source.configuration.costs[j].profile + source.configuration.costs[j].optimization;
