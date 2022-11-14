@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const assert = require('assert').strict;
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
@@ -43,6 +45,8 @@ module.exports = class sourceManager {
     this._baseManager = baseManager;
 
     // Correspondance entre les sources et les opérations possibles 
+    // Le contenu de ce tableau dépend du moteur et du code écrit dans la source correspondante
+    // Par exemple, le projet OSRM permet de faire du nearest et nous avons choisis de l'implémenter dans Road2
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
@@ -61,17 +65,6 @@ module.exports = class sourceManager {
   */
   get source() {
     return this._source;
-  }
-
-  /**
-  *
-  * @function
-  * @name get operationsByType
-  * @description Récupérer l'ensemble des opérations possibles par type de source
-  *
-  */
-   get operationsByType() {
-    return this._operationsByType;
   }
 
   /**
@@ -200,7 +193,7 @@ module.exports = class sourceManager {
           LOGGER.error("La source décrite dans le fichier " + sourceFile + " est mal configuée");
           return false;
         } else {
-          this._checkedSourceId.push(sourceConf.source.id);
+          this._checkedSourceId.push(sourceConf.id);
         }
 
       }
@@ -529,17 +522,17 @@ module.exports = class sourceManager {
 
         for (let j = 0; j < sourceJsonObject.storage.base.attributes.length; j++) {
 
-          if (sourceJsonObject.storage.base.attributes[j].key) {
+          if (!sourceJsonObject.storage.base.attributes[j].key) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].key' est absent");
             return false;
           } 
 
-          if (sourceJsonObject.storage.base.attributes[j].column) {
+          if (!sourceJsonObject.storage.base.attributes[j].column) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].column' est absent");
             return false;
           } 
 
-          if (sourceJsonObject.storage.base.attributes[j].default) {
+          if (!sourceJsonObject.storage.base.attributes[j].default) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].default' est absent");
             return false;
           } else {

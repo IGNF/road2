@@ -1,6 +1,10 @@
 'use strict';
 
 const Resource = require('./resource');
+const log4js = require('log4js');
+
+// Création du LOGGER
+var LOGGER = log4js.getLogger("OSRMRESOURCE");
 
 /**
 *

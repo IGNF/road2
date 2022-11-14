@@ -59,6 +59,7 @@ module.exports = class pgrSource extends Source {
     // Attributs disponibles sur les voies dans la base 
     this._otherAttributes = new Array();
 
+    // TODO : à l'exemple des ressources, faire une fonction init() pour chaque source appelée dans le sourceManager
     // Création des tableaux d'attributs
     for (let i = 0; i < sourceJsonObject.storage.base.attributes.length; i++) {
       let curAttribute = sourceJsonObject.storage.base.attributes[i];
@@ -87,8 +88,11 @@ module.exports = class pgrSource extends Source {
 
     // Initialisation des coûts disponibles 
     for (let i = 0; i < sourceJsonObject.costs.length; i++) {
-      Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      if (!this._costs[sourceJsonObject.costs[i].profile]) {
+        Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      }
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].optimization, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].costType, { value: new Object(), configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "costColumn", { value: sourceJsonObject.costs[i].costColumn, configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "rcostColumn", { value: sourceJsonObject.costs[i].rcostColumn, configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "costColumn", { value: sourceJsonObject.costs[i].costColumn, configurable: true, enumerable: true, writable: true });

@@ -42,7 +42,7 @@ module.exports = class smartroutingSource extends Source {
   constructor(sourceJsonObject) {
 
     // Constructeur parent
-    super(sourceJsonObject.id, "pgr", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
+    super(sourceJsonObject.id, "smartrouting", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;

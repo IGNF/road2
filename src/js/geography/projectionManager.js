@@ -112,7 +112,8 @@ module.exports = class ProjectionManager {
   */
   checkBboxConfiguration (bbox, projectionId) {
 
-    LOGGER.info("Vérification d'une bbox...");
+    LOGGER.info("Vérification d'une bbox... ");
+    LOGGER.debug("bbox:'" + bbox+"'");
 
     if (!bbox) {
       LOGGER.error("Aucune bbox fournie");
@@ -124,27 +125,31 @@ module.exports = class ProjectionManager {
       return false;
     }
 
-    let regex = new RegExp("^(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)$");
-    if (!regex.test(bbox)) {
-      LOGGER.error("La bbox n'est pas correctement formattée");
-      return false;
-    }
-
-    let bboxArray = new Array(4);
+    let bboxArray = new Array();
     try {
-      bboxArray = regex.exec(bbox);
+      bboxArray = bbox.match(/^(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)$/);
     } catch(error) {
       LOGGER.error("Impossible d'analyser la bbox");
       LOGGER.error(error);
       return false;
     }
 
-    if (bboxArray[0] >= bboxArray[2]) {
-      LOGGER.error("Mauvaise configuration : Xmin est supérieur ou égal à Xmax");
+    if (bboxArray === null) {
+      LOGGER.error("La bbox n'est pas correctement formattée : aucune correspondance n'a été trouvée");
+      return false;
+    }
+
+    if (bboxArray.length !== 5) {
+      LOGGER.error("La bbox n'est pas correctement formattée : l'ensemble des correspondances n'a pas été correctement identifié");
       return false;
     }
 
     if (bboxArray[1] >= bboxArray[3]) {
+      LOGGER.error("Mauvaise configuration : Xmin est supérieur ou égal à Xmax");
+      return false;
+    }
+
+    if (bboxArray[2] >= bboxArray[4]) {
       LOGGER.error("Mauvaise configuration : Ymin est supérieur ou égal à Ymax");
       return false;
     }

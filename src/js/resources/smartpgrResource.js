@@ -1,7 +1,6 @@
 'use strict';
 
 const Resource = require('./resource');
-const Duration = require('../time/duration');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -96,10 +95,16 @@ module.exports = class smartpgrResource extends Resource {
 
         } else if (source.type === 'pgr') {
 
-          let linkedIdRoute = source.configuration.cost.profile + source.configuration.cost.optimization;
-          let linkedIdIso = source.configuration.cost.profile + source.configuration.cost.costType;
-          this._linkedSource[linkedIdRoute] = source.configuration.id;
-          this._linkedSource[linkedIdIso] = source.configuration.id;
+          console.log(source);
+
+          for (let j = 0; j < source.configuration.costs.length; j++) {
+
+            let linkedIdRoute = source.configuration.costs[j].profile + source.configuration.costs[j].optimization;
+            let linkedIdIso = source.configuration.costs[j].profile + source.configuration.costs[j].costType;
+            this._linkedSource[linkedIdRoute] = source.configuration.id;
+            this._linkedSource[linkedIdIso] = source.configuration.id;
+
+          }
 
         } else {
 

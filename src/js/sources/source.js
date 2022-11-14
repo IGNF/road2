@@ -72,6 +72,28 @@ module.exports = class Source {
   /**
   *
   * @function
+  * @name get description
+  * @description Récupérer la description de la source
+  *
+  */
+   get description () {
+    return this._description;
+  }
+
+  /**
+  *
+  * @function
+  * @name get projection
+  * @description Récupérer la projection de la source
+  *
+  */
+   get projection () {
+    return this._projection;
+  }
+
+  /**
+  *
+  * @function
   * @name getConnected
   * @description Récupérer l'état de connexion de la source
   *

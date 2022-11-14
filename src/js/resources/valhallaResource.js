@@ -1,6 +1,10 @@
 'use strict';
 
 const Resource = require('./resource');
+const log4js = require('log4js');
+
+// Création du LOGGER
+var LOGGER = log4js.getLogger("VALRESOURCE");
 
 /**
 *
@@ -75,16 +79,16 @@ module.exports = class valhallaResource extends Resource {
    initResource (sourceManager) {
 
     // Instanciation de la correspondance entre profile/optimization et sourceId
-    for (let i=0; i < this._configuration.sources.length; i++) {
+    for (let s=0; s < this._configuration.sources.length; s++) {
 
-      if (!sourceManager.isLoadedSourceAvailable(this._configuration.sources[i])) {
+      if (!sourceManager.isLoadedSourceAvailable(this._configuration.sources[s])) {
         LOGGER.error("La source n'a pas été chargée");
         return false;
       } else {
 
         LOGGER.debug("La source est bien disponible");
 
-        let source = sourceManager.getSourceById(this._configuration.sources[i]);
+        let source = sourceManager.getSourceById(this._configuration.sources[s]);
 
         // TODO : faire cette vérification aussi pendant le check de la ressource
         if (source.type !== "valhalla") {
@@ -92,14 +96,20 @@ module.exports = class valhallaResource extends Resource {
           return false;
         }
 
-        let linkedIdRoute = source.configuration.cost.profile + source.configuration.cost.optimization;
-        let linkedIdIso = source.configuration.cost.profile + source.configuration.cost.costType;
-        this._linkedSource[linkedIdRoute] = source.configuration.id;
-        this._linkedSource[linkedIdIso] = source.configuration.id;
+        for (let i = 0; i < source.configuration.costs.length; i++) {
+
+          let linkedIdRoute = source.configuration.costs[i].profile + source.configuration.costs[i].optimization;
+          let linkedIdIso = source.configuration.costs[i].profile + source.configuration.costs[i].costType;
+          this._linkedSource[linkedIdRoute] = source.configuration.id;
+          this._linkedSource[linkedIdIso] = source.configuration.id;
+
+        }
 
       }
 
     }
+
+    
 
     return true;
 

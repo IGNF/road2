@@ -31,8 +31,15 @@ module.exports = class resourceManager {
     // Liste des ressources chargées dans le manager
     this._resource = {};
 
-    // Liste des types de ressource gérées par le manager
-    this._availableResourceTypes = ["pgr", "smartpgr","osrm","valhalla"];
+    // Correspondance entre les ressources et les opérations possibles 
+    // Le contenu de ce tableau dépend du code écrit dans la ressource correspondante, de ce nous avons choisis de l'implémenter dans Road2
+    // Ce tableau peut beaucoup ressembler à son équivalent du sourceManager mais il peut aussi s'en écarter selon les futures ressources qui seront implémentées
+    this._operationsByType = {
+      "osrm": ["nearest", "route"],
+      "pgr": ["route", "isochrone"],
+      "smartpgr": ["route", "isochrone"],
+      "valhalla": ["route", "isochrone"]
+    };
 
     // Manager de source
     this._sourceManager = sourceManager;
@@ -139,8 +146,10 @@ module.exports = class resourceManager {
     LOGGER.info("Verification de la configuration d'une ressource...");
 
     if (!resourceJsonObject.resource) {
-      LOGGER.error("Le fichier ne contient pas d'objet resource");
+      LOGGER.error("La configuration ne contient pas d'objet resource");
       return false;
+    } else {
+      LOGGER.debug("La configuration contient bien un objet resource");
     }
 
     // ID
@@ -148,6 +157,7 @@ module.exports = class resourceManager {
       LOGGER.error("La ressource ne contient pas d'id.");
       return false;
     } else {
+
       LOGGER.info("Ressource id: " + resourceJsonObject.resource.id);
 
       // On vérifie que l'id de la ressource n'est pas déjà pris par une autre ressource chargée
@@ -181,6 +191,9 @@ module.exports = class resourceManager {
       LOGGER.error("La ressource ne contient pas de version.");
       return false;
     } else {
+
+      LOGGER.debug("La ressource contient une version " + resourceJsonObject.resource.resourceVersion);
+
       // on vérifie que c'est bien une string
       if (typeof resourceJsonObject.resource.resourceVersion !== "string") {
         LOGGER.error("La version de la ressource n'est pas une chaine de carateres.");
@@ -194,8 +207,10 @@ module.exports = class resourceManager {
       return false;
     } else {
 
+      LOGGER.debug("La ressource contient un type " + resourceJsonObject.resource.type);
+
       // Vérification que le type est valide
-      if (this._availableResourceTypes.includes(resourceJsonObject.resource.type)) {
+      if (Object.keys(this._operationsByType).includes(resourceJsonObject.resource.type)) {
         LOGGER.info("Type de la ressource disponible: " + resourceJsonObject.resource.type);
       } else {
         LOGGER.error("La ressource indique un type invalide: " + resourceJsonObject.resource.type);
@@ -208,7 +223,9 @@ module.exports = class resourceManager {
     if (!resourceJsonObject.resource.description) {
       LOGGER.error("La ressource ne contient pas de description.");
       return false;
-    } 
+    } else {
+      LOGGER.debug("La ressource contient une description");
+    }
 
     // Sources
     if (!resourceJsonObject.resource.sources) {
@@ -218,7 +235,7 @@ module.exports = class resourceManager {
 
       LOGGER.info("Verification des sources...");
 
-      if (Array.isArray(resourceJsonObject.resource.sources)) {
+      if (!Array.isArray(resourceJsonObject.resource.sources)) {
         LOGGER.error("Mauvaise configuration: 'resource.sources' n'est pas un tableau");
         return false;
       }
@@ -232,13 +249,16 @@ module.exports = class resourceManager {
 
         let sourceId = resourceJsonObject.resource.sources[i];
         if (!this._sourceManager.isCheckedSourceAvailable(sourceId)) {
-          LOGGER.error("La ressource contient une source non disponible.");
+          LOGGER.error("La ressource contient une source non disponible : " + sourceId);
           return false;
         } else {
           // TODO : on stocke l'id de la ressource pour cette source donnée
         }
 
       }
+
+      LOGGER.debug("Vérification des sources terminée");
+
     }
 
     // availableOperations
@@ -258,19 +278,10 @@ module.exports = class resourceManager {
     for (let i = 0; i < resourceJsonObject.resource.availableOperations.length; i++) {
 
       let operationId = resourceJsonObject.resource.availableOperations[i].id;
-      let found = false;
+      let availableOperationsOfType = this._operationsByType[resourceJsonObject.resource.type];
 
-      for (let j = 0; resourceJsonObject.resource.sources; j++) {
-        let sourceType = resourceJsonObject.resource.sources[j].type;
-        let operations = this._sourceManager.operationsByType[sourceType];
-        if (operations.includes(operationId)) {
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        LOGGER.error("L'opération " + operationId + " n'a pas de source pour y répondre");
+      if (!availableOperationsOfType.includes(operationId)) {
+        LOGGER.error("L'opération " + operationId + " n'est pas disponible pour le type de ressource " + resourceJsonObject.resource.type);
         return false;
       }
 
