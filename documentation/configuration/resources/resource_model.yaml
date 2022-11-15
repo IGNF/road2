@@ -1,0 +1,64 @@
+# Description d'un fichier de ressource pour Road2
+
+# Information sur la ressource diffusée.
+"resource":
+  type: object
+  required: true
+  properties:	
+    # Id de la ressource, unique par instance de Road2
+    "id":
+      type: string
+      required: true
+    # Type de la ressource
+    "type":
+      type: string
+      required: true
+      enum: ["osrm","pgr","smartpgr","valhalla"]
+    # Description de la ressource
+    "description":
+      type: string
+      required: true
+    # Version de la ressource. C'est généralement la date de génération de cette ressource. 
+    "resourceVersion"
+      type: "string"
+      required: true
+    # Liste des sources proposée dans cette ressource. On indique seulement les ids des sources. 
+    # Il y a une correspondance qui doit être respectée entre les types de source et de ressource
+    "sources":
+      type: array 
+      required: true
+      minItems: 1
+      items:
+        type: string
+    # Informations sur les opérations autorisées sur la ressource qui va être générée. 
+    "availableOperations":
+      type: array
+      required: true
+      minItems: 1
+      items:
+        type: object
+        properties:
+          # Id de l'opération
+          "id":
+            type: string 
+            required: true 
+          # Paramètres de l'opération 
+          "parameters":
+            type: array
+            required: true
+            items:
+              type: object 
+              properties:
+                # Id du parametre
+                "id":
+                  type: string
+                  required: true
+                # Valeur par défaut possible pour ce parametre
+                "defaultValueContent":
+                  type: string 
+                  required: false 
+                # Valeurs possibles pour ce parametre
+                # TODO : finir de spécifier (en attendant, voir les exemples de fichier)
+                "values":
+                  type: string or array or object 
+                  required: true

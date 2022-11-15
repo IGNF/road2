@@ -1,0 +1,32 @@
+{
+    "id": "bdtopo-auto-valhalla",
+    "description":"test valhalla", 
+    "type": "valhalla",
+    "projection": "EPSG:4326",
+    "bbox": "1.7,48.4,3.3,49.1",
+    "storage": {
+      "tar": "/home/docker/data/bdtopo-valhalla-tiles.tar",
+      "dir": "/home/docker/data/bdtopo-valhalla-tiles/",
+      "config": "/home/docker/data/valhalla.json"
+    },
+    "costs": [
+        {
+            "profile": "car",
+            "optimization": "fastest",
+            "costType": "time",
+            "costing": "auto"
+        },
+        {
+            "profile": "car",
+            "optimization": "shortest",
+            "costType": "distance",
+            "costing": "auto_shorter"
+        },
+        {
+            "profile": "pedestrian",
+            "optimization": "shortest",
+            "costType": "distance",
+            "costing": "pedestrian"
+        }
+    ]
+}

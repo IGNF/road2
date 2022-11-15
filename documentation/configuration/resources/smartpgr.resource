@@ -1,272 +1,13 @@
 {
   "resource": {
-    "id": "bduni-idf-pgr",
-    "type": "pgr",
+    "id": "bduni-idf-smartpgr",
+    "type": "smartpgr",
+    "resourceVersion": "yyyy-mm-dd",
+    "threshold": 30000,
     "description": "Donn\u00e9es BDUNI v2.",
-    "resourceVersion": "10/05/2020",
-    "topology": {
-      "id": "base-bduni",
-      "type": "db",
-      "description": "Donn\u00e9es issues de la BDUNI de l'IGN.",
-      "storage": {
-        "base": {
-          "dbConfig": "/home/docker/data/output_base.json",
-          "schema": "public",
-          "attributes": [
-            {
-              "key": "name",
-              "column": "way_names",
-              "default": "false"
-            },
-            {
-              "key": "nom_1_gauche",
-              "column": "nom_1_gauche",
-              "default": "true"
-            },
-            {
-              "key": "nom_1_droite",
-              "column": "nom_1_droite",
-              "default": "true"
-            },
-            {
-              "key": "cpx_numero",
-              "column": "cpx_numero",
-              "default": "true"
-            },
-            {
-              "key": "cpx_toponyme_route_nommee",
-              "column": "cpx_toponyme_route_nommee",
-              "default": "true"
-            },
-            {
-              "key": "cleabs",
-              "column": "cleabs",
-              "default": "false"
-            },
-            {
-              "key": "nature",
-              "column": "nature",
-              "default": "false"
-            },
-            {
-              "key": "importance",
-              "column": "importance",
-              "default": "false"
-            },
-            {
-              "key": "position_par_rapport_au_sol",
-              "column": "position_par_rapport_au_sol",
-              "default": "false"
-            },
-            {
-              "key": "nombre_de_voies",
-              "column": "nombre_de_voies",
-              "default": "false"
-            },
-            {
-              "key": "largeur_de_chaussee",
-              "column": "largeur_de_chaussee",
-              "default": "false"
-            },
-            {
-              "key": "itineraire_vert",
-              "column": "itineraire_vert",
-              "default": "false"
-            },
-            {
-              "key": "sens_de_circulation",
-              "column": "sens_de_circulation",
-              "default": "false"
-            },
-            {
-              "key": "bande_cyclable",
-              "column": "bande_cyclable",
-              "default": "false"
-            },
-            {
-              "key": "reserve_aux_bus",
-              "column": "reserve_aux_bus",
-              "default": "false"
-            },
-            {
-              "key": "urbain",
-              "column": "urbain",
-              "default": "false"
-            },
-            {
-              "key": "vitesse_moyenne_vl",
-              "column": "vitesse_moyenne_vl",
-              "default": "false"
-            },
-            {
-              "key": "acces_vehicule_leger",
-              "column": "acces_vehicule_leger",
-              "default": "false"
-            },
-            {
-              "key": "acces_pieton",
-              "column": "acces_pieton",
-              "default": "false"
-            },
-            {
-              "key": "nature_de_la_restriction",
-              "column": "nature_de_la_restriction",
-              "default": "false"
-            },
-            {
-              "key": "restriction_de_hauteur",
-              "column": "restriction_de_hauteur",
-              "default": "false"
-            },
-            {
-              "key": "restriction_de_poids_total",
-              "column": "restriction_de_poids_total",
-              "default": "false"
-            },
-            {
-              "key": "restriction_de_poids_par_essieu",
-              "column": "restriction_de_poids_par_essieu",
-              "default": "false"
-            },
-            {
-              "key": "restriction_de_largeur",
-              "column": "restriction_de_largeur",
-              "default": "false"
-            },
-            {
-              "key": "restriction_de_longueur",
-              "column": "restriction_de_longueur",
-              "default": "false"
-            },
-            {
-              "key": "matieres_dangereuses_interdites",
-              "column": "matieres_dangereuses_interdites",
-              "default": "false"
-            },
-            {
-              "key": "insee_commune_gauche",
-              "column": "insee_commune_gauche",
-              "default": "false"
-            },
-            {
-              "key": "insee_commune_droite",
-              "column": "insee_commune_droite",
-              "default": "false"
-            },
-            {
-              "key": "cpx_numero_route_europeenne",
-              "column": "cpx_numero_route_europeenne",
-              "default": "false"
-            },
-            {
-              "key": "cpx_classement_administratif",
-              "column": "cpx_classement_administratif",
-              "default": "false"
-            },
-            {
-              "key": "cpx_gestionnaire",
-              "column": "cpx_gestionnaire",
-              "default": "false"
-            }
-          ]
-        }
-      },
-      "projection": "EPSG:4326",
-      "bbox": "1.7,48.4,3.3,49.1"
-    },
     "sources": [
-      {
-        "id": "bduni-idf-car-fastest-pgr",
-        "type": "pgr",
-        "storage": {
-          "costColumn": "cost_s_car",
-          "rcostColumn": "reverse_cost_s_car"
-        },
-        "cost": {
-          "profile": "car",
-          "optimization": "fastest",
-          "compute": {
-            "storage": {
-              "file": "/home/docker/data/costs_calculation_sample.json"
-            },
-            "configuration": {
-              "name": "cost_s_car",
-              "storage": {
-                "file": "/home/docker/data/costs_calculation_sample.json"
-              }
-            }
-          }
-        }
-      },
-      {
-        "id": "bduni-idf-car-shortest-pgr",
-        "type": "pgr",
-        "storage": {
-          "costColumn": "cost_m_car",
-          "rcostColumn": "reverse_cost_m_car"
-        },
-        "cost": {
-          "profile": "car",
-          "optimization": "shortest",
-          "compute": {
-            "storage": {
-              "file": "/home/docker/data/costs_calculation_sample.json"
-            },
-            "configuration": {
-              "name": "cost_m_car",
-              "storage": {
-                "file": "/home/docker/data/costs_calculation_sample.json"
-              }
-            }
-          }
-        }
-      },
-      {
-        "id": "bduni-idf-pedestrian-fastest-pgr",
-        "type": "pgr",
-        "storage": {
-          "costColumn": "cost_s_pedestrian",
-          "rcostColumn": "reverse_cost_s_pedestrian"
-        },
-        "cost": {
-          "profile": "pedestrian",
-          "optimization": "fastest",
-          "compute": {
-            "storage": {
-              "file": "/home/docker/data/costs_calculation_sample.json"
-            },
-            "configuration": {
-              "name": "cost_s_pedestrian",
-              "storage": {
-                "file": "/home/docker/data/costs_calculation_sample.json"
-              }
-            }
-          }
-        }
-      },
-      {
-        "id": "bduni-idf-pedestrian-shortest-pgr",
-        "type": "pgr",
-        "storage": {
-          "costColumn": "cost_m_pedestrian",
-          "rcostColumn": "reverse_cost_m_pedestrian"
-        },
-        "cost": {
-          "profile": "pedestrian",
-          "optimization": "shortest",
-          "compute": {
-            "storage": {
-              "file": "/home/docker/data/costs_calculation_sample.json"
-            },
-            "configuration": {
-              "name": "cost_m_pedestrian",
-              "storage": {
-                "file": "/home/docker/data/costs_calculation_sample.json"
-              }
-            }
-          }
-        }
-      }
+      "bdtopo-smartrouting",
+      "bduni-idf-pgr"
     ],
     "availableOperations": [
       {
@@ -275,7 +16,7 @@
           {
             "id": "resource",
             "values": [
-              "bduni-idf-pgr"
+              "bduni-idf-smartpgr"
             ]
           },
           {
@@ -433,7 +174,7 @@
               },
               {
                 "keyType": "numerical-pgr",
-                "key": "LARGEUR",
+                "key": "largeur",
                 "availableConstraintType": [
                   "banned"
                 ],
@@ -441,15 +182,17 @@
               },
               {
                 "keyType": "numerical-pgr",
-                "key": "IMPORTANCE",
+                "key": "importance",
                 "availableConstraintType": [
-                  "banned"
+                  "banned",
+                  "avoid",
+                  "prefer"
                 ],
                 "field": "importance"
               },
               {
                 "keyType": "name-pgr",
-                "key": "NATURE",
+                "key": "nature",
                 "availableConstraintType": [
                   "banned"
                 ],
@@ -546,9 +289,11 @@
               },
               {
                 "keyType": "name-pgr",
-                "key": "CL_ADMIN",
+                "key": "cpx_classement_administratif",
                 "availableConstraintType": [
-                  "banned"
+                  "banned",
+                  "prefer",
+                  "avoid"
                 ],
                 "availableValues": [
                   {
@@ -611,7 +356,7 @@
           {
             "id": "resource",
             "values": [
-              "bduni-idf-pgr"
+              "bduni-idf-smartpgr"
             ]
           },
           {
@@ -630,7 +375,10 @@
             ]
           },
           {
-            "id": "costValue"
+            "id": "costValue",
+            "values": {
+              "min": 1
+            }
           },
           {
             "id": "profile",
@@ -923,4 +671,3 @@
       }
     ]
   }
-}
