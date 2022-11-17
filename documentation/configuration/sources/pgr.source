@@ -1,5 +1,5 @@
 {
-  "id": "bduni-idf-car-fastest-pgr",
+  "id": "bduni-pgr",
   "description":"test pgr", 
   "type": "pgr",
   "projection": "EPSG:4326",

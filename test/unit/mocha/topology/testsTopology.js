@@ -14,7 +14,7 @@ describe('Test de la classe Topology', function() {
       "type": "osm",
       "description": "Corse en version OSM",
       "projection": "EPSG:4326",
-      "bbox": "-90,-180,90,180"
+      "bbox": "-180,-90,180,90"
     };
 
 

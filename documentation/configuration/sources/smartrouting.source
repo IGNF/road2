@@ -3,7 +3,7 @@
     "type": "smartrouting",
     "description":"test",
     "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180",                                          
+    "bbox": "-180,-90,180,90",                                          
     "storage": {                                                     
         "url": "https://wxs.ign.fr/calcul"                             
     }                                                                

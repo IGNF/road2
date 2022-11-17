@@ -20,14 +20,14 @@
         {
           "id": "start",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
         {
           "id": "end",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
@@ -48,7 +48,7 @@
         {
           "id": "intermediates",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
@@ -138,7 +138,7 @@
         {
           "id": "coordinates",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },

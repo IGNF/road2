@@ -64,7 +64,7 @@ describe('Test de la classe valhallaSource', function() {
       "file": "/home/docker/data/corse-latest.osm.pbf"
     },
     "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180",
+    "bbox": "-180,-90,180,90",
 
   };
 

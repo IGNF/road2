@@ -1,5 +1,5 @@
 {
-    "id": "bdtopo-auto-valhalla",
+    "id": "bdtopo-valhalla",
     "description":"test valhalla", 
     "type": "valhalla",
     "projection": "EPSG:4326",
