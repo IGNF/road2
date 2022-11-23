@@ -20,7 +20,7 @@ describe('Test de la classe valhallaSource', function() {
       },
       "/home/docker/config": {
         "graph_bdtopo.lua": "",
-        "costs_calculation.json": "",
+        "costs_calculation_sample.json": "",
       },
       "/home/docker/data/corse-latest-valhalla-tiles": {
       }
@@ -49,7 +49,7 @@ describe('Test de la classe valhallaSource', function() {
         "configuration": {
           "costing": "auto",
           "storage": {
-            "file": "/home/docker/config/costs_calculation.json"
+            "file": "/home/docker/config/costs_calculation_sample.json"
           }
         }
       }

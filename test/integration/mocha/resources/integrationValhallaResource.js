@@ -43,7 +43,7 @@ describe('Test de la classe ValhallaResource', function() {
             "configuration": {
               "costing": "auto",
               "storage": {
-                "file": "/home/docker/config/costs_calculation.json"
+                "file": "/home/docker/config/costs_calculation_sample.json"
               }
             }
           }

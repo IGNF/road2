@@ -47,8 +47,11 @@ module.exports = class valhallaSource extends Source {
 
     // Initialisation des coûts
     for (let i = 0; i < sourceJsonObject.costs.length; i++) {
-      Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      if (!this._costs[sourceJsonObject.costs[i].profile]) {
+        Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      }
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].optimization, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].costType, { value: new Object(), configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "costing", { value: sourceJsonObject.costs[i].costing, configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "costing", { value: sourceJsonObject.costs[i].costing, configurable: true, enumerable: true, writable: true });
     }
