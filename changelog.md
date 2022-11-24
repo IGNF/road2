@@ -8,6 +8,8 @@ ADDED:
 CHANGED:
   - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement. 
   - Le fichier server.json permet maintenant de configurer l'administrateur et donc n'a plus le même contenu. Ce dernier est dans service.json. 
+  - Les sources ne sont plus configurées dans le même fichier que les ressources. Chaque source est configurée dans son fichier. L'ensemble est placé dans un dossier de sources. Il peut y en avoir plusieurs. 
+  - Les sources PGRouting et Valhalla ne sont plus configurées de la même manière : chaque source de ces types peut contenir plusieurs coûts. 
 
 # 1.1.2
 

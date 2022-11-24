@@ -753,7 +753,7 @@ module.exports = class parameterManager  {
             LOGGER.error("Le type de la cle contrainte n'est pas precise");
             return false;
           } else {
-            if ( !(["name-pgr", "numerical-pgr", "name-osrm"].includes(key.keyType)) ) {
+            if ( !(["name-pgr", "numerical-pgr", "name-osrm","name-valhalla"].includes(key.keyType)) ) {
               LOGGER.error("Le type de la cle contrainte est invalide");
               return false;
             } else {
@@ -845,7 +845,7 @@ module.exports = class parameterManager  {
               }
 
             }
-          } else if (key.keyType === "name-osrm") {
+          } else if (key.keyType === "name-osrm" || key.keyType === "name-valhalla") {
 
             if (!key.availableValues) {
               LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");

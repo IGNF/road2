@@ -38,15 +38,15 @@ C'est le second concept le plus important après l'indépendance des APIs et des
 
 #### 1.2.1 Notion de graphe 
 
-Il semble utile de passer la notion de *graphe*, selon Road2, pour expliquer ce qui suit. Quand on fait du calcul d'itinéraire, on utilise un moteur qui lit un *graphe* pour générer l'itinéraire. Or, **un *graphe* est une topologie, c'est-à-dire un ensemble de noeuds et d'arcs qui forment un tout navigable, sur laquelle il y a un unique coût**. 
+Il semble utile de passer la notion de *graphe*, selon Road2, pour expliquer ce qui suit. Quand on fait du calcul d'itinéraire, on utilise un moteur qui lit un *graphe* pour générer l'itinéraire. Or, **un *graphe* est une topologie, c'est-à-dire un ensemble de noeuds et d'arcs qui forment un tout navigable, sur laquelle il y a au moins un coût**. 
 
 En effet, à chaque arc est associé au minimum un coût. Ce coût peut être la distance de l'arc ou le temps nécessaire pour le parcourir en voiture. Ainsi, chaque coût peut être vu comme le couple *profile/optimisation*, où *profile* est le moyen de transport (ex. voiture) et *optimisation* est le type de déplacement que l'on souhaite (ex. "plus rapide"). 
 
-Certains graphes peuvent avoir plusieurs coûts par topologie (ex. PGRouting) et d'autres non (ex. OSRM). Mais lors d'un calcul d'itinéraire, un seul coût est utilisé. On peut donc considérer que chaque graphe n'a qu'un seul coût. 
+Certains graphes peuvent avoir plusieurs coûts par topologie (ex. PGRouting, Valhalla) et d'autres non (ex. OSRM). Mais lors d'un calcul d'itinéraire, un seul coût est utilisé. 
 
 #### 1.2.2 Notion de source 
 
-Comme précisé juste au-dessus, pour avoir un itinéraire, il est nécessaire de faire appel à un moteur et à un graphe. La *source*, dans le langage conceptuel de Road2, est l'origine du calcul. **La source contient l'appel à un moteur sur un graphe précis pour obtenir le résultat d'un calcul**. C'est le lien entre l'application et le calcul réel, comme celui d'un itinéraire par exemple. 
+Comme précisé juste au-dessus, pour avoir un itinéraire, il est nécessaire de faire appel à un moteur qui utilise un graphe. La *source*, dans le langage conceptuel de Road2, est l'origine du calcul. **La source contient l'appel à un moteur sur un graphe précis pour obtenir le résultat d'un calcul**. C'est le lien entre l'application et le calcul réel, comme celui d'un itinéraire par exemple. 
 
 Concrètement, une *source* regroupe deux entités : 
 - une classe Javascript qui fait le lien entre le reste du code et le moteur. Chaque moteur sera donc lié à Road2 par une classe fille de la classe `Source`. Cette classe fille devra contenir le code qui permet de demander au moteur un itinéraire ou autre chose (ex. isochrone, etc...). C'est ce qui concerne le développeur. 
@@ -56,19 +56,27 @@ De tout ce qui vient d'être dit, on remarque qu'ajouter un moteur revient à aj
 
 De plus, en théorie, une unique source peut faire appel à plusieurs moteurs pour rendre un résultat. L'essentiel est qu'une source ne renvoie qu'un résultat pour une seule requête. 
 
+Au final, une source va prendre prendre en compte une instance de `Request`, faire le calcul et renvoyer une instance de `Response`. Cela permet à la source de rester indépendante du reste du code. 
+
+Lorsque l’on fait du calcul d’itinéraire, il faut à minima une topologie et des coûts associés à cette topologie. Un coût correspond à un seul mode de déplacement et une seule optimisation (ex. le couple Voiture/plus court).
+
+Il se trouve qu'un graphe OSRM ne contient qu’un seul coût par dossier. Il permet donc de calculer des itinéraires uniquement sur un seul mode de déplacement et une seule optimisation. Par contre, PgRouting propose autant de colonnes de coût que l'on souhaite sur une même topologie. On retrouve le même regroupement de couples sur une topologie dans Valhalla. 
+
 #### 1.2.3 Notion de ressource 
 
-Il est une contrainte technique qu’il serait préférable de masquer à l’utilisateur. Lorsque l’on fait du calcul d’itinéraire, il faut à minima une topologie et des coûts associés à cette topologie. Un coût correspond à un seul mode de déplacement et une seule optimisation(ex. Voiture/plus court).
+Cependant, pour l'utilisateur et pour l'administrateur du service, nous avons créé la notion de *ressource*. **Une ressource sera définie comme un ensemble de sources**. C'est elle qui fait le lien entre une requête et la bonne source permettant d'y répondre. 
 
-Par exemple, un graphe OSRM ne contient qu’un seul coût. Il permet donc de calculer des itinéraires uniquement sur un seul mode de déplacement et une seule optimisation. De la même manière, une fonction PgRouting utilise une seule colonne de coût à la fois.
+À l'origine, l'objectif était de pouvoir associer plusieurs sources issues des mêmes données mais ayant un calcul de coût différent, et donc de donner à l’*utilisateur* une vue simplifiée des contraintes techniques. La ressource étant donc le *lien* entre la vue technique et la vue utilisateur. **Une autre manière de voir la ressource est de la voir comme un graphe qui a plusieurs coûts sur chaque arc**. 
 
-Afin de masquer cette contrainte technique, on va regrouper plusieurs graphes issus des mêmes données topologiques mais ayant des coûts différents. Ce regroupement sera une *ressource*. **Une ressource sera alors définie comme un ensemble de sources**. En associant plusieurs sources issues des mêmes données mais ayant un calcul de coût différent, on peut donner à l’utilisateur une vue simplifiée des contraintes techniques. La ressource est donc le *lien* entre la vue technique et la vue utilisateur. **Une autre manière de voir la ressource est de la voir comme un graphe qui a plusieurs coûts sur chaque arc**. 
+Cela est utile pour OSRM par exemple. Dans ce cas, il faut donc être vigilant lors de la génération des données. Lorsque l’on fera une ressource, il est alors impératif d’utiliser une même topologie pour plusieurs calculs de coûts différents. 
 
-Il faudra donc être vigilant lors de la génération des données. Lorsque l’on fera une ressource, il sera impératif d’utiliser une même topologie pour plusieurs calculs de coûts différents. Cela peut d'ailleurs avoir un impact sur les contraintes, comme les filtres. En effet, les contraintes sont appliquées au niveau de la ressource et non d’une source. C’est un choix qui permet de simplifier la configuration. 
+Mais depuis le début du projet, nous avons élargi les possibilités en permettant d'associer des sources qui n'ont pas la même topologie. Ainsi, aujourd'hui, une ressource n'est qu'un regroupement de sources. Il peut n'y en avoir qu'une. C'est souvent le cas pour PGRouting. 
 
-De plus, une instance de Road2 doit pouvoir gérer plusieurs ressources. Une ressource sera notamment configurable par un fichier. Le serveur lira l’ensemble des fichiers contenus dans un dossier indiqué par la configuration générale. 
+Pour l'*administrateur*, une instance de Road2 doit pouvoir gérer plusieurs ressources. Une ressource sera notamment configurable par un fichier. Le serveur lira l’ensemble des fichiers contenus dans un dossier indiqué par la configuration générale. 
 
-Enfin, Road2 est codé pour qu'il soit facile d'ajouter de nouveaux types de ressources et de sources indépendamment. Il est donc possible de créer différents types de source et de les associer au sein de divers types de ressources.
+Il est à noter que tout cela peut d'ailleurs avoir un impact sur les contraintes, comme les filtres. En effet, les contraintes sont appliquées au niveau de la ressource et non d’une source. C’est un choix qui permet de simplifier la configuration. 
+
+Enfin, précisons que Road2 est codé pour qu'il soit facile d'ajouter de nouveaux types de ressources et de sources indépendamment. Il est donc possible de créer différents types de source et de les associer au sein de divers types de ressources.
 
 ### 1.3 Les opérations
 

@@ -401,6 +401,11 @@ module.exports = class operationManager  {
 
     LOGGER.info("Verification de l'operation de la ressource...");
 
+    if (!Array.isArray(resourceOperationJsonObject)) {
+      LOGGER.error("Mauvais configuration : la configuration d'opérations fournie n'est pas un tableau");
+      return false;
+    }
+
     // on regarde d'abord la taille du tableau donné en entrée
     if (resourceOperationJsonObject.length === 0) {
       LOGGER.error("Il n'y aucune operation decrite");

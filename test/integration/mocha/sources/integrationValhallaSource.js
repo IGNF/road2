@@ -20,7 +20,7 @@ describe('Test de la classe valhallaSource', function() {
       },
       "/home/docker/config": {
         "graph_bdtopo.lua": "",
-        "costs_calculation.json": "",
+        "costs_calculation_sample.json": "",
       },
       "/home/docker/data/corse-latest-valhalla-tiles": {
       }
@@ -49,7 +49,7 @@ describe('Test de la classe valhallaSource', function() {
         "configuration": {
           "costing": "auto",
           "storage": {
-            "file": "/home/docker/config/costs_calculation.json"
+            "file": "/home/docker/config/costs_calculation_sample.json"
           }
         }
       }
@@ -64,7 +64,7 @@ describe('Test de la classe valhallaSource', function() {
       "file": "/home/docker/data/corse-latest.osm.pbf"
     },
     "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180",
+    "bbox": "-180,-90,180,90",
 
   };
 

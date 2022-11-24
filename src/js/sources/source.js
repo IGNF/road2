@@ -18,10 +18,9 @@ module.exports = class Source {
   * @description Constructeur de la classe source
   * @param {string} id - Identifiant de la source
   * @param {string} type - Type de la source
-  * @param {Topology} topology - Topologie dont dérive la source (classe fille de topology)
   *
   */
-  constructor(id, type, topology) {
+  constructor(id, type, description, projection, bbox) {
 
     // Id d'une source. Il doit être unique.
     this._id = id;
@@ -29,11 +28,17 @@ module.exports = class Source {
     // Type de la source
     this._type = type;
 
+    // Description de la source
+    this._description = description;
+
+    // Projection de la source 
+    this._projection = projection;
+
+    // Emprise de la source 
+    this._bbox = bbox;
+
     // État de la connexion de la source
     this._connected = false;
-
-    // Topologie dont dérive la source
-    this._topology = topology;
 
     // État de la source (même si connectée, elle peut être disfonctionnelle)
     // Peut être : "green" si la dernière requête a fonctionnée, "orange" si la source est connectée mais injoignable, "red" à l'initialisation ou si plus gros problème
@@ -62,6 +67,28 @@ module.exports = class Source {
   */
   get type () {
     return this._type;
+  }
+
+  /**
+  *
+  * @function
+  * @name get description
+  * @description Récupérer la description de la source
+  *
+  */
+   get description () {
+    return this._description;
+  }
+
+  /**
+  *
+  * @function
+  * @name get projection
+  * @description Récupérer la projection de la source
+  *
+  */
+   get projection () {
+    return this._projection;
   }
 
   /**
@@ -108,17 +135,6 @@ module.exports = class Source {
   */
   set state (st) {
     this._state = st;
-  }
-
-  /**
-  *
-  * @function
-  * @name get topology
-  * @description Récupérer la topologie de la source
-  *
-  */
-  get topology () {
-    return this._topology;
   }
 
   /**

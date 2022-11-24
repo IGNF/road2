@@ -63,14 +63,14 @@ describe('Test de la classe SourceManager', function() {
           {
             "id": "start",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
           {
             "id": "end",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
@@ -91,7 +91,7 @@ describe('Test de la classe SourceManager', function() {
           {
             "id": "intermediates",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },

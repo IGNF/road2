@@ -185,13 +185,6 @@ module.exports = {
 
     }
 
-
-    // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
-    if (!resource.linkedSource[profile+optimization]) {
-      throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
-    } else {
-      LOGGER.debug("profile et optimization compatibles");
-    }
     // ---
 
 
@@ -200,6 +193,12 @@ module.exports = {
 
     LOGGER.debug(routeRequest);
 
+    // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
+    if (!resource.checkSourceAvailibilityFromRequest(routeRequest)) {
+      throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
+    } else {
+      LOGGER.debug("profile et optimization compatibles");
+    }
 
     // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet RouteRequest
 
@@ -850,13 +849,6 @@ module.exports = {
 
     }
 
-    /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
-    if (!resource.linkedSource[profile+costType]) {
-      throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
-    } else {
-      LOGGER.debug("Parameters 'profile' and 'costType' are compatible");
-    }
-
     /* Paramètre 'direction'. */
     if (parameters.direction) {
 
@@ -913,6 +905,13 @@ module.exports = {
       timeUnit,
       distanceUnit
     );
+
+    /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
+    if (!resource.checkSourceAvailibilityFromRequest(isochroneRequest)) {
+      throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
+    } else {
+      LOGGER.debug("Parameters 'profile' and 'costType' are compatible");
+    }
 
     // Contraintes
     // ---

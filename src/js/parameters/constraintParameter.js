@@ -188,6 +188,21 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
           }
 
+      } else if (this._values[i].keyType === "name-valhalla") {
+
+        this._verification[this._values[i].key.toLowerCase()].keyType = "name-valhalla";
+
+        currentKeyDescription.availableOperators = new Array();
+        currentKeyDescription.availableOperators.push("=");
+        currentKeyDescription.values = new Array();
+
+        for(let l = 0; l < this._values[i].availableValues.length; l++) {
+
+          this._verification[this._values[i].key.toLowerCase()][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].field;
+          currentKeyDescription.values.push(this._values[i].availableValues[l].value);
+
+        }
+
       } else {
         return false;
       }
@@ -304,9 +319,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     }
 
-    if (this._verification[userJson.key.toLowerCase()].keyType === "name-pgr" || this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
+    let nameTable = ["name-pgr","name-osrm","name-valhalla"];
+    if (nameTable.includes(this._verification[userJson.key.toLowerCase()].keyType)) {
 
-      LOGGER.debug("keyType is name-pgr ror name-osrm");
+      LOGGER.debug("keyType is name-pgr ror name-osrm ror name-valhalla");
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -466,6 +482,12 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       // field = the_geom
       // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
+      let field = this._verification[userJson.key.toLowerCase()][userJson.value];
+
+      if (userJson.constraintType === 'banned') {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+      }
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-valhalla") {
       let field = this._verification[userJson.key.toLowerCase()][userJson.value];
 
       if (userJson.constraintType === 'banned') {

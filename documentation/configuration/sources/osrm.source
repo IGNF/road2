@@ -1,0 +1,14 @@
+{                                                                                 
+    "id": "bduni-idf-car-fastest",                                                  
+    "description":"test osrm", 
+    "type": "osrm",                                                                 
+    "projection": "EPSG:4326",
+    "bbox": "1.7,48.4,3.3,49.1",
+    "storage": {                                                                    
+        "file": "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"  
+    },                                                                              
+    "cost": {                                                                       
+        "profile": "car",                                                             
+        "optimization": "fastest"                                                    
+    }                                                                               
+}

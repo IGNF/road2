@@ -1,8 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const assert = require('assert').strict;
-const storageManager = require('../utils/storageManager');
-const errorManager = require('../utils/errorManager');
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
 const smartroutingSource = require('../sources/smartroutingSource');
@@ -21,7 +21,7 @@ module.exports = class sourceManager {
   * @description Constructeur de la classe sourceManager
   *
   */
-  constructor() {
+  constructor(projectionManager, baseManager) {
 
     // Liste des ids des sources chargées par le manager
     this._loadedSourceId = new Array();
@@ -38,27 +38,22 @@ module.exports = class sourceManager {
     // Descriptions des sources vérifiées par le manager
     this._checkedSourceConfiguration = {};
 
-    // Correspondance entre l'id d'une source et l'id de la topologie dont elle dérive
-    this._sourceTopology = {};
+    // Manager des projections 
+    this._projectionManager = projectionManager;
+
+    // Manager de bases de données (utiles pour certaines sources)
+    this._baseManager = baseManager;
 
     // Correspondance entre les sources et les opérations possibles 
+    // Le contenu de ce tableau dépend du moteur et du code écrit dans la source correspondante
+    // Par exemple, le projet OSRM permet de faire du nearest et nous avons choisis de l'implémenter dans Road2
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "smartrouting": ["route", "isochrone"]
+      "smartrouting": ["route", "isochrone"],
+      "valhalla": ["route", "isochrone"]
     };
 
-  }
-
-  /**
-  *
-  * @function
-  * @name get loadedSourceId
-  * @description Récupérer l'ensemble des ids de sources chargées
-  *
-  */
-  get loadedSourceId() {
-    return this._loadedSourceId;
   }
 
   /**
@@ -75,54 +70,161 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name get sourceTopology
-  * @description Récupérer la correspondance source/topologie
+  * @name isCheckedSourceAvailable
+  * @description Fonction utilisée pour vérifier si une source a été vérifiée
+  * @param {string} id - Id de la source
+  * @return {boolean} 
   *
   */
-  get sourceTopology() {
-    return this._sourceTopology;
+
+  isCheckedSourceAvailable(id) {
+
+    if (this._checkedSourceId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._checkedSourceId.length; i++) {
+      if (this._checkedSourceId[i] === id) {
+        return true;
+      }
+    }
+    return false;
+
   }
 
   /**
   *
   * @function
-  * @name get operationsByType
-  * @description Récupérer l'ensemble des opérations possibles par type de source
+  * @name getSourceById
+  * @description Fonction utilisée pour récupérer une source
+  * @param {string} id - Id de la source
+  * @return {source} source - Instance fille de la classe Source
   *
   */
-   get operationsByType() {
-    return this._operationsByType;
+
+  getSourceById(id) {
+
+    if (this.isLoadedSourceAvailable(id)) {
+      return this._source[id];
+    } else {
+      return null;
+    }
+
   }
 
   /**
   *
   * @function
-  * @name set loadedSourceId
-  * @description Attribuer l'ensemble des ids de sources
-  * @param {table} list - État de la connexion
+  * @name isLoadedSourceAvailable
+  * @description Fonction utilisée pour vérifier si une source a été chargée
+  * @param {string} id - Id de la source
+  * @return {boolean} 
   *
   */
-  set loadedSourceId(list) {
-    this._loadedSourceId = list;
+
+   isLoadedSourceAvailable(id) {
+
+    if (this._loadedSourceId.length === 0) {
+      return false;
+    }
+
+    for (let i = 0; i < this._loadedSourceId.length; i++) {
+      if (this._loadedSourceId[i] === id) {
+        return true;
+      }
+    }
+    return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkSourceDirectory
+  * @description Fonction utilisée pour vérifier un dossier contenant des sources.
+  * @param {string} directory - Dossier qui contient les configurations des ressources
+  * @return {boolean} 
+  *
+  */
+
+  async checkSourceDirectory(directory) {
+
+    LOGGER.info("Vérification d'un dossier de sources...");
+    LOGGER.info("Nom du dossier: " + directory);
+
+    if (fs.existsSync(directory)) {
+
+      let fileList = new Array();
+      try {
+        fileList = fs.readdirSync(directory);
+      } catch(error) {
+        LOGGER.error("Impossible de lire le dossier :");
+        LOGGER.error(error);
+        return false;
+      }
+
+      if (fileList.length === 0) {
+        LOGGER.warn("Le dossier " + directory + " est vide");
+        return false;
+      }
+
+      for (let i = 0; i < fileList.length; i++) {
+
+        let source = fileList[i];
+        let sourceFile = "";
+        try {
+          sourceFile = directory + "/" + source;
+          fs.accessSync(sourceFile, fs.constants.R_OK);
+        } catch (err) {
+          LOGGER.error("Le fichier de source ne peut etre lu: " + sourceFile);
+        }
+
+        let sourceConf = {};
+        try {
+          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+          sourceConf = JSON.parse(fs.readFileSync(sourceFile));
+        } catch (error) {
+          LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de source: " + sourceFile);
+          LOGGER.error(error);
+          return false;
+        }
+
+        if (!(await this.checkSourceConfiguration(sourceConf))) {
+          LOGGER.error("La source décrite dans le fichier " + sourceFile + " est mal configuée");
+          return false;
+        } else {
+          this._checkedSourceId.push(sourceConf.id);
+        }
+
+      }
+
+      LOGGER.info("Vérification du dossier de sources terminée");
+      return true;
+
+    } else {
+      LOGGER.error("Mauvaise configuration: Le dossier n'existe pas: " + directory );
+      return false;
+    }
+
   }
 
   /**
   *
   * @function
   * @name checkSourceConfiguration
-  * @description Fonction utilisée pour vérifier la partie source d'un fichier de description d'une ressource.
+  * @description Fonction utilisée pour vérifier la configuration d'une source.
   * @param {json} sourceJsonObject - Description JSON de la source
   * @return {boolean} 
   *
   */
 
-  checkSourceConfiguration(sourceJsonObject) {
+  async checkSourceConfiguration(sourceJsonObject) {
 
     LOGGER.info("Verification de la source...");
 
     // ID
     if (!sourceJsonObject.id) {
-      LOGGER.error("La ressource contient une source sans id.");
+      LOGGER.error("Mauvaise configuration: source.id absent");
       return false;
     } else {
       // On vérifie que l'id n'est pas déjà chargé.
@@ -173,128 +275,82 @@ module.exports = class sourceManager {
 
     }
 
-    // Type
-    if (!sourceJsonObject.type) {
-      LOGGER.error("La ressource contient une source sans type.");
+    // Description
+    if (!sourceJsonObject.description) {
+      LOGGER.error("Mauvaise configuration: source.description absent");
       return false;
     } else {
-      // Vérification que le type est valide puis vérification spécifique à chaque type
-      let available = false;
-      // La partie délimitée peut être copié-collée pour ajouter un nouveau type.
-      // Il ne reste plus qu'à créer la fonction de vérification correspondante.
-      //------ OSRM
-      if (sourceJsonObject.type === "osrm") {
-        available = true;
-        LOGGER.info("Source osrm.");
-
-        // On vérifie que le module osrm est disponible 
-        try {
-          let osrmTest = require('osrm');
-        } catch(error) {
-          LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
-          return false;
-        }
-
-        if (!this.checkSourceOsrm(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source osrm.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la source est correctement configurée.
-        }
+      if (typeof(sourceJsonObject.description) !== "string") {
+        LOGGER.error("Mauvaise configuration: source.description n'est pas une chaine de caractère");
+      return false;
       } else {
-        // On va voir si c'est un autre type.
+        LOGGER.debug("source.description présent");
       }
-      //------ OSRM
-      //------ PGR
-      if (sourceJsonObject.type === "pgr") {
-        available = true;
-        LOGGER.info("Source pgrouting.");
+    }
 
-        // On vérifie que le module pg est disponible
-        try {
-          let { poolTest } = require('pg');
-        } catch(error) {
-          LOGGER.error("Le module pg n'est pas disponible mais une source pgrouting est proposée dans la configuration.");
-          return false;
-        }
-
-        if (!this.checkSourcePgr(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source pgr.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
-      } else {
-        // On va voir si c'est un autre type.
-      }
-      //------ PGR
-      //------ SMARTROUTING
-      if (sourceJsonObject.type === "smartrouting") {
-        available = true;
-        LOGGER.info("Source smartrouting.");
-
-        if (!this.checkSourceSmartrouting(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source smartrouting.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
-      } else {
-        // On va voir si c'est un autre type.
-      }
-      //------ SMARTROUTING
-      //------ VALHALLA
-      if (sourceJsonObject.type === "valhalla") {
-        available = true;
-        LOGGER.info("Source valhalla.");
-
-        let operationFound = false;
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("route")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("route", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite
-          }
-        } else {
-          // on continue pour voir la suite
-        }
-
-        // On vérifie que les opérations possibles sur ce type de source soient disponibles dans l'instance du service
-        if (operationManager.verifyAvailabilityOperation("isochrone")) {
-          // On vérifie que les opérations possibles sur ce type de source soient disponibles pour la ressource
-          if (operationManager.isAvailableInTable("isochrone", resourceOperationTable)) {
-            operationFound = true;
-          } else {
-            // on continue pour voir la suite
-          }
-        } else {
-          // on continue pour voir la suite
-        }
-
-        if (!operationFound) {
-          LOGGER.error("Le service ne propose pas d'operations disponibles pour ce type de source (ex. route, isochrone), il n'est donc pas possible de charger cette source.");
-          return false;
-        }
-
-        if (!this.checkSourceValhalla(sourceJsonObject)) {
-          LOGGER.error("Erreur lors de la verification de la source valhalla.");
-          return false;
-        } else {
-          // il n'y a eu aucun problème, la ressource est correctement configurée.
-        }
-      } else {
-        // On va voir si c'est un autre type.
-      }
-      //------ VALHALLA
-
-      // Si ce n'est aucun type valide, on renvoie une erreur.
-      if (!available) {
-        LOGGER.error("La source indique un type invalide: " + sourceJsonObject.type);
+    // Projection 
+    if (!sourceJsonObject.projection) {
+      LOGGER.error("Mauvaise configuration: source.projection absent");
+      return false;
+    } else {
+      // Vérification de la projection
+      if (!this._projectionManager.isProjectionChecked(sourceJsonObject.projection)) {
+        LOGGER.error("La source indique une projection non disponible sur le service: " + sourceJsonObject.projection);
         return false;
       }
+    }
+
+    // Bbox 
+    if (!sourceJsonObject.bbox) {
+      LOGGER.error("Mauvaise configuration: source.bbox absent");
+      return false;
+    } else {
+      // Vérification de la bbox
+      if (!this._projectionManager.checkBboxConfiguration(sourceJsonObject.bbox, sourceJsonObject.projection)) {
+        LOGGER.error("La source indique une bbox incorrecte: " + sourceJsonObject.bbox);
+        return false;
+      }
+    }
+
+    // Type
+    if (!sourceJsonObject.type) {
+      LOGGER.error("Mauvaise configuration: source.type absent");
+      return false;
+    } else {
+
+      LOGGER.debug("Type présent");
+
+      // Vérification que le type est valide puis vérification spécifique à chaque type
+
+      if (!Object.keys(this._operationsByType).includes(sourceJsonObject.type)) {
+        LOGGER.error("La source indique un type non disponible : " + sourceJsonObject.type);
+        return false;
+      } else {
+        LOGGER.debug("Le type présent est disponible : " + sourceJsonObject.type);
+      }
+
+      let validation = false;
+
+      if (sourceJsonObject.type === "osrm") {
+        validation = this.checkSourceOsrm(sourceJsonObject);
+      } else if (sourceJsonObject.type === "pgr") {
+        validation = await this.checkSourcePgr(sourceJsonObject);
+      } else if (sourceJsonObject.type === "valhalla") {
+        validation = this.checkSourceValhalla(sourceJsonObject);
+      } else if (sourceJsonObject.type === "smartrouting") {
+        validation = this.checkSourceSmartrouting(sourceJsonObject);
+      } else {
+        LOGGER.error("La source indique un type invalide : " + sourceJsonObject.type);
+        return false;
+      }
+
+      if (!validation) {
+        LOGGER.error("Erreur lors de la verification de la source");
+        return false;
+      } else {
+        LOGGER.debug("Aucune erreur lors de la vérification de la source");
+      }
+
     }
 
     LOGGER.info("Fin de la verification de la source.");
@@ -308,7 +364,7 @@ module.exports = class sourceManager {
   * @name checkSourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source osrm.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
@@ -316,54 +372,56 @@ module.exports = class sourceManager {
 
     LOGGER.info("Verification de la source osrm...");
 
+    // On vérifie que le module osrm est disponible 
+    try {
+      let osrmTest = require('osrm');
+    } catch(error) {
+      LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
+      return false;
+    }
+
     // Storage
     if (!sourceJsonObject.storage) {
-      LOGGER.error("La ressource contient une source sans stockage.");
+      LOGGER.error("Mauvaise configuration : 'source.storage' absent");
       return false;
     } else {
-      if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
-        LOGGER.error("Stockage de la source incorrect.");
+
+      LOGGER.debug("'source.storage' présent");
+
+      if (!sourceJsonObject.storage.file) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.file' absent");
         return false;
       } else {
-        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+        LOGGER.debug("'source.storage.file' présent");
+        // TODO : Vérifier l'existence et les droits de lecture
       }
     }
 
     // Cost
     if (!sourceJsonObject.cost) {
-      LOGGER.error("La ressource contient une source sans cout.");
+      LOGGER.error("Mauvaise configuration : 'source.cost' absent");
       return false;
     } else {
+
+      LOGGER.debug("'source.storage.cost' présent");
+
       // Profile
       if (!sourceJsonObject.cost.profile) {
-        LOGGER.error("La ressource contient une source sans profile.");
+        LOGGER.error("Mauvaise configuration : 'source.cost.profile' absent");
         return false;
       } else {
         // rien à faire
+        LOGGER.debug("'source.cost.profile' présent");
       }
       // Optimization
       if (!sourceJsonObject.cost.optimization) {
-        LOGGER.error("La ressource contient une source sans optimization.");
+        LOGGER.error("Mauvaise configuration : 'source.cost.optimization' absent");
         return false;
       } else {
         // rien à faire
+        LOGGER.debug("'source.cost.optimization' présent");
       }
-      // Compute
-      if (!sourceJsonObject.cost.compute) {
-        LOGGER.info("La ressource contient une source sans compute.");
-      } else {
-        if (!sourceJsonObject.cost.compute.storage) {
-          LOGGER.error("La ressource contient une source ayant un cout sans stockage.");
-          return false;
-        } else {
-          if (!storageManager.checkJsonStorage(sourceJsonObject.cost.compute.storage)) {
-            LOGGER.warn("La ressource contient une source ayant un stockage du cout incorrect.");
-          } else {
-            // rien à faire
-          }
-        }
-        //TODO: ajouter la vérification de configuration
-      }
+
     }
 
     LOGGER.info("Fin de la verification de la source osrm.");
@@ -376,67 +434,189 @@ module.exports = class sourceManager {
   * @name checkSourcePgr
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source pgr.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
- checkSourcePgr(sourceJsonObject) {
+  async checkSourcePgr(sourceJsonObject) {
 
   LOGGER.info("Verification de la source pgr...");
 
-  // Storage
-  if (!sourceJsonObject.storage) {
-    LOGGER.error("La ressource contient une source sans stockage.");
+  // On vérifie que le module pg est disponible
+  try {
+    let { poolTest } = require('pg');
+  } catch(error) {
+    LOGGER.error("Le module pg n'est pas disponible mais une source pgrouting est proposée dans la configuration.");
     return false;
-  } else {
-    if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
-      LOGGER.error("Stockage de la source incorrect.");
-      return false;
-    } else {
-      // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
-    }
   }
 
-  // Cost
-  if (!sourceJsonObject.cost) {
-    LOGGER.error("La ressource contient une source sans cout.");
+  // Storage
+  if (!sourceJsonObject.storage) {
+
+    LOGGER.error("Mauvaise configuration : 'source.storage' absent");
     return false;
+
   } else {
-    // Profile
-    if (!sourceJsonObject.cost.profile) {
-      LOGGER.error("La ressource contient une source sans profile.");
+    
+    LOGGER.debug("'source.storage' présent");
+
+    if (!sourceJsonObject.storage.base) {
+
+      LOGGER.error("Mauvaise configuration : 'source.storage.base' absent");
       return false;
+
     } else {
-      // rien à faire
-    }
-    // Optimization
-    if (!sourceJsonObject.cost.optimization) {
-      LOGGER.error("La ressource contient une source sans optimization.");
-      return false;
-    } else {
-      // rien à faire
-    }
-    // Compute
-    if (!sourceJsonObject.cost.compute) {
-      LOGGER.info("La ressource contient une source sans compute.");
-    } else {
-      if (!sourceJsonObject.cost.compute.storage) {
-        LOGGER.error("La ressource contient une source ayant un cout sans stockage.");
+
+      LOGGER.debug("'source.storage.base' présent");
+
+      if (!sourceJsonObject.storage.base.dbConfig) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.base.dbConfig' absent");
         return false;
       } else {
-        if (!storageManager.checkJsonStorage(sourceJsonObject.cost.compute.storage)) {
-          LOGGER.error("La ressource contient une source ayant un stockage du cout incorrect.");
+        LOGGER.debug("'source.storage.base.dbConfig' présent");
+        
+        if (!(await this._baseManager.checkBaseConfiguration(sourceJsonObject.storage.base.dbConfig))) {
+          LOGGER.error("Mauvaise configuration : 'source.storage.base.dbConfig' invalide");
           return false;
         } else {
-          // rien à faire
+          LOGGER.debug("'source.storage.base.dbConfig' valide");
+          this._baseManager.saveCheckedBaseConfiguration(sourceJsonObject.storage.base.dbConfig);
         }
+
       }
-      // TODO: ajouter la vérification de configuration
+
+      if (!sourceJsonObject.storage.base.schema) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.base.schema' absent");
+        return false;
+      } else {
+
+        LOGGER.debug("'source.storage.base.schema' présent");
+
+        if (typeof(sourceJsonObject.storage.base.schema) !== "string") {
+          LOGGER.error("Mauvaise configuration : 'source.storage.base.schema' n'est pas une chaine de caractères");
+          return false;
+        }
+
+      }
+
+      if (!sourceJsonObject.storage.base.attributes) {
+        // Cet élément n'est pas obligatoire pour laisser plus de liberté
+        LOGGER.info("Configuration : 'source.storage.base.attributes' absent");
+      } else {
+
+        LOGGER.debug("'source.storage.base.attributes' présent");
+
+        if (!Array.isArray(sourceJsonObject.storage.base.attributes)) {
+          LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes' n'est pas un tableau");
+          return false;
+        } else {
+          LOGGER.debug("'source.storage.base.attributes' est un tableau");
+        }
+
+        if (sourceJsonObject.storage.base.attributes.length === 0) {
+          LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes' est un tableau vide");
+          return false;
+        } else {
+          LOGGER.debug("'source.storage.base.attributes' est un tableau non vide");
+        }
+
+        for (let j = 0; j < sourceJsonObject.storage.base.attributes.length; j++) {
+
+          if (!sourceJsonObject.storage.base.attributes[j].key) {
+            LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].key' est absent");
+            return false;
+          } 
+
+          if (!sourceJsonObject.storage.base.attributes[j].column) {
+            LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].column' est absent");
+            return false;
+          } 
+
+          if (!sourceJsonObject.storage.base.attributes[j].default) {
+            LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].default' est absent");
+            return false;
+          } else {
+            if (sourceJsonObject.storage.base.attributes[j].default !== "true" && sourceJsonObject.storage.base.attributes[j].default !== "false" ) {
+              LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].default' doit être 'true' or 'false' (string)");
+              return false;
+            }
+          }
+
+        }
+
+      }
+
     }
+
   }
+
+  // Coûts
+  if (!sourceJsonObject.costs) {
+    LOGGER.error("Mauvaise configuration : 'source.costs' absent");
+    return false;
+  } else {
+
+    LOGGER.debug("'source.costs' présent");
+
+    if (!Array.isArray(sourceJsonObject.costs)) {
+      LOGGER.error("Mauvaise configuration : 'source.costs' n'est pas un tableau");
+      return false;
+    } else {
+      LOGGER.debug("'source.costs' est un tableau");
+    }
+
+    if (sourceJsonObject.costs.length === 0) {
+      LOGGER.error("Mauvaise configuration : 'source.costs' est un tableau vide");
+      return false;
+    } else {
+      LOGGER.debug("'source.costs' n'est pas un tableau vide");
+    }
+
+    for (let i = 0; i < sourceJsonObject.costs.length; i++) {
+
+      if (!sourceJsonObject.costs[i].profile) {
+        LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].profile' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs["+i+"].profile' présent");
+      }
+
+      if (!sourceJsonObject.costs[i].optimization) {
+        LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].optimization' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs["+i+"].optimization' présent");
+      }
+
+      if (!sourceJsonObject.costs[i].costType) {
+        LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].costType' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs["+i+"].costType' présent");
+      }
+
+      if (!sourceJsonObject.costs[i].costColumn) {
+        LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].costColumn' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs["+i+"].costColumn' présent");
+      }
+
+      if (!sourceJsonObject.costs[i].rcostColumn) {
+        LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].rcostColumn' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs["+i+"].rcostColumn' présent");
+      }
+
+    }
+
+  }
+
 
   LOGGER.info("Fin de la verification de la source pgr.");
   return true;
+
 }
 
   /**
@@ -445,29 +625,34 @@ module.exports = class sourceManager {
   * @name checkSourceSmartrouting
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source smartrouting.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
-   checkSourceSmartrouting(sourceJsonObject) {
+  checkSourceSmartrouting(sourceJsonObject) {
 
     LOGGER.info("Verification de la source smartrouting...");
 
     // Storage
     if (!sourceJsonObject.storage) {
-      LOGGER.error("La ressource contient une source sans stockage.");
+      LOGGER.error("Mauvaise configuration : 'source.storage' absent");
       return false;
     } else {
-      if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
-        LOGGER.error("Stockage de la source incorrect.");
+
+      LOGGER.debug("'source.storage' présent");
+
+      if (!sourceJsonObject.storage.url) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.url' absent");
         return false;
       } else {
-        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+        LOGGER.debug("'source.storage.url' présent");
+        // TODO: vérifier la forme de l'URL avec une regex
       }
     }
 
     LOGGER.info("Fin de la verification de la source smartrouting.");
     return true;
+
   }
 
   /**
@@ -476,7 +661,7 @@ module.exports = class sourceManager {
   * @name checkSourceValhalla
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source valhalla.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} vrai si tout c'est bien passé et faux s'il y a eu une erreur
+  * @return {boolean} 
   *
   */
 
@@ -486,19 +671,96 @@ module.exports = class sourceManager {
 
     // Storage
     if (!sourceJsonObject.storage) {
-      LOGGER.error("La ressource contient une source sans stockage.");
+
+      LOGGER.error("Mauvaise configuration : 'source.storage' absent");
       return false;
+
     } else {
-      if (!storageManager.checkJsonStorage(sourceJsonObject.storage)) {
-        LOGGER.error("Stockage de la source incorrect.");
+
+      LOGGER.debug("'source.storage' présent");
+
+      if (!sourceJsonObject.storage.tar) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.tar' absent");
         return false;
       } else {
-        // Normalement, il n'y a plus rien à faire car la fonction checkDuplicationSource() vérifie déjà que la source n'est pas dupliquée
+        LOGGER.debug("'source.storage.tar' présent");
       }
+
+      if (!sourceJsonObject.storage.dir) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.dir' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.storage.dir' présent");
+      }
+
+      if (!sourceJsonObject.storage.config) {
+        LOGGER.error("Mauvaise configuration : 'source.storage.config' absent");
+        return false;
+      } else {
+        LOGGER.debug("'source.storage.config' présent");
+      }
+
+    }
+
+    // Coûts
+    if (!sourceJsonObject.costs) {
+      LOGGER.error("Mauvaise configuration : 'source.costs' absent");
+      return false;
+    } else {
+
+      LOGGER.debug("'source.costs' présent");
+
+      if (!Array.isArray(sourceJsonObject.costs)) {
+        LOGGER.error("Mauvaise configuration : 'source.costs' n'est pas un tableau");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs' est un tableau");
+      }
+
+      if (sourceJsonObject.costs.length === 0) {
+        LOGGER.error("Mauvaise configuration : 'source.costs' est un tableau vide");
+        return false;
+      } else {
+        LOGGER.debug("'source.costs' n'est pas un tableau vide");
+      }
+
+      for (let i = 0; i < sourceJsonObject.costs.length; i++) {
+
+        if (!sourceJsonObject.costs[i].profile) {
+          LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].profile' absent");
+          return false;
+        } else {
+          LOGGER.debug("'source.costs["+i+"].profile' présent");
+        }
+
+        if (!sourceJsonObject.costs[i].optimization) {
+          LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].optimization' absent");
+          return false;
+        } else {
+          LOGGER.debug("'source.costs["+i+"].optimization' présent");
+        }
+
+        if (!sourceJsonObject.costs[i].costType) {
+          LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].costType' absent");
+          return false;
+        } else {
+          LOGGER.debug("'source.costs["+i+"].costType' présent");
+        }
+
+        if (!sourceJsonObject.costs[i].costing) {
+          LOGGER.error("Mauvaise configuration : 'source.costs["+i+"].costing' absent");
+          return false;
+        } else {
+          LOGGER.debug("'source.costs["+i+"].costing' présent");
+        }
+
+      }
+
     }
 
     LOGGER.info("Fin de la verification de la source smartrouting.");
     return true;
+
   }
 
   /**
@@ -595,15 +857,58 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name loadSourceConfiguration
-  * @description Fonction utilisée pour créer une source.
-  * @param {json} sourceJsonObject - Description JSON de la source
-  * @param {Topology} topology - Instance de la classe Topology
+  * @name loadSourceDirectory
+  * @description Fonction utilisée pour créer les sources contenues dans un dossier.
+  * @param {string} directory - Dossier qui contient les configurations des ressources
   * @return {boolean}
   *
   */
 
-  loadSourceConfiguration(sourceJsonObject, topology) {
+  loadSourceDirectory(directory) {
+
+    // Pour chaque fichier du dossier des sources, on crée une source
+    let files = fs.readdirSync(directory).filter( (file) => {
+      return path.extname(file).toLowerCase() === ".source";
+    });
+
+    for (let fileName of files) {
+
+      let sourceFile = directory + "/" + fileName;
+      LOGGER.info("Chargement de la source : " + sourceFile);
+
+      // Récupération du contenu en objet pour vérification puis création de la source
+      let sourceContent = {};
+      try {
+        sourceContent = JSON.parse(fs.readFileSync(sourceFile));
+      } catch (error) {
+        LOGGER.error(error);
+        LOGGER.error("Erreur lors de la lecture de la source: " + sourceFile);
+      }
+
+      // Création de la ressource
+      if (!this.loadSourceConfiguration(sourceContent)) {
+        LOGGER.error("La source configurée dans le fichier " + sourceFile + " n'a pas pu être chargée");
+      } else {
+        LOGGER.info("Source chargée : " + sourceFile);
+      }
+
+    }
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadSourceConfiguration
+  * @description Fonction utilisée pour créer une source.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean}
+  *
+  */
+
+  loadSourceConfiguration(sourceJsonObject) {
 
     LOGGER.info("Creation de la source: " + sourceJsonObject.id);
 
@@ -615,20 +920,31 @@ module.exports = class sourceManager {
     }
 
     if (sourceJsonObject.type === "osrm") {
-      source = new osrmSource(sourceJsonObject, topology);
+      source = new osrmSource(sourceJsonObject);
     } else if (sourceJsonObject.type === "pgr") {
-      source = new pgrSource(sourceJsonObject, topology);
+
+      // Création de la base associée
+      let base = {};
+      if (!this._baseManager.loadBaseConfiguration(sourceJsonObject.storage.base.dbConfig)) {
+        LOGGER.error("Impossible de charger la base configurée dans " + sourceJsonObject.storage.base.dbConfig);
+        return false;
+      } else {
+        base = this._baseManager.getBase(sourceJsonObject.storage.base.dbConfig);
+      }
+      // Création de la source
+      source = new pgrSource(sourceJsonObject, base);
+
     } else if (sourceJsonObject.type === "smartrouting") {
-      // smartrouting n'utilise pas la topologie définie dans la conf
       source = new smartroutingSource(sourceJsonObject);
     } else if (sourceJsonObject.type === "valhalla") {
-      source = new valhallaSource(sourceJsonObject, topology);
+      source = new valhallaSource(sourceJsonObject);
     } else {
-      // On va voir si c'est un autre type.
       LOGGER.error("Le type de la source est inconnu");
       return false;
     }
 
+    // On sauvegarde la source et certains éléments pour le manager afin de pouvoir réutiliser ces infomations plus tard
+    // Notamment dans la gestion (ajout/suppression/modification) de sources durant la vie du service
     this._loadedSourceId.push(sourceJsonObject.id);
     this._loadedSourceConfiguration[sourceJsonObject.id] = sourceJsonObject;
     this._source[sourceJsonObject.id] = source;

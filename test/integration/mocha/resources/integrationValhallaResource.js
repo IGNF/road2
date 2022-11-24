@@ -43,7 +43,7 @@ describe('Test de la classe ValhallaResource', function() {
             "configuration": {
               "costing": "auto",
               "storage": {
-                "file": "/home/docker/config/costs_calculation.json"
+                "file": "/home/docker/config/costs_calculation_sample.json"
               }
             }
           }
@@ -54,7 +54,7 @@ describe('Test de la classe ValhallaResource', function() {
 
     ],
     "defaultSourceId": "corse-auto-valhalla",
-    "boundingBox": "-90,-180,90,180",
+    "boundingBox": "-180,-90,180,90",
     "defaultProjection": "EPSG:4326",
     "availableProjections": ["EPSG:4326","EPSG:2154"]
     }

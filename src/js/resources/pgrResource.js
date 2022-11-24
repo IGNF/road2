@@ -1,9 +1,10 @@
 'use strict';
 
 const Resource = require('./resource');
+const log4js = require('log4js');
 
 // Création du LOGGER
-const log4js = require('log4js');
+var LOGGER = log4js.getLogger("PGRRESOURCE");
 
 /**
 *
@@ -36,32 +37,6 @@ module.exports = class pgrResource extends Resource {
     // Correspondance entre profile/optimization et sourceId
     this._linkedSource = {};
 
-    // Instanciation de la correspondance entre profile/optimization et sourceId
-    // et instanciation du profile et de l'optimisation par défaut
-    for (let i=0; i < this._configuration.sources.length; i++) {
-
-      /* TODO: Il serait mieux, dans le futur, d'avoir un nouveau type de ressource, dédiée à l'isochrone. */
-      const currentSourceOptimization = this._configuration.sources[i].cost.optimization;
-
-      let linkedId = '';
-      if (operations["isochrone"]) {
-        if (currentSourceOptimization === "fastest") {
-          linkedId = this._configuration.sources[i].cost.profile + "time";
-        } else if (currentSourceOptimization === "shortest") {
-          linkedId = this._configuration.sources[i].cost.profile + "distance";
-        } else {
-          /* TODO: À repenser. */
-        }
-
-        this._linkedSource[linkedId] = this._configuration.sources[i].id;
-      }
-      if (operations["route"]) {
-        linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
-
-        this._linkedSource[linkedId] = this._configuration.sources[i].id;
-      }
-    }
-
   }
 
   /**
@@ -78,23 +53,49 @@ module.exports = class pgrResource extends Resource {
   /**
   *
   * @function
-  * @name get linkedSource
-  * @description Récupérer la correspondance entre profile/optimization et sourceId de la ressource
+  * @name initResource
+  * @description Créer les liens entre divers éléments d'une ressource et les sources associées
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * @param {SourceManager} sourceManager - Manager des sources du service 
+  * @return {boolean} 
   *
   */
-  get linkedSource () {
-    return this._linkedSource;
-  }
+   initResource (sourceManager) {
 
-  /**
-  *
-  * @function
-  * @name set linkedSource
-  * @description Attribuer la correspondance entre profile/optimization et sourceId de la ressource
-  *
-  */
-  set linkedSource (ls) {
-    this._linkedSource = ls;
+    // Instanciation de la correspondance entre profile/optimization et sourceId
+    for (let s=0; s < this._configuration.sources.length; s++) {
+
+      if (!sourceManager.isLoadedSourceAvailable(this._configuration.sources[s])) {
+        LOGGER.error("La source n'a pas été chargée");
+        return false;
+      } else {
+
+        LOGGER.debug("La source est bien disponible");
+
+        let source = sourceManager.getSourceById(this._configuration.sources[s]);
+
+        // TODO : faire cette vérification aussi pendant le check de la ressource
+        if (source.type !== "pgr") {
+          LOGGER.error("La source n'est pas de type 'pgr'");
+          return false;
+        }
+
+        for (let i = 0; i < source.configuration.costs.length; i++) {
+
+          let linkedIdRoute = source.configuration.costs[i].profile + source.configuration.costs[i].optimization;
+          let linkedIdIso = source.configuration.costs[i].profile + source.configuration.costs[i].costType;
+          this._linkedSource[linkedIdRoute] = source.configuration.id;
+          this._linkedSource[linkedIdIso] = source.configuration.id;
+
+        }
+        
+      }
+
+    }
+    
+
+    return true;
+    
   }
 
   /**
@@ -109,20 +110,50 @@ module.exports = class pgrResource extends Resource {
   */
   getSourceIdFromRequest (request) {
 
-    const currentOperation = request.operation;
     let source = "";
 
-    /* TODO: Pour le moment, c'est un contrôle en dur sur le type de l'opération. Il serait mieux de revoir cette façon de voir (avoir peut-être un catalogue de correspondance ? Maybe..). */
-    if (currentOperation === "isochrone") {
+    if (request.operation === "isochrone") {
       source = request.profile + request.costType;
-    } else {
+    } else if (request.operation === "route") {
       source = request.profile + request.optimization;
+    } else {
+      return null;
     }
 
     if (this._linkedSource[source]) {
       return this._linkedSource[source];
     } else {
       return null;
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name checkSourceAvailibilityFromRequest
+  * @description Savoir s'il y a une source disponible pour répondre à la requête. Par exemple, pour un itinéraire, il s'agira de savoir si un couple profile/optimization est disponible.
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
+  * @return {boolean} 
+  *
+  */
+   checkSourceAvailibilityFromRequest (request) {
+
+    let source = "";
+
+    if (request.operation === "isochrone") {
+      source = request.profile + request.costType;
+    } else if (request.operation === "route") {
+      source = request.profile + request.optimization;
+    } else {
+      return false;
+    }
+
+    if (this._linkedSource[source]) {
+      return true;
+    } else {
+      return false;
     }
 
   }

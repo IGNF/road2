@@ -1,36 +1,11 @@
 {
   "resource": {
-  "id": "corse-osm",
+  "id": "data-osm",
   "type": "osrm",
-  "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
-  "resourceVersion": "2020-09-28",
-  "topology": {
-    "id": "corse-osm",
-    "type": "osm",
-    "description": "Données OSM sur la Corse.",
-    "storage": {
-      "file": "/home/docker/internal/corse-latest.osm.pbf"
-    },
-    "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180"
-  },
+  "description": "Exemple d'une ressource créée à partir des données OSM.",
+  "resourceVersion": "yyyy-mm-dd",
   "sources": [
-    {
-      "id": "corse-car-fastest",
-      "type": "osrm",
-      "storage": {
-        "file": "/home/docker/internal/corse-latest.osrm"
-      },
-      "cost": {
-        "profile": "car",
-        "optimization": "fastest",
-        "compute": {
-          "storage": {
-            "file": "/usr/local/share/osrm/profiles/car.lua"
-          }
-        }
-      }
-    }
+    "data-osm-car-fastest"
   ],
   "availableOperations":[
     {
@@ -39,20 +14,20 @@
         {
           "id": "resource",
           "values": [
-            "corse-osm"
+            "data-osm"
           ]
         },
         {
           "id": "start",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
         {
           "id": "end",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
@@ -73,7 +48,7 @@
         {
           "id": "intermediates",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
@@ -157,18 +132,19 @@
         {
           "id": "resource",
           "values": [
-            "corse-osm"
+            "data-osm"
           ]
         },
         {
           "id": "coordinates",
           "values": {
-            "bbox": "-90,-180,90,180",
+            "bbox": "-180,-90,180,90",
             "projection": "EPSG:4326"
           }
         },
         {
           "id": "number",
+          "defaultValueContent": 1,
           "values": {
             "min": 1,
             "max": 10

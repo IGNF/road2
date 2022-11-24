@@ -40,7 +40,7 @@ describe('Test de la classe pgrSource', function() {
       "file": "/home/docker/internal/corse-latest.osm.pbf"
     },
     "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180",
+    "bbox": "-180,-90,180,90",
     "base": {connected: false, connect(){this.connected = true;}},
     "defaultAttributesKeyTable": {length: 0}
 

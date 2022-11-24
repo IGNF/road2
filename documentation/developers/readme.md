@@ -16,7 +16,7 @@ L'ensemble des fonctionnalités sont répertoriées à [part](./functionnalities
 
 ## Participer aux développements 
 
-Les participations à ce projet sont encouragées. L'ajout de moteurs ou d'API, bien évidemment. Mais toutes autres fonctionnalités sont les bienvenues. 
+Les participations à ce projet sont encouragées. L'ajout de moteurs ou d'API, bien évidemment. Mais toutes autres fonctionnalités sont les bienvenues. Encore, une fois, il vous est demandé de réaliser vos développements en partant de la branche *develop*. 
 
 ### Prise en main du projet
 

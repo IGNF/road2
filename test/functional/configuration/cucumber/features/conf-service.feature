@@ -399,6 +399,77 @@ Feature: Road2 service configuration
   # TODO 
   # Tester un dossier de ressources dont une des ressources ne peut être lues 
 
+  Scenario: [service.json] (sources different)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.sources" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:sources:directories' manquant !"
+
+  Scenario: [service.json] (sources vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.sources" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Objet 'application:sources' manquant !"
+
+  Scenario: [service.json] (sources absent)
+    Given a valid configuration 
+    And without attribute "application.sources" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Objet 'application:sources' manquant !"
+
+  Scenario: [service.json] (sources.directories est une chaine de caracteres)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.sources.directories" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:sources:directories' n'est pas un tableau !"
+
+  # TODO 
+  # Tester le paramètre sources.directories sur un tableau vide 
+
+  Scenario: [service.json] (sources.directories sur un dossier qui n'existe pas et en chemin relatif)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.sources.directories.[1]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Mauvaise configuration: Le dossier n'existe pas:"
+
+    Scenario: [service.json] (sources.directories sur deux dossiers qui n'existent pas et en chemins relatifs)
+    Given a valid configuration 
+    And with parameter "test" for attribute "application.sources.directories.[0]" in service configuration
+    And with parameter "test1" for attribute "application.sources.directories.[1]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Le dossier n'existe pas"
+
+  Scenario: [service.json] (sources.directories contient un élément vide)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.sources.directories.[1]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Mauvaise configuration: Champ 'application:sources:directories' contient un élément vide"
+
+  Scenario: [service.json] (sources.directories contient que des éléments vides)
+    Given a valid configuration 
+    And with parameter "" for attribute "application.sources.directories.[0]" in service configuration
+    And with parameter "" for attribute "application.sources.directories.[1]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Aucun dossier de source n'a été validé"
+
+  Scenario: [service.json] (sources.directories absent)
+    Given a valid configuration 
+    And without attribute "application.sources.directories" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Mauvaise configuration: Champ 'application:sources:directories' manquant !"
+
+  # TODO 
+  # Tester un dossier de ressources dont une des ressources ne peut être lues 
+
   Scenario: [service.json] (network different)
     Given a valid configuration 
     And with parameter "test" for attribute "application.network" in service configuration

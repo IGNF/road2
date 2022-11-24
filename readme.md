@@ -67,13 +67,13 @@ Pour une discussion détaillée sur les données attendues, on pourra se référ
 
 ### Configuration
 
-Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON, au minimum quatre, permettant l'instanciation du serveur avec des ressources. 
+Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON permettant l'instanciation du serveur avec des ressources. 
 
 ### Lancement 
 
 Une fois configuré, il est possible de lancer une instance de Road2 avec la commande: 
 ```
-node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/server.json
+node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/administration.json
 ```
 
 ### Pour plus de détails
@@ -82,11 +82,13 @@ On trouvera dans le dossier [docker/distrubutions](./docker/distributions) diff�
 
 ## Participer aux développements 
 
+Les participations à ce projet sont encouragées. Il vous est demandé de réaliser vos développements en partant de la branche *develop*. 
+
 On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 
 Pour en savoir plus sur notre roadmap, vous pouvez regarder ce [document](./documentation/developers/roadmap.md). 
 
-De plus, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
+Enfin, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
 
 ## Utilisation en production
 

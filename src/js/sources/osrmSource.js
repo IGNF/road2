@@ -39,13 +39,12 @@ module.exports = class osrmSource extends Source {
   * @name constructor
   * @description Constructeur de la classe osrmSource
   * @param {json} sourceJsonObject - Description de la source en json
-  * @param {topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject, topology) {
+  constructor(sourceJsonObject) {
 
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type, topology);
+    super(sourceJsonObject.id, "osrm", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
@@ -173,15 +172,15 @@ module.exports = class osrmSource extends Source {
         // Coordonnées
         let coordinatesTable = new Array();
         // start
-        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.start.getCoordinatesIn(super.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(super.projection));
           }
         }
         // end
-        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.end.getCoordinatesIn(super.projection));
 
         LOGGER.debug("coordinates:");
         LOGGER.debug(coordinatesTable);
@@ -286,7 +285,7 @@ module.exports = class osrmSource extends Source {
       // ---
       let osrmRequest = {};
 
-      osrmRequest.coordinates = [request.coordinates.getCoordinatesIn(this.topology.projection)];
+      osrmRequest.coordinates = [request.coordinates.getCoordinatesIn(super.projection)];
       osrmRequest.number = request.number;
       // ---
 
@@ -400,10 +399,10 @@ module.exports = class osrmSource extends Source {
     let askedProjection = routeRequest.start.projection;
     LOGGER.debug("asked projection: " + askedProjection);
 
-    LOGGER.debug("topology projection: " + this.topology.projection);
+    LOGGER.debug("source projection: " + super.projection);
 
     // start
-    start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], this.topology.projection);
+    start = new Point(osrmResponse.waypoints[0].location[0], osrmResponse.waypoints[0].location[1], super.projection);
     if (!start.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
     } else {
@@ -412,7 +411,7 @@ module.exports = class osrmSource extends Source {
     }
 
     // end
-    end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], this.topology.projection);
+    end = new Point(osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[0], osrmResponse.waypoints[osrmResponse.waypoints.length-1].location[1], super.projection);
     if (!end.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
     } else {
@@ -439,7 +438,7 @@ module.exports = class osrmSource extends Source {
       let currentOsrmRoute = osrmResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", this._topology.projection) );
+      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", super.projection) );
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of geometry in OSRM response. ");
       } else {
@@ -465,7 +464,7 @@ module.exports = class osrmSource extends Source {
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
 
-        let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], this.topology.projection);
+        let legStart = new Point(osrmResponse.waypoints[j].location[0], osrmResponse.waypoints[j].location[1], super.projection);
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         } else {
@@ -473,7 +472,7 @@ module.exports = class osrmSource extends Source {
           LOGGER.debug(legStart);
         }
 
-        let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], this.topology.projection);
+        let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], super.projection);
         if (!legEnd.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         } else {
@@ -496,7 +495,7 @@ module.exports = class osrmSource extends Source {
           LOGGER.debug("Step number " + k + " of portion number " + j + " for route number " + i);
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", this._topology.projection) );
+          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "geojson", super.projection) );
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
           } else {
@@ -561,7 +560,7 @@ module.exports = class osrmSource extends Source {
     let askedProjection = nearestRequest.coordinates.projection;
     LOGGER.debug("asked projection: " + askedProjection);
 
-    LOGGER.debug("topology projection: " + this.topology.projection);
+    LOGGER.debug("source projection: " + super.projection);
 
     // Création de la réponse
     let nearestResponse = new NearestResponse(nearestRequest.resource, nearestRequest.coordinates);
@@ -577,7 +576,7 @@ module.exports = class osrmSource extends Source {
 
           if (osrmResponse.waypoints[i].location) {
 
-            let pointGeom = new Point(osrmResponse.waypoints[i].location[0], osrmResponse.waypoints[i].location[1], this.topology.projection);
+            let pointGeom = new Point(osrmResponse.waypoints[i].location[0], osrmResponse.waypoints[i].location[1], super.projection);
             if (!pointGeom.transform(askedProjection)) {
               throw errorManager.createError(" Error during reprojection of a point in OSRM response. ");
             } else {

@@ -42,7 +42,7 @@ describe('Test de la classe ResourceManager', function() {
         "file": "/home/docker/internal/corse-latest.osm.pbf"
       },
       "projection": "EPSG:4326",
-      "bbox": "-90,-180,90,180"
+      "bbox": "-180,-90,180,90"
     },
     "sources": [
       {
@@ -75,14 +75,14 @@ describe('Test de la classe ResourceManager', function() {
           {
             "id": "start",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
           {
             "id": "end",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
@@ -103,7 +103,7 @@ describe('Test de la classe ResourceManager', function() {
           {
             "id": "intermediates",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },

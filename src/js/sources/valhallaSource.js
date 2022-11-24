@@ -22,7 +22,7 @@ const LOGGER = log4js.getLogger("VALHALLASOURCE");
 *
 * @class
 * @name valhallaSource
-* @description Classe modélisant une source pgRouting.
+* @description Classe modélisant une source Valhalla.
 *
 */
 module.exports = class valhallaSource extends Source {
@@ -32,16 +32,29 @@ module.exports = class valhallaSource extends Source {
   * @name constructor
   * @description Constructeur de la classe valhallaSource
   * @param{json} sourceJsonObject - Description de la source
-  * @param{topology} topology -  Instance de la classe Topology
   *
   */
-  constructor(sourceJsonObject, topology) {
+  constructor(sourceJsonObject) {
 
     // Constructeur parent
-    super(sourceJsonObject.id, "valhalla", topology);
+    super(sourceJsonObject.id, "valhalla", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
+
+    // Gestions des coûts disponibles 
+    this._costs = {};
+
+    // Initialisation des coûts
+    for (let i = 0; i < sourceJsonObject.costs.length; i++) {
+      if (!this._costs[sourceJsonObject.costs[i].profile]) {
+        Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      }
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].optimization, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile], sourceJsonObject.costs[i].costType, { value: new Object(), configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].optimization], "costing", { value: sourceJsonObject.costs[i].costing, configurable: true, enumerable: true, writable: true });
+      Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "costing", { value: sourceJsonObject.costs[i].costing, configurable: true, enumerable: true, writable: true });
+    }
 
   }
 
@@ -119,15 +132,15 @@ module.exports = class valhallaSource extends Source {
 
         // Coordonnées
         // start
-        coordinatesTable.push(request.start.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.start.getCoordinatesIn(super.projection));
         // intermediates
         if (request.intermediates.length !== 0) {
           for (let i = 0; i < request.intermediates.length; i++) {
-            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(this.topology.projection));
+            coordinatesTable.push(request.intermediates[i].getCoordinatesIn(super.projection));
           }
         }
         // end
-        coordinatesTable.push(request.end.getCoordinatesIn(this.topology.projection));
+        coordinatesTable.push(request.end.getCoordinatesIn(super.projection));
 
         LOGGER.debug("coordinates:");
         LOGGER.debug(coordinatesTable);
@@ -169,7 +182,7 @@ module.exports = class valhallaSource extends Source {
       locationsString = locationsString.slice(0, -1);
       locationsString += "]";
 
-      const costingString = `"costing":"${this._configuration.cost.compute.configuration.costing}"`;
+      const costingString = `"costing":"${this._costs[request.profile][request.optimization].costing}"`;
       // Permet de grandement se simplifier le parsing !!
       const optionsString = `"directions_options":{"format":"osrm"}`;
       const commandString = `valhalla_service ${this._configuration.storage.config} route '{${locationsString},${costingString},${optionsString}}' `;
@@ -258,7 +271,7 @@ module.exports = class valhallaSource extends Source {
         }
 
         const locationsString = `"locations":[{"lat":${request.point.lat},"lon":${request.point.lon}}]`;
-        const costingString = `"costing":"${this._configuration.cost.compute.configuration.costing}"`;
+        const costingString = `"costing":"${this._costs[request.profile][request.costType].costing}"`;
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
         const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${contoursString},${reverseString}}' `;
@@ -372,10 +385,10 @@ module.exports = class valhallaSource extends Source {
     let askedProjection = routeRequest.start.projection;
     LOGGER.debug("asked projection: " + askedProjection);
 
-    LOGGER.debug("topology projection: " + this.topology.projection);
+    LOGGER.debug("source projection: " + super.projection);
 
     // start
-    start = new Point(valhallaResponse.waypoints[0].location[0], valhallaResponse.waypoints[0].location[1], this.topology.projection);
+    start = new Point(valhallaResponse.waypoints[0].location[0], valhallaResponse.waypoints[0].location[1], super.projection);
     if (!start.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of start in OSRM response. ");
     } else {
@@ -384,7 +397,7 @@ module.exports = class valhallaSource extends Source {
     }
 
     // end
-    end = new Point(valhallaResponse.waypoints[valhallaResponse.waypoints.length-1].location[0], valhallaResponse.waypoints[valhallaResponse.waypoints.length-1].location[1], this.topology.projection);
+    end = new Point(valhallaResponse.waypoints[valhallaResponse.waypoints.length-1].location[0], valhallaResponse.waypoints[valhallaResponse.waypoints.length-1].location[1], super.projection);
     if (!end.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of end in OSRM response. ");
     } else {
@@ -411,7 +424,7 @@ module.exports = class valhallaSource extends Source {
       let currentOsrmRoute = valhallaResponse.routes[i];
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
-      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "polyline", this._topology.projection, 6) );
+      routes[i] = new Route( new Line(currentOsrmRoute.geometry, "polyline", super.projection, 6) );
       if (!routes[i].geometry.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of geometry in OSRM response. ");
       } else {
@@ -437,7 +450,7 @@ module.exports = class valhallaSource extends Source {
 
         let currentOsrmRouteLeg = currentOsrmRoute.legs[j];
 
-        let legStart = new Point(valhallaResponse.waypoints[j].location[0], valhallaResponse.waypoints[j].location[1], this.topology.projection);
+        let legStart = new Point(valhallaResponse.waypoints[j].location[0], valhallaResponse.waypoints[j].location[1], super.projection);
         if (!legStart.transform(askedProjection)) {
           throw errorManager.createError(" Error during reprojection of leg start in OSRM response. ");
         } else {
@@ -445,7 +458,7 @@ module.exports = class valhallaSource extends Source {
           LOGGER.debug(legStart);
         }
 
-        let legEnd = new Point(valhallaResponse.waypoints[j+1].location[0], valhallaResponse.waypoints[j+1].location[1], this.topology.projection);
+        let legEnd = new Point(valhallaResponse.waypoints[j+1].location[0], valhallaResponse.waypoints[j+1].location[1], super.projection);
         if (!legEnd.transform(askedProjection)) {
         throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         } else {
@@ -468,7 +481,7 @@ module.exports = class valhallaSource extends Source {
           LOGGER.debug("Step number " + k + " of portion number " + j + " for route number " + i);
 
           let currentOsrmRouteStep = currentOsrmRouteLeg.steps[k];
-          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "polyline", this._topology.projection, 6) );
+          steps[k] = new Step( new Line(currentOsrmRouteStep.geometry, "polyline", super.projection, 6) );
           if (!steps[k].geometry.transform(askedProjection)) {
             throw errorManager.createError(" Error during reprojection of step's geometry in OSRM response. ");
           } else {
@@ -545,7 +558,7 @@ module.exports = class valhallaSource extends Source {
     }
 
     // Création d'un objet Point (utile plus tard).
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, this.topology.projection);
+    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, super.projection);
 
     let rawGeometry = valhallaResponse.features[0].geometry;
 
@@ -561,7 +574,7 @@ module.exports = class valhallaSource extends Source {
     }
 
     // Création d'un objet Polygon à partir du GeoJSON reçu.
-    geometry = new Polygon(rawGeometry, "geojson", this._topology.projection);
+    geometry = new Polygon(rawGeometry, "geojson", super.projection);
 
     /* Envoi de la réponse au proxy. */
     return new IsochroneResponse(
