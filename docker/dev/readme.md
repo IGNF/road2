@@ -27,6 +27,7 @@ Si on utilise ces Dockerfile avec un VPN, on vérifiera que les configurations D
 Si on utilise ces Dockerfile sur un réseau avec lequel il peut y avoir des problèmes d'IP, il sera utile de dédier à Docker une plage d'IP non utilisées:
 - L'attribut `bip` du fichier ``/etc/docker/daemon.json` permet de préciser une plage d'IP. 
 - Si bip a été rempli, on veillera à ce que ces IP soient bien ajouter à l'interface `docker0`. La commande `sudo ip route add {plage_ip} dev docker0` permet de le faire. 
+- On pourra aussi avoir besoin d'ajouter le réseau créer par ce compose : `sudo ip route add {plage_ip} dev br-{id_du_network} proto kernel scope link src {ip_gateway}` où l'id est obtenu en faisant un `docker network ls`. 
 
 Cette plage d'IP sera différente de celle attribuée à la stack Road2 lancée via docker-compose (eg. celui présent dans le fichier `.env`). 
 

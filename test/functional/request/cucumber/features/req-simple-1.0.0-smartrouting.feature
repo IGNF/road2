@@ -52,7 +52,7 @@ Feature: Road2-SMARTROUTING
     And the response should contain a complete and valid iso
     And the response should contain an attribute "constraints.[0].key"
 
-  Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource smartpgr avec appel à la source pgr
+  Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource smartpgr avec appel à la source smartrouting
     Given an "GET" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone-smartpgr"
     And with query parameters:
