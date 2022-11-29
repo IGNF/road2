@@ -2,9 +2,9 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
 
-class road2RouteLoadTestPgr extends Simulation {
+class routeOsrm extends Simulation {
 
-    val urls = ssv("./resources/road2_parameters_idf_pgr_wo_int.ssv").shuffle.circular
+    val urls = ssv("./resources/routeOsrm.ssv").shuffle.circular
 
     val httpConf = http.baseUrl("http://road2:8080/simple/1.0.0/route?").disableCaching
 
@@ -17,9 +17,7 @@ class road2RouteLoadTestPgr extends Simulation {
 
     setUp(
     scn.inject(
-        // nothingFor(5 seconds),
-        // rampUsersPerSec (0) to (10) during (60 seconds),
-        constantUsersPerSec(1) during (300 seconds) randomized
+        constantUsersPerSec(1) during (60 seconds) randomized
     ).protocols(httpConf))
 
 }

@@ -6,12 +6,11 @@ Ce dossier contient les scripts utiles aux tests de charges. Ces tests sont effe
 
 Le dossier `gatling` contient le dossier `user-files` nécessaire à Getling pour effectuer les tests. On y retrouve donc la définition des simulations et les ressources nécessaire. En l'état, il est possible de lancer le scénario contenu dans `gatling/user-files/simulations/road2.scala` qui utilise la ressource `gatling/user-files/resources/road2_parameters.ssv`. 
 
-Si Gatling est installé sur la machine, on pourra pointer le dossier `user-files`. De la même manière, il est possible d'utiliser Docker. 
+Si Gatling est installé sur la machine, on pourra pointer le dossier `user-files`. Pour plus d'informations, voir le site [officiel](https://gatling.io/). 
 
-Avec le `docker-compose` du repository, il est possible de lancer les tests de charge avec les données déjà disponibles:
-`docker-compose up road2-gatling`
+Autrement, il est possible d'utiliser l'image docker disponible sur [dockerhub](https://hub.docker.com/r/denvazh/gatling). 
 
-Pour utiliser le `docker-compose` avec d'autres données, il suffira de modifier le `.env` associé et ainsi de pointer vers un autre `user-files`. On priviligiera cette approche à celle modifiant les fichiers de ce repository.  
+C'est ce qui est fait dans le [docker-compose](../../docker/test/) dédié aux tests dans ce dépôt. Voir le [readme](../../docker/test/readme.md) pour son utilisation. 
 
 ## random-route-generator 
 

@@ -1,16 +1,12 @@
 version: "3.7"
 
 services:
-  load-road2-generation:
+  generate-load-data:
     build:
       context: ../..
       dockerfile: ./docker/test/Dockerfile
-      args:
-        - dnsIP=${dns_ip}
-        - dnsHost=${dns_host}
-        - proxy=${proxy}
-    image: load-road2-generation
-    container_name: load-road2-generation-launch
+    image: generate-load-data
+    container_name: generate-load-data-launch
     command: ["R", "-f", "/home/docker/routeGenerator.R", "--args", "/home/docker/data/road2_parameters.ssv", "${nb_line}", "${resource}", "${xmin}", "${ymin}", "${xmax}", "${ymax}"]
     volumes:
       - iti-load-data-volume:/home/docker/data
@@ -21,9 +17,15 @@ services:
     volumes:
       - iti-load-data-volume:/home/docker/data
       - ${gatling_results}:/opt/gatling/results
-      - ${gatling_user-files}:/opt/gatling/user-files
-    command: "-s road2LoadTest"
+      - ${gatling_user_files}:/opt/gatling/user-files
+    command: ["-s", "${gatling_scenario}"]
 
 volumes:
   iti-load-data-volume:
     name: iti-load-data-volume
+
+networks:
+  default:
+    # Nom du réseau utilisé dans le docker-compose du dossier ../dev/
+    name: iti-network
+    external: true

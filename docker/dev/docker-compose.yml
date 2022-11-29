@@ -73,6 +73,7 @@ volumes:
 
 networks:
   iti-network:
+    # Nom utilisé ailleurs dans ce projet
     name: iti-network
     driver: bridge
     ipam:
