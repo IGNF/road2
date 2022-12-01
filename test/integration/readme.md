@@ -1,5 +1,7 @@
 # Description des tests d'intégration 
 
+## Tests des classes 
+
 Pour lancer les tests d'intégration, il est conseillé d'utiliser docker-compose afin de disposer d'un environnement de test plus complet:
 ```
 docker-compose up -d road2
@@ -65,3 +67,100 @@ Autres:
     - index.js de l'api simple 1.0.0
     - init.js de l'api simple 1.0.0
     - update.js de l'api simple 1.0.0
+
+## Tests des dépendances 
+
+### Liste des dépendances et de leurs usages
+
+- @mapbox/polyline 
+    - geometry/line.js
+        - encode()
+        - toGeoJSON()
+        - fromGeoJSON()
+    - geometry/polygon.js
+        - encode()
+        - toGeoJSON()
+        - fromGeoJSON()
+
+- @turf/turf
+    - apis/simple/1.0.0/controller/controller.js
+        - bbox()
+        - lineSlice()
+    - geometry/polygon.js
+        - polygon()
+        - polygonToLine()
+    - sources/pgrSource.js
+        - point()
+        - truncate()
+        - lineSlice()
+        - nearestPointOnLine()
+        - length()
+        - cleanCoords()
+
+- assert
+    - deepStrictEqual()
+    - equal()
+    - deepEqual()
+
+- cors
+    - service/service.js
+        - ()
+
+- express
+    - administrator/administrator.js
+        - ()
+        - use()
+        - Router()
+        - router.use()
+        - json()
+
+- got
+    - utils/httpQuery.js
+        - ()
+        - post()
+
+- helmet
+    - administrator/administrator.js
+        - ()
+    - service/service.js
+        - ()
+
+- https-proxy-agent
+    - utils/httpQuery.js
+        - ()
+
+- log4js
+    - configure()
+    - getLogger()
+
+- nconf
+    - road2.js
+        - use()
+        - get()
+        - argv().get()
+        - argv().env()
+
+- proj4
+    - geography/projectionManager.js
+        - defs()
+        - ()
+
+- wkt 
+    - sources/smartroutingSource.js
+        - parse()
+
+- osrm 
+    - sources/sourceManager.js
+    - sources/osrmSource.js
+        - route()
+        - nearest()
+
+- pg {Pool}
+    - base/base.js
+        - ()
+        - connect()
+        - end()
+    - base/baseManager.js
+    - sources/sourcesManager.js
+    - sources/pgrSource.js
+        - query()

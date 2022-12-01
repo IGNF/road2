@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:16-alpine
 
 ### Dossier contenant la configuration
 WORKDIR /home/docker/config

@@ -11,6 +11,18 @@ CHANGED:
   - Les sources ne sont plus configurées dans le même fichier que les ressources. Chaque source est configurée dans son fichier. L'ensemble est placé dans un dossier de sources. Il peut y en avoir plusieurs. 
   - Les sources PGRouting et Valhalla ne sont plus configurées de la même manière : chaque source de ces types peut contenir plusieurs coûts. 
 
+UPDATED:
+  - Passage à `osrm` 5.26.0
+  - Passage à `pg` 8.8.0
+  - Passage à `turf` 6.5.0
+  - Passage à `express` 4.18.2
+  - Passage à `helmet` 6.0.1
+  - Passage à `https-proxy-agent` 5.0.1
+  - Passage à `log4js` 6.7.1
+  - Passage à `nconf` 0.12.0
+  - Passage à `proj4` 2.8.0
+  - Utilisation de NodeJS 16 dans docker
+
 # 1.1.2
 
 FIXED:

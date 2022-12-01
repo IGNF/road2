@@ -662,7 +662,7 @@ class road2World {
 
         if (this._cleanTmpDirectories) {
 
-            fs.rmdir(this._tmpDirConf, {
+            fs.rm(this._tmpDirConf, {
                 "recursive": true
             }, (err) => { return err;});
             
