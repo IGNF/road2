@@ -1,83 +1,56 @@
-FROM debian:buster-20181112
+### TODO : Supprimer la compilation et l'installation de Valhalla dès que l'on aura un binding NodeJS pour lui et donc repasser sur une image node
+FROM node:16-bullseye as build
 
-LABEL maintainer="IGN <rdev@ign.fr>"
-LABEL version="1.0"
+### Compilation de Valhalla
+RUN apt-get update && \
+apt-get install -y cmake make libtool pkg-config g++ gcc curl unzip jq lcov protobuf-compiler \
+vim-common locales libcurl4-openssl-dev zlib1g-dev liblz4-dev libprotobuf-dev && \
+apt-get install -y libgeos-dev libgeos++-dev libluajit-5.1-dev libspatialite-dev libsqlite3-dev wget sqlite3 spatialite-bin python3-shapely && \
+apt-get install -y libsqlite3-mod-spatialite python3-pip
 
-### MAJ
-RUN apt-get -y update
-RUN apt-get -y upgrade
+WORKDIR /home/prime-server
+RUN apt-get install -y git cmake autoconf automake pkg-config libtool make gcc g++ lcov libcurl4-openssl-dev libzmq3-dev libczmq-dev
+RUN git clone --depth 1 --recursive https://github.com/kevinkreiser/prime_server.git && cd prime_server && \
+cmake -B build . && cmake --build build && make -C build install
 
-### Utilitaires
-RUN apt-get -y install wget vim unzip
+WORKDIR /home/valhalla/
+RUN pip install --upgrade conan
+RUN git clone --branch 3.2.0 --depth 1 --recursive https://github.com/valhalla/valhalla.git && cd valhalla && \
+mkdir build && cmake -B build -DCMAKE_BUILD_TYPE=Release && make -C build && make -C build package
 
-### Installation des dépendances de NodeJS
-RUN apt-get install -y python g++ make
+FROM node:16-bullseye as road2
 
-### Installation de NodeJS à partir des sources
-# https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms
-# https://github.com/nodejs/help/wiki/Installation
-WORKDIR /home/docker/nodejs
-RUN wget -O node-v12.14.0.tar.gz "https://nodejs.org/dist/v12.14.0/node-v12.14.0.tar.gz"
-RUN tar -xzf /home/docker/nodejs/node-v12.14.0.tar.gz
-RUN cd node-v12.14.0  && ./configure && make -j4 && make install
+### Installation des dépendances pour Valhalla et prime-server
+RUN apt-get update && \
+    apt-get install -y libtool pkg-config curl unzip jq lcov protobuf-compiler \
+    vim-common locales libcurl4-openssl-dev zlib1g-dev liblz4-dev libprotobuf-dev \
+    libgeos-dev libgeos++-dev libluajit-5.1-dev libspatialite-dev libsqlite3-dev wget sqlite3 spatialite-bin python3-shapely \
+    libsqlite3-mod-spatialite libzmq3-dev libczmq-dev
 
-### Installation des dépendances de OSRM
-# https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM
-RUN apt-get install -y cmake libboost-dev libboost-filesystem-dev libboost-thread-dev libboost-system-dev libboost-regex-dev libstxxl-dev libxml2-dev libsparsehash-dev libbz2-dev zlib1g-dev libzip-dev libgomp1 liblua5.2-dev pkg-config libgdal-dev libboost-program-options-dev libboost-iostreams-dev libboost-test-dev libtbb-dev libexpat1-dev
+### Installation prime-server
+COPY --from=build /usr/local/lib/libprime_server.so.0.7.0 /usr/lib/libprime_server.so.0.0.0
+COPY --from=build /usr/local/lib/libprime_server.so.0 /usr/lib/libprime_server.so.0
+COPY --from=build /usr/local/lib/libprime_server.so /usr/lib/libprime_server.so
 
-### Installation de OSRM pour utiliser la libosrm dans Road2
-# https://github.com/Project-OSRM/osrm-backend
-# https://github.com/Project-OSRM/osrm-backend/blob/master/docs/nodejs/api.md
-# https://github.com/door2door-io/osrm-express-server-demo
-# https://github.com/Project-OSRM/osrm-backend/blob/master/CMakeLists.txt
-WORKDIR /home/docker/osrm
-RUN wget https://github.com/Project-OSRM/osrm-backend/archive/v5.25.0.zip
-RUN unzip v5.25.0.zip -d ./osrm-backend
-RUN cd /home/docker/osrm/osrm-backend/osrm-backend-5.25.0/ && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && cmake --build . --target install
+### Installation de valhalla
+COPY --from=build /home/valhalla/valhalla/build/valhalla-3.2.0-Linux.tar.gz ./
+RUN tar -xzvf valhalla-3.2.0-Linux.tar.gz && cd valhalla-3.2.0-Linux && cp -r bin/* /usr/bin/ && cp -r lib/* /usr/lib/ && cp -r include/* /usr/include/ && cp -r share/* /usr/share/
 
-### Dossier des données
-WORKDIR /home/docker/internal
-
-### Récupération de données sur la Corse
-# L'objectif est d'avoir un container indépendant du docker-compose
-RUN wget download.geofabrik.de/europe/france/corse-latest.osm.pbf
-RUN osrm-extract corse-latest.osm.pbf -p /usr/local/share/osrm/profiles/car.lua
-RUN osrm-contract corse-latest.osrm
-
-### Dossier contenant la configuration
+### Dossier contenant la configuration de Road2
 WORKDIR /home/docker/config
 COPY /docker/config /home/docker/config/
 
 ### Dossier de l'application
 WORKDIR /home/docker/app
-
-### Récupération des sources de l'application
-COPY package.json ./
-COPY eslint.json ./
-COPY jsdoc.json ./
 COPY src ./src/
-COPY /test ./test/
+### Récupération des sources de l'application
+COPY *.json ./
 
-### Installation des dépandences de l'application NodeJS
-# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-# https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
-# https://expressjs.com/fr/starter/installing.html
-RUN npm install
-
-### Installation de mocha pour les tests
-# https://mochajs.org/#installation
-RUN npm install mocha -g
-
-### Installation de eslint pour le code
-# https://eslint.org/docs/user-guide/configuring
-RUN npm install eslint -g
-
-### Installation de jsdoc pour la documentation du code
-# http://usejsdoc.org/about-configuring-jsdoc.html
-RUN npm install jsdoc -g
+### Installation des dépendances de l'application NodeJS
+RUN npm install && npm install -g mocha eslint jsdoc
 
 ### Volume partagé pour lire les données
 VOLUME ["/home/docker/data"]
 
 ### Commande de lancement de l'application
-CMD npm run debug -- --ROAD2_CONF_FILE=/home/docker/config/road2.json
+CMD npm run debug -- --ROAD2_CONF_FILE=../config/road2.json

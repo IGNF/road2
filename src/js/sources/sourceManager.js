@@ -376,6 +376,7 @@ module.exports = class sourceManager {
     try {
       let osrmTest = require('osrm');
     } catch(error) {
+      LOGGER.debug(error);
       LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
       return false;
     }

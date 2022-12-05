@@ -17,6 +17,39 @@ Feature: Road2-PGR
     | GET     |
     | POST    |
 
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec un autre crs
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:2154       |
+      | start          | 651475,6826145  |
+      | end            | 651475,6826140  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "crs" with value "EPSG:2154"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec mauvais crs
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:4325       |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'crs' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource pgr
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
@@ -799,6 +832,39 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     | method  |
     | GET     |
     | POST    |
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un autre crs
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:2154       |
+      | point          | 651475,6826145  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "crs" with value "EPSG:2154"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec mauvais crs
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:4325       |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'crs' is invalid"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
+
 
   Scenario: [GET] Isochrone sur l'API simple 1.0.0 avec une contrainte sur une ressource pgr
     Given an "GET" request on operation "isochrone" in api "simple" "1.0.0"

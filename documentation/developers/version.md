@@ -44,8 +44,8 @@ Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui 
 Démarche à suivre pour chaque projet:
 
 1. Tester `develop` et corriger si nécessaire.
-2. Merge de `develop` sur `master`.
-3. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `master` à 1.0.1.
+3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` et corriger si nécessaire.
 6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.
@@ -63,8 +63,8 @@ Démarche à suivre pour Road2:
 
 0. Réaliser les montée de version et les merge sur Route Graph Generator et PGRouting Procedures. 
 1. Tester `develop` avec les `develop` des autres projets, et corriger si nécessaire.
-2. Merge de `develop` sur `master`.
-3. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `develop` à 1.0.1.
+3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` avec les `master` des autres projets, et corriger si nécessaire.
 6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.

@@ -1,6 +1,6 @@
 # Démonstration locale de Road2 
 
-Ce fichier décrit les instructions à suivre pour avoir une démonstration locale de Road2. 
+Ce fichier décrit les instructions à suivre pour avoir une démonstration locale de Road2 limitée aux moteurs OSRM et PGRouting. 
 
 ## Principe 
 
