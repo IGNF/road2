@@ -56,7 +56,9 @@
             "id": "isochrone-valhalla",
             "parameters": {
                 "resource": "bduni-idf-valhalla",
-                "point": "2.333865,48.881989"
+                "point": "2.333865,48.881989",
+                "costValue": "100",
+                "costType": "time"
           }
         },
         {

@@ -7,10 +7,6 @@ Feature: Road2-Valhalla
   Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sur une ressource valhalla
     Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone-valhalla"
-    And with query parameters:
-      | key         | value     |
-      | costType    | distance  |
-      | costValue   | 31000     |
     When I send the request
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -21,13 +17,13 @@ Feature: Road2-Valhalla
     | GET     |
     | POST    |
 
-  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 sur une ressource valhalla
+  Scenario Outline: [<method>] Isochrone distance sur l'API simple 1.0.0 sur une ressource valhalla
     Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone-valhalla"
     And with query parameters:
-      | key         | value     |
-      | costType    | distance  |
-      | costValue   | 1000      |
+      | key            | value           |
+      | costType       | distance        |
+      | costValue      | 1000            |
     When I send the request
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
