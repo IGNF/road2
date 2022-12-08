@@ -714,10 +714,10 @@ module.exports = {
       } else {
 
         LOGGER.debug("point valide");
-        //TODO: passer par la classe Point
-        const tmpStringCoordinates = parameters.point.split(",");
-        point.lon = Number(tmpStringCoordinates[0]);
-        point.lat = Number(tmpStringCoordinates[1]);
+        let tmpStringCoordinates = parameters.point.split(",");
+        point = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
+        LOGGER.debug("user point in road2' object:");
+        LOGGER.debug(point);
 
       }
 

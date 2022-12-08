@@ -23,7 +23,7 @@ Feature: Road2-Valhalla
     And with query parameters:
       | key            | value           |
       | costType       | distance        |
-      | costValue      | 1000            |
+      | costValue      | 2000            |
     When I send the request
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
@@ -33,6 +33,23 @@ Feature: Road2-Valhalla
     | method  |
     | GET     |
     | POST    |
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un autre crs
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone-valhalla"
+    And with query parameters:
+      | key            | value           |
+      | crs            | EPSG:2154       |
+      | point          | 651475,6826145  |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
+    And the response should contain an attribute "crs" with value "EPSG:2154"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    | 
 
 Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec valhalla
     Given an "<method>" request on operation "route" in api "simple" "1.0.0"

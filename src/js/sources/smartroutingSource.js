@@ -195,7 +195,7 @@ module.exports = class smartroutingSource extends Source {
 
         // Coordonnées
         // location
-        smartroutingRequest.location = request.point.lon + "," + request.point.lat;
+        smartroutingRequest.location = request.point.x + "," + request.point.y;
 
         // optimization
         const mapMethods = {

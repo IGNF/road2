@@ -270,11 +270,15 @@ module.exports = class valhallaSource extends Source {
           reverse = "true";
         }
 
-        const locationsString = `"locations":[{"lat":${request.point.lat},"lon":${request.point.lon}}]`;
+        // Reprojection du point si nécessaire
+        let tmpPoint = request.point.getCoordinatesIn(super.projection);
+
+        const locationsString = `"locations":[{"lat":${tmpPoint[1]},"lon":${tmpPoint[0]}}]`;
         const costingString = `"costing":"${this._costs[request.profile][request.costType].costing}"`;
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
-        const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${contoursString},${reverseString}}' `;
+        const polygonsString = `"polygons":true`;
+        const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${contoursString},${reverseString},${polygonsString}}' `;
         LOGGER.info(commandString);
 
         return new Promise( (resolve, reject) => {
@@ -538,6 +542,7 @@ module.exports = class valhallaSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, valhallaResponseStr) {
+    
     let point = {};
     let geometry = {};
     let valhallaResponse;
@@ -557,24 +562,39 @@ module.exports = class valhallaSource extends Source {
       throw errorManager.createError(" No data found ", 404);
     }
 
-    // Création d'un objet Point (utile plus tard).
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, super.projection);
+    // Projection demandée dans la requête
+    let askedProjection = isochroneRequest.point.projection;
+    LOGGER.debug("asked projection: " + askedProjection);
+
+    LOGGER.debug("data projection: " + super.projection);
+
+    // Création d'un objet Point 
+    point = isochroneRequest.point;
+    if (!point.transform(askedProjection)) {
+      throw errorManager.createError(" Error during reprojection of point in Valhalla response");
+    } else {
+      LOGGER.debug("point in asked projection:");
+      LOGGER.debug(point);
+    }
 
     let rawGeometry = valhallaResponse.features[0].geometry;
 
-    // Cas où il n'y a pas d'isochrone car costValue trop faible
+    // Création d'un objet Polygon à partir de la géométrie brute
     if (rawGeometry === null) {
-      rawGeometry = {
-        type: 'Point',
-        coordinates: [
-          isochroneRequest.point.lon,
-          isochroneRequest.point.lat
-        ]
-      };
-    }
+      // Potentiellement le cas où il n'y a pas d'isochrone car costValue trop faible
+      geometry = new Polygon({type: 'Point',coordinates: [point.x,point.y]}, "geojson", askedProjection);
+    } else {
 
-    // Création d'un objet Polygon à partir du GeoJSON reçu.
-    geometry = new Polygon(rawGeometry, "geojson", super.projection);
+      geometry = new Polygon(rawGeometry, "geojson", super.projection);
+
+      if (!geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of point in Valhalla response");
+      } else {
+        LOGGER.debug("point in asked projection:");
+        LOGGER.debug(point);
+      }
+
+    }
 
     /* Envoi de la réponse au proxy. */
     return new IsochroneResponse(

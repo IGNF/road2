@@ -426,7 +426,13 @@ module.exports = class pgrSource extends Source {
 
         LOGGER.debug("type of request is isochroneRequest");
 
-        const point = [request.point.lon, request.point.lat];
+        let point = "";
+        try {
+          point = JSON.stringify(request.point.getCoordinatesIn(super.projection));
+        } catch(error) {
+          LOGGER.error(error);
+          reject(errorManager.createError("Impossible de récupérer les coordonnées du point"));
+        }
 
         let constraints = "";
 
@@ -446,12 +452,11 @@ module.exports = class pgrSource extends Source {
           LOGGER.debug("no constraints asked");
         }
 
-        const queryString = `SELECT * FROM ${this._schema}.generateIsochrone(ARRAY ${JSON.stringify(point)}, $1, $2, $3, $4, $5, $6)`;
-
+        const queryString = `SELECT * FROM ${this._schema}.generateIsochrone(ARRAY ${point}, $1, $2, $3, $4, $5)`;
+        
         const SQLParametersTable = [
           request.costValue,
           request.direction,
-          parseInt(request.askedProjection.split(':')[1]), // e.g. Transformer "EPSG:4326" en 4326 (pour PostGIS).
           this._costs[request.profile][request.costType].costColumn,
           this._costs[request.profile][request.costType].rcostColumn,
           constraints
@@ -489,7 +494,7 @@ module.exports = class pgrSource extends Source {
                   LOGGER.debug(result);
 
                   try {
-                    resolve(this.writeIsochroneResponse(request, pgrRequest, result));
+                    resolve(this.writeIsochroneResponse(request, result));
                   } catch (error) {
                     reject(error);
                   }
@@ -1055,7 +1060,8 @@ module.exports = class pgrSource extends Source {
   * @param {pgrResponse} pgrResponse - Objet pgrResponse
   *
   */
-  writeIsochroneResponse(isochroneRequest, pgrRequest, pgrResponse) {
+  writeIsochroneResponse(isochroneRequest, pgrResponse) {
+
     let point = {};
     let geometry = {};
 
@@ -1064,20 +1070,46 @@ module.exports = class pgrSource extends Source {
       throw errorManager.createError(" No data found ", 404);
     }
 
-    // Création d'un objet Point (utile plus tard).
-    point = new Point(isochroneRequest.point.lon, isochroneRequest.point.lat, super.projection);
+    // Projection demandée dans la requête
+    let askedProjection = isochroneRequest.point.projection;
+    LOGGER.debug("asked projection: " + askedProjection);
 
-    let rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+    LOGGER.debug("data projection: " + super.projection);
 
-    // Cas où il n'y a pas d'isochrone car costValue trop faible
+
+    // Création d'un objet Point
+    point = isochroneRequest.point;
+    if (!point.transform(askedProjection)) {
+      throw errorManager.createError(" Error during reprojection of point in PGRouting response");
+    } else {
+      LOGGER.debug("point in asked projection:");
+      LOGGER.debug(point);
+    }
+
+    let rawGeometry = null; 
+    
+    try {
+      rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
+    } catch(error) {
+      LOGGER.debug(error);
+      throw errorManager.createError("Impossible de parser la réponse de PGRouting");
+    }
+    
+    // Création d'un objet Polygon à partir de la géométrie brute
     if (rawGeometry === null) {
-      rawGeometry = {
-        type: 'Point',
-        coordinates: [
-          isochroneRequest.point.lon,
-          isochroneRequest.point.lat
-        ]
-      };
+      // Potentiellement le cas où il n'y a pas d'isochrone car costValue trop faible
+      geometry = new Polygon({type: 'Point',coordinates: [point.x,point.y]}, "geojson", askedProjection);
+    } else {
+
+      geometry = new Polygon(rawGeometry, "geojson", super.projection);
+
+      if (!geometry.transform(askedProjection)) {
+        throw errorManager.createError(" Error during reprojection of point in PGRouting response");
+      } else {
+        LOGGER.debug("point in asked projection:");
+        LOGGER.debug(point);
+      }
+
     }
 
     // Création d'un objet Polygon à partir du GeoJSON reçu.

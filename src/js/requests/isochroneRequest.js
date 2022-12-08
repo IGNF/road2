@@ -18,7 +18,7 @@ module.exports = class isochroneRequest extends Request {
   * @name constructor
   * @description Constructeur de la classe isochroneRequest
   * @param {string} resource - Ressource.
-  * @param {string} point - Point de départ.
+  * @param {Point} point - Point de départ ou d'arrivée
   * @param {string} costType - Type du coût.
   * @param {string} costValue - Valeur du coût.
   * @param {string} profile - Profil utilisé pour le calcul.

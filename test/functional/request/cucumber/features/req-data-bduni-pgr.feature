@@ -83,3 +83,38 @@ Feature: Road2 with Bduni data via PGR
     | method  |
     | GET     |
     | POST    |
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key              | value                    |
+      | point            | 2.1,48.7                 |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
+    And the iso should be similar to "../../data/bduni/pgr/3.json"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    |
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec un geometryFormat polyline
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key              | value                    |
+      | point            | 2.1,48.7                 |
+      | geometryFormat   | polyline                 |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
+    And the iso should be similar to "../../data/bduni/pgr/4.json"
+
+  Examples:
+    | method  |
+    | GET     |
+    | POST    |

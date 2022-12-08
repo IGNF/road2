@@ -843,7 +843,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     When I send the request 
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain a complete and valid road
+    And the response should contain a complete and valid iso
     And the response should contain an attribute "crs" with value "EPSG:2154"
   Examples:
     | method  |

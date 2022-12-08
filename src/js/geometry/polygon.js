@@ -4,6 +4,7 @@ const errorManager = require('../utils/errorManager');
 const turf = require('@turf/turf');
 const polyline = require('@mapbox/polyline');
 const Geometry = require('../geometry/geometry');
+const proj4 = require('proj4');
 
 /**
 *
@@ -40,6 +41,17 @@ module.exports = class Polygon extends Geometry {
   */
   get geom () {
     return this._geom;
+  }
+
+  /**
+  *
+  * @function
+  * @name getGeoJSON
+  * @description Récupérer la représentation geoJSON du polygon
+  *
+  */
+   getGeoJSON () {
+    return this._convertGeometry(this._geom, this._format, 'geojson');
   }
 
   /**
@@ -111,5 +123,92 @@ module.exports = class Polygon extends Geometry {
       //TODO: voir si on peut remplacer ce throw par un return {}
       throw errorManager.createError("Unsupported geometry conversion");
     }
+
   }
+
+
+  /**
+  *
+  * @function
+  * @name transform
+  * @description Reprojeter un polygon
+  * @param{string} projection - Projection demandée
+  *
+  */
+  transform (projection) {
+
+    if (projection === this._projection) {
+      return true;
+    }
+
+    let geojson = this.getGeoJSON();
+
+    // vérifications sur le geojson à reprojeter
+    if (!geojson.coordinates) {
+      return false;
+    }
+    if (!Array.isArray(geojson.coordinates)) {
+      return false;
+    }
+    if (geojson.coordinates.length === 0) {
+      return false;
+    }
+
+    for (let g = 0; g < geojson.coordinates.length; g++) {
+
+      if (!geojson.coordinates[g]) {
+        return false;
+      }
+      if (!Array.isArray(geojson.coordinates[g])) {
+        return false;
+      }
+      if (geojson.coordinates[g].length === 0) {
+        return false;
+      }
+
+      for (let c = 0; c < geojson.coordinates[g].length; c++) {
+
+        if (!geojson.coordinates[g][c]) {
+          return false;
+        }
+        if (!Array.isArray(geojson.coordinates[g][c])) {
+          return false;
+        }
+        if (geojson.coordinates[g][c].length < 2) {
+          return false;
+        }
+
+      }
+
+    }
+
+    // Reprojection
+    for (let g = 0; g < geojson.coordinates.length; g++) {
+
+      for (let c = 0; c < geojson.coordinates[g].length; c++) {
+
+        let reprojectedPoint = proj4(this.projection, projection, [geojson.coordinates[g][c][0], geojson.coordinates[g][c][1]]);
+        
+        if (!Array.isArray(reprojectedPoint)) {
+          return false;
+        }
+        if (reprojectedPoint.length !== 2) {
+          return false;
+        }
+
+        geojson.coordinates[g][c][0] = reprojectedPoint[0];
+        geojson.coordinates[g][c][1] = reprojectedPoint[1];
+
+      }
+
+    }
+
+    // TODO: gérer les différents formats de géométrie 
+
+    this._projection = projection;
+
+    return true;
+
+  }
+
 }

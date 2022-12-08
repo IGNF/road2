@@ -567,7 +567,7 @@ module.exports = class osrmSource extends Source {
 
     // Récupération de l'ensemble des points de la réponse d'OSRM 
     if (osrmResponse.waypoints) {
-      console.log(osrmResponse);
+      LOGGER.debug(osrmResponse);
       if (osrmResponse.waypoints.length < 1) {
         throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 1. ");
       } else {

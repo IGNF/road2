@@ -5,6 +5,7 @@ const turf = require('@turf/turf');
 const axios = require('axios');
 const tunnel = require('tunnel');
 const https = require('https');
+const polyline = require('@mapbox/polyline');
 
 
 /**
@@ -704,7 +705,64 @@ class road2World {
         
     }
 
+    checkIsoContent(filePath) {
 
+        let referenceResponse = {};
+        let responseJSON = {};
+
+                
+        if (typeof this._response === "string") {
+            responseJSON = JSON.parse(this._response);
+        } else {
+            responseJSON = this._response;
+        }
+
+        try {
+            referenceResponse = JSON.parse(fs.readFileSync(path.resolve(__dirname,filePath)));
+        } catch (error) {
+            return "Can't parse JSON file";
+        }
+
+        let refIso = referenceResponse.geometry;
+        let curIso = this._response.geometry;
+
+        if (typeof(refIso) === "string") {
+
+            if (refIso === curIso) {
+                return true;
+            }
+
+            // On part du principe que c'est du polyline
+            refIso = turf.polygon(polyline.decode(refIso));
+            curIso = turf.polygon(polyline.decode(curIso));
+
+        } else {
+
+            // On part du principe que c'est du GeoJSON
+            if (curIso.coordinates) {
+
+                refIso = turf.polygon(refIso.coordinates);
+                try {
+                    curIso = turf.polygon(curIso.coordinates);
+                } catch(error) {
+                    return "Can't convert curIso into polygon with turfJS";
+                }
+
+            } else {
+                return "curIso doesn't have coordinates";
+            }
+            
+        }
+
+        let buffer = turf.buffer(refIso, 0.1, {units: 'kilometers'});
+
+        if (!turf.booleanWithin(curIso, buffer)) {
+            return "Iso is out of the buffer";
+        } else {
+            return true;
+        }
+
+    }
 
 }
 

@@ -11,6 +11,9 @@ CHANGED:
   - Les sources ne sont plus configurées dans le même fichier que les ressources. Chaque source est configurée dans son fichier. L'ensemble est placé dans un dossier de sources. Il peut y en avoir plusieurs. 
   - Les sources PGRouting et Valhalla ne sont plus configurées de la même manière : chaque source de ces types peut contenir plusieurs coûts. 
 
+FIXED:
+  - Les reprojections des isochrones fonctionnent
+
 UPDATED:
   - Passage à `osrm` 5.26.0
   - Passage à `pg` 8.8.0
@@ -22,6 +25,8 @@ UPDATED:
   - Passage à `nconf` 0.12.0
   - Passage à `proj4` 2.8.0
   - Utilisation de NodeJS 16 dans docker
+  - Passage à `pgrouting-procedures` 2.0.0
+  - Passage à `route-graph-generator` 1.2.3
 
 # 1.1.2
 
