@@ -86,7 +86,7 @@ Les participations à ce projet sont encouragées. Il vous est demandé de réal
 
 On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 
-Pour en savoir plus sur notre roadmap, vous pouvez regarder ce [document](./documentation/developers/roadmap.md). 
+Pour en savoir plus sur notre roadmap, vous pouvez regarder le projet [IGNF/Road2 Roadmap](https://github.com/orgs/IGNF/projects/3). 
 
 Enfin, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
 
