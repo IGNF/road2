@@ -9,7 +9,7 @@ describe('Test de la classe ProjectionManager', function() {
     logManager.manageLogs();
   });
 
-  describe('Test du constructeur et des getters/setters', function() {
+  describe('Test du constructeur', function() {
 
     let projManager = new ProjectionManager();
 
@@ -33,6 +33,20 @@ describe('Test de la classe ProjectionManager', function() {
 
   });
 
+  describe('Test de isProjectionChecked', function() {
+
+    let projManager = new ProjectionManager();
+    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+
+    it('isProjectionChecked()', function() {
+      projManager.checkProjectionDirectory(directory);
+      assert.equal(projManager.isProjectionChecked("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2155"), false);
+    });
+
+  });
+
   describe('Vérification d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
@@ -40,9 +54,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('checkProjectionFile()', function() {
       assert.equal(projManager.checkProjectionFile(file), true);
-      assert.equal(projManager.isChecked("EPSG:4326"), true);
-      assert.equal(projManager.isChecked("EPSG:2154"), true);
-      assert.equal(projManager.isChecked("EPSG:2155"), false);
+      assert.equal(projManager.isProjectionChecked("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2155"), false);
     });
 
   });
@@ -54,23 +68,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('checkProjectionDirectory()', function() {
       assert.equal(projManager.checkProjectionDirectory(directory), true);
-      assert.equal(projManager.isChecked("EPSG:4326"), true);
-      assert.equal(projManager.isChecked("EPSG:2154"), true);
-      assert.equal(projManager.isChecked("EPSG:2155"), false);
-    });
-
-  });
-
-  describe('Test de isChecked', function() {
-
-    let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
-
-    it('isChecked()', function() {
-      projManager.checkProjectionDirectory(directory);
-      assert.equal(projManager.isChecked("EPSG:4326"), true);
-      assert.equal(projManager.isChecked("EPSG:2154"), true);
-      assert.equal(projManager.isChecked("EPSG:2155"), false);
+      assert.equal(projManager.isProjectionChecked("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionChecked("EPSG:2155"), false);
     });
 
   });
@@ -90,6 +90,20 @@ describe('Test de la classe ProjectionManager', function() {
 
   });
 
+  describe('Test de isProjectionLoaded', function() {
+
+    let projManager = new ProjectionManager();
+    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+
+    it('isProjectionLoaded()', function() {
+      projManager.loadProjectionDirectory(directory);
+      assert.equal(projManager.isProjectionLoaded("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2155"), false);
+    });
+
+  });
+
   describe('Chargement d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
@@ -97,9 +111,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('loadProjectionFile()', function() {
       assert.equal(projManager.loadProjectionFile(file), true);
-      assert.equal(projManager.isAvailable("EPSG:4326"), true);
-      assert.equal(projManager.isAvailable("EPSG:2154"), true);
-      assert.equal(projManager.isAvailable("EPSG:2155"), false);
+      assert.equal(projManager.isProjectionLoaded("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2155"), false);
     });
 
   });
@@ -111,23 +125,9 @@ describe('Test de la classe ProjectionManager', function() {
 
     it('loadProjectionDirectory()', function() {
       assert.equal(projManager.loadProjectionDirectory(directory), true);
-      assert.equal(projManager.isAvailable("EPSG:4326"), true);
-      assert.equal(projManager.isAvailable("EPSG:2154"), true);
-      assert.equal(projManager.isAvailable("EPSG:2155"), false);
-    });
-
-  });
-
-  describe('Test de isAvailable', function() {
-
-    let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
-
-    it('isAvailable()', function() {
-      projManager.loadProjectionDirectory(directory);
-      assert.equal(projManager.isAvailable("EPSG:4326"), true);
-      assert.equal(projManager.isAvailable("EPSG:2154"), true);
-      assert.equal(projManager.isAvailable("EPSG:2155"), false);
+      assert.equal(projManager.isProjectionLoaded("EPSG:4326"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2154"), true);
+      assert.equal(projManager.isProjectionLoaded("EPSG:2155"), false);
     });
 
   });
