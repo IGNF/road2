@@ -326,14 +326,72 @@ module.exports = {
   *
   */
 
-   fromGeoJSON: function(jsonObject) {
+   fromGeoJSON: function(jsonObject) {    
 
-    let finalWkt = "";
+    if (jsonObject.type === "Point") {
 
+      return this._fromPoint(jsonObject);
+
+    } else if (jsonObject.type === "LineString") {
+
+      return this._internalFrom(jsonObject,"LINESTRING");
+
+    } else if (jsonObject.type === "Polygon") {
+
+      return this._internalFrom(jsonObject,"POLYGON");
+
+    } else if (jsonObject.type === "GeometryCollection") {
+
+      let arrayWkt = new Array();
+      for(let geometry of jsonObject.geometries) {
+        arrayWkt.push(this.fromGeoJSON(geometry));
+      }
+      return "GEOMETRYCOLLECTION(" + arrayWkt.toString() + ")";
+      
+    } else {
+      return "";
+    }
     
+  },
 
-    return finalWkt;
-    
+  /**
+  *
+  * @function
+  * @name _fromPoint
+  * @description Conversion d'un GeoJSON en WKT
+  * @param {JSON} jsonObject - JSON à convertir
+  * @return {string} wktString 
+  *
+  */
+
+  _fromPoint: function(jsonObject) { 
+
+    let geometry = JSON.stringify(jsonObject.coordinates);
+    geometry = geometry.replaceAll(/\[(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)\]/g,"($1 $2 $3)");
+    geometry = geometry.replaceAll(/\[(-?\d+\.?\d*),(-?\d+\.?\d*)\]/g,"($1 $2)");
+    return "POINT"+geometry;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name _internalFrom
+  * @description Conversion d'un GeoJSON en WKT
+  * @param {JSON} jsonObject - JSON à convertir
+  * @return {string} wktString 
+  *
+  */
+
+   _internalFrom: function(jsonObject, type) { 
+
+    let geometry = JSON.stringify(jsonObject.coordinates);
+    geometry = geometry.replaceAll(/\[(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)\]/g,"$1 $2 $3");
+    geometry = geometry.replaceAll(/\[(-?\d+\.?\d*),(-?\d+\.?\d*)\]/g,"$1 $2");
+    geometry = geometry.replaceAll(/\[/g,"(");
+    geometry = geometry.replaceAll(/\]/g,")");
+    return type+geometry;
+
   }
 
 

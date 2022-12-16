@@ -179,4 +179,28 @@ describe('Test de la classe Wkt', function() {
 
   });
 
+  describe('Test de la fonction fromGeoJSON()', function() {
+
+    it('Avec un bon geojson (point)', function() {
+      assert.deepStrictEqual(Wkt.fromGeoJSON(pointJson), pointWkt);
+    });
+
+    it('Avec un bon geojson (linestring)', function() {
+      assert.deepStrictEqual(Wkt.fromGeoJSON(linestringJson), linestringWkt);
+    });
+
+    it('Avec un bon geojson (polygon)', function() {
+      assert.deepStrictEqual(Wkt.fromGeoJSON(polygonJson), polygonWkt);
+    });
+
+    it('Avec un bon geojson (polygon donuts)', function() {
+      assert.deepStrictEqual(Wkt.fromGeoJSON(polygonJson2), polygonWkt2);
+    });
+
+    it('Avec un bon geojson (geometry collection)', function() {
+      assert.deepStrictEqual(Wkt.fromGeoJSON(geometryCollectionJson), geomcollWkt);
+    });
+
+  });
+
 });
