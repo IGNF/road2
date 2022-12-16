@@ -145,10 +145,6 @@ Autres:
         - defs()
         - ()
 
-- wkt 
-    - sources/smartroutingSource.js
-        - parse()
-
 - osrm 
     - sources/sourceManager.js
     - sources/osrmSource.js

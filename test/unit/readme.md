@@ -33,3 +33,4 @@ On trouvera donc les classes ou les fichiers suivants:
 - simplify.js //TODO
 - storageManager (log4js)
 - validationManager
+- wkt

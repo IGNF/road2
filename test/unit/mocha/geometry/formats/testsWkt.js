@@ -2,9 +2,6 @@ const assert = require('assert');
 const Wkt = require('../../../../../src/js/geometry/formats/wkt');
 const logManager = require('../../logManager');
 
-const { hrtime } = require('node:process');
-const WKTmodule = require('wkt');
-
 describe('Test de la classe Wkt', function() {
 
   before(function() {

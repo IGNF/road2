@@ -13,7 +13,7 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
-const wkt = require('wkt');
+const wkt = require('../geometry/formats/wkt');
 const httpQuery = require('../utils/httpQuery');
 
 
@@ -330,7 +330,7 @@ module.exports = class smartroutingSource extends Source {
     // ---
 
     // convertion de la geometry
-    const wayGeojson = wkt.parse(smartroutingResponse.geometryWkt);
+    const wayGeojson = wkt.toGeoJSON(smartroutingResponse.geometryWkt);
     let way = new Line(wayGeojson, 'geojson', askedProjection);
 
     // start et end
@@ -443,7 +443,7 @@ module.exports = class smartroutingSource extends Source {
     location = new Point(locationCoords[0], locationCoords[1], projection);
 
     // Geometrie
-    const rawGeometry = wkt.parse(smartroutingResponse.wktGeometry);
+    const rawGeometry = wkt.toGeoJSON(smartroutingResponse.wktGeometry);
 
     // Cas où il n'y a pas d'isochrone car costValue trop faible
     if (rawGeometry === null) {
