@@ -15,7 +15,7 @@ cmake -B build . && cmake --build build && make -C build install
 
 WORKDIR /home/valhalla/
 RUN pip install --upgrade conan
-RUN git clone --branch feature-exclude_bridges/tunnels/toll --depth 1 --recursive https://github.com/IGNF/valhalla.git && cd valhalla && \
+RUN git clone --branch 3.2.0-with_hard_exclude --depth 1 --recursive https://github.com/IGNF/valhalla.git && cd valhalla && \
 mkdir build && cmake -B build -DCMAKE_BUILD_TYPE=Release && make -C build && make -C build package
 
 FROM node:16-bullseye as road2
