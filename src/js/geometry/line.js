@@ -2,7 +2,8 @@
 
 const errorManager = require('../utils/errorManager');
 const polyline = require('@mapbox/polyline');
-const Geometry = require('../geometry/geometry');
+const wkt = require('./formats/wkt');
+const Geometry = require('./geometry');
 const proj4 = require('proj4');
 const assert = require('assert');
 
@@ -30,7 +31,7 @@ module.exports = class Line extends Geometry {
   */
   constructor(geom, format, projection, polylinePrecision = 5) {
 
-    super("polyline", projection);
+    super("line", projection);
 
     // Géométrie de la polyline
     this._geom = geom;
@@ -38,9 +39,10 @@ module.exports = class Line extends Geometry {
     // Format de géométrie (geojson, polyline...)
     this._format = format;
 
-    if (polylinePrecision != 5) {
+    if (polylinePrecision != 5 && this._format === "polyline") {
       this._geom = polyline.encode(polyline.decode(geom, polylinePrecision));
     }
+
   }
 
   /**
@@ -53,29 +55,6 @@ module.exports = class Line extends Geometry {
   get geom () {
     return this._geom;
   }
-
-  /**
-  *
-  * @function
-  * @name getGeoJSON
-  * @description Récupérer la représentation geoJSON de la ligne
-  *
-  */
-  getGeoJSON () {
-    return this._convertGeometry(this._geom, this._format, 'geojson');
-  }
-
-  /**
-  *
-  * @function
-  * @name getEncodedPolyline
-  * @description Récupérer la représentation polyline de la ligne
-  *
-  */
-  getEncodedPolyline () {
-    return this._convertGeometry(this._geom, this._format, 'polyline');
-  }
-
 
   /**
   *
@@ -94,8 +73,8 @@ module.exports = class Line extends Geometry {
   * @name convertGeometry
   * @description Convertit une géométrie depuis un format vers un autre
   * @param {Object|string} geom - Géométrie source
-  * @param {string} srcFormat - type de la gémétrie source pour l'instant, dans {geojson, polyline}
-  * @param {string} outFormat - type voulu en sortie pour l'instant, dans {geojson, polyline}
+  * @param {string} srcFormat - type de la gémétrie source pour l'instant, dans {geojson, polyline,wkt}
+  * @param {string} outFormat - type voulu en sortie pour l'instant, dans {geojson, polyline,wkt}
   * @return {Object|string} out_geom - géométrie convertie
   *
   */
@@ -106,6 +85,14 @@ module.exports = class Line extends Geometry {
       return polyline.toGeoJSON(geom);
     } else if (srcFormat === "geojson" && outFormat === "polyline") {
       return polyline.fromGeoJSON(geom);
+    } else if (srcFormat === "wkt" && outFormat === "geojson") {
+      return wkt.toGeoJSON(geom);
+    } else if (srcFormat === "geojson" && outFormat === "wkt") {
+      return wkt.fromGeoJSON(geom);
+    } else if (srcFormat === "polyline" && outFormat === "wkt") {
+      return wkt.fromGeoJSON(polyline.toGeoJSON(geom));
+    } else if (srcFormat === "wkt" && outFormat === "polyline") {
+      return polyline.fromGeoJSON(wkt.toGeoJSON(geom));
     } else {
       //TODO: voir si on peut remplacer ce throw par un return {}
       throw errorManager.createError("Unsupported geometry conversion");
@@ -122,7 +109,7 @@ module.exports = class Line extends Geometry {
   */
   transform (projection) {
 
-    if (this.projection !== projection) {
+    if (super.projection !== projection) {
 
       let tmpGeom = this.getLineIn(projection, this._format);
 
@@ -134,7 +121,7 @@ module.exports = class Line extends Geometry {
       } catch (err) {
 
         this._geom = tmpGeom;
-        this.projection = projection;
+        super.projection = projection;
 
         return true;
 
@@ -158,7 +145,7 @@ module.exports = class Line extends Geometry {
   */
   getLineIn (projection, format) {
 
-    let geojson = this.getGeoJSON();
+    let geojson = this._convertGeometry(this._geom, this._format, 'geojson');
 
     // vérifications sur le geojson à reprojeter
     if (!geojson.coordinates) {
@@ -176,7 +163,7 @@ module.exports = class Line extends Geometry {
 
     for (let i = 0; i < geojson.coordinates.length; i++) {
 
-      let reprojectedPoint =  proj4(this.projection, projection, [geojson.coordinates[i][0], geojson.coordinates[i][1]]);
+      let reprojectedPoint =  proj4(super.projection, projection, [geojson.coordinates[i][0], geojson.coordinates[i][1]]);
 
       if (!Array.isArray(reprojectedPoint)) {
         return {};

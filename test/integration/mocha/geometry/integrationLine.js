@@ -55,14 +55,6 @@ describe('Test de la classe Line', function() {
 
   describe('Changement de format', function() {
 
-    it('getGeoJSON()', function() {
-      assert.deepEqual(line.getGeoJSON(), refGeojson);
-    });
-
-    it('getEncodedPolyline()', function() {
-      assert.deepEqual(line.getEncodedPolyline(), refPolyline);
-    });
-
     it('getGeometryWithFormat()', function() {
       assert.deepEqual(line.getGeometryWithFormat("geojson"), refGeojson);
     });

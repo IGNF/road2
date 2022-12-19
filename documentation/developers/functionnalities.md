@@ -34,7 +34,7 @@ Selon les données présentes dans les graphes, il est possible de choisir les i
 
 Par l'intermédiaire de plusieurs paramètres, il est possible de préciser le contenu de la réponse : 
 - La présence ou non des étapes du parcours. 
-- Le format des géométries dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
+- Le format des géométries dans la réponse. Pour le moment, geojson, polyline et wkt sont disponibles. 
 - La présence ou non d'une bbox dans la réponse. 
 
 ### 1.8 : Choisir les unités de la requête et de la réponse 
@@ -80,7 +80,7 @@ La notion de contrainte est définie dans les [concepts](./concepts.md). Elle es
 ### 2.8 : Préciser le contenu de la réponse 
 
 Par l'intermédiaire de plusieurs paramètres, un seul pour le moment, il est possible de préciser le contenu de la réponse : 
-- Le format des géométrie dans la réponse. Pour le moment, geojson et polyline sont disponibles. 
+- Le format des géométrie dans la réponse. Pour le moment, geojson, polyline et wkt sont disponibles. 
 
 ### 2.9 : Choisir les unités de la requête et de la réponse 
 
