@@ -42,7 +42,9 @@
             "id": "isochrone-smartpgr",
             "parameters": {
                 "resource": "bduni-idf-smartpgr",
-                "point": "2.333865,48.881989"
+                "point": "2.333865,48.881989",
+                "costValue": "100",
+                "costType": "time"
             }
         },
         {
