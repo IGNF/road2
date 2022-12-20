@@ -50,6 +50,22 @@ Feature: Road2-PGR
     | GET     |
     | POST    | 
 
+  Scenario Outline: [<method>] Route sur l'API simple 1.0.0 avec geometryFormat=wkt
+    Given an "<method>" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value            |
+      | geometryFormat | wkt              |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain a string attribute "geometry"
+  Examples:
+    | method  |
+    | GET     |
+    | POST    |
+
   Scenario: [GET] Route sur l'API simple 1.0.0 avec deux contraintes sur une ressource pgr
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-pgr"
@@ -779,6 +795,22 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
 
+  Examples:
+    | method  |
+    | GET     |
+    | POST    |
+
+  Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0 avec geometryFormat=wkt
+    Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
+    And with default parameters for "isochrone"
+    And with query parameters:
+      | key            | value            |
+      | geometryFormat | wkt              |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid iso
+    And the response should contain a string attribute "geometry"
   Examples:
     | method  |
     | GET     |

@@ -4,6 +4,8 @@ ADDED:
   - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
   - Cette classe est configurée par un nouveau fichier de configuration. 
   - Ajout du moteur Valhalla pour les itinéraires et les isochrones
+  - Le module `wkt` a été remplacé par une implémentation interne
+  - Le format wkt est disponible pour le paramètre geometryFormat de l'API simple/1.0.0
 
 CHANGED:
   - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement. 

@@ -99,7 +99,8 @@
             "defaultValueContent": "geojson",
             "values": [
               "geojson",
-              "polyline"
+              "polyline",
+              "wkt"
             ]
           },
           {
@@ -413,7 +414,8 @@
             "defaultValueContent": "geojson",
             "values": [
               "geojson",
-              "polyline"
+              "polyline",
+              "wkt"
             ]
           },
           {

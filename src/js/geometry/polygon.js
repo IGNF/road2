@@ -3,6 +3,7 @@
 const errorManager = require('../utils/errorManager');
 const turf = require('@turf/turf');
 const polyline = require('@mapbox/polyline');
+const wkt = require('./formats/wkt');
 const Geometry = require('../geometry/geometry');
 const proj4 = require('proj4');
 
@@ -46,17 +47,6 @@ module.exports = class Polygon extends Geometry {
   /**
   *
   * @function
-  * @name getGeoJSON
-  * @description Récupérer la représentation geoJSON du polygon
-  *
-  */
-   getGeoJSON () {
-    return this._convertGeometry(this._geom, this._format, 'geojson');
-  }
-
-  /**
-  *
-  * @function
   * @name getGeometryWithFormat
   * @description Récupérer la géométrie au format spécifié, pour l'instant, dans {geojson, polyline}
   *
@@ -81,12 +71,54 @@ module.exports = class Polygon extends Geometry {
     if (srcFormat === outFormat) {
       return geom;
     } else if (srcFormat === "polyline" && outFormat === "geojson") {
-      let tmpPolygon = polyline.toGeoJSON(geom);
-      tmpPolygon.type = "Polygon";
-      return tmpPolygon;
+      return this._polyline2GeoJson(geom);
     } else if (srcFormat === "geojson" && outFormat === "polyline") {
+      return this._geoJson2Polyline(geom);
+    } else if (srcFormat === "wkt" && outFormat === "geojson") {
+      return wkt.toGeoJSON(geom);
+    } else if (srcFormat === "geojson" && outFormat === "wkt") {
+      return wkt.fromGeoJSON(geom);
+    } else if (srcFormat === "polyline" && outFormat === "wkt") {
+      return wkt.fromGeoJSON(this.__polyline2GeoJson(geom));
+    } else if (srcFormat === "wkt" && outFormat === "polyline") {
+      return this._geoJson2Polyline(wkt.toGeoJSON(geom));
+    } else {
+      //TODO: voir si on peut remplacer ce throw par un return {}
+      throw errorManager.createError("Unsupported geometry conversion");
+    }
 
-      let result = [];
+  }
+
+  /**
+  *
+  * @function
+  * @name _polyline2GeoJson
+  * @description Convertit une géométrie GeoJSON vers Polyline
+  * @param {Object|string} geom - Géométrie source
+  * @return {Object|string} out_geom - géométrie convertie
+  *
+  */
+  _polyline2GeoJson (geom) {
+
+    let tmpGeoJSON = polyline.toGeoJSON(geom);
+    tmpGeoJSON.type = "Polygon";
+    return tmpGeoJSON;
+
+  }
+
+
+  /**
+  *
+  * @function
+  * @name _geoJson2Polyline
+  * @description Convertit une géométrie GeoJSON vers Polyline
+  * @param {Object|string} geom - Géométrie source
+  * @return {Object|string} out_geom - géométrie convertie
+  *
+  */
+  _geoJson2Polyline (geom) {
+
+    let result = [];
 
       if (geom.type === "Point") {
         // Cas où l'isochrone est un simple point
@@ -119,11 +151,6 @@ module.exports = class Polygon extends Geometry {
 
       }
 
-    } else {
-      //TODO: voir si on peut remplacer ce throw par un return {}
-      throw errorManager.createError("Unsupported geometry conversion");
-    }
-
   }
 
 
@@ -141,7 +168,7 @@ module.exports = class Polygon extends Geometry {
       return true;
     }
 
-    let geojson = this.getGeoJSON();
+    let geojson = this._convertGeometry(this._geom, this._format, 'geojson');
 
     // vérifications sur le geojson à reprojeter
     if (!geojson.coordinates) {
@@ -187,7 +214,7 @@ module.exports = class Polygon extends Geometry {
 
       for (let c = 0; c < geojson.coordinates[g].length; c++) {
 
-        let reprojectedPoint = proj4(this.projection, projection, [geojson.coordinates[g][c][0], geojson.coordinates[g][c][1]]);
+        let reprojectedPoint = proj4(super.projection, projection, [geojson.coordinates[g][c][0], geojson.coordinates[g][c][1]]);
         
         if (!Array.isArray(reprojectedPoint)) {
           return false;
@@ -203,9 +230,8 @@ module.exports = class Polygon extends Geometry {
 
     }
 
-    // TODO: gérer les différents formats de géométrie 
-
-    this._projection = projection;
+    this._geom = this._convertGeometry(geojson, 'geojson', this._format);
+    super.projection = projection;
 
     return true;
 

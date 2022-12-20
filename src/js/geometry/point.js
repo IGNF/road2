@@ -68,8 +68,8 @@ module.exports = class Point extends Geometry {
   */
   getCoordinatesIn (projection) {
 
-    if (this.projection !== projection) {
-      return proj4(this.projection, projection, [this._x, this._y]);
+    if (super.projection !== projection) {
+      return proj4(super.projection, projection, [this._x, this._y]);
     } else {
       return [this._x, this._y];
     }
@@ -86,9 +86,9 @@ module.exports = class Point extends Geometry {
   */
   transform (projection) {
 
-    if (this.projection !== projection) {
+    if (super.projection !== projection) {
 
-      let reprojectedPoint =  proj4(this.projection, projection, [this._x, this._y]);
+      let reprojectedPoint =  proj4(super.projection, projection, [this._x, this._y]);
 
       if (!Array.isArray(reprojectedPoint)) {
         return false;
@@ -99,7 +99,7 @@ module.exports = class Point extends Geometry {
 
       this._x = reprojectedPoint[0];
       this._y = reprojectedPoint[1];
-      this.projection = projection;
+      super.projection = projection;
 
       return true;
 
