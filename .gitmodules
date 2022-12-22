@@ -1,8 +1,8 @@
 [submodule "docker/route-graph-generator"]
 	path = docker/route-graph-generator
 	url = https://github.com/IGNF/route-graph-generator.git
-	branch = master
+	branch = develop
 [submodule "docker/motors/pgrouting-procedures"]
 	path = docker/motors/pgrouting-procedures
 	url = https://github.com/IGNF/pgrouting-procedures.git
-	branch = master
+	branch = develop
