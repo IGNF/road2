@@ -10,7 +10,7 @@ apt-get install -y libsqlite3-mod-spatialite python3-pip
 
 WORKDIR /home/prime-server
 RUN apt-get install -y git cmake autoconf automake pkg-config libtool make gcc g++ lcov libcurl4-openssl-dev libzmq3-dev libczmq-dev
-RUN git clone --depth 1 --recursive https://github.com/kevinkreiser/prime_server.git && cd prime_server && \
+RUN git clone --depth 3 --recursive https://github.com/kevinkreiser/prime_server.git && cd prime_server && git checkout 43715e5 && \
 cmake -B build . && cmake --build build && make -C build install
 
 WORKDIR /home/valhalla/
@@ -33,8 +33,8 @@ COPY --from=build /usr/local/lib/libprime_server.so.0 /usr/lib/libprime_server.s
 COPY --from=build /usr/local/lib/libprime_server.so /usr/lib/libprime_server.so
 
 ### Installation de valhalla
-COPY --from=build /home/valhalla/valhalla/build/valhalla-3.1.4-Linux.tar.gz ./
-RUN tar -xzvf valhalla-3.1.4-Linux.tar.gz && cd valhalla-3.1.4-Linux && cp -r bin/* /usr/bin/ && cp -r lib/* /usr/lib/ && cp -r include/* /usr/include/ && cp -r share/* /usr/share/
+COPY --from=build /home/valhalla/valhalla/build/valhalla-3.2.0-Linux.tar.gz ./
+RUN tar -xzvf valhalla-3.2.0-Linux.tar.gz && cd valhalla-3.2.0-Linux && cp -r bin/* /usr/bin/ && cp -r lib/* /usr/lib/ && cp -r include/* /usr/include/ && cp -r share/* /usr/share/
 
 ### Dossier contenant la configuration de Road2
 WORKDIR /home/docker/config
