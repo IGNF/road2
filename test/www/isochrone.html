@@ -29,7 +29,7 @@
           </div>
 
           <div class="col">
-            
+
             <form id="iso-form">
               <p><strong>Paramètres de l'isochrone</strong></p>
               <p>
@@ -39,6 +39,8 @@
                 <label for="bduni-idf-pgr">BDUni sur l'Île-de-France via PGR</label>
                 <input type="radio" id="bduni-idf-smartpgr" name="userResource" value="bduni-idf-smartpgr">
                 <label for="bduni-idf-smartpgr">BDUni sur l'Île-de-France via PGR et Smartrouting</label>
+                <input type="radio" id="bdtopo-idf-valhalla" name="userResource" value="bdtopo-idf-valhalla">
+                <label for="bdtopo-idf-valhalla">BDUni sur l'Île-de-France via Valhalla</label>
                 <br>
                 <p>Mode de déplacement : </p>
                 <input type="radio" id="car" name="userProfile" value="car" checked>
@@ -96,7 +98,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="request">
-            
+
         </div>
         <div class="container-fluid row">
           <p>
@@ -106,7 +108,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="response">
-            
+
         </div>
 
       </div>
@@ -120,7 +122,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="request-other">
-            
+
         </div>
 
         <div class="container-fluid row">
@@ -131,10 +133,10 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="response-other">
-            
+
         </div>
       </div>
-      
+
     </div>
 
     <!-- Optional JavaScript -->
@@ -150,7 +152,7 @@
     <!-- Script pour le chargement de la carte et l'utilisation du service -->
     <script src="js/isochrone.js"></script>
     <!-- Script pour le menu contextuel personnalisé -->
-    <script src="https://cdn.jsdelivr.net/npm/ol-contextmenu"></script>
+    <script src="https://unpkg.com/ol-contextmenu@4.1.0/dist/ol-contextmenu.js"></script>
 
   </body>
 </html>

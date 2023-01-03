@@ -42,7 +42,7 @@ module.exports = class valhallaSource extends Source {
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
-    // Gestions des coûts disponibles 
+    // Gestions des coûts disponibles
     this._costs = {};
 
     // Initialisation des coûts
@@ -275,10 +275,18 @@ module.exports = class valhallaSource extends Source {
 
         const locationsString = `"locations":[{"lat":${tmpPoint[1]},"lon":${tmpPoint[0]}}]`;
         const costingString = `"costing":"${this._costs[request.profile][request.costType].costing}"`;
+        let costingOptionsString = `"costing_options":{"${this._costs[request.profile][request.costType].costing}":{`;
+        for (let i = 0; i < constraints.length; i++) {
+          costingOptionsString += `"${constraints[i]}": "1"`
+          if (i != constraints.length - 1) {
+            costingOptionsString += ","
+          }
+        }
+        costingOptionsString += "}}"
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
         const polygonsString = `"polygons":true`;
-        const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${contoursString},${reverseString},${polygonsString}}' `;
+        const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}}' `;
         LOGGER.info(commandString);
 
         return new Promise( (resolve, reject) => {
@@ -542,7 +550,7 @@ module.exports = class valhallaSource extends Source {
   *
   */
   writeIsochroneResponse(isochroneRequest, valhallaResponseStr) {
-    
+
     let point = {};
     let geometry = {};
     let valhallaResponse;
@@ -568,7 +576,7 @@ module.exports = class valhallaSource extends Source {
 
     LOGGER.debug("data projection: " + super.projection);
 
-    // Création d'un objet Point 
+    // Création d'un objet Point
     point = isochroneRequest.point;
     if (!point.transform(askedProjection)) {
       throw errorManager.createError(" Error during reprojection of point in Valhalla response");
