@@ -54,9 +54,8 @@ module.exports = class ResourceParameter {
   *
   */
   load(parameterConf) {
-
+    LOGGER.debug("configuration du parametre : " + parameterConf.toString());
     return false;
-
   }
 
   /**
@@ -65,7 +64,7 @@ module.exports = class ResourceParameter {
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {object} options - Options
+  * @param {object|string} options - Options
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
@@ -167,6 +166,8 @@ module.exports = class ResourceParameter {
   specificCheck(userValue, options) {
 
     LOGGER.debug("specificCheck()");
+    LOGGER.debug("user value : " + userValue);
+    LOGGER.debug("options: " + options.toString());
     return errorManager.createErrorMessage("");
 
   }
@@ -227,6 +228,9 @@ module.exports = class ResourceParameter {
   */
   specificConvertion(userValue, options) {
 
+    LOGGER.debug("specificConversion()");
+    LOGGER.debug("user value : " + userValue);
+    LOGGER.debug("options: " + options.toString());
     return null;
 
   }

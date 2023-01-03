@@ -101,7 +101,7 @@ module.exports = class FloatParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name check
+  * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon

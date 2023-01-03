@@ -12,10 +12,12 @@
     }
   },
   "extends": "eslint:recommended",
+  "parser":"esprima",
   "rules": {
     "strict": 1,
     "eqeqeq": 1,
     "curly": 1,
-    "no-console": 0
+    "no-console": 1,
+    "no-unused-vars": 1
   }
 }

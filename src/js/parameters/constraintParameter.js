@@ -221,13 +221,12 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {object} options - Options
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
   *
   */
-  specificCheck(userValue, options) {
+  specificCheck(userValue) {
 
     LOGGER.debug("specificCheck()");
 
@@ -294,7 +293,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
 
       // Gestion du champ costRatio pour contraintes préférentielles
-      if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
+      if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
 
         if (userJson.costRatio) {
 

@@ -431,7 +431,7 @@ module.exports = class pgrSource extends Source {
           point = JSON.stringify(request.point.getCoordinatesIn(super.projection));
         } catch(error) {
           LOGGER.error(error);
-          reject(errorManager.createError("Impossible de récupérer les coordonnées du point"));
+          throw errorManager.createError("Impossible de récupérer les coordonnées du point");
         }
 
         let constraints = "";
@@ -519,15 +519,13 @@ module.exports = class pgrSource extends Source {
 
       } else {
 
-        // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ?
-        LOGGER.error("type of request not found");
+        throw errorManager.createError("type of request not found");
 
       }
 
     } else {
 
-      // TODO: qu'est-ce qui se passe si on arrive là, doit-on retourner une erreur ou une promesse ?
-      LOGGER.error("request operation not found");
+      throw errorManager.createError("request operation not found");
 
     }
 
@@ -657,7 +655,7 @@ module.exports = class pgrSource extends Source {
     for (let rowIdx = 0; rowIdx < pgrResponse.rows.length; rowIdx++) {
       row = pgrResponse.rows[rowIdx];
 
-      if (row.path_seq != lastPathSeq) {
+      if (row.path_seq !== lastPathSeq) {
         // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
         response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
         // Si ce n'est pas la première leg, il faut ajouter la dernière géométrie parcourue (pour faire le lien)
@@ -729,7 +727,7 @@ module.exports = class pgrSource extends Source {
       }
 
       // Gestion des derniers points intermédiaires sur le même tronçon que le point final (ticket #34962)
-      if (rowIdx == pgrResponse.rows.length - 1) {
+      if (rowIdx === pgrResponse.rows.length - 1) {
         while (response.routes[0].legs.length < response.waypoints.length - 1) {
           response.routes[0].legs.push( { steps: [], geometry: {type: "LineString", coordinates: [] }, duration: 0, distance: 0 } );
           // Cas possible de problème dans les données : le tronçon n'a pas de géométrie
@@ -880,7 +878,7 @@ module.exports = class pgrSource extends Source {
           let currentPgrRouteStepDistance = turf.length(currentPgrRouteStep.geometry);
 
           // Troncature de la géométrie : cas où il n'y a qu'un step
-          if (k == 0 && currentPgrRouteLeg.steps.length == 1){
+          if (k === 0 && currentPgrRouteLeg.steps.length === 1){
             let stepStart = turf.point(response.waypoints[j].location);
             let stepEnd = turf.point(response.waypoints[j + 1].location);
 
@@ -900,7 +898,7 @@ module.exports = class pgrSource extends Source {
           }
 
           // Troncature de la géométrie : cas de début de leg
-          else if (k == 0){
+          else if (k === 0){
             let stepStart = turf.point(response.waypoints[j].location);
             currentPgrRouteStep.geometry.coordinates = turf.truncate(
               turf.lineSlice(
@@ -921,7 +919,7 @@ module.exports = class pgrSource extends Source {
           }
 
           // Troncature de la géométrie : cas de fin de leg
-          else if (k == currentPgrRouteLeg.steps.length - 1) {
+          else if (k === currentPgrRouteLeg.steps.length - 1) {
             let stepEnd = turf.point(response.waypoints[j+1].location);
 
             // Pour le cas des boucles, il faut tester si l'intersection entre le dernier tronçon

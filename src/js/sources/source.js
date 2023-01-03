@@ -1,5 +1,7 @@
 'use strict';
 
+const errorManager = require('../utils/errorManager');
+
 /**
 *
 * @class

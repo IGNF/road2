@@ -4,7 +4,6 @@ const ResourceParameter = require('./resourceParameter');
 const log4js = require('log4js');
 const errorManager = require('../utils/errorManager');
 const validationManager = require('../utils/validationManager');
-const mathManager = require('../utils/mathManager');
 
 
 var LOGGER = log4js.getLogger("INTPARAM");

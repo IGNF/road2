@@ -39,7 +39,7 @@ module.exports = class Line extends Geometry {
     // Format de géométrie (geojson, polyline...)
     this._format = format;
 
-    if (polylinePrecision != 5 && this._format === "polyline") {
+    if (polylinePrecision !== 5 && this._format === "polyline") {
       this._geom = polyline.encode(polyline.decode(geom, polylinePrecision));
     }
 

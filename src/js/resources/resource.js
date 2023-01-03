@@ -1,5 +1,9 @@
 'use strict';
 
+const log4js = require('log4js');
+
+var LOGGER = log4js.getLogger("RESOURCE");
+
 /**
 *
 * @class
@@ -95,6 +99,7 @@ module.exports = class Resource {
   */
   getSourceIdFromRequest (request) {
     let sourceId = "";
+    LOGGER.debug(request.toString());
     return sourceId;
   }
 
@@ -111,6 +116,7 @@ module.exports = class Resource {
   *
   */
    checkSourceAvailibilityFromRequest (request) {
+    LOGGER.debug(request.toString());
     return false;
   }
 
@@ -127,6 +133,7 @@ module.exports = class Resource {
   *
   */
    initResource (sourceManager) {
+    LOGGER.debug(sourceManager.toString());
     return false;
   }
 

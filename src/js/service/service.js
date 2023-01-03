@@ -289,7 +289,7 @@ module.exports = class Service {
             return false;
           }
 
-          if (!LogManager.checkLogConfiguration(logConf, logConfPath)) {
+          if (!LogManager.checkLogConfiguration(logConf)) {
             LOGGER.error("Le logger est mal configuré");
             return false;
           } 
@@ -927,7 +927,7 @@ module.exports = class Service {
   * @description Fonction utilisée pour rediriger une requête vers le bon moteur.
   * Une requête se fait nécessairement sur une ressource. Cette ressource est indiquée dans la requête.
   * La ressource sait comment déterminer la source concernée par la requête.
-  * Et la source interrogera le moteur.
+  * Et la source interrogera le moteur.
   * @param {Request} request - Requête
   *
   */
@@ -956,7 +956,8 @@ module.exports = class Service {
     try {
       return source.computeRequest(request);
     } catch(err) {
-      return err
+      // TODO : modifier ce comportement
+      return err;
     }
     // ---
 
