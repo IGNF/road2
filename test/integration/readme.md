@@ -13,12 +13,12 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
 - Premier niveau:
     - apisManager (ExpressJS, api, log4js)
     - baseManager (base, log4js)
-    - looseConstraint (constraint)
+    - looseConstraint (constraint)*
     - line (geometry, proj4, polyline)
     - point (geometry, proj4)
     - polygon (geoemtry, turf, proj4, polyline)
     - operation (parameter)
-    - resourceParameter (parameter)*
+    - resourceParameter (parameter)
     - routeRequest (request)
     - isochroneRequest (request)
     - serverManager (server, ExpressJS, log4js)
