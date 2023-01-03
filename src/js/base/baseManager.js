@@ -40,28 +40,6 @@ module.exports = class baseManager {
   /**
   *
   * @function
-  * @name get loadedBaseConfiguration
-  * @description Récupérer la liste des configurations déjà chargées par ce manager
-  *
-  */
-  get loadedBaseConfiguration() {
-    return this._loadedBaseConfiguration;
-  }
-
-  /**
-  *
-  * @function
-  * @name get baseCatalog
-  * @description Récupérer le catalogue des bases
-  *
-  */
-  get baseCatalog() {
-    return this._baseCatalog;
-  }
-
-  /**
-  *
-  * @function
   * @name getBase
   * @description Récupérer une base par sa configuration
   * @param {string} configPath - Chemin de la configuration
