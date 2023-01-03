@@ -64,6 +64,7 @@ router.all("/getcapabilities", function(req, res) {
   // il est récupéré par express dans req.host
   if (req.hostname) {
 
+    // TODO : corriger avec quelque chose du genre ^http(s)?:\/\/(.+) puis split au premier /
     let regexpHost = /^http[s]?:\/\/[\w\d:-_\.]*\//;
 
     try {

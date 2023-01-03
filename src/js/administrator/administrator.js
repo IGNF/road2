@@ -60,11 +60,10 @@ module.exports = class Administrator {
      * @name checkAdminConfiguration
      * @description Vérifier la partie administration de la configuration
      * @param {json} configuration - Configuration de Road2 (contenu du server.json)
-     * @param {string} configurationPath - Chemin de la configuration de Road2 (chemin du server.json)
      *
      */
 
-    checkAdminConfiguration(configuration, configurationPath) {
+    checkAdminConfiguration(configuration) {
 
         LOGGER.info("Verification de la configuration de l'administrateur...");
 

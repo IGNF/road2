@@ -485,12 +485,11 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /nearest
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
-  * @param {string} method - Méthode de la requête
   * @return {object} NearestRequest - Instance de la classe NearestRequest
   *
   */
 
-   checkNearestParameters: function(parameters, service, method) {
+   checkNearestParameters: function(parameters, service) {
 
     let resource;
     let coordinates = {};
@@ -709,7 +708,7 @@ module.exports = {
 
       /* Vérification de la validité des coordonnées fournies. */
       let validity = isochroneOperation.getParameterById("point").check(parameters.point, askedProjection);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'point' is invalid: " + validity.message, 400);
       } else {
 
@@ -733,7 +732,7 @@ module.exports = {
 
       /* Vérification de la validité du paramètre fourni. */
       let validity = isochroneOperation.getParameterById("costType").check(parameters.costType);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'costType' is invalid: " + validity.message, 400);
       } else {
         costType = parameters.costType;
@@ -752,7 +751,7 @@ module.exports = {
 
       /* Vérification de la validité du paramètre fourni. */
       let validity = isochroneOperation.getParameterById("costValue").check(parameters.costValue);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'costValue' is invalid: " + validity.message, 400);
       } else {
 

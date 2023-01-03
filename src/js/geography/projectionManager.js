@@ -107,10 +107,9 @@ module.exports = class ProjectionManager {
   * @name checkBboxConfiguration
   * @description Savoir si une bbox est valide dans une projection donnée
   * @param {string} bbox - Bbox à vérifier
-  * @param {string} projectionId - ID de la projection 
   *
   */
-  checkBboxConfiguration (bbox, projectionId) {
+  checkBboxConfiguration (bbox) {
 
     LOGGER.info("Vérification d'une bbox... ");
     LOGGER.debug("bbox:'" + bbox+"'");
@@ -153,8 +152,6 @@ module.exports = class ProjectionManager {
       LOGGER.error("Mauvaise configuration : Ymin est supérieur ou égal à Ymax");
       return false;
     }
-
-    // TODO : vérifier la cohérence avec la projection indiquée
 
     LOGGER.info("Vérification de la bbox terminée");
     return true;

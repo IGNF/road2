@@ -306,7 +306,7 @@ module.exports = class sourceManager {
       return false;
     } else {
       // Vérification de la bbox
-      if (!this._projectionManager.checkBboxConfiguration(sourceJsonObject.bbox, sourceJsonObject.projection)) {
+      if (!this._projectionManager.checkBboxConfiguration(sourceJsonObject.bbox)) {
         LOGGER.error("La source indique une bbox incorrecte: " + sourceJsonObject.bbox);
         return false;
       }

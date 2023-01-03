@@ -38,7 +38,8 @@
     "mock-fs": "^4.9.0",
     "cucumber": "5.1.0",
     "axios": "^0.21.1",
-    "tunnel": "^0.0.6"
+    "tunnel": "^0.0.6",
+    "esprima":"4.0.1"
   },
   "bundledDependencies": [
     "cors",

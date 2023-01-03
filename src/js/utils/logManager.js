@@ -13,12 +13,11 @@ module.exports = {
      * @name checkLogConfiguration
      * @description Vérification de la configuration d'un logger
      * @param {object} userLogConfiguration - Configuration du logger
-     * @param {string} userLogConfPath - Chemin absolu de la configuration du logger
      * @return {boolean}
      *
      */
 
-    checkLogConfiguration: function(userLogConfiguration, userLogConfPath) {
+    checkLogConfiguration: function(userLogConfiguration) {
 
         LOGGER.info("Vérification de la configuration du logger...");
 

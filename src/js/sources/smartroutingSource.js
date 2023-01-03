@@ -443,7 +443,7 @@ module.exports = class smartroutingSource extends Source {
     location = new Point(locationCoords[0], locationCoords[1], projection);
 
     // Geometrie
-    const rawGeometry = wkt.toGeoJSON(smartroutingResponse.wktGeometry);
+    let rawGeometry = wkt.toGeoJSON(smartroutingResponse.wktGeometry);
 
     // Cas où il n'y a pas d'isochrone car costValue trop faible
     if (rawGeometry === null) {
