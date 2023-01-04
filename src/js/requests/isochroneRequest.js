@@ -9,9 +9,11 @@ const Request = require('./request');
 * @description Classe modélisant une requête d'isochrone.
 * Chaque requête reçue par le service doit être transformée en requête de cette forme
 * pour le proxy
+*
 */
 
 module.exports = class isochroneRequest extends Request {
+
   /**
   *
   * @function
@@ -29,31 +31,29 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} distanceUnit - Unité de distance utilisée pour le calcul.
   *
   */
-  constructor(
-    resource,
-    point,
-    costType,
-    costValue,
-    profile,
-    direction,
-    askedProjection,
-    geometryFormat,
-    timeUnit,
-    distanceUnit
-  ) {
+
+  constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat, timeUnit, distanceUnit) {
 
     // Constructeur parent
     super("isochrone", resource, "isochroneRequest");
 
-    /* Initialisation du reste des paramètres. */
+    // Initialisation du reste des paramètres
     this._point = point;
+
     this._costType = costType;
+
     this._costValue = costValue;
+
     this._profile = profile;
+
     this._direction = direction;
+
     this._askedProjection = askedProjection;
+
     this._geometryFormat = geometryFormat;
+
     this._timeUnit = timeUnit;
+
     this._distanceUnit = distanceUnit;
 
     // Gestion des contraintes 

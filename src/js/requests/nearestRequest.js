@@ -24,16 +24,16 @@ module.exports = class nearestRequest extends Request {
   * @param {integer} number - Type du coût.
   *
   */
-  constructor(
-    resource,
-    coordinates
-  ) {
+
+  constructor(resource, coordinates) {
 
     // Constructeur parent
     super("nearest", resource, "nearestRequest");
 
-    // Initialisation du reste des paramètres.
+    // Coordonnées du point fourni
     this._coordinates = coordinates;
+
+    // Nombre de points attendus en retour 
     this._number = 1;
 
   }

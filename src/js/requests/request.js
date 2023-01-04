@@ -30,7 +30,7 @@ module.exports = class Request {
     // Ressource concernée
     this._resource = resource;
 
-    // Type de la requête
+    // Type de la requête (ne doit pas être modifié)
     this._type = type;
 
   }
@@ -91,20 +91,5 @@ module.exports = class Request {
   get type () {
     return this._type;
   }
-
-  /**
-  *
-  * @function
-  * @name set type
-  * @description Attribuer le type de la requête
-  * @param {string} ty - Type de la requête 
-  *
-  */
-  set type (ty) {
-    this._type = ty;
-  }
-
-
-
 
 }

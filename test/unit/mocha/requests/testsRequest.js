@@ -39,9 +39,10 @@ describe('Test de la classe Request', function() {
       assert.equal(request.resource, "corse-osm-2");
     });
 
-    it('Set Type', function() {
+    // Le type ne devrait pas changer car il dépend de la classe fille appelée
+    it('Set Type ne change rien', function() {
       request.type = "otherRequest";
-      assert.equal(request.type, "otherRequest");
+      assert.equal(request.type, "routeRequest");
     });
 
   });
