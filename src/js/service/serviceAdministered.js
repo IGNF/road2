@@ -4,7 +4,7 @@
 *
 * @class
 * @name ServiceAdministered
-* @description Classe modélisant une service administré par l'administrateur.
+* @description Classe modélisant une service administré par l'administrateur. C'est une classe mère dérivée par serviceProcess
 * @param {string} id - Identifiant du service administré
 * @param {string} type - Type de service administré
 *
@@ -18,6 +18,8 @@ module.exports = class ServiceAdministered {
   * @function
   * @name constructor
   * @description Constructeur de la classe ServiceAdministered
+  * @param {string} id - id du service
+  * @param {string} type - Type du service, parmi 'newProcess' pour le moment
   * 
   */
   constructor(id, type) {

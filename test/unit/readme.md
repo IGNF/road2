@@ -9,7 +9,7 @@ docker-compose exec road2 npm run utest
 Mais cela devrait fonctionner uniquement avec `mocha`. Lancer la commande suivante depuis la racine du projet:
 ```
 mocha --recursive './test/unit/mocha/**/*.js'
-``` 
+```
 
 Les tests unitaires concernent les classes qui ne dépendent pas d'une autre classe du projet pour fonctionner. Les autres classes sont testées dans les tests d'intégration [ici](./integration/readme.md). 
 
@@ -34,3 +34,4 @@ On trouvera donc les classes ou les fichiers suivants:
 - storageManager (log4js)
 - validationManager
 - wkt
+- serviceAdministered
