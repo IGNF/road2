@@ -13,17 +13,19 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
 - Premier niveau:
     - apisManager (ExpressJS, api, log4js)
     - baseManager (base, log4js)
-    - looseConstraint (constraint)*
+    - looseConstraint (constraint)
     - line (geometry, proj4, polyline)
     - point (geometry, proj4)
     - polygon (geoemtry, turf, proj4, polyline)
     - operation (parameter)
     - resourceParameter (parameter)
-    - routeRequest (request)
-    - isochroneRequest (request)
-    - serverManager (server, ExpressJS, log4js)
+    - serverManager (server, ExpressJS, log4js)*
+    - serviceProcess (serviceAdministered, log4js, fork)
     
 - Deuxième niveau: 
+    - routeRequest (request, point)
+    - isochroneRequest (request, point)
+    - nearestRequest (request, point)
     - resourceOperation (resourceParameter)
     - boolParameter (resourceParameter)
     - enumParameter (resourceParameter)
@@ -60,6 +62,12 @@ Huitième niveau:
 
 Neuvième niveau: 
     - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
+
+Dixième niveau:
+    - serviceManager (service, serviceProcess, log4js)
+
+Onzième niveau:
+    - administrator (express, log4js, helmet, path, fs, assert, serverManager, serviceManager, apisManager)
 
 Autres: 
     - road2.js

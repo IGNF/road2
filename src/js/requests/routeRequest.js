@@ -56,7 +56,7 @@ module.exports = class routeRequest extends Request {
 
     // geometryFormat
     // type des géométries demandé
-    this._geometryFormat = "geojson"
+    this._geometryFormat = "geojson";
 
     // bbox
     this._bbox = true;
@@ -266,6 +266,17 @@ module.exports = class routeRequest extends Request {
   */
   get waysAttributes () {
     return this._waysAttributes;
+  }
+
+  /**
+  *
+  * @function
+  * @name set waysAttributes
+  * @description Attribuer la liste des attributs disponibles pour les voies empruntées.
+  *
+  */
+   set waysAttributes (wa) {
+    this._waysAttributes = wa;
   }
 
   /**

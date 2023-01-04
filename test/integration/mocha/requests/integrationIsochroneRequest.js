@@ -9,7 +9,7 @@ describe('Test de la classe IsochroneRequest', function() {
     logManager.manageLogs();
   });
 
-  let request = new IsochroneRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, "time", 100, "car", "departure", "EPSG:4326", "geojson", "s", "m");
+  let request = new IsochroneRequest("corse-osm", {lon: 8.732901, lat: 41.928821}, "time", 100, "car", "departure", "EPSG:4326", "geojson", "minute", "meter");
 
   describe('Test du constructeur et des getters', function() {
 
@@ -54,11 +54,15 @@ describe('Test de la classe IsochroneRequest', function() {
     });
 
     it('Get timeUnit', function() {
-      assert.deepEqual(request.timeUnit, "s");
+      assert.deepEqual(request.timeUnit, "minute");
     });
 
     it('Get distanceUnit', function() {
-      assert.deepEqual(request.distanceUnit, "m");
+      assert.deepEqual(request.distanceUnit, "meter");
+    });
+
+    it('Get constraints', function() {
+      assert.deepEqual(request.constraints, new Array());
     });
 
   });
@@ -75,9 +79,9 @@ describe('Test de la classe IsochroneRequest', function() {
       assert.equal(request.resource, "corse-osm-2");
     });
 
-    it('Set Type', function() {
+    it('Set Type ne change rien', function() {
       request.type = "otherRequest";
-      assert.equal(request.type, "otherRequest");
+      assert.equal(request.type, "isochroneRequest");
     });
 
     it('Set point', function() {
@@ -116,13 +120,18 @@ describe('Test de la classe IsochroneRequest', function() {
     });
 
     it('Set timeUnit', function() {
-      request.timeUnit = "min";
-      assert.deepEqual(request.timeUnit, "min");
+      request.timeUnit = "second";
+      assert.deepEqual(request.timeUnit, "second");
     });
 
     it('Set distanceUnit', function() {
-      request.distanceUnit = "km";
-      assert.deepEqual(request.distanceUnit, "km");
+      request.distanceUnit = "kilometer";
+      assert.deepEqual(request.distanceUnit, "kilometer");
+    });
+
+    it('Set constraints', function() {
+      request.constraints = [{"test":true}];
+      assert.deepEqual(request.constraints, [{"test":true}]);
     });
 
 
