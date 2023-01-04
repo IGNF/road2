@@ -40,7 +40,7 @@ describe('Test de la classe Line', function() {
   describe('Test du constructeur et des getters/setters', function() {
 
     it('Get type', function() {
-      assert.equal(line.type, "polyline");
+      assert.equal(line.type, "line");
     });
 
     it('Get projection', function() {

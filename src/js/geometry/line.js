@@ -33,7 +33,7 @@ module.exports = class Line extends Geometry {
 
     super("line", projection);
 
-    // Géométrie de la polyline
+    // Géométrie de la Line
     this._geom = geom;
 
     // Format de géométrie (geojson, polyline...)
