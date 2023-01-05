@@ -10,7 +10,7 @@ apt-get install -y libsqlite3-mod-spatialite python3-pip
 
 WORKDIR /home/prime-server
 RUN apt-get install -y git cmake autoconf automake pkg-config libtool make gcc g++ lcov libcurl4-openssl-dev libzmq3-dev libczmq-dev
-RUN git clone --depth 3 --recursive https://github.com/kevinkreiser/prime_server.git && cd prime_server && git checkout 43715e5 && \
+RUN git clone --depth 1 --recursive https://github.com/kevinkreiser/prime_server.git && cd prime_server && \
 cmake -B build . && cmake --build build && make -C build install
 
 WORKDIR /home/valhalla/
