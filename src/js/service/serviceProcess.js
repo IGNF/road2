@@ -36,34 +36,9 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         // Emplacement de la configuration
         this._configurationLocation = location;
 
-        // Stockage de la configuration
-        this._configuration = {};
-
         // Instance de childProcess quand le processus est lancé
-        this._serviceAdministered;
+        this._serviceAdministered = {};
 
-    }
-
-    /**
-     *
-     * @function
-     * @name get configurationLocation
-     * @description Récupérer la configurationLocation du service
-     *
-     */
-    get configurationLocation () {
-        return this._configurationLocation;
-    }
-
-    /**
-     *
-     * @function
-     * @name get configuration
-     * @description Récupérer la configuration du service
-     *
-     */
-    get configuration () {
-        return this._configuration;
     }
 
     /**
