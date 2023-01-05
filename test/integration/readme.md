@@ -20,7 +20,6 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - operation (parameter)
     - resourceParameter (parameter)
     - serverManager (server, ExpressJS, log4js, fs, assert)
-    - serviceProcess (serviceAdministered, log4js, fork)*
     
 - Deuxième niveau: 
     - routeRequest (request, point)
@@ -65,6 +64,7 @@ Neuvième niveau:
 
 Dixième niveau:
     - serviceManager (service, serviceProcess, log4js)
+    - serviceProcess (serviceAdministered, service, log4js, fork)
 
 Onzième niveau:
     - administrator (express, log4js, helmet, path, fs, assert, serverManager, serviceManager, apisManager)
