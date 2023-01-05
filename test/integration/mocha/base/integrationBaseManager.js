@@ -1,8 +1,7 @@
 const assert = require('assert');
-const Base = require('../../../../src/js/base/base');
 const BaseManager = require('../../../../src/js/base/baseManager');
 const logManager = require('../../../unit/mocha/logManager');
-const fs = require('fs');
+const path = require('path');
 
 describe('Test de la classe BaseManager', function() {
 
@@ -11,7 +10,8 @@ describe('Test de la classe BaseManager', function() {
     logManager.manageLogs();
   });
 
-  let configuration = "/home/docker/app/test/integration/mocha/config/dbs/db_config_test.json";
+  let configuration = path.resolve(__dirname, "../config/dbs/db_config_test.json");
+
   let baseManager = new BaseManager();
 
   describe('Test du constructeur et des attributs', function() {

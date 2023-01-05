@@ -19,8 +19,8 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - polygon (geoemtry, turf, proj4, polyline)
     - operation (parameter)
     - resourceParameter (parameter)
-    - serverManager (server, ExpressJS, log4js)*
-    - serviceProcess (serviceAdministered, log4js, fork)
+    - serverManager (server, ExpressJS, log4js, fs, assert)
+    - serviceProcess (serviceAdministered, log4js, fork)*
     
 - Deuxième niveau: 
     - routeRequest (request, point)
