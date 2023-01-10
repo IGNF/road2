@@ -1,7 +1,7 @@
 const assert = require('assert');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
 const OperationManager = require('../../../../src/js/operations/operationManager');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const Source = require('../../../../src/js/sources/source');
 
 const sinon = require('sinon');

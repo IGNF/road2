@@ -30,7 +30,7 @@ module.exports = class FloatParameter extends ResourceParameter {
   */
   constructor(parameter) {
 
-    // id
+    // Paramètre de service
     super(parameter);
 
     // defaultValueContent

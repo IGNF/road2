@@ -1,6 +1,6 @@
 const assert = require('assert');
 const BaseManager = require('../../../../src/js/base/baseManager');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 
 describe('Test de la classe BaseManager', function() {

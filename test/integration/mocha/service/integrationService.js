@@ -7,7 +7,7 @@ const SourceManager = require('../../../../src/js/sources/sourceManager');
 const ServerManager = require('../../../../src/js/server/serverManager');
 const Resource = require('../../../../src/js/resources/resource');
 const Source = require('../../../../src/js/sources/source');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 const fs = require('fs');
 

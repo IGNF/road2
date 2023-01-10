@@ -1,6 +1,6 @@
 const assert = require('assert');
 const ServerManager = require('../../../../src/js/server/serverManager');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');

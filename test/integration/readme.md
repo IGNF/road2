@@ -31,7 +31,9 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - floatParameter (resourceParameter)
     - pointParameter (resourceParameter, point, log4js)
     - constraintParameter (resourceParameter, constraint, looseConstraint)
-    - isochroneResponse (response, point, geometry)
+    - intParameter (resourceParameter)
+    - isochroneResponse (response, point, geometry)*
+    - nearestResponse (response, point, geometry)
     - step (line, duration, distance)
     - source (baseManager, projectionManager)
 
@@ -50,7 +52,7 @@ Cinquième niveau:
     - routeResponse (response, point, route)
 
 Sixième niveau: 
-    - osrmSource (source, osrm, routeResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
+    - osrmSource (source, osrm, routeResponse, nearestResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
     - pgrSource (source, routeResponse, isochroneResponse, route, portion, line, point, polygon, step, distance, duration, errorManager, gisManager, copyManager, simplify, turf, looseConstraint, log4js)
 
 Septième niveau: 
