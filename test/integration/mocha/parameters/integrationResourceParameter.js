@@ -1,9 +1,9 @@
 const assert = require('assert');
 const Parameter = require('../../../../src/js/parameters/parameter');
 const ResourceParameter = require('../../../../src/js/parameters/resourceParameter');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
-describe('Test de la classe RresourceParameter', function() {
+describe('Test de la classe ResourceParameter', function() {
 
   before(function() {
     // runs before all tests in this block

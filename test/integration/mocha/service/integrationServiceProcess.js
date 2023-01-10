@@ -1,6 +1,6 @@
 const assert = require('assert');
 const ServiceProcess = require('../../../../src/js/service/serviceProcess');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 
 describe('Test de la classe ServiceProcess', function() {

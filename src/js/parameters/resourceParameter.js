@@ -115,16 +115,12 @@ module.exports = class ResourceParameter {
           userTable = userValue.split("|");
 
         } else {
-          //TODO: ce n'est pas censé arriver, que fait-on ? 
-          return errorManager.createErrorMessage("");
+          return errorManager.createErrorMessage("style non reconnu");
         }
 
       } else {
 
-        // on peut avoir simplement un float 
-        // TODO: vérification du float ? 
-        LOGGER.debug("user parameter is NOT a string");
-        userTable = userValue;
+        return errorManager.createErrorMessage("user parameter is NOT a string");
 
       }
 

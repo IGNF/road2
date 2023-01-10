@@ -1,6 +1,6 @@
 const assert = require('assert');
 const IsochroneRequest = require('../../../../src/js/requests/isochroneRequest');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe IsochroneRequest', function() {
 

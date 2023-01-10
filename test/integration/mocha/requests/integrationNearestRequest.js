@@ -1,7 +1,7 @@
 const assert = require('assert');
 const NearestRequest = require('../../../../src/js/requests/nearestRequest');
 const Point = require('../../../../src/js/geometry/point');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe NearestRequest', function() {
 
