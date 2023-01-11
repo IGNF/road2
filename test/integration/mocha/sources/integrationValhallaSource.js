@@ -39,7 +39,7 @@ describe('Test de la classe valhallaSource', function() {
       "dir": "/home/docker/data/corse-latest-valhalla-tiles/",
       "config": "/home/docker/data/valhalla.json"
     },
-    "cost": {
+    "costs": [{
       "profile": "car",
       "optimization": "fastest",
       "compute": {
@@ -54,6 +54,7 @@ describe('Test de la classe valhallaSource', function() {
         }
       }
     }
+  ]
   };
 
   let topology = {
