@@ -21,7 +21,7 @@ Les features `configuration/cucumber/features/conf*.feature` permettent de teste
 
 Afin de lancer ces tests, on suivra la procédure suivante:
 - lancer le serveur Road2 via docker-compose 
-- exécuter la commande `npm run rtest` via docker-compose. 
+- exécuter la commande `npm run ctest` via docker-compose. 
 
 
 
