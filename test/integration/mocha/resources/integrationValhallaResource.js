@@ -1,7 +1,7 @@
 const assert = require('assert');
 const ValhallaResource = require('../../../../src/js/resources/valhallaResource');
 const RouteRequest = require('../../../../src/js/requests/routeRequest');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 const sinon = require('sinon');
 

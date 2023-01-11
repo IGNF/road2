@@ -18,19 +18,22 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - point (geometry, proj4)
     - polygon (geoemtry, turf, proj4, polyline)
     - operation (parameter)
-    - resourceParameter (parameter)*
-    - routeRequest (request)
-    - isochroneRequest (request)
-    - serverManager (server, ExpressJS, log4js)
+    - resourceParameter (parameter)
+    - serverManager (server, ExpressJS, log4js, fs, assert)
     
 - Deuxième niveau: 
+    - routeRequest (request, point)
+    - isochroneRequest (request, point)
+    - nearestRequest (request, point)
     - resourceOperation (resourceParameter)
     - boolParameter (resourceParameter)
     - enumParameter (resourceParameter)
     - floatParameter (resourceParameter)
     - pointParameter (resourceParameter, point, log4js)
     - constraintParameter (resourceParameter, constraint, looseConstraint)
-    - isochroneResponse (response, point, geometry)
+    - intParameter (resourceParameter)
+    - isochroneResponse (response, point, geometry)*
+    - nearestResponse (response, point, geometry)
     - step (line, duration, distance)
     - source (baseManager, projectionManager)
 
@@ -49,7 +52,7 @@ Cinquième niveau:
     - routeResponse (response, point, route)
 
 Sixième niveau: 
-    - osrmSource (source, osrm, routeResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
+    - osrmSource (source, osrm, routeResponse, nearestResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
     - pgrSource (source, routeResponse, isochroneResponse, route, portion, line, point, polygon, step, distance, duration, errorManager, gisManager, copyManager, simplify, turf, looseConstraint, log4js)
 
 Septième niveau: 
@@ -60,6 +63,13 @@ Huitième niveau:
 
 Neuvième niveau: 
     - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
+
+Dixième niveau:
+    - serviceManager (service, serviceProcess, log4js)
+    - serviceProcess (serviceAdministered, service, log4js, fork)
+
+Onzième niveau:
+    - administrator (express, log4js, helmet, path, fs, assert, serverManager, serviceManager, apisManager)
 
 Autres: 
     - road2.js

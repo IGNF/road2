@@ -4,11 +4,10 @@ const RouteRequest = require('../../../../src/js/requests/routeRequest');
 const ApisManager = require('../../../../src/js/apis/apisManager');
 const ResourceManager = require('../../../../src/js/resources/resourceManager');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
-const TopologyManager = require('../../../../src/js/topology/topologyManager');
 const ServerManager = require('../../../../src/js/server/serverManager');
 const Resource = require('../../../../src/js/resources/resource');
 const Source = require('../../../../src/js/sources/source');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 const fs = require('fs');
 
@@ -70,7 +69,6 @@ describe('Test de la classe Service', function() {
       sourceManager.getSourceTopology = sinon.stub().returns("toto");
       service._sourceManager = sourceManager;
 
-      const topologyManager = sinon.mock(TopologyManager);
       topologyManager.getTopologyById = sinon.stub().returns("toto");
       service._topologyManager = topologyManager;
 

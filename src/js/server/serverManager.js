@@ -12,7 +12,7 @@ const LOGGER = log4js.getLogger("SERVERMANAGER");
 *
 * @class
 * @name serverManager
-* @description Gestionnaire des serveurs disponible sur un service
+* @description Gestionnaire des serveurs disponibles sur un service ou un administrateur
 *
 */
 
@@ -53,7 +53,7 @@ module.exports = class serverManager {
   * @param {object} config - Configuration à vérifier
   *
   */
-   checkServerConfiguration(config) {
+  checkServerConfiguration(config) {
 
     if (!config) {
       LOGGER.error("Aucune configuration n'a ete fournie");
@@ -316,15 +316,16 @@ module.exports = class serverManager {
     LOGGER.info("Arret de l'ensemble des serveurs.");
 
     if (this._loadedServerId.length === 0) {
-      LOGGER.warn("Aucun serveur n'est disponible.");
+      LOGGER.warn("Aucun serveur n'est disponible (id).");
       return true;
     }
 
     try {
       assert.deepStrictEqual(this._serverCatalog, {});
-    } catch (err) {
-      LOGGER.warn("Aucun serveur n'est disponible.");
+      LOGGER.warn("Aucun serveur n'est disponible (catalog).");
       return true;
+    } catch (err) {
+      // On continue
     }
 
     for (let serverId in this._serverCatalog) {

@@ -14,16 +14,14 @@ module.exports = class apisManager {
   *
   * @function
   * @name constructor
-  * @description Constructeur de la classe resourceManager
+  * @description Constructeur de la classe apisManager
+  * @param {string} apisDirectory - Dossier qui contient les APIs. Par défaut, il s'agit du dossier de ce projet contenant des APIs
   *
   */
-  constructor() {
+  constructor(apisDirectory = "../apis/") {
 
     // Dossier contenant les APIs du projet
-    this._apisDirectory = "../apis/";
-
-    // Prefix utilisé pour chaque route des APIS
-    this._prefix = "";
+    this._apisDirectory = apisDirectory;
 
     // Liste des routes chargées par l'app Express
     this._listOfRoutes = new Array();
@@ -31,50 +29,6 @@ module.exports = class apisManager {
     // Catalogue des apis
     this._apisCatalog = {};
 
-  }
-
-  /**
-  *
-  * @function
-  * @name get apisDirectory
-  * @description Récupérer le chemin du dossier qui contient les APIs
-  *
-  */
-  get apisDirectory () {
-    return this._apisDirectory;
-  }
-
-  /**
-  *
-  * @function
-  * @name get prefix
-  * @description Récupérer le prefix utilisé par ce manager
-  *
-  */
-  get prefix () {
-    return this._prefix;
-  }
-
-  /**
-  *
-  * @function
-  * @name get listOfRoutes
-  * @description Récupérer la liste des routes disponibles via ce manager
-  *
-  */
-  get listOfRoutes () {
-    return this._listOfRoutes;
-  }
-
-  /**
-  *
-  * @function
-  * @name get apisCatalog
-  * @description Récupérer la liste des apis disponibles via ce manager
-  *
-  */
-  get apisCatalog () {
-    return this._apisCatalog;
   }
 
   /**
@@ -121,6 +75,7 @@ module.exports = class apisManager {
           availableAPI= fs.statSync(tmpPathName).isDirectory()
         } catch(error) {
           LOGGER.error("Mauvaise configuration: 'name' ne peut être évalué.");
+          LOGGER.error(error);
           return false;
         }
         
@@ -183,95 +138,6 @@ module.exports = class apisManager {
   /**
   *
   * @function
-  * @name loadApiDirectory
-  * @description Fonction utilisée pour charger l'ensemble des APIs disponibles dans un dossier.
-  * @param {express} app - Objet créé par ExpressJS représentant l'application
-  *
-  */
-
-  loadApiDirectory (app) {
-
-    LOGGER.info("Chargement des APIS...");
-
-    // Soit _apisDirectory est un chemin absolu qui pointe vers un autre repo d'APIs, soit c'est celui du repo officiel de Road2 (usage de __dirname)
-    let APIsDirectory = path.resolve(__dirname, this._apisDirectory);
-
-    // on lit le contenu du dossier
-    let APIsDirectoryTable = new Array();
-
-    try {
-      APIsDirectoryTable = fs.readdirSync(APIsDirectory);
-    } catch (error) {
-      LOGGER.error("Le dossier n'est pas lisible: " + APIsDirectory);
-      LOGGER.error(error);
-      return false;
-    }
-
-    // S'il est vide ce n'est pas normal
-    if (APIsDirectoryTable.length === 0) {
-      LOGGER.error("Le dossier des apis est vide.");
-      return false;
-    }
-
-    // Pour chaque sous-dossier on a potentiellement une api
-    for (let i = 0; i < APIsDirectoryTable.length; i++) {
-
-      let apiName = APIsDirectoryTable[i];
-
-      let APIDirectory = APIsDirectory + "/" + apiName;
-
-      if (fs.statSync(APIDirectory).isDirectory()) {
-        // c'est un dossier qui contient potentiellement une API
-
-        LOGGER.info("Nouvelle API: " + apiName);
-
-        let APIDirectoryTable = fs.readdirSync(APIDirectory);
-
-        if (APIDirectoryTable.length === 0) {
-          LOGGER.error("Le dossier de l'api est vide.");
-          return false;
-        }
-
-        for (let j = 0; j < APIDirectoryTable.length; j++) {
-
-          let apiVersion = APIDirectoryTable[j];
-
-          let APIDirectoryVersion = APIDirectory + "/" + apiVersion;
-
-          if (fs.statSync(APIDirectoryVersion).isDirectory()) {
-              // c'est un dossier qui contient potentiellement une version de l'API
-
-              LOGGER.info("Nouvelle version: " + apiVersion);
-
-              let configuration = {
-                name: apiName,
-                version: apiVersion 
-              };
-
-              if (!this.loadApiConfiguration(app, configuration)) {
-                LOGGER.error("Impossible de charger l'API " + apiName + "/" + apiVersion);
-              }
-
-          } else {
-            // Si ce n'est pas un dossier, on ne fait rien
-          }
-
-        }
-
-      } else {
-        // Si ce n'est pas un dossier, on ne fait rien
-      }
-
-    }
-
-    LOGGER.info("APIS chargees.");
-    return true;
-
-  }
-
-  /**
-  *
-  * @function
   * @name loadApiConfiguration
   * @description Fonction utilisée pour charger l'API d'un seul dossier
   * @param {express} app - Objet créé par ExpressJS représentant l'application
@@ -293,16 +159,10 @@ module.exports = class apisManager {
 
       // Gestion du router
       // ------------------
-      let route;
-
-      if (this._prefix !== "") {
-        route = "/" + this._prefix + "/" + apiName + "/" + apiVersion;
-      } else {
-        route = "/"+ apiName + "/" + apiVersion;
-      }
+      let route = "/"+ apiName + "/" + apiVersion;
 
       // On vérifie que la route n'existe pas déjà
-      if (this.verifyRouteExistanceById(route)) {
+      if (this._verifyRouteExistanceById(route)) {
         // Si elle existe c'est un vrai problème donc on arrête le chargement
         LOGGER.error("La route " + route + " existe deja. L'api n'est donc pas chargee.");
         return false;
@@ -361,14 +221,14 @@ module.exports = class apisManager {
   /**
   *
   * @function
-  * @name verifyRouteExistanceById
+  * @name _verifyRouteExistanceById
   * @description Fonction utilisée pour vérifier que la route n'est pas déjà chargée
   * @param {string} route - Route à tester
   * @return {boolean} true si la route est déjà présente et false sinon
   *
   */
 
-  verifyRouteExistanceById (route) {
+  _verifyRouteExistanceById (route) {
 
     for (let i = 0; i < this._listOfRoutes.length; i++) {
       if (this._listOfRoutes[i] === route) {

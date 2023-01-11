@@ -1,8 +1,7 @@
 const assert = require('assert');
-const Base = require('../../../../src/js/base/base');
 const BaseManager = require('../../../../src/js/base/baseManager');
-const logManager = require('../../../unit/mocha/logManager');
-const fs = require('fs');
+const logManager = require('../logManager');
+const path = require('path');
 
 describe('Test de la classe BaseManager', function() {
 
@@ -11,24 +10,27 @@ describe('Test de la classe BaseManager', function() {
     logManager.manageLogs();
   });
 
-  let configuration = "/home/docker/app/test/integration/mocha/config/dbs/db_config_test.json";
-  let referenceBase = new Base(JSON.parse(fs.readFileSync(configuration)));
+  let configuration = path.resolve(__dirname, "../config/dbs/db_config_test.json");
 
   let baseManager = new BaseManager();
 
-  describe('Test du constructeur et des getters/setters', function() {
+  describe('Test du constructeur et des attributs', function() {
 
     it('Get loadedBaseConfiguration', function() {
-      assert.deepEqual(baseManager.loadedBaseConfiguration, new Array());
+      assert.deepEqual(baseManager._loadedBaseConfiguration, new Array());
+    });
+
+    it('Get checkedBaseConfiguration', function() {
+      assert.deepEqual(baseManager._checkedBaseConfiguration, new Array());
     });
 
     it('Get baseCatalog', function() {
-      assert.deepEqual(baseManager.baseCatalog, {});
+      assert.deepEqual(baseManager._baseCatalog, {});
     });
 
   });
 
-  describe('Verifications des configurations', function() {
+  describe('Cycle de vérification des configurations', function() {
 
     it('checkBaseConfiguration()', async function() {
       let response = await baseManager.checkBaseConfiguration(configuration);
@@ -40,15 +42,27 @@ describe('Test de la classe BaseManager', function() {
       assert.deepEqual(baseManager._checkedBaseConfiguration, [configuration]);
     });
 
+    it('flushCheckedBaseConfiguration()', function() {
+      baseManager.saveCheckedBaseConfiguration(configuration);
+      baseManager.flushCheckedBaseConfiguration();
+      assert.deepEqual(baseManager._checkedBaseConfiguration, new Array());
+    });
+
   });
 
-  describe('Creation d\'une base', function() {
+  describe('Chargement des configurations', function() {
 
     it('loadBaseConfiguration()', function() {
-      let newBase = baseManager.loadBaseConfiguration(configuration);
-      // TODO: comprendre pourquoi le assert qui suit ne marche pas 
-      // assert.deepEqual(baseManager.baseCatalog[configuration], referenceBase);
-      assert.equal(newBase.connected, false);
+      assert.equal(baseManager.loadBaseConfiguration(configuration), true);
+    });
+
+  });
+
+  describe('Récupération d\'une base', function() {
+
+    it('getBase()', function() {
+      let base = baseManager.getBase(configuration);
+      assert.deepEqual(base.connected, false);
     });
 
   });

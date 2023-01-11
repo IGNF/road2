@@ -1,56 +1,83 @@
 const assert = require('assert');
+const Parameter = require('../../../../src/js/parameters/parameter');
 const ResourceParameter = require('../../../../src/js/parameters/resourceParameter');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
-describe('Test de la classe RouteRequest', function() {
+describe('Test de la classe ResourceParameter', function() {
 
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();
   });
 
-  let resourceParameter = new ResourceParameter({explode: true, min: 0, max: 5, style: "pipeDelimited"});
+  let parameter = new Parameter("intermediates","point","intermediates","Points intermédiaires","true","false");
+  let resourceParameter = new ResourceParameter(parameter);
 
   describe('Test du constructeur et des getters', function() {
 
-    it('Get Parameter', function() {
+    it('Get serviceParameter', function() {
       assert.equal(resourceParameter.serviceParameter.style, "pipeDelimited");
     });
 
   });
 
-  describe('Test de load', function() {
+  describe('Test du chargement', function() {
 
-    it('Load', function() {
-      assert.equal(resourceParameter.load("toto"), false);
+    // Dans cette classe, cette fonction renvoit toujours false car elle est réellement implémentée dans les classes filles
+    it('load()', function() {
+      assert.equal(resourceParameter.load({"id":"test"}), false);
     });
 
   });
 
-  describe('Test des check', function() {
+  describe('Test des vérifications', function() {
 
-    it('Check', function() {
+    // Dans cette classe, cette fonction renvoit toujours une erreur car elle fait appel à specificCheck() qui est réellement implémentée dans les classes filles
+    it('check() avec options', function() {
+      assert.equal(resourceParameter.check("toto", {"test":true}).code, "error");
+    });
+
+    it('check() avec options vides', function() {
       assert.equal(resourceParameter.check("toto", {}).code, "error");
     });
 
-    it('Specific check', function() {
+    it('check() sans options', function() {
+      assert.equal(resourceParameter.check("toto").code, "error");
+    });
+
+    // Dans cette classe, cette fonction renvoit toujours une erreur car elle est réellement implémentée dans les classes filles
+    it('specificCheck() avec options', function() {
+      assert.equal(resourceParameter.specificCheck("toto", {"test":true}).code, "error");
+    });
+
+    it('specificCheck() avec options vides', function() {
       assert.equal(resourceParameter.specificCheck("toto", {}).code, "error");
+    });
+
+    it('specificCheck() sans options', function() {
+      assert.equal(resourceParameter.specificCheck("toto").code, "error");
     });
 
   });
 
   describe('Test des conversions', function() {
 
-    it('Convert into table OK', function() {
-      assert.equal(resourceParameter.convertIntoTable(["toto", "tata"], [], {}), false);
+    // Dans cette classe, cette fonction renvoit toujours une erreur car elle fait appel à specificConversion() qui est réellement implémentée dans les classes filles
+    it('convertIntoTable() avec des paramètres bons', function() {
+      assert.equal(resourceParameter.convertIntoTable("test", [], {}), false);
     });
 
-    it('Convert into table OK not exploded', function() {
-      assert.equal(resourceParameterNotExplode.convertIntoTable("toto|tata", [], {}), true);
+    // Dans cette classe, cette fonction renvoit toujours une erreur car elle est réellement implémentée dans les classes filles
+    it('specificConvertion() avec options', function() {
+      assert.equal(resourceParameter.specificConvertion("toto", {"test":true}), null);
     });
 
-    it('Specific Convertion', function() {
+    it('specificConvertion() avec options vides', function() {
       assert.equal(resourceParameter.specificConvertion("toto", {}), null);
+    });
+
+    it('specificConvertion() sans options', function() {
+      assert.equal(resourceParameter.specificConvertion("toto"), null);
     });
 
   });

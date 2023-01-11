@@ -4,11 +4,11 @@
      "console": { "type": "console", "layout": {"type": "pattern", "pattern": "%[[%d] [%p] %c %z -%] %m"} }
    },
    "categories": {
-     "default": { "appenders": ["console"], "level": "info" }
+     "default": { "appenders": ["console"], "level": "debug" }
    }
  },
  "httpConf": {
-     "level": "info",
+     "level": "debug",
      "format": ":remote-addr - :method :url HTTP/:http-version :status :content-length :referrer :user-agent"
  }
 }

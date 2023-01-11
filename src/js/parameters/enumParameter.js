@@ -29,7 +29,7 @@ module.exports = class EnumParameter extends ResourceParameter {
   */
   constructor(parameter) {
 
-    // id
+    // Paramètre de service
     super(parameter);
 
     // defaultValueContent

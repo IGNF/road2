@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Line = require('../../../../src/js/geometry/line');
 const proj4 = require('proj4');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe Line', function() {
 
@@ -40,7 +40,7 @@ describe('Test de la classe Line', function() {
   describe('Test du constructeur et des getters/setters', function() {
 
     it('Get type', function() {
-      assert.equal(line.type, "polyline");
+      assert.equal(line.type, "line");
     });
 
     it('Get projection', function() {

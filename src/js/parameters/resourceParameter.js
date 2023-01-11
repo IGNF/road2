@@ -23,12 +23,12 @@ module.exports = class ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe ResourceParameter
-  * @param {object} parameter - Référence au paramètre de service
+  * @param {Parameter} parameter - Référence au paramètre de service, instance de la classe Parameter
   *
   */
   constructor(parameter) {
 
-    // id
+    // paramètre du service
     this._serviceParameter = parameter;
 
   }
@@ -49,7 +49,7 @@ module.exports = class ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
-  * @param {string} parameterConf - Configuration d'un paramètre
+  * @param {object} parameterConf - Configuration d'un paramètre
   * @return {boolean}
   *
   */
@@ -115,16 +115,12 @@ module.exports = class ResourceParameter {
           userTable = userValue.split("|");
 
         } else {
-          //TODO: ce n'est pas censé arriver, que fait-on ? 
-          return errorManager.createErrorMessage("");
+          return errorManager.createErrorMessage("style non reconnu");
         }
 
       } else {
 
-        // on peut avoir simplement un float 
-        // TODO: vérification du float ? 
-        LOGGER.debug("user parameter is NOT a string");
-        userTable = userValue;
+        return errorManager.createErrorMessage("user parameter is NOT a string");
 
       }
 
@@ -167,7 +163,9 @@ module.exports = class ResourceParameter {
 
     LOGGER.debug("specificCheck()");
     LOGGER.debug("user value : " + userValue);
-    LOGGER.debug("options: " + options.toString());
+    if (options) {
+      LOGGER.debug("options: " + options.toString());
+    }
     return errorManager.createErrorMessage("");
 
   }
@@ -230,7 +228,9 @@ module.exports = class ResourceParameter {
 
     LOGGER.debug("specificConversion()");
     LOGGER.debug("user value : " + userValue);
-    LOGGER.debug("options: " + options.toString());
+    if (options) {
+      LOGGER.debug("options: " + options.toString());
+    }
     return null;
 
   }

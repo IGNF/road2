@@ -1,6 +1,6 @@
 const assert = require('assert');
 const RouteRequest = require('../../../../src/js/requests/routeRequest');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe RouteRequest', function() {
 
@@ -49,6 +49,30 @@ describe('Test de la classe RouteRequest', function() {
       assert.deepEqual(request.intermediates, new Array());
     });
 
+    it('Get waysAttributes', function() {
+      assert.deepEqual(request.waysAttributes, new Array());
+    });
+
+    it('Get geometryFormat', function() {
+      assert.deepEqual(request.geometryFormat, "geojson");
+    });
+
+    it('Get bbox', function() {
+      assert.deepEqual(request.bbox, true);
+    });
+
+    it('Get timeUnit', function() {
+      assert.deepEqual(request.timeUnit, "minute");
+    });
+
+    it('Get distanceUnit', function() {
+      assert.deepEqual(request.distanceUnit, "meter");
+    });
+
+    it('Get constraints', function() {
+      assert.deepEqual(request.constraints, new Array());
+    });
+
   });
 
   describe('Test des setters', function() {
@@ -63,9 +87,9 @@ describe('Test de la classe RouteRequest', function() {
       assert.equal(request.resource, "corse-osm-2");
     });
 
-    it('Set Type', function() {
+    it('Set Type ne change rien', function() {
       request.type = "otherRequest";
-      assert.equal(request.type, "otherRequest");
+      assert.equal(request.type, "routeRequest");
     });
 
     it('Set Start', function() {
@@ -98,7 +122,48 @@ describe('Test de la classe RouteRequest', function() {
       assert.deepEqual(request.intermediates, [{lon: 8.732902, lat: 41.953932},{lon: 8.732801, lat: 41.953835}]);
     });
 
+    it('Set waysAttributes', function() {
+      request.waysAttributes = ["name"];
+      assert.deepEqual(request.waysAttributes, ["name"]);
+    });
+
+    it('Set geometryFormat', function() {
+      request.geometryFormat = "wkt";
+      assert.deepEqual(request.geometryFormat, "wkt");
+    });
+
+    it('Set bbox', function() {
+      request.bbox = false;
+      assert.deepEqual(request.bbox, false);
+    });
+
+    it('Set timeUnit', function() {
+      request.timeUnit = "second";
+      assert.deepEqual(request.timeUnit, "second");
+    });
+
+    it('Set distanceUnit', function() {
+      request.distanceUnit = "kilometer";
+      assert.deepEqual(request.distanceUnit, "kilometer");
+    });
+
+    it('Set constraints', function() {
+      request.constraints = [{"test":true}]
+      assert.deepEqual(request.constraints, [{"test":true}]);
+    });
+
   });
 
+  describe('Test de isAttributeRequested()', function() {
+
+    it('isAttributeRequested() d\'un attribut demandé', function() {
+      assert.equal(request.isAttributeRequested("name"), true);
+    });
+
+    it('isAttributeRequested() d\'un attribut non demandé', function() {
+      assert.equal(request.isAttributeRequested("test"), false);
+    });
+
+  });
 
 });
