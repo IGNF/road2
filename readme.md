@@ -6,7 +6,7 @@ Road2 est un serveur de calcul d'itinéraires et d'isochrones écrit en Javascri
 
 Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérennisant l'accès au service. Pour une plus longue discussion sur les concepts logiciels introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/developers/concepts.md).
 
-Actuellement, Road2 propose deux moteurs, OSRM et PGRouting, via une unique API REST. 
+Actuellement, Road2 propose trois moteurs, OSRM, PGRouting et Valhalla, via une unique API REST. 
 
 ## Fonctionnalités disponibles 
 
@@ -28,7 +28,7 @@ Road2 est diffusé sous la licence GPL v3.
 
 L'IGN propose un démonstrateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services_betas/itineraires.html) et [l'isochrone](https://geoservices.ign.fr/documentation/services_betas/isochrones.html). Ces démonstrateurs permettent de construire des requêtes via une carte et de visualiser les résultats. 
 
-Autrement, pour une première prise en main du service en local, il est possible d'utiliser l'image [alpine](./docker/demonstration/Dockerfile) de Road2. Cela permettra d'avoir localement une instance du service et une page web permettant de le tester. Les instructions de mise en place sont données [ici](./docker/demonstration/readme.md). 
+Autrement, pour une première prise en main du service en local, il est possible d'utiliser l'image [alpine](./docker/demonstration/Dockerfile) de Road2. Cela permettra d'avoir localement une instance du service et une page web permettant de le tester. Les instructions de mise en place sont données [ici](./documentation/docker/demonstration/readme.md). 
 
 ### Découvrir et tester les APIs du service 
 
@@ -38,7 +38,7 @@ L'IGN propose également des pages pour tester une instance du service sur l'ens
 
 Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/administration/1.0.0/api.yaml) YAML suivant le même formalisme. 
 
-Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./docker/demonstration/readme.md). 
+Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./documentation/docker/demonstration/readme.md). 
 
 ## Installation et utilisation de Road2 
 
@@ -78,7 +78,7 @@ node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/administration.
 
 ### Pour plus de détails
 
-On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Centos 7 et Debian 10 sont disponibles. 
+On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Debian 10 est disponible. 
 
 ## Participer aux développements 
 
@@ -88,7 +88,7 @@ On trouvera une documentation dédiée aux développeurs [ici](./documentation/d
 
 Pour en savoir plus sur notre roadmap, vous pouvez regarder le projet [IGNF/Road2 Roadmap](https://github.com/orgs/IGNF/projects/3). 
 
-Enfin, il est possible d'utiliser ce [docker-compose](./docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
+Enfin, il est possible d'utiliser ce [docker-compose](./documentation/docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
 
 ## Utilisation en production
 
