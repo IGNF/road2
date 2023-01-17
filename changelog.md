@@ -47,15 +47,15 @@ FIXED:
 ADDED:
   - Ajout de la fonctionnalité nearest via OSRM
 
-## 1.O.14
+## 1.0.14
 FIXED:
   - Mauvaise ligne pour un log
 
-## 1.O.13
+## 1.0.13
 ADDED:
   - Pas d'erreur si certificat auto-signé ou périmé
 
-## 1.O.12
+## 1.0.12
 FIXED:
   - got dans bundledDependencies
   - http-proxy-agent dans bundledDependencies
