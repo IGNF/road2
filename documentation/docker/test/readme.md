@@ -1,15 +1,15 @@
 # Docker-compose pour faire des tests
 
-# Construction et utilisation avec docker-compose 
+## Construction et utilisation avec docker-compose 
 
-## Pré-requis
+### Pré-requis
 
 Pour utiliser `docker-compose`, il suffit de :
 - installer `docker`.
 - se placer dans le dossier `/docker/test/` du projet Road2.
 - créer un fichier `.env` à côté du `docker-compose.yml` qui sera une copie adaptée du `compose.env.example`
 
-## Construction des images
+### Construction des images
 
 Il possible d'utiliser les Dockerfiles de chaque projet pour builder les images une par une. Mais cela peut se faire automatiquement via docker-compose.
 
@@ -47,6 +47,6 @@ Cette commande lance la génération d'un fichier `ssv` dans un volume docker. C
 docker-compose up load-road2
 ```
 
-## Utiliser des données et scénarii de la machine hôte
+### Utiliser des données et scénarii de la machine hôte
 
 Si on souhaite utiliser des données et des scénarii stockés sur la machine hôte, il suffira de modifier le `.env` pour pointer vers un autre `user-files`. 

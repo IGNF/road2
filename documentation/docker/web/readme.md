@@ -5,14 +5,14 @@ Cette image permet de :
 - visualiser la documentation de l'API et du code.
 
 
-# Construction de l'image
+## Construction de l'image
 
 Pour construire l'image, il suffit de lancer la commande suivante à la racine du projet Road2:
 ```
 docker build -t web-road2 -f docker/web/Dockerfile .
 ```
 
-# Lancer le serveur web
+## Lancer le serveur web
 
 Pour lancer le serveur web qui rend la page accessible, il suffit d'utiliser la commande suivante:
 ```
@@ -24,7 +24,7 @@ docker run --name web-road2-page --rm -d -p 8080:80 web-road2
 docker run --name web-road2-page --rm -d -p 8080:80 -v $src:/home/docker/web/www/road2 web-road2
 ```
 
-# Tester Road2
+## Tester Road2
 
 On pourra tester Road2 sur le lien suivant: http://localhost:8080/road2/
 
