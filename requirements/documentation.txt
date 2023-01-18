@@ -1,8 +1,8 @@
 # Documentation (for devs)
 # -----------------------
 
+furo==2022.*
 myst-parser[linkify]>=0.17,<0.19
 sphinx-autobuild==2021.*
-sphinx-book-theme<1
 sphinx-copybutton>=0.2,<1
 sphinxext-opengraph>=0.4,<1
