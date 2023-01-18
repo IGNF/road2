@@ -15,7 +15,7 @@ sphinx-build -b html documentation documentation/_build
 sphinx-build -b html -d documentation/_build/cache -j auto -q documentation documentation/_build/html
 ```
 
-Ouvrir `docs/_build/index.html` dans un navigateur web.
+Ouvrir `documentation/_build/index.html` dans un navigateur web.
 
 ## Ecrire la documentation avec un rendu en direct
 
