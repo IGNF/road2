@@ -12,7 +12,7 @@ Actuellement, Road2 propose trois moteurs, OSRM, PGRouting et Valhalla, via une 
 ```{toctree}
 ---
 caption: Road2
-maxdepth: 2
+maxdepth: 1
 numbered: true
 ---
 Configuration <configuration/readme>
@@ -26,7 +26,7 @@ Changelog <developers/history>
 ```{toctree}
 ---
 caption: Développement
-maxdepth: 2
+maxdepth: 1
 numbered: true
 ---
 Développement <developers/readme>
@@ -42,7 +42,7 @@ Documentation <developers/documentation>
 ```{toctree}
 ---
 caption: Tests
-maxdepth: 2
+maxdepth: 1
 numbered: true
 ---
 Tests <test/readme>
@@ -57,7 +57,7 @@ Tests charges <test/load/readme>
 ```{toctree}
 ---
 caption: Images docker
-maxdepth: 2
+maxdepth: 1
 numbered: true
 ---
 Présentation <docker/readme>

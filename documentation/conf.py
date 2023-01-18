@@ -63,15 +63,8 @@ pygments_style = "sphinx"
 
 #html_favicon = str(__about__.__icon_path__)
 #html_logo = str(__about__.__icon_path__)
-html_static_path = ["_static"]
-html_theme = "sphinx_book_theme"
-html_theme_options = {
-    "home_page_in_toc": True,
-    "path_to_docs": "docs",
-    "repository_branch": "develop",
-    "show_toc_level": 3,
-
-}
+html_theme = "furo"
+html_title = "Road2 documentation"
 
 # -- EXTENSIONS --------------------------------------------------------
 # MyST Parser
