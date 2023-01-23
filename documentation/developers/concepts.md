@@ -4,11 +4,11 @@ Ce chapitre décrit plusieurs concepts logiciels utilisés dans Road2. La plupar
 
 ## Partie 1 : Modularité de l'application
 
-### 1.1 Indépendance entre les APIs et les moteurs
+### Indépendance entre les APIs et les moteurs
 
 C'est le concept de base pour comprendre le code de Road2. 
 
-#### 1.1.1 Notions d'API 
+#### Notions d'API 
 
 **Une API, pour Road2, est un ensemble de routes que le serveur reconnaît et regroupe au sein d'une même appellation**. Pour chaque appellation, il y aura potentiellement plusieurs versions. Et au sein de chaque version, il y aura potentiellement plusieurs routes. 
 
@@ -16,7 +16,7 @@ Par exemple, si on considère une API qui s'appelle `rest` qui ne possède qu'un
 
 Chaque API est définie dans un dossier distinct des autres. Cela les rend indépendantes les unes des autres. Et pour une même appellation, on a une indépendance entre deux versions différentes. On trouvera des exemples d'implémentation dans le dossier des [apis du code](../../src/js/apis/). 
 
-#### 1.1.2 Notion de moteur 
+#### Notion de moteur 
 
 **Un moteur, pour Road2, est une brique logicielle qui peut effectuer divers calculs**. Cette brique peut être une librairie, un autre service web, une base de données, etc... 
 
@@ -24,7 +24,7 @@ Par exemple, OSRM est un moteur qui est écrit en C++ et qui propose une envelop
 
 Au passage, il semble utile de préciser ici que chaque moteur est indépendant des autres par son implémentation dans le code du projet (cf. la notion de source plus bas).
 
-#### 1.1.3 Notion de service 
+#### Notion de service 
 
 Road2 a été codé pour faciliter la gestion des APIs et des moteurs. Pour atteindre cet objectif, la partie API et la partie moteur sont séparées et aucune ne voit ce que fait l'autre.
 
@@ -32,11 +32,11 @@ Une API va donc devoir créer un objet requête générique qui sera envoyé à 
 
 Cela permet d'ajouter ou supprimer une API sans qu'une telle modification impacte les moteurs. Et inversement.
 
-### 1.2 Lien entre les ressources et les sources
+### Lien entre les ressources et les sources
 
 C'est le second concept le plus important après l'indépendance des APIs et des moteurs. Il est nécessaire de le comprendre pour développer sur le projet. 
 
-#### 1.2.1 Notion de graphe 
+#### Notion de graphe 
 
 Il semble utile de passer la notion de *graphe*, selon Road2, pour expliquer ce qui suit. Quand on fait du calcul d'itinéraire, on utilise un moteur qui lit un *graphe* pour générer l'itinéraire. Or, **un *graphe* est une topologie, c'est-à-dire un ensemble de noeuds et d'arcs qui forment un tout navigable, sur laquelle il y a au moins un coût**. 
 
@@ -44,7 +44,7 @@ En effet, à chaque arc est associé au minimum un coût. Ce coût peut être la
 
 Certains graphes peuvent avoir plusieurs coûts par topologie (ex. PGRouting, Valhalla) et d'autres non (ex. OSRM). Mais lors d'un calcul d'itinéraire, un seul coût est utilisé. 
 
-#### 1.2.2 Notion de source 
+#### Notion de source 
 
 Comme précisé juste au-dessus, pour avoir un itinéraire, il est nécessaire de faire appel à un moteur qui utilise un graphe. La *source*, dans le langage conceptuel de Road2, est l'origine du calcul. **La source contient l'appel à un moteur sur un graphe précis pour obtenir le résultat d'un calcul**. C'est le lien entre l'application et le calcul réel, comme celui d'un itinéraire par exemple. 
 
@@ -62,7 +62,7 @@ Lorsque l’on fait du calcul d’itinéraire, il faut à minima une topologie e
 
 Il se trouve qu'un graphe OSRM ne contient qu’un seul coût par dossier. Il permet donc de calculer des itinéraires uniquement sur un seul mode de déplacement et une seule optimisation. Par contre, PgRouting propose autant de colonnes de coût que l'on souhaite sur une même topologie. On retrouve le même regroupement de couples sur une topologie dans Valhalla. 
 
-#### 1.2.3 Notion de ressource 
+#### Notion de ressource 
 
 Cependant, pour l'utilisateur et pour l'administrateur du service, nous avons créé la notion de *ressource*. **Une ressource sera définie comme un ensemble de sources**. C'est elle qui fait le lien entre une requête et la bonne source permettant d'y répondre. 
 
@@ -78,7 +78,7 @@ Il est à noter que tout cela peut d'ailleurs avoir un impact sur les contrainte
 
 Enfin, précisons que Road2 est codé pour qu'il soit facile d'ajouter de nouveaux types de ressources et de sources indépendamment. Il est donc possible de créer différents types de source et de les associer au sein de divers types de ressources.
 
-### 1.3 Les opérations
+### Les opérations
 
 Une opération est un calcul que l'on veut réaliser. Un calcul d'itinéraire, un calcul d'isochrone, un distancier sont des exemples d'opérations attendues. Or, un moteur donné ne peut pas forcément réaliser toutes ces opérations. Il se peut que l'un puisse faire des itinéraires et des distancier mais pas des isochrones. Il est donc nécessaire de savoir ce qu'un moteur peut faire.
 
@@ -86,7 +86,7 @@ De plus, une opération donnée peut être plus ou moins gourmandes en ressource
 
 Road2 intègre donc la notion d'opération pour gérer ces différentes problématiques.
 
-#### 1.3.1 Les paramètres
+#### Les paramètres
 
 Chaque opération possède des paramètres pour pouvoir effectuer un calcul. La plupart des paramètres peuvent se regrouper dans des catégories. Par exemple, un paramètre pourra être un mot clé issue d'une liste ou un point représentant des coordonnées.
 
@@ -94,19 +94,19 @@ Au sein de ces catégories, la vérification de la validité d'un paramètre sui
 
 Afin de mutualiser le code, des classes de paramètres ont été créées. Et elles peuvent être utilisées n'importe où dans le code. On trouvera un exemple d'utilisation de ces classes dans l'api `simple/1.0.0`.
 
-### 1.4 Interface : requests et responses 
+### Interface : requests et responses 
 
 Maintenant, il est possible de parler avec plus de détails de l'interface qu'il y a entre une API donnée et un moteur. Comme précisé plus haut, le moteur n'a pas connaissance des APIs et les APIs ne connaissent pas les moteurs. Ainsi, pour communiquer, il y a une interface qui se résume à deux classes d'objets Javascript : `Request` et `Response`. 
 
-#### 1.4.1 L'objet Request 
+#### L'objet Request 
 
 La classe `Request` est considérée comme une classe mère. À partir d'elle, on peut créer autant de classe fille que l'on veut. Chaque instance d'une classe fille `request` est une requête générique qui sera transmise à un moteur. Ce dernier ne saura donc pas quelle API l'a interrogé mais il aura toutes les informations utiles pour effectuer le calcul demandé. 
 
-#### 1.4.2 L'objet Response 
+#### L'objet Response 
 
 Quand un moteur a fini son calcul, il crée un objet qui lui est propre. Mais pour être compris par une API, il doit créer un objet `response`, classe fille de `Response`, qui représente une réponse générique que chaque API peut comprendre. L'API ne sait donc pas quel moteur a fait le calcul mais elle a toutes les informations utiles pour répondre à l'utilisateur selon le formalisme attendu. 
 
-### 1.5 Les contraintes 
+### Les contraintes 
 
 Road2 a développé la notion de contrainte pour permettre de calculs d'itinéraire plus complexes. Une contrainte est une condition que l'on donne à Road2 et qu'il traduit aux différents moteurs qui supportent ces conditions. 
 
@@ -118,11 +118,11 @@ Ces conditions ont été généralisées. En plus de pouvoir interdire, on peut 
 
 Cette partie décrit l'application de ces concepts dans le code au cours d'une exécution classique. 
 
-### 2.1 Au lancement de l'application
+### Au lancement de l'application
 
 Le projet Road2 propose deux serveurs web, un service et un administrateur. Il donc possède deux points d'entrée selon l'usage que l'on souhaite en faire. On peut lancer uniquement le service et cela fonctionnera très bien. Et on peut aussi lancer un administrateur uniquement. Celui-ci lancera un service quand on le lui demandera. Enfin, on peut lancer les deux d'un coup.  
 
-#### 2.1.1 Lancement de l'administrateur 
+#### Lancement de l'administrateur 
 
 Le premier point d'entrée possible est le fichier `src/js/road2.js`. Ce fichier va générer une instance de la classe `Administrator`.
 
@@ -134,7 +134,7 @@ Un administrateur a été créé pour réaliser des tâches qui auraient gêné 
 
 L'administrateur a donc été créé pour être indépendant du service. Si l'administrateur a des tâches fastidieuses, cela n'impacte pas le service. Si l'un tombe, l'autre non. 
 
-#### 2.1.2 Lancement d'un service 
+#### Lancement d'un service 
 
 Le point d'entrée historique est le fichier `src/js/service/main.js`. Ce fichier va générer une instance de la classe `Service`. 
 
@@ -148,7 +148,7 @@ Après cela, on charge les ressources et les sources du service indiquées dans 
 
 Enfin, on finit par charger les APIs exposées par le service. C'est là qu'ExpressJS crée le ou les serveurs Node et charge les routes disponibles.  
 
-#### 2.1.3 Zoom sur la vérification de la configuration 
+#### Zoom sur la vérification de la configuration 
 
 Que ce soit un administrateur ou un service, la configuration sera vérifiée. 
 
@@ -166,7 +166,7 @@ Pour bien fonctionner, le manager aura donc deux listes. Une liste plutôt éph�
 La deuxième liste sera une liste des configurations déjà chargées. Cette liste est persistante et indique l'état du manager. Elle sert à s'assurer que l'on charge une seule fois chaque configuration même si elle est demandée plusieurs fois. 
 Aussi, quand on souhaitera modifier la configuration durant la vie de l'application, c'est cette liste qui sera considérée la première pour vérifier la cohérence. La première liste ne sera réutilisée que si c'est un ensemble censé être cohérent que l'on vérifie. 
 
-### 2.2 : A la réception d'une requête
+### A la réception d'une requête
 
 Lorsqu'une requête arrive, elle est traitée par le router d'ExpressJS de l'API appelée. Il est possible de faire les traitements que l'on veut au sein de ce router. Ces traitements peuvent n'avoir aucun rapport avec le reste de l'application. C'est un router express au sens basique du framework.
 

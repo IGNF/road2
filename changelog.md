@@ -1,4 +1,6 @@
-# 2.0.0
+# CHANGELOG
+
+## 2.0.0
 
 ADDED:
   - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
@@ -30,43 +32,43 @@ UPDATED:
   - Passage à `pgrouting-procedures` 2.0.0
   - Passage à `route-graph-generator` 1.2.3
 
-# 1.1.2
+## 1.1.2
 
 FIXED:
   - Géométries reprojetées pour les requêtes sur PGRouting
 
-# 1.1.1
+## 1.1.1
 
 FIXED:
   - Géométrie étrange quand on est dans une raquette
 
-# 1.1.0
+## 1.1.0
 
 ADDED:
   - Ajout de la fonctionnalité nearest via OSRM
 
-# 1.O.14
+## 1.0.14
 FIXED:
   - Mauvaise ligne pour un log
 
-# 1.O.13
+## 1.0.13
 ADDED:
   - Pas d'erreur si certificat auto-signé ou périmé
 
-# 1.O.12
+## 1.0.12
 FIXED:
   - got dans bundledDependencies
   - http-proxy-agent dans bundledDependencies
 
-# 1.0.11
+## 1.0.11
 FIXED:
   - wkt dans bundledDependencies
 
-# 1.0.10
+## 1.0.10
 ADDED:
   - Ressource hybride smartrouting / pgr pour l'isochrone
 
-# 1.0.6
+## 1.0.6
 
 ADDED:
  - chaque source peut donner l'état de sa connexion
@@ -78,7 +80,7 @@ CHANGED:
 FIXED:
  - géométrie des itinéraires invalide lorsqu'après être passé par un point intermédiaire, l'itinéraire doit reprendre le même tronçon en sens inverse
 
-# 1.0.5
+## 1.0.5
 
 FIXED:
  - gestion d'une erreur PGR si aucun isochrone n'est trouvé.
@@ -96,7 +98,7 @@ ADDED:
  - gestion des proxy http pour les tests fonctionnels
  - lecture du hostname dans la request et adaptation du getcapabilities
 
-# 1.0.4
+## 1.0.4
 
 CHANGED:
  - suppresion des dossiers temporaires dans les tests fonctionnels
@@ -105,7 +107,7 @@ FIXED:
  - Plus d'erreur dans l'isochrone quand la costValue est trop basse pour avoir un polygone
  - min et max de costValue n'etaient pas dans l'objet values
 
-# 1.0.3
+## 1.0.3
 
 CHANGED:
  - Le port HTTPS peut être n'import quel port
@@ -114,7 +116,7 @@ CHANGED:
 FIXED:
  - La vérification des sources est plus fine quant au type des opérations possibles (ajout de l'isochrone).
 
-# 1.0.2
+## 1.0.2
 
 ADDED:
  - Modification du server.json: emplacement du fichier de configuration des CORS

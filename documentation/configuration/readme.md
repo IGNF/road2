@@ -23,7 +23,7 @@ Chaque *service.json* va indiquer les éléments suivants :
 
 Ce fichier indique quelques informations générales liées à l'instance d'administration. Son principal objectif est l'indication des logs et des services gérés. 
 
-On peut trouver un [exemple](../../docker/config/road2.json) de ce fichier et le [modèle](./administration/administration_model.yaml) au format YAML. 
+On peut trouver un [exemple](../../docker/config/road2.json) de ce fichier et le [modèle](./administration/admin_model.yaml) au format YAML. 
 
 ## service.json
 

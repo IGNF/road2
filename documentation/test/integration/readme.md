@@ -42,36 +42,36 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - resource (resourceOperation)
     - portion (point, step, duration, distance)
 
-Quatrième niveau: 
+- Quatrième niveau: 
     - operationManager (parameterManager, operation, resourceOperation, log4js)
     - osrmResource (resource, resourceOperation)
     - pgrResource (resource, resourceOperation, log4js)
     - route (line, portion, duration, distance)
 
-Cinquième niveau: 
+- Cinquième niveau: 
     - routeResponse (response, point, route)
 
-Sixième niveau: 
+- Sixième niveau: 
     - osrmSource (source, osrm, routeResponse, nearestResponse, route, portion, line, point, step, distance, duration, errorManager, log4js)
     - pgrSource (source, routeResponse, isochroneResponse, route, portion, line, point, polygon, step, distance, duration, errorManager, gisManager, copyManager, simplify, turf, looseConstraint, log4js)
 
-Septième niveau: 
+- Septième niveau: 
     - sourceManager (osrmSource, pgrSource, errorManager, storageManager, operationManager, log4js)
 
-Huitième niveau: 
+- Huitième niveau: 
     - resourceManager (osrmResource, pgrResource, sourceManager, operationManager, log4js)
 
-Neuvième niveau: 
+- Neuvième niveau: 
     - service (apisManager, resourceManager, sourceManager, operationManager, baseManager, projectionManager, serverManager, errorManager, ExpressJS, log4js)
 
-Dixième niveau:
+- Dixième niveau:
     - serviceManager (service, serviceProcess, log4js)
     - serviceProcess (serviceAdministered, service, log4js, fork)
 
-Onzième niveau:
+- Onzième niveau:
     - administrator (express, log4js, helmet, path, fs, assert, serverManager, serviceManager, apisManager)
 
-Autres: 
+- Autres: 
     - road2.js
     - controller.js de l'api simple 1.0.0
     - index.js de l'api simple 1.0.0

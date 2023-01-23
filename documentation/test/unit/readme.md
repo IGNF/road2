@@ -11,7 +11,7 @@ Mais cela devrait fonctionner uniquement avec `mocha`. Lancer la commande suivan
 mocha --recursive './test/unit/mocha/**/*.js'
 ```
 
-Les tests unitaires concernent les classes qui ne dépendent pas d'une autre classe du projet pour fonctionner. Les autres classes sont testées dans les tests d'intégration [ici](./integration/readme.md). 
+Les tests unitaires concernent les classes qui ne dépendent pas d'une autre classe du projet pour fonctionner. Les autres classes sont testées dans les tests d'intégration [ici](../integration/readme.md). 
 
 On trouvera donc les classes ou les fichiers suivants: 
 - api (ExpressJS, log4js)
