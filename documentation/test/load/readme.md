@@ -10,7 +10,7 @@ Si Gatling est installé sur la machine, on pourra pointer le dossier `user-file
 
 Autrement, il est possible d'utiliser l'image docker disponible sur [dockerhub](https://hub.docker.com/r/denvazh/gatling). 
 
-C'est ce qui est fait dans le [docker-compose](../../docker/test/) dédié aux tests dans ce dépôt. Voir le [readme](../../docker/test/readme.md) pour son utilisation. 
+C'est ce qui est fait dans le {{ '[docker-compose]({}/tree/{}/docker/test/)'.format(repo_url, repo_branch) }} dédié aux tests dans ce dépôt. Voir le [readme](../../docker/test/readme.md) pour son utilisation. 
 
 ## random-route-generator 
 

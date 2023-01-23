@@ -6,6 +6,7 @@
 
 # standard
 import sys
+import json
 from datetime import datetime
 from os import environ, path
 
@@ -13,6 +14,17 @@ sys.path.insert(0, path.abspath(".."))  # move into project package
 
 # -- Build environment -----------------------------------------------------
 on_rtd = environ.get("READTHEDOCS", None) == "True"
+
+# -- Project information -----------------------------------------------------
+f = open('../package.json')
+
+package_node = json.load(f)
+
+author = package_node["author"]
+description = package_node["description"]
+project = package_node["name"]
+version = package_node["version"]
+uri_repository = "https://github.com/IGNF/road2/"
 
 # -- General configuration ---------------------------------------------------
 
@@ -66,6 +78,12 @@ pygments_style = "sphinx"
 html_theme = "furo"
 html_title = "Road2 documentation"
 
+# Language to be used for generating the HTML full-text search index.
+# Sphinx supports the following languages:
+#   'da', 'de', 'en', 'es', 'fi', 'fr', 'hu', 'it', 'ja'
+#   'nl', 'no', 'pt', 'ro', 'ru', 'sv', 'tr'
+html_search_language = "fr"
+
 # -- EXTENSIONS --------------------------------------------------------
 # MyST Parser
 myst_enable_extensions = [
@@ -81,13 +99,13 @@ myst_enable_extensions = [
 ]
 
 myst_substitutions = {
-    #"author": author,
+    "author": author,
     "date_update": datetime.now().strftime("%d %B %Y"),
-    #"description": description,
-    #"repo_url": __about__.__uri__,
-    #"title": project,
-    #"version": version,
-    #"license": license,
+    "description": description,    
+    "repo_branch": "develop",
+    "repo_url": uri_repository,
+    "title": project,
+    "version": version,
 }
 
 myst_url_schemes = ["http", "https", "mailto"]

@@ -19,7 +19,7 @@ Il suffit de lancer la commande `docker-compose build`.
 
 ### Tests de charge avec gatling
 
-Après avoir rempli le `.env` en pointant, par exemple, sur le `user-files` de ce [dépôt](../../test/load/gatling/user-files) et en ayant pris soin de choisir un scénario, il suffit d'exécuter la commande :
+Après avoir rempli le `.env` en pointant, par exemple, sur le `user-files` de ce {{ '[dépôt]({}/tree/{}/test/load/gatling/user-files/)'.format(repo_url, repo_branch) }} et en ayant pris soin de choisir un scénario, il suffit d'exécuter la commande :
 ```
 # Une fois le .env modifié pour choisir le scénario notamment
 # Choisir le scénario (attention road2Docker ne fonctionne pas tant que docker-compose up generate-load-data n'a pas été appelé au moins une fois)

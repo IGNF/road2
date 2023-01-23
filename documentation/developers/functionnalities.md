@@ -174,4 +174,4 @@ PGRouting gère tout les types de contraintes, des plus simples au plus complexe
 
 Le GetCapabilities est une réponse JSON qui décrit les paramètres de chaque opérations et les valeurs disponibles pour une instance de Road2. 
 
-On trouvera un exemple dans la [documentation](../apis/simple/1.0.0/). 
+On trouvera un exemple dans la {{ '[documentation]({}/tree/{}/documentation/apis/simple/1.0.0/)'.format(repo_url, repo_branch) }}. 
