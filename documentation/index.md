@@ -1,4 +1,10 @@
-# Road2
+# {{ title }} - Documentation
+
+> **Description:** {{ description }}  
+> **Auteur et contributeurs:** {{ author }}  
+> **Version:** {{ version }}  
+> **Code source:** {{ repo_url }}  
+> **Dernière mise à jour de la documentation:** {{ date_update }}
 
 ## Présentation générale 
 

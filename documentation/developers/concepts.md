@@ -14,7 +14,7 @@ C'est le concept de base pour comprendre le code de Road2.
 
 Par exemple, si on considère une API qui s'appelle `rest` qui ne possède qu'une seule version `1.0.0`. Dans cette API, on pourrait définir une seule route `compute` qui permet de demander un itinéraire avec les paramètres `start` et `end` au minimum. On parlera alors de l'API `rest/1.0.0` qui permet à un utilisateur d'obtenir un itinéraire en faisant la requête `/rest/1.0.0/compute?start=2,48&end=2,48.1`. 
 
-Chaque API est définie dans un dossier distinct des autres. Cela les rend indépendantes les unes des autres. Et pour une même appellation, on a une indépendance entre deux versions différentes. On trouvera des exemples d'implémentation dans le dossier des [apis du code](../../src/js/apis/). 
+Chaque API est définie dans un dossier distinct des autres. Cela les rend indépendantes les unes des autres. Et pour une même appellation, on a une indépendance entre deux versions différentes. On trouvera des exemples d'implémentation dans le dossier des {{ '[apis du code]({}/tree/{}/src/js/apis)'.format(repo_url, repo_branch) }}. 
 
 #### Notion de moteur 
 

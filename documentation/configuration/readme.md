@@ -55,13 +55,13 @@ On peut trouver un [exemple](../../docker/config/projections/projection.json) de
 
 Dans les fichiers du type *service.json*, il est possible d'indiquer plusieurs dossiers *sources*. Chaque dossier sera lu et les fichiers `*.source` seront analysés par Road2. Chacun de ces fichiers représente une source pour Road2. 
 
-On peut trouver, dans ce [dossier](./sources/), un exemple de ce genre de fichier pour chaque type de source disponible dans le code de Road2.
+On peut trouver, dans {{ '[documentation/configuration/sources]({}/tree/{}/documentation/configuration/sources)'.format(repo_url, repo_branch) }}, un exemple de ce genre de fichier pour chaque type de source disponible dans le code de Road2.
 
 ## Les ressources 
 
 Dans les fichiers *service.json*, il peut également indiquer plusieurs dossiers *resources*. Chaque dossier sera lu et les fichiers `*.resource` seront analysés par Road2. Chacun de ces fichiers représente cette fois-ci une ressource pour Road2. 
 
-On peut trouver, dans ce [dossier](./resources/), un exemple de ce genre de fichier pour chaque type de ressource disponible dans le code de Road2. Chaque type suit le même modèle YAML. 
+On peut trouver, dans ce {{ '[documentation/configuration/resources]({}/tree/{}/documentation/configuration/resources)'.format(repo_url, repo_branch) }}, un exemple de ce genre de fichier pour chaque type de ressource disponible dans le code de Road2. Chaque type suit le même modèle YAML. 
 
 ## Les fichiers liés à certains moteurs de Road2
 

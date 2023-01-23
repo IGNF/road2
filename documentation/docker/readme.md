@@ -9,5 +9,5 @@ Il y a un sous-dossier pour les grands usages identifiés :
 
 D'autres sous-dossiers sont ordonnés ainsi pour des raisons pratiques : 
 - [web](./web/readme.md) : Ce dossier regroupe des fichiers utiles pour avoir un petit site web qui contient plusieurs documentations et des pages de tests graphiques pour Road2. 
-- [config](./config/) : Ce dossier regroupe plusieurs fichiers de configurations qui se trouvent être communs aux autres sous-dossiers. 
+- {{ '[config]({}/tree/{}/docker/config/)'.format(repo_url, repo_branch) }} : Ce dossier regroupe plusieurs fichiers de configurations qui se trouvent être communs aux autres sous-dossiers. 
 - [distributions](./distributions/readme.md) : Ce dossier peut regrouper différents `Dockerfile` qui sont des exemples d'installation sous différentes distributions. Actuellement, il ne reste plus qu'un exemple pour Debian. C'est le Dockerfile préconisé pour développer sur Road2 car il contient tous les binaires utiles aux différents moteurs. 
