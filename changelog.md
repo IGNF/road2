@@ -4,7 +4,8 @@
 
 ADDED:
   - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
-  - Cette classe est configurée par un nouveau fichier de configuration. 
+    - Cette classe est configurée par un nouveau fichier de configuration. 
+    - Les classes service* sont des interfaces pour permettre à l'administrateur de gérer les services associés. Elles permettent de gérer un service dans le même processus ou dans un nouveau (méthode conseillée). 
   - Ajout du moteur Valhalla pour les itinéraires et les isochrones
   - Le module `wkt` a été remplacé par une implémentation interne
   - Le format wkt est disponible pour le paramètre geometryFormat de l'API simple/1.0.0

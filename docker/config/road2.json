@@ -9,7 +9,7 @@
         "id": "main",
         "configuration": "/home/docker/config/service.json",
         "onStart": "true",
-        "creationType": "sameProcess" 
+        "creationType": "newProcess" 
       }
     ],
     "network" : {
