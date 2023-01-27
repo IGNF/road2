@@ -458,8 +458,9 @@ module.exports = class Administrator {
             }
 
             // Chargement du service
+            let options = {adminLogConfiguration: this._logConfiguration};
             LOGGER.info("Chargement du service...");
-            if (!this._serviceManager.loadService(curIASConf.creationType, curIASConf.id, serviceConfLocation, serviceConfiguration)) {
+            if (!await this._serviceManager.loadService(curIASConf.creationType, curIASConf.id, serviceConfLocation, options)) {
                 LOGGER.error("Impossible de créer le service "+ curIASConf.id);
                 // On essaye les suivants
                 continue;

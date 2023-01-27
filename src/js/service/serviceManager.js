@@ -2,6 +2,7 @@
 
 const log4js = require('log4js');
 const Service = require('./service');
+const ServiceInsider = require('./serviceInsider');
 const ServiceProcess = require('./serviceProcess');
 
 // Création du LOGGER
@@ -28,9 +29,6 @@ module.exports = class serviceManager {
 
         // Catalogue de services chargés (objets de la classe ServiceAdministered)
         this._loadedServiceAdministeredCatalog = {};
-
-        // Contenu de la configuration des services chargés (contenu du service.json)
-        this._loadedServiceConfigurations = {};
 
         // Emplacement de la configuration des services chargés (chemin du service.json)
         this._loadedServiceConfLocations = {};
@@ -73,10 +71,10 @@ module.exports = class serviceManager {
      * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
      * @param {string} id - Id du service pour l'administrateur
      * @param {string} configurationLocation - Emplacement de la configuration du service à charger
-     * @param {object} serviceConfiguration - Contenu de la configuration du service à charger 
+     * @param {object} options - Contenu optionnel pour le chargement de certains types de services
      * 
      */
-    loadService(creationType, id, configurationLocation, serviceConfiguration) {
+    async loadService(creationType, id, configurationLocation, options) {
 
         LOGGER.info("Création et lancement du service " + id);
 
@@ -89,8 +87,9 @@ module.exports = class serviceManager {
         if (creationType === "sameProcess") {
 
             // Instanciation du service directement sur le même process que l'administrateur
-            LOGGER.error("Type de création non implémentée. Impossible de créer le service.");
-            return false;
+            LOGGER.debug("sameProcess : Création d'un service dans le même processus");
+
+            serviceAdministered = new ServiceInsider(id, configurationLocation);
 
         } else if (creationType === "newProcess") {
 
@@ -115,12 +114,14 @@ module.exports = class serviceManager {
 
         // On le démarre par le même appel, qu'importe son type de création
         LOGGER.info("Démarrage du service " + id);
-        serviceAdministered.loadService();
+        if (!(await serviceAdministered.loadService(options))) {
+            LOGGER.error("Impossible de charger le service " + id);
+            return false;
+        }
 
         // Sauvegarde du service dans le manager
         LOGGER.info("Service démarré. Sauvegarde dans le serviceManager...");
         this._loadedServiceAdministeredCatalog[id] = serviceAdministered;
-        this._loadedServiceConfigurations[id] = serviceConfiguration;
         this._loadedServiceConfLocations[id] = configurationLocation;
 
         return true;
