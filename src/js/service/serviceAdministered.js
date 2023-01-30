@@ -54,4 +54,16 @@ module.exports = class ServiceAdministered {
     return this._type;
   }
 
+  /**
+  *
+  * @function
+  * @name loadService
+  * @description Fonction pour utiliser pour charger un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
+  *
+  */
+  loadService() {
+    
+  }
+
+
 }

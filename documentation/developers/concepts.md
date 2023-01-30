@@ -132,7 +132,9 @@ Cet administrateur permet plusieurs choses :
 
 Un administrateur a été créé pour réaliser des tâches qui auraient gêné la bonne exécution du service. 
 
-L'administrateur a donc été créé pour être indépendant du service. Si l'administrateur a des tâches fastidieuses, cela n'impacte pas le service. Si l'un tombe, l'autre non. 
+L'administrateur a donc été créé pour être indépendant du service. Dans leur écriture, ils ont été pensé pour être lancé dans des processus différents. Ainsi, si l'administrateur a des tâches fastidieuses, cela n'impacte pas le service. Si l'un tombe, l'autre non.
+
+Cependant, il est possible de démarrer un service dans le même processus que son administrateur. 
 
 #### Lancement d'un service 
 

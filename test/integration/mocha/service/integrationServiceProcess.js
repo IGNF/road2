@@ -27,8 +27,8 @@ describe('Test de la classe ServiceProcess', function() {
       assert.equal(serviceProcess._configurationLocation, configuration);
     });
 
-    it('Get _serviceAdministered', function() {
-      assert.deepEqual(serviceProcess._serviceAdministered, {});
+    it('Get _serviceInstance', function() {
+      assert.deepEqual(serviceProcess._serviceInstance, {});
     });
 
   });

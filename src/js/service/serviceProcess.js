@@ -37,7 +37,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         this._configurationLocation = location;
 
         // Instance de childProcess quand le processus est lancé
-        this._serviceAdministered = {};
+        this._serviceInstance = {};
 
     }
 
@@ -82,7 +82,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         // Création du service via un fork : on lance simplement service/main.js
         LOGGER.info("Fork du processus pour créer le service...");
 
-        this._serviceAdministered = fork("./src/js/service/main.js", [this._configurationLocation], serviceOptions);
+        this._serviceInstance = fork("./src/js/service/main.js", [this._configurationLocation], serviceOptions);
 
         LOGGER.info("Processus enfant créé");
 
