@@ -7,7 +7,7 @@
     "provider": {
       "name": "IGN",
       "site": "www.ign.fr",
-      "mail": "sav@ign.fr"
+      "mail": "contact.geoservices@ign.fr"
     },
     "logs": {
       "configuration": "/home/docker/config/log4js-service.json"
