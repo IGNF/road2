@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/adminConfiguration"
     patch:
       tags:
       - "Gestion de l'administrateur"
@@ -102,14 +102,14 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/adminConfiguration"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/adminConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -132,18 +132,28 @@ paths:
         Cette requête retourne l'ensemble des services connus par l'administrateur. 
         Cette liste peut être vide si aucun service n'a été configuré.
       operationId: "services"
+      parameters:
+        - name: "withId"
+          description: "Si on souhaite récupérer les ids des services. Ces ids sont normalement dans la configuration de l'administrateur. "
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  services:
-                    type: "array"
-                    items:
-                      type: "string"
+                type: "array"
+                items:
+                  type: "object"
+                  allOf:
+                    - type: "object"
+                      properties:
+                        id:
+                          type: "string"
+                    - $ref: "#/components/schemas/serviceConfiguration"
     post:
       tags:
       - "Gestion des services"
@@ -157,7 +167,7 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/serviceConfiguration"
       responses:
         201:
           description: "successful operation"
@@ -165,6 +175,12 @@ paths:
             application/json:
               schema:
                 type: "object"
+                allOf:
+                  - type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                  - $ref: "#/components/schemas/serviceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -193,7 +209,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/serviceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -228,14 +244,14 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/serviceConfiguration"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/serviceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -313,7 +329,7 @@ paths:
                   resources:
                     type: "array"
                     items:
-                      type: "string"
+                      $ref: "#/components/schemas/resourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -391,7 +407,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/resourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -428,14 +444,14 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/resourceConfiguration"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/resourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -505,10 +521,10 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  resources:
+                  sources:
                     type: "array"
                     items:
-                      type: "string"
+                      $ref: "#/components/schemas/sourceConfiguration"
     post:
       tags:
       - "Gestion des sources"
@@ -527,14 +543,14 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/sourceConfiguration"
       responses:
         201:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/sourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -574,7 +590,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/sourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -611,14 +627,14 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
+              $ref: "#/components/schemas/sourceConfiguration"
       responses:
         200:
           description: "successful operation"
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/sourceConfiguration"
         400:
           description: "Invalid parameters"
           content:
@@ -670,6 +686,7 @@ paths:
                 
 components:
   schemas:
+  
     errorResponse:
       type: "object"
       properties:
@@ -680,3 +697,408 @@ components:
               type: "string"
             message:
               type: "string"
+
+    adminConfiguration:
+      type: "object"
+      properties:
+        administration: 
+          type: "object"
+          properties: 
+            api: 
+              type: "object"
+              properties: 
+                name: 
+                  type: "string"
+                  example: "admin"
+                version: 
+                  type: "string"
+                  example: "1.0.0"
+            services: 
+              type: "array"
+              minItems: 0
+              items: 
+                type: "object"
+                properties: 
+                  id: 
+                    type: "string"
+                    example: "main"
+                  configuration: 
+                    type: "string"
+                    example: "/home/docker/config/service.json"
+                  onStart: 
+                    type: "string"
+                    example: "true"
+                  creationType: 
+                    type: "string"
+                    example: "newProcess"
+            network: 
+              type: "object"
+              properties: 
+                server: 
+                  type: "object"
+                  properties: 
+                    id: 
+                      type: "string"
+                      example: "administrator"
+                    https: 
+                      type: "string"
+                      example: "false"
+                    host: 
+                      type: "string"
+                      example: "0.0.0.0"
+                    port: 
+                      type: "string"
+                      example: "8079"
+            logs: 
+              type: "object"
+              properties: 
+                configuration: 
+                  type: "string"
+                  example: "/home/docker/config/log4js-administration.json"
+                    
+    serviceConfiguration:
+      type: "object"
+      properties:
+        application: 
+          type: "object"
+          properties: 
+            name: 
+              type: "string"
+              example: "Road2"
+            title: 
+              type: "string"
+              example: "Service de calcul d'itinéraire"
+            description: 
+              type: "string"
+              example: "Ce service permet de calculer des itinéraires sur les données du Géoportail."
+            url: 
+              type: "string"
+              example: "https://localhost/"
+            provider: 
+              type: "object"
+              properties: 
+                name: 
+                  type: "string"
+                  example: "IGN"
+                site: 
+                  type: "string"
+                  example: "www.ign.fr"
+                mail: 
+                  type: "string"
+                  example: "contact.geoservices@ign.fr"
+            logs: 
+              type: "object"
+              properties: 
+                configuration: 
+                  type: "string"
+                  example: "/home/docker/config/log4js-service.json"
+            operations: 
+              type: "object"
+              properties: 
+                directory: 
+                  type: "string"
+                  example: "/home/docker/app/src/resources/operations"
+                parameters: 
+                  type: "object"
+                  properties: 
+                    directory: 
+                      type: "string"
+                      example: "/home/docker/app/src/resources/parameters"
+            resources: 
+              type: "object"
+              properties: 
+                directories: 
+                  type: "array"
+                  items: 
+                    type: "string"
+                    example: "/home/docker/data/resources/"
+            sources: 
+              type: "object"
+              properties: 
+                directories: 
+                  type: "array"
+                  items: 
+                    type: "string"
+                    example: "/home/docker/data/sources/"
+            network: 
+              type: "object"
+              properties: 
+                servers: 
+                  type: "array"
+                  items: 
+                    type: "object"
+                    properties: 
+                      id: 
+                        type: "string"
+                        example: "internalServer"
+                      https: 
+                        type: "string"
+                        example: "false"
+                      host: 
+                        type: "string"
+                        example: 0.0.0.0
+                      port: 
+                        type: "string"
+                        example: "8080"
+                cors: 
+                  type: "object"
+                  properties: 
+                    configuration: 
+                      type: "string"
+                      example: "/home/docker/config/cors.json"
+            projections: 
+              type: "object"
+              properties: 
+                directory: 
+                  type: "string"
+                  example: "/home/docker/config/projections/"
+            apis: 
+              type: "array"
+              items: 
+                type: "object"
+                properties: 
+                  name: 
+                    type: "string"
+                    example: "simple"
+                  version: 
+                    type: "string"
+                    example: "1.0.0"
+    
+    resourceConfiguration:
+      type: "object"
+      properties:
+        resource: 
+          type: "object"
+          properties: 
+            id: 
+              type: "string"
+              example: "my-resource"
+            type: 
+              type: "string"
+              example: "osrm"
+            description: 
+              type: "string"
+              example: "Exemple d'une ressource."
+            resourceVersion: 
+              type: "string"
+              example: "yyyy-mm-dd"
+            sources: 
+              type: "array"
+              items: 
+                type: "string"
+                example: "data-car-fastest"
+            availableOperations: 
+              type: "array"
+              items: 
+                type: "object"
+                properties: 
+                  id: 
+                    type: "string"
+                    example: "route"
+                  parameters: 
+                    type: "array"
+                    items: 
+                      type: "object"
+                      properties: 
+                        id: 
+                          type: "string"
+                          example: "resource"
+                        defaultValueContent:
+                          type: "string"
+                        values: 
+                          type: "object"
+
+    sourceConfiguration:
+      oneOf:
+        - $ref: "#/components/schemas/osrmSourceConfiguration"
+        - $ref: "#/components/schemas/pgrSourceConfiguration"
+        - $ref: "#/components/schemas/valhallaSourceConfiguration"
+
+    osrmSourceConfiguration:
+      type: "object"
+      properties:
+          id: 
+            type: "string"
+            example: "bduni-idf-car-fastest"
+          description: 
+            type: "string"
+            example: "test osrm"
+          type: 
+            type: "string"
+            enum: ["osrm"]
+          projection: 
+            type: "string"
+            example: "EPSG:4326"
+          bbox: 
+            type: "string"
+            example: "1.748.43.349.1"
+          storage: 
+            type: "object"
+            properties: 
+              file: 
+                type: "string"
+                example: "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"
+          cost:
+            type: "object"
+            properties:
+              cost: 
+                type: "object"
+                properties: 
+                  profile: 
+                    type: "string"
+                    example: "car"
+                  optimization: 
+                    type: "string"
+                    example: "fastest"
+                  
+    pgrSourceConfiguration:
+      type: "object"
+      properties:
+          id: 
+            type: "string"
+            example: "bduni-idf-car-fastest"
+          description: 
+            type: "string"
+            example: "test osrm"
+          type: 
+            type: "string"
+            enum: ["pgrouting"]
+          projection: 
+            type: "string"
+            example: "EPSG:4326"
+          bbox: 
+            type: "string"
+            example: "1.748.43.349.1"
+          storage: 
+            type: "object"
+            properties:
+              base: 
+                type: "object"
+                properties: 
+                  dbConfig: 
+                    type: "string"
+                    example: "/home/docker/data/output_base.json"
+                  schema: 
+                    type: "string"
+                    example: "public"
+                  attributes: 
+                    type: "array"
+                    items: 
+                      type: "object"
+                      properties: 
+                        key: 
+                          type: "string"
+                          example: "name"
+                        column: 
+                          type: "string"
+                          example: "way_names"
+                        default: 
+                          type: "string"
+                          example: "false"
+          costs:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                cost: 
+                  type: "object"
+                  properties: 
+                      profile: 
+                        type: "string"
+                        example: "car"
+                      optimization: 
+                        type: "string"
+                        example: "fastest"
+                      costType: 
+                        type: "string"
+                        example: "time"
+                      costColumn: 
+                        type: "string"
+                        example: "cost_s_car"
+                      rcostColumn: 
+                        type: "string"
+                        example: "reverse_cost_s_car"
+                      
+    valhallaSourceConfiguration:
+      type: "object"
+      properties:
+          id: 
+            type: "string"
+            example: "bduni-idf-car-fastest"
+          description: 
+            type: "string"
+            example: "test osrm"
+          type: 
+            type: "string"
+            enum: ["valhalla"]
+          projection: 
+            type: "string"
+            example: "EPSG:4326"
+          bbox: 
+            type: "string"
+            example: "1.748.43.349.1"
+          storage: 
+            oneOf:
+              - type: "object"
+                properties: 
+                  file: 
+                    type: "string"
+                    example: "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"
+              - type: "object"
+                properties:
+                  base: 
+                    type: "object"
+                    properties: 
+                      dbConfig: 
+                        type: "string"
+                        example: "/home/docker/data/output_base.json"
+                      schema: 
+                        type: "string"
+                        example: "public"
+                      attributes: 
+                        type: "array"
+                        items: 
+                          type: "object"
+                          properties: 
+                            key: 
+                              type: "string"
+                              example: "name"
+                            column: 
+                              type: "string"
+                              example: "way_names"
+                            default: 
+                              type: "string"
+                              example: "false"
+              - type: "object"
+                properties:
+                  tar: 
+                    type: "string"
+                    example: "/home/docker/data/bdtopo-valhalla-tiles.tar"
+                  dir: 
+                    type: "string"
+                    example: "/home/docker/data/bdtopo-valhalla-tiles/"
+                  config: 
+                    type: "string"
+                    example: "/home/docker/data/valhalla.json"
+          costs:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                cost: 
+                  type: "object"
+                  properties: 
+                    profile: 
+                      type: "string"
+                      example: "car"
+                    optimization: 
+                      type: "string"
+                      example: "fastest"
+                    costType: 
+                      type: "string"
+                      example: "time"
+                    costing: 
+                      type: "string"
+                      example: "auto"
+                      
+                      
