@@ -55,9 +55,18 @@ paths:
         Cette requête retourne l'état du serveur d'administration et 
         de l'ensemble des services qu'il administre. Cet état fait principalement 
         référence à la disponibilité des données. Chaque service a un état lié à la 
-        disponibilité de ses ressources. Chaque ressource a un état lié à la 
-        dispoinibilité de ses sources. Et chaque source, celle de ses données. 
+        disponibilité de ses sources. Chaque source a un état lié à la disponibilité de ses données. 
       operationId: "health"
+      parameters:
+        - name: "verbose"
+          description: |
+            "Par défaut, puisque verbose=false, la requête retourne seulement l'état global 
+            de l'administrateur et de ses services. Si on souhaite récupérer plus d'information 
+            sur l'état de chaque service, on met verbose à true."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
       responses:
         200:
           description: "successful operation"
@@ -67,11 +76,56 @@ paths:
                 type: "object"
                 properties:
                   state:
-                    type: string
+                    type: "string"
                     enum: ["green","yellow","red"]
                     description: |
-                      Lorsque tout va bien: 'green'. Si un des services a 
-                      un problème:yellow. Si aucun service n'est disponible:red."
+                      "Lorsque tout va bien: 'green'. Si un des services a 
+                      un problème:yellow. Si aucun service n'est disponible:red. Seule information retournée
+                      si verbose=false. "
+                    example: "green"
+                  administrator: 
+                    type: "object"
+                    properties: 
+                      state: 
+                        type: "string"
+                        example: "green"
+                        enum: ["green","yellow","red"]
+                        description: |
+                          "Pour le moment, seul green est disponible car soit le serveur est disponible pour
+                          répondre aux requêtes d'administration, soit il ne l'est pas du tout."
+                  services: 
+                    type: "array"
+                    items: 
+                      type: "object"
+                      properties: 
+                        id: 
+                          type: "string"
+                          example: "main"
+                          description: |
+                            "Id du service pour l'administrateur"
+                        state: 
+                          type: "string"
+                          example: "green"
+                          enum: ["green","yellow","red"]
+                          description: |
+                            "Lorsque toutes les sources sont disponibles : 'green'. Si une des sources a 
+                            un problème:yellow. Si aucune source n'est disponible:red."
+                        sources: 
+                          type: "array"
+                          items: 
+                            type: "object"
+                            properties: 
+                              id: 
+                                type: "string"
+                                example: "bduni-idf-car-fastest"
+                                description: |
+                                  "Id de la source pour le service"
+                              state: 
+                                type: "string"
+                                example: "green"
+                                enum: ["green","red"]
+                                description: |
+                                  "Lorsque les données sont disponibles : 'green'. Si les données ne le sont plus: 'red'."
            
   /configuration:
     get:
