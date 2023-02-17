@@ -90,4 +90,16 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
     }
 
+    /**
+     *
+     * @function
+     * @name computeRequest
+     * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
+     * @param {object} request - Instance fille de la classe Request 
+     * 
+     */
+    computeRequest(request) {
+
+    }
+
 }

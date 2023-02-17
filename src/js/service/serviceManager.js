@@ -128,4 +128,48 @@ module.exports = class serviceManager {
 
     }
 
+    /**
+     *
+     * @function
+     * @name computeRequest
+     * @description Gestion d'une requête pour un service 
+     * La requête est envoyé au service puis la réponse du service est retournée
+     * @param {string} serviceId - Id du service selon l'administrateur
+     * @param {object} request - Instance fille de la classe Request 
+     * 
+     */
+    async computeRequest(serviceId, request) {
+
+        LOGGER.info("computeRequest...");
+
+        // Quelques vérifications
+        if (!serviceId) {
+            LOGGER.error("Aucun id de service");
+        } 
+        if (typeof(serviceId) !== "string") {
+            LOGGER.error("L'id de service n'est pas une string");
+        } else {
+            LOGGER.debug("serviceId: " + serviceId);
+        }
+        if (!request) {
+            LOGGER.error("Aucune requête");
+        } 
+        if (typeof(request) !== "object") {
+            LOGGER.error("La requête n'est pas un objet");
+        } else {
+            LOGGER.debug("request:");
+            LOGGER.debug(request);
+        }
+
+        // On récupère le service administré
+        let administeredService = this._loadedServiceAdministeredCatalog[serviceId];
+        if (!administeredService) {
+            LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+        }
+
+        // On envoit la requête et renvoit la réponse 
+        return administeredService.computeRequest(request);
+
+    }
+
 }
