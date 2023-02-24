@@ -17,10 +17,6 @@ describe('Test de la classe Request', function() {
       assert.equal(request.operation, "route");
     });
 
-    it('Get Resource', function() {
-      assert.equal(request.resource, "corse-osm");
-    });
-
     it('Get Type', function() {
       assert.equal(request.type, "routeRequest");
     });
@@ -32,11 +28,6 @@ describe('Test de la classe Request', function() {
     it('Set Operation', function() {
       request.operation = "nearest";
       assert.equal(request.operation, "nearest");
-    });
-
-    it('Set Resource', function() {
-      request.resource = "corse-osm-2";
-      assert.equal(request.resource, "corse-osm-2");
     });
 
     // Le type ne devrait pas changer car il dépend de la classe fille appelée
