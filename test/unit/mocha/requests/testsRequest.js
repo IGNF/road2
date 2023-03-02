@@ -9,7 +9,7 @@ describe('Test de la classe Request', function() {
     logManager.manageLogs();
   });
 
-  let request = new Request("route", "corse-osm", "routeRequest");
+  let request = new Request("route", "routeRequest");
 
   describe('Test du constructeur et des getters', function() {
 

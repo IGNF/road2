@@ -28,7 +28,7 @@ module.exports = class healthResponse {
 
     // États des services 
     // Un administrateur peut n'avoir aucun service 
-    this._serviceStates = [];
+    this._serviceStates = new Array();
 
   }
 

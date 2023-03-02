@@ -4,6 +4,7 @@ const log4js = require('log4js');
 const Service = require('./service');
 const ServiceInsider = require('./serviceInsider');
 const ServiceProcess = require('./serviceProcess');
+const errorManager = require('../utils/errorManager');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICEMANAGER");
@@ -165,6 +166,7 @@ module.exports = class serviceManager {
         let administeredService = this._loadedServiceAdministeredCatalog[serviceId];
         if (!administeredService) {
             LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+            throw errorManager.createError("Unknown service : " + serviceId);
         }
 
         // On envoit la requête et renvoit la réponse 

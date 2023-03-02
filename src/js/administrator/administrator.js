@@ -549,6 +549,7 @@ module.exports = class Administrator {
             }
 
             // On stocke le retour de ce service 
+            curHealthResponse.serviceStates[0].id = curServiceId;
             healthResponse.serviceStates.push(curHealthResponse.serviceStates[0]);
 
         }
@@ -556,14 +557,14 @@ module.exports = class Administrator {
         // En fonction des états définis précédemment, on va définir l'état global 
         // Pour faire simple : 
         // - global est orange si un des services est orange
-        //  - un service est orange si une des sources est indisponible (cela est traité dans le service)
         // - global est rouge si un des services est rouge
-        //  - service est rouge si la moitié, ou plus, de ses sources sont indisponibles (cela est traité dans le service)
         if (gotRed) {
-            healthResponse.adminState = "red";
+            healthResponse.globalState = "red";
         } else {
             if (gotOrange) {
-                healthResponse.adminState = "orange";
+                healthResponse.globalState = "orange";
+            } else {
+                healthResponse.globalState = "green";
             }
         }
 

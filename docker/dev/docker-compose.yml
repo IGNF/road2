@@ -14,6 +14,7 @@ services:
     command : "npm run debug -- --ROAD2_CONF_FILE=../config/road2.json"
     ports:
       - 8080:8080
+      - 8079:8079
       - 9229:9229
       - 9230:9230
       - 443:443

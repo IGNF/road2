@@ -74,7 +74,7 @@ module.exports = {
     userResponse.administrator = {};
     userResponse.administrator.state = healthResponse.adminState;
 
-    userResponse.services = new Array();
+    userResponse.services = healthResponse.serviceStates;
 
     return userResponse;
 

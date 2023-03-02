@@ -18,11 +18,10 @@ module.exports = class Request {
   * @name constructor
   * @description Constructeur de la classe Request
   * @param {string} operation - Type d'opération concernée
-  * @param {string} resource - Ressource concernée
   * @param {string} type - Type de la requête
   *
   */
-  constructor(operation, resource, type) {
+  constructor(operation, type) {
 
     // Opération concernée
     this._operation = operation;

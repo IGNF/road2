@@ -14,6 +14,8 @@ const ProjectionManager = require('../geography/projectionManager');
 const ServerManager = require('../server/serverManager');
 const LogManager = require('../utils/logManager');
 const log4js = require('log4js');
+const errorManager = require('../utils/errorManager');
+const HealthResponse = require('../responses/healthResponse');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -732,7 +734,7 @@ module.exports = class Service {
 
     }
 
-    if (this._sourceManager.source.length === 0) {
+    if (this._sourceManager.sources.length === 0) {
       LOGGER.fatal("Aucune ressource n'a pu etre chargee");
       return false;
     }
@@ -947,7 +949,7 @@ module.exports = class Service {
     let sourceId = resource.getSourceIdFromRequest(request);
 
     // La source est dans le catalogue du sourceManager
-    let source = this._sourceManager.source[sourceId];
+    let source = this._sourceManager.sources[sourceId];
     // ---
 
     //On renvoie la requête vers le moteur
@@ -960,6 +962,90 @@ module.exports = class Service {
       return err;
     }
     // ---
+
+  }
+
+  /**
+  *
+  * @function
+  * @name computeAdminRequest
+  * @description Fonction utilisée pour traiter une requête venant de l'administrateur
+  * @param {object} request - Instance fille de la classe Request 
+  *
+  */
+
+  computeAdminRequest(request) {
+
+    LOGGER.info("computeAdminRequest...");
+
+    // On part du principe qu'un maximum de vérifications ont été faites avant par l'administrateur
+    // On essaye de réduire l'exécution par le service 
+
+    // En fonction du type de la requête, on va appeler différentes fonctions 
+    // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper. 
+    if (request.type === "healthRequest") {
+      return this.computeHealthRequest(request);
+    } else {
+      throw errorManager.createError("Unknown request type");
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name computeHealthRequest
+  * @description Fonction utilisée pour connaître l'état du service
+  * @param {HealthRequest} healthRequest - Instance de la classe HealthRequest 
+  *
+  */
+
+  computeHealthRequest(healthRequest) {
+
+    LOGGER.info("computeHealthRequest...");
+
+    let healthResponse = new HealthResponse();
+    let nbRed = 0;
+    let nbSources = this._sourceManager.loadedSourceId.length;
+    let serviceState = {};
+    serviceState.sources = new Array();
+
+    // Récupération de la disponibilité de chaque source
+    for (let sourceId in this._sourceManager.sources) {
+
+      let sourceState = this._sourceManager.sources[sourceId].state;
+      
+      if (sourceState === "red") {
+        nbRed++;
+      } else if (sourceState === "green" || sourceState === "init") {
+        // Les cas "green" et "init" sont considérés comme équivalent 
+      } else {
+        // État inconnu donc on lève une alerte et on le met manuellement à "unknown" pour ne pas renvoyer n'importe quoi à l'administrateur
+        sourceState = "unknown";
+        nbRed++;
+      }
+
+      serviceState.sources.push({id: sourceId, state: sourceState});
+
+    }
+
+    // Pour faire simple : 
+    //  - un service est orange si une des sources est indisponible 
+    //  - service est rouge si la moitié, ou plus, de ses sources sont indisponibles 
+    if (nbRed > 0) {
+
+      if (nbRed >= nbSources / 2) {
+        serviceState.state = "red";
+      } else {
+        serviceState.state = "orange";
+      }
+      
+    } else {
+      serviceState.state = "green";
+    }
+
+    healthResponse.serviceStates.push(serviceState);
+    return healthResponse;
 
   }
 

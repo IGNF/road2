@@ -43,9 +43,11 @@ module.exports = class Source {
     this._connected = false;
 
     // État de la source (même si connectée, elle peut être dysfonctionnelle)
-    // "green" si la dernière requête a fonctionnée, "red" à l'initialisation ou si la donnée n'est plus accessible
+    // "green" si la dernière requête a fonctionnée, 
+    // "red" si la donnée n'est plus accessible, 
+    // "init" à sa création (utile pour une requête /health de l'administrateur)
     // Ajouter la gestion de ce paramètre dans chaque classe fille
-    this._state = "red";
+    this._state = "init";
 
   }
 
