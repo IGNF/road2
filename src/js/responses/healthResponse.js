@@ -20,6 +20,9 @@ module.exports = class healthResponse {
   */
   constructor() {
 
+    // Type de la réponse 
+    this._type = "healthResponse";
+
     // État global 
     this._globalState = "unknown";
 

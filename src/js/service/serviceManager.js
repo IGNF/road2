@@ -145,18 +145,18 @@ module.exports = class serviceManager {
 
         // Quelques vérifications
         if (!serviceId) {
-            LOGGER.error("Aucun id de service");
+            throw errorManager.createError("Aucun id de service");
         } 
         if (typeof(serviceId) !== "string") {
-            LOGGER.error("L'id de service n'est pas une string");
+            throw errorManager.createError("L'id de service n'est pas une string");
         } else {
             LOGGER.debug("serviceId: " + serviceId);
         }
         if (!request) {
-            LOGGER.error("Aucune requête");
+            throw errorManager.createError("Aucune requête");
         } 
         if (typeof(request) !== "object") {
-            LOGGER.error("La requête n'est pas un objet");
+            throw errorManager.createError("La requête n'est pas un objet");
         } else {
             LOGGER.debug("request:");
             LOGGER.debug(request);
@@ -170,7 +170,9 @@ module.exports = class serviceManager {
         }
 
         // On envoit la requête et renvoit la réponse 
-        return administeredService.computeRequest(request);
+        let response = await administeredService.computeRequest(request);
+
+        return response;
 
     }
 

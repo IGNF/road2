@@ -153,6 +153,8 @@ module.exports = class ServiceInsider extends ServiceAdministered {
    */
   computeRequest(request) {
 
+    LOGGER.info("computeRequest...");
+
     // L'instance de Service est accessible, il suffit de faire appel à la fonction qui traite les requêtes
     return this._serviceInstance.computeAdminRequest(request);
 

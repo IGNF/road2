@@ -509,9 +509,20 @@ module.exports = class Administrator {
 
             let curServiceId = this._configuration.administration.services[i].id;
             LOGGER.debug("Demande de l'état du service : " + curServiceId);
+
+            // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
             let curHealthResponse = await this._serviceManager.computeRequest(curServiceId, healthRequest);
 
-            if (!curHealthResponse.serviceStates[0]) {
+            if (curHealthResponse._type !== "healthResponse") {
+                // Ce n'est pas normal, on renvoit une erreur pour ce service
+                // et on met le flag rouge
+                LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse du bon type");
+                gotRed = true;
+                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                continue;
+            }
+
+            if (!curHealthResponse._serviceStates[0]) {
                 // Ce n'est pas normal, on renvoit une erreur pour ce service
                 // et on met le flag rouge
                 LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse");
@@ -520,7 +531,7 @@ module.exports = class Administrator {
                 continue;
             }
 
-            if (!curHealthResponse.serviceStates[0].state) {
+            if (!curHealthResponse._serviceStates[0].state) {
                 // Ce n'est pas normal, on renvoit une erreur pour ce service
                 // et on met le flag rouge
                 LOGGER.error("Le service " + curServiceId + " n'a pas donné d'état");
@@ -530,13 +541,13 @@ module.exports = class Administrator {
             }
 
             // Pour la suite, on note la présence d'orange et de rouge dans les services
-            if (curHealthResponse.serviceStates[0].state === "orange") {
+            if (curHealthResponse._serviceStates[0].state === "orange") {
                 LOGGER.debug("Le service " + curServiceId + " est orange");
                 gotOrange = true;
-            } else if (curHealthResponse.serviceStates[0].state === "red") {
+            } else if (curHealthResponse._serviceStates[0].state === "red") {
                 LOGGER.debug("Le service " + curServiceId + " est red");
                 gotRed = true;
-            } else if (curHealthResponse.serviceStates[0].state === "green") {
+            } else if (curHealthResponse._serviceStates[0].state === "green") {
                 // Tout va bien, rien à faire
                 LOGGER.debug("Le service " + curServiceId + " est green");
             } else {
@@ -549,8 +560,8 @@ module.exports = class Administrator {
             }
 
             // On stocke le retour de ce service 
-            curHealthResponse.serviceStates[0].id = curServiceId;
-            healthResponse.serviceStates.push(curHealthResponse.serviceStates[0]);
+            curHealthResponse._serviceStates[0].id = curServiceId;
+            healthResponse.serviceStates.push(curHealthResponse._serviceStates[0]);
 
         }
 

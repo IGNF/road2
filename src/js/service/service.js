@@ -968,6 +968,49 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name initIPC
+  * @description Fonction utilisée pour permettra la communication IPC afin de traiter une requête venant de l'administrateur envoyée via ce protocol
+  *
+  */
+
+  initIPC() {
+
+    LOGGER.info("initIPC...");
+
+    process.on('message', (request) => {
+
+      LOGGER.debug("Service child received request: ");
+      LOGGER.debug(request);
+
+      // TODO : vérifier que le message vient bien du parent ? 
+
+      let response;
+      try {
+        response = this.computeAdminRequest(request);
+      } catch(error) {
+        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        process.send(error);
+        return false;
+      }
+
+      try {
+        response._uuid = request._uuid;
+        process.send(response);
+      } catch(error) {
+        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        process.send(error);
+        return false;
+      }
+
+      return true;
+
+    });
+
+  }
+
+  /**
+  *
+  * @function
   * @name computeAdminRequest
   * @description Fonction utilisée pour traiter une requête venant de l'administrateur
   * @param {object} request - Instance fille de la classe Request 
@@ -981,9 +1024,11 @@ module.exports = class Service {
     // On part du principe qu'un maximum de vérifications ont été faites avant par l'administrateur
     // On essaye de réduire l'exécution par le service 
 
+    // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
+
     // En fonction du type de la requête, on va appeler différentes fonctions 
     // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper. 
-    if (request.type === "healthRequest") {
+    if (request._type === "healthRequest") {
       return this.computeHealthRequest(request);
     } else {
       throw errorManager.createError("Unknown request type");
