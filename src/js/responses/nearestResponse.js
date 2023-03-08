@@ -25,7 +25,10 @@ module.exports = class nearestResponse extends Response {
   constructor(resource, coordinates) {
 
     // Constructeur parent
-    super(resource);
+    super("nearestResponse");
+
+    // Ressource 
+    this._resource = resource;
 
     // coordinates
     this._coordinates = coordinates;
@@ -34,6 +37,29 @@ module.exports = class nearestResponse extends Response {
     //Tableau contenant l'ensemble des points renvoyés par le moteur
     this._points = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la réponse
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la réponse
+  * @param {Point} res - Ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

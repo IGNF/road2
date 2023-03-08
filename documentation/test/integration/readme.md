@@ -20,6 +20,8 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - operation (parameter)
     - resourceParameter (parameter)
     - serverManager (server, ExpressJS, log4js, fs, assert)
+    - healthRequest (request)
+    - healthResponse (response)
     
 - Deuxième niveau: 
     - routeRequest (request, point)
@@ -123,6 +125,7 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
         - Router()
         - router.use()
         - json()
+        - set
 
 - got
     - utils/httpQuery.js

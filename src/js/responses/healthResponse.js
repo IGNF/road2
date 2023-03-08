@@ -1,5 +1,7 @@
 'use strict';
 
+const Response = require('./response');
+
 /**
 *
 * @class
@@ -8,7 +10,7 @@
 *
 */
 
-module.exports = class healthResponse {
+module.exports = class healthResponse extends Response {
 
 
   /**
@@ -21,7 +23,7 @@ module.exports = class healthResponse {
   constructor() {
 
     // Type de la réponse 
-    this._type = "healthResponse";
+    super("healthResponse");
 
     // État global 
     this._globalState = "unknown";

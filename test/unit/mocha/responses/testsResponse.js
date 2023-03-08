@@ -11,15 +11,15 @@ describe('Test de la classe Response', function() {
 
   describe('Test du constructeur et des getters/setters', function() {
 
-    let response = new Response("mon-id");
+    let response = new Response("mon-type");
 
-    it('Get Resource', function() {
-      assert.equal(response.resource, "mon-id");
+    it('Get Type', function() {
+      assert.equal(response.type, "mon-type");
     });
 
-    it('Set Resource', function() {
-      response.resource = "nouvel-id";
-      assert.equal(response.resource, "nouvel-id");
+    it('Set Type n\'existe pas car non modifiable', function() {
+      response.type = "nouveau-type";
+      assert.equal(response.type, "mon-type");
     });
 
   });
