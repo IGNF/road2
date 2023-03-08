@@ -14,7 +14,7 @@ RUN git clone --depth 1 --recursive https://github.com/kevinkreiser/prime_server
 cmake -B build . && cmake --build build && make -C build install
 
 WORKDIR /home/valhalla/
-RUN pip install --upgrade conan
+RUN pip install --upgrade "conan<2.0.0"
 RUN git clone --branch 3.2.0-with_hard_exclude --depth 1 --recursive https://github.com/IGNF/valhalla.git && cd valhalla && \
 mkdir build && cmake -B build -DCMAKE_BUILD_TYPE=Release && make -C build && make -C build package
 
@@ -47,7 +47,7 @@ COPY src ./src/
 COPY *.json ./
 
 ### Installation des dépendances de l'application NodeJS
-RUN npm install && npm install -g mocha eslint jsdoc
+RUN npm install && npm install -g mocha eslint jsdoc nyc
 
 ### Volume partagé pour lire les données
 VOLUME ["/home/docker/data"]
