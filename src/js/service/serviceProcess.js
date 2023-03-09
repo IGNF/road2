@@ -4,6 +4,11 @@ const log4js = require('log4js');
 const { fork } = require('child_process');
 
 const ServiceAdministered = require('./serviceAdministered');
+const errorManager = require('../utils/errorManager');
+const healthResponse = require('../responses/healthResponse');
+const {
+    setInterval,
+  } = require('node:timers/promises');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICEPRO");
@@ -38,6 +43,12 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
         // Instance de childProcess quand le processus est lancé
         this._serviceInstance = {};
+
+        // Compteur des requêtes envoyées effectivement au service
+        this._requestCount = 0;
+
+        // Liste des réponses en attente de lecture
+        this._unReadResponses = {};
 
     }
 
@@ -82,11 +93,105 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         // Création du service via un fork : on lance simplement service/main.js
         LOGGER.info("Fork du processus pour créer le service...");
 
-        this._serviceInstance = fork("./src/js/service/main.js", [this._configurationLocation], serviceOptions);
+        this._serviceInstance = fork("./src/js/service/main.js", [this._configurationLocation, "child"], serviceOptions);
 
         LOGGER.info("Processus enfant créé");
 
+        // Puisqu'un processus enfant a été créé et qu'il y a un canal IPC entre eux, on instancie la gestion des messages
+        this._serviceInstance.on("message", (response) => {
+
+            LOGGER.debug("Parent got message:");
+            LOGGER.debug(response);
+
+            // On stocke la réponse 
+            this._unReadResponses[response._uuid] = response;
+
+        });
+
         return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name computeRequest
+     * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
+     * @param {object} request - Instance fille de la classe Request 
+     * 
+     */
+    async computeRequest(request) {
+
+        LOGGER.info("computeRequest...");
+
+        // On vérifie que le child est toujours connecté
+        if (!this._serviceInstance.connected) {
+            throw errorManager.createError("Impossible d'envoyer une requête au service car non connecté");
+        } else {
+
+            LOGGER.debug("Le service child est connecté");
+
+            // On crée un UUID qui va permettre de faire le lien avec la réponse
+            // TODO : que se passe-t-il si l'instance tourne longtemps, y'a-t-il une limite ?
+            this._requestCount++;
+            request._uuid = this._requestCount.toString();
+            LOGGER.debug("Création d'un UUID:" + request._uuid);
+
+            // On envoit la requête au child
+            if (!this._serviceInstance.send(request)) {
+                throw errorManager.createError("Erreur lors de l'envoie de la requête");
+            }
+
+            // On attend la réponse et on la renvoit
+            let response = await this.waitResponse(request._uuid);
+            
+            return response;
+
+        }
+
+    }
+
+    /**
+     *
+     * @function
+     * @name waitResponse
+     * @description Fonction pour utiliser pour récupérer la réponse d'une requête une fois qu'elle est arrivée
+     * @param {string} uuid - UUID de la requête 
+     * 
+     */
+    async waitResponse(uuid) {
+
+        LOGGER.info("waitResponse...");
+
+        let response = {};
+
+        // Toutes les 10ms on va voir si la réponse est disponible
+        const interval = 10;
+
+        for await (const startTime of setInterval(interval, Date.now())) {
+
+            // Est-ce que la réponse est disponible ?
+            if (this._unReadResponses[uuid]) {
+                LOGGER.debug("Response found for uuid: " + uuid);
+                response = this._unReadResponses[uuid];
+                LOGGER.debug(response);
+                // On supprime la réponse de l'objet pour libérer la mémoire
+                delete this._unReadResponses[uuid];
+                LOGGER.debug(this._unReadResponses);
+                break;
+            }
+
+            // Gestion du timeout : 1min
+            const now = Date.now();
+            if ((now - startTime) > 60000) {
+                LOGGER.info("Timeout atteint pour l'attente de la réponse");
+                response = errorManager.createError("Pas de réponse reçue dans le temps imparti");
+                break;
+            }
+
+        }
+
+        return response;
 
     }
 

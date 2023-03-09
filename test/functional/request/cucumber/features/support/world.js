@@ -739,6 +739,7 @@ class road2World {
         } else {
 
             // On part du principe que c'est du GeoJSON
+            // TODO : ajouter la gestion du polyline
             if (curIso.coordinates) {
 
                 refIso = turf.polygon(refIso.coordinates);

@@ -30,7 +30,7 @@ module.exports = class sourceManager {
     this._checkedSourceId = new Array();
 
     // Catalogue des sources du manager
-    this._source = {};
+    this._sources = {};
 
     // Descriptions des sources chargées par le manager
     this._loadedSourceConfiguration = {};
@@ -59,12 +59,23 @@ module.exports = class sourceManager {
   /**
   *
   * @function
-  * @name get source
-  * @description Récupérer l'ensemble des ids de sources chargées
+  * @name get loadedSourceId
+  * @description Récupérer l'ensemble des id de sources chargées
   *
   */
-  get source() {
-    return this._source;
+  get loadedSourceId() {
+    return this._loadedSourceId;
+  }
+
+  /**
+  *
+  * @function
+  * @name get sources
+  * @description Récupérer l'ensemble des sources chargées
+  *
+  */
+   get sources() {
+    return this._sources;
   }
 
   /**
@@ -105,7 +116,7 @@ module.exports = class sourceManager {
   getSourceById(id) {
 
     if (this.isLoadedSourceAvailable(id)) {
-      return this._source[id];
+      return this._sources[id];
     } else {
       return null;
     }
@@ -915,7 +926,7 @@ module.exports = class sourceManager {
 
     let source;
 
-    if (this._source[sourceJsonObject.id]) {
+    if (this._sources[sourceJsonObject.id]) {
       LOGGER.info("La source " + sourceJsonObject.id + " existe déjà");
       return true;
     }
@@ -948,7 +959,7 @@ module.exports = class sourceManager {
     // Notamment dans la gestion (ajout/suppression/modification) de sources durant la vie du service
     this._loadedSourceId.push(sourceJsonObject.id);
     this._loadedSourceConfiguration[sourceJsonObject.id] = sourceJsonObject;
-    this._source[sourceJsonObject.id] = source;
+    this._sources[sourceJsonObject.id] = source;
 
     return true;
 
@@ -969,7 +980,7 @@ module.exports = class sourceManager {
 
     try {
 
-      await this._source[sourceId].connect();
+      await this._sources[sourceId].connect();
       LOGGER.info("Source connectee.");
       return true;
 

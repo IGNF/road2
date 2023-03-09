@@ -4,6 +4,7 @@
 const express = require('express');
 const log4js = require('log4js');
 const packageJSON = require('../../../../../package.json');
+const controller = require('./controller/controller');
 
 var LOGGER = log4js.getLogger("ADMIN");
 var router = express.Router();
@@ -32,7 +33,6 @@ router.route("/version")
 
 // Health
 // Pour avoir l'état du service
-// TODO: implémenter une véritable vérification de l'état
 router.route("/health")
 
   .get(async function(req, res, next) {
@@ -40,10 +40,31 @@ router.route("/health")
     LOGGER.debug("requete GET sur /admin/1.0.0/health?");
     LOGGER.debug(req.originalUrl);
 
-    res.set('content-type', 'application/json');
-    res.status(200).json({
-      "state": "green"
-    });
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.query;
+    LOGGER.debug(parameters);
+
+    try {
+
+      // Vérification des paramètres de la requête
+      const healthRequest = controller.checkHealthParameters(parameters);
+      LOGGER.debug(healthRequest);
+      // Envoie au service et récupération de l'objet réponse
+      const healthResponse = await administrator.computeHealthRequest(healthRequest);
+      LOGGER.debug(healthResponse);
+      // Formattage de la réponse
+      const userResponse = controller.writeHealthResponse(healthRequest, healthResponse);
+      LOGGER.debug(userResponse);
+
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);
+
+    } catch (error) {
+      return next(error);
+    }
 
   });
 

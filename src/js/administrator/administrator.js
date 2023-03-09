@@ -9,6 +9,7 @@ const assert = require('assert').strict;
 const serverManager = require('../server/serverManager');
 const serviceManager = require('../service/serviceManager');
 const apisManager = require('../apis/apisManager');
+const HealthResponse = require('../responses/healthResponse');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("ADMINISTRATOR");
@@ -324,6 +325,9 @@ module.exports = class Administrator {
         // Application Express
         let administrator = express();
 
+        // Stockage de l'instance Administrator dans l'app expressJS afin que les informations soient accessibles par les requêtes
+        administrator.set("administrator", this);
+
         // Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
         administrator.use(helmet());
 
@@ -471,6 +475,111 @@ module.exports = class Administrator {
         }
 
         return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name computeHealthRequest
+     * @description Gestion de la requête d'état du serveur 
+     * Cette fonction ne suit pas le m$eme chemin que les autres car elle est globale 
+     * et ne concerne pas un service particulier
+     * Elle renvoit une healthResponse complète et c'est au niveau de l'API qu'on peut la modifier
+     * @param {HealthRequest} healthRequest - Instance de la classe HealthRequest
+     *
+     */
+
+    async computeHealthRequest(healthRequest) {
+
+        LOGGER.info("computeHealthRequest...");
+
+        let gotOrange = false;
+        let gotRed = false;
+
+        let healthResponse = new HealthResponse();
+
+        // Étant donné que l'administrateur est en train de répondre, on le met au vert 
+        // À voir s'il y a des fonctionnalités qui pourraient le mettre à l'orange ou au rouge
+        // Dans ce cas là, il faudra que l'administrator ait un attribut d'état et que celui-ci soit lu dans cette fonction
+        healthResponse.adminState = "green";
+
+        // Pour chaque service, on demande au serviceManager l'état du service
+        for (let i = 0; i < this._configuration.administration.services.length; i++) {
+
+            let curServiceId = this._configuration.administration.services[i].id;
+            LOGGER.debug("Demande de l'état du service : " + curServiceId);
+
+            // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
+            let curHealthResponse = await this._serviceManager.computeRequest(curServiceId, healthRequest);
+
+            if (curHealthResponse._type !== "healthResponse") {
+                // Ce n'est pas normal, on renvoit une erreur pour ce service
+                // et on met le flag rouge
+                LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse du bon type");
+                gotRed = true;
+                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                continue;
+            }
+
+            if (!curHealthResponse._serviceStates[0]) {
+                // Ce n'est pas normal, on renvoit une erreur pour ce service
+                // et on met le flag rouge
+                LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse");
+                gotRed = true;
+                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                continue;
+            }
+
+            if (!curHealthResponse._serviceStates[0].state) {
+                // Ce n'est pas normal, on renvoit une erreur pour ce service
+                // et on met le flag rouge
+                LOGGER.error("Le service " + curServiceId + " n'a pas donné d'état");
+                gotRed = true;
+                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                continue;
+            }
+
+            // Pour la suite, on note la présence d'orange et de rouge dans les services
+            if (curHealthResponse._serviceStates[0].state === "orange") {
+                LOGGER.debug("Le service " + curServiceId + " est orange");
+                gotOrange = true;
+            } else if (curHealthResponse._serviceStates[0].state === "red") {
+                LOGGER.debug("Le service " + curServiceId + " est red");
+                gotRed = true;
+            } else if (curHealthResponse._serviceStates[0].state === "green") {
+                // Tout va bien, rien à faire
+                LOGGER.debug("Le service " + curServiceId + " est green");
+            } else {
+                // Cela ne devrait pas arriver, on renvoit une erreur pour ce service
+                // et on met le flag rouge
+                LOGGER.error("Le service " + curServiceId + " est dans un état inconnu");
+                gotRed = true;
+                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                continue;
+            }
+
+            // On stocke le retour de ce service 
+            curHealthResponse._serviceStates[0].id = curServiceId;
+            healthResponse.serviceStates.push(curHealthResponse._serviceStates[0]);
+
+        }
+
+        // En fonction des états définis précédemment, on va définir l'état global 
+        // Pour faire simple : 
+        // - global est orange si un des services est orange
+        // - global est rouge si un des services est rouge
+        if (gotRed) {
+            healthResponse.globalState = "red";
+        } else {
+            if (gotOrange) {
+                healthResponse.globalState = "orange";
+            } else {
+                healthResponse.globalState = "green";
+            }
+        }
+
+        return healthResponse;
 
     }
 

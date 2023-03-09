@@ -35,7 +35,10 @@ module.exports = class isochroneRequest extends Request {
   constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat, timeUnit, distanceUnit) {
 
     // Constructeur parent
-    super("isochrone", resource, "isochroneRequest");
+    super("isochrone", "isochroneRequest");
+
+    // Ressource concernée
+    this._resource = resource;
 
     // Initialisation du reste des paramètres
     this._point = point;
@@ -59,6 +62,29 @@ module.exports = class isochroneRequest extends Request {
     // Gestion des contraintes 
     this._constraints = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la requête
+  *
+  */
+  get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

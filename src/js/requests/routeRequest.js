@@ -29,7 +29,10 @@ module.exports = class routeRequest extends Request {
   constructor(resource, start, end, profile, optimization) {
 
     // Constructeur parent
-    super("route", resource, "routeRequest");
+    super("route", "routeRequest");
+
+    // Ressource concernée
+    this._resource = resource;
 
     // Point de départ
     this._start = start;
@@ -71,6 +74,29 @@ module.exports = class routeRequest extends Request {
     // Tableau contenant des instances de Constraint
     this._constraints = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la requête
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

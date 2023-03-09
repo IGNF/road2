@@ -65,5 +65,16 @@ module.exports = class ServiceAdministered {
     
   }
 
+  /**
+  *
+  * @function
+  * @name computeRequest
+  * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
+  *
+  */
+   computeRequest() {
+    
+  }
+
 
 }

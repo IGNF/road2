@@ -42,7 +42,10 @@ module.exports = class isochroneResponse extends Response {
     distanceUnit) {
 
     // Constructeur parent
-    super(resource);
+    super("isochroneResponse");
+
+    // Ressource 
+    this._resource = resource;
 
     // point
     this._point = point;
@@ -71,6 +74,29 @@ module.exports = class isochroneResponse extends Response {
     // distanceUnit
     this._distanceUnit = distanceUnit;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la réponse
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la réponse
+  * @param {Point} res - Ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

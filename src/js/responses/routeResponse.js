@@ -28,7 +28,10 @@ module.exports = class routeResponse extends Response {
   constructor(resource, start, end, profile, optimization) {
 
     // Constructeur parent
-    super(resource);
+    super("routeResponse");
+
+    // Ressource 
+    this._resource = resource;
 
     // start
     this._start = start;
@@ -46,6 +49,29 @@ module.exports = class routeResponse extends Response {
     //Tableau contenant l'ensemble des itinéraires calculés par le moteur
     this._routes = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la réponse
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la réponse
+  * @param {Point} res - Ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

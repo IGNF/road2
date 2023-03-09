@@ -4,6 +4,7 @@ const log4js = require('log4js');
 const Service = require('./service');
 const ServiceInsider = require('./serviceInsider');
 const ServiceProcess = require('./serviceProcess');
+const errorManager = require('../utils/errorManager');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICEMANAGER");
@@ -125,6 +126,53 @@ module.exports = class serviceManager {
         this._loadedServiceConfLocations[id] = configurationLocation;
 
         return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name computeRequest
+     * @description Gestion d'une requête pour un service 
+     * La requête est envoyé au service puis la réponse du service est retournée
+     * @param {string} serviceId - Id du service selon l'administrateur
+     * @param {object} request - Instance fille de la classe Request 
+     * 
+     */
+    async computeRequest(serviceId, request) {
+
+        LOGGER.info("computeRequest...");
+
+        // Quelques vérifications
+        if (!serviceId) {
+            throw errorManager.createError("Aucun id de service");
+        } 
+        if (typeof(serviceId) !== "string") {
+            throw errorManager.createError("L'id de service n'est pas une string");
+        } else {
+            LOGGER.debug("serviceId: " + serviceId);
+        }
+        if (!request) {
+            throw errorManager.createError("Aucune requête");
+        } 
+        if (typeof(request) !== "object") {
+            throw errorManager.createError("La requête n'est pas un objet");
+        } else {
+            LOGGER.debug("request:");
+            LOGGER.debug(request);
+        }
+
+        // On récupère le service administré
+        let administeredService = this._loadedServiceAdministeredCatalog[serviceId];
+        if (!administeredService) {
+            LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+            throw errorManager.createError("Unknown service : " + serviceId);
+        }
+
+        // On envoit la requête et renvoit la réponse 
+        let response = await administeredService.computeRequest(request);
+
+        return response;
 
     }
 
