@@ -174,6 +174,10 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             if (this._unReadResponses[uuid]) {
                 LOGGER.debug("Response found for uuid: " + uuid);
                 response = this._unReadResponses[uuid];
+                LOGGER.debug(response);
+                // On supprime la réponse de l'objet pour libérer la mémoire
+                delete this._unReadResponses[uuid];
+                LOGGER.debug(this._unReadResponses);
                 break;
             }
 
