@@ -6,7 +6,8 @@
         "admin": {
             "1.0.0": {
                 "health": "/admin/1.0.0/health",
-                "version": "/admin/1.0.0/version"
+                "version": "/admin/1.0.0/version",
+                "services": "/admin/1.0.0/services"
             }
         }
     },
