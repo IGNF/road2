@@ -583,6 +583,42 @@ module.exports = class Administrator {
 
     }
 
+
+    /**
+     *
+     * @function
+     * @name getServicesConfigurations
+     * @description Récupération de la configuration des services
+     * @param {json} response - Reponse json contenant les configuration de services
+     *
+     */
+
+    getServicesConfigurations(parameters) {
+
+        LOGGER.info("getServicesConfigurations...");
+
+        let responses = new Array();
+
+        // Pour chaque service, on récupère la configuration depuis le fichier de configuration
+        for (let i = 0; i < this._configuration.administration.services.length; i++) {
+
+            let curServiceId = this._configuration.administration.services[i].id;
+            
+            LOGGER.debug("Lecture fichier de configuration du service : " + curServiceId);
+            let curServiceConfFile = this._configuration.administration.services[i].configuration
+            let configuration = JSON.parse(fs.readFileSync(curServiceConfFile));
+
+            // Ajout de l'id
+            configuration.id = curServiceId
+            
+            responses.push(configuration) 
+        }        
+
+        return responses;
+    }
+
 }
+
+
 
 
