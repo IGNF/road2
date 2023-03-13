@@ -602,7 +602,7 @@ module.exports = class Administrator {
         if (service) {
             return this.readServiceConfiguration(service);
         } else {
-            throw errorManager.createError(`Can't find service ${parameters.serviceId}`)
+            throw errorManager.createError(`Can't find service ${parameters.serviceId}`, 404)
         }      
 
     }
@@ -632,7 +632,7 @@ module.exports = class Administrator {
             return configuration
 
         } catch (error) {
-            throw errorManager.createError(`Can't read service configuration file : ${error}`)
+            throw errorManager.createError(`Can't read service configuration file : ${error}`, 500)
         }
 
     }
