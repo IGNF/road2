@@ -7,7 +7,8 @@ ADDED:
 
 CHANGED:
   - La documentation de l'API d'administration a été grandement enrichie. 
-  - La route /health a une réponse plus complète et est vraiment codée pour prendre en compte l'état de chaque service et chaque source disponibles. 
+  - La route /health a une réponse plus complète et est vraiment codée pour prendre en compte l'état de chaque service et chaque source disponibles.
+  - Les dossiers de sources et de resources des services peuvent maintenant être vide à l'initialisation. 
 
 ## 2.0.0
 
