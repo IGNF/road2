@@ -578,8 +578,12 @@ module.exports = class Administrator {
         // Pour chaque service, on récupère la configuration depuis le fichier de configuration
         for (let i = 0; i < this._configuration.administration.services.length; i++) {            
             const configuration = this.readServiceConfiguration(this._configuration.administration.services[i]);
+
+            // Ajout de l'id
+            configuration.id = this._configuration.administration.services[i].id
+
             responses.push(configuration);
-        }        
+        }
 
         return responses;
     }
@@ -603,7 +607,7 @@ module.exports = class Administrator {
             return this.readServiceConfiguration(service);
         } else {
             throw errorManager.createError(`Can't find service ${parameters.serviceId}`, 404)
-        }      
+        }
 
     }
 
@@ -624,10 +628,7 @@ module.exports = class Administrator {
         try {
             const serviceConf = service.configuration
             const configurationLocation =  path.resolve(path.dirname(this._configurationPath), serviceConf);
-            let configuration = JSON.parse(fs.readFileSync(configurationLocation));
-
-            // Ajout de l'id
-            configuration.id = service.id
+            const configuration = JSON.parse(fs.readFileSync(configurationLocation));
             
             return configuration
 
