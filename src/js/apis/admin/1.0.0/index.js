@@ -68,6 +68,34 @@ router.route("/health")
 
   });
 
+// Services
+// Pour avoir des informations sur les services
+router.route("/services")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/services?");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    // on récupère l'ensemble des paramètres de la requête
+    let parameters = req.query;
+    LOGGER.debug(parameters);
+
+    try {
+
+      const servicesResponse = administrator.getServicesConfigurations(parameters)
+      res.set('content-type', 'application/json');
+      res.status(200).json(servicesResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
+
 // Gestion des erreurs
 // Cette partie doit être placée après la définition des routes normales
 // ---

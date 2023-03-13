@@ -65,3 +65,20 @@ Feature: Road2 with data
     When I send the request 
     Then the server should send a response with status 404
     And the response should contain "Not found"
+
+  Scenario: [admin/1.0.0] Configurations des services
+    Given an "GET" request on operation "services" in api "admin" "1.0.0"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "application"
+    And the response should contain an attribute "[0].id"
+
+  Scenario: [admin/1.0.0] Configurations des services en POST ne marche pas
+    Given an "POST" request on operation "services" in api "admin" "1.0.0"
+    And with query parameters:
+      | key       | value           |
+      | test      | other           |
+    When I send the request 
+    Then the server should send a response with status 404
+    And the response should contain "Not found"

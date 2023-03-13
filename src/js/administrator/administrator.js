@@ -10,6 +10,7 @@ const serverManager = require('../server/serverManager');
 const serviceManager = require('../service/serviceManager');
 const apisManager = require('../apis/apisManager');
 const HealthResponse = require('../responses/healthResponse');
+const errorManager = require('../utils/errorManager');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("ADMINISTRATOR");
@@ -583,6 +584,48 @@ module.exports = class Administrator {
 
     }
 
+
+    /**
+     *
+     * @function
+     * @name getServicesConfigurations
+     * @description Récupération de la configuration des services
+     * @param {json} response - Reponse json contenant les configuration de services
+     *
+     */
+
+    getServicesConfigurations(parameters) {
+
+        LOGGER.info("getServicesConfigurations...");
+
+        let responses = new Array();
+
+        // Pour chaque service, on récupère la configuration depuis le fichier de configuration
+        for (let i = 0; i < this._configuration.administration.services.length; i++) {
+
+            const curServiceId = this._configuration.administration.services[i].id;
+            
+            LOGGER.debug("Lecture fichier de configuration du service : " + curServiceId);
+            try {
+                const curServiceConf = this._configuration.administration.services[i].configuration
+                const configurationLocation =  path.resolve(path.dirname(this._configurationPath), curServiceConf);
+                let configuration = JSON.parse(fs.readFileSync(configurationLocation));
+
+                // Ajout de l'id
+                configuration.id = curServiceId
+                
+                responses.push(configuration) 
+
+            } catch (error) {
+                throw errorManager.createError("Can't read service configuration file : " + error)
+            }
+        }        
+
+        return responses;
+    }
+
 }
+
+
 
 

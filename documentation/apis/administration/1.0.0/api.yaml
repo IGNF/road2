@@ -186,13 +186,6 @@ paths:
         Cette requête retourne l'ensemble des services connus par l'administrateur. 
         Cette liste peut être vide si aucun service n'a été configuré.
       operationId: "services"
-      parameters:
-        - name: "withId"
-          description: "Si on souhaite récupérer les ids des services. Ces ids sont normalement dans la configuration de l'administrateur. "
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
       responses:
         200:
           description: "successful operation"
@@ -208,6 +201,12 @@ paths:
                         id:
                           type: "string"
                     - $ref: "#/components/schemas/serviceConfiguration"
+        500:
+          description: "Internal error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
     post:
       tags:
       - "Gestion des services"
@@ -747,8 +746,6 @@ components:
         error:
           type: "object"
           properties:
-            errorType:
-              type: "string"
             message:
               type: "string"
 
