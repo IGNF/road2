@@ -9,6 +9,9 @@ CHANGED:
   - La documentation de l'API d'administration a été grandement enrichie. 
   - La route /health a une réponse plus complète et est vraiment codée pour prendre en compte l'état de chaque service et chaque source disponibles. 
 
+DELETED:
+  - option onStart inside admin configuration is deleted 
+
 ## 2.0.0
 
 ADDED:

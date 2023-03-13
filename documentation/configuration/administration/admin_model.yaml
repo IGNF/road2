@@ -34,10 +34,6 @@
 					"configuration":
 						type: string
 						required: true
-					# Indiquer si on souhaite que le service soit démarré au lancement de l'admin
-					"onStart":
-						type: string
-						required: true
 					# Type de création du service. Pour le moment, il seul 'newProcess' est accepté. On crée un nouveau processus pour le service. 
 					"creationType":
 						type: string

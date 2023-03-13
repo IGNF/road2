@@ -776,9 +776,6 @@ components:
                   configuration: 
                     type: "string"
                     example: "/home/docker/config/service.json"
-                  onStart: 
-                    type: "string"
-                    example: "true"
                   creationType: 
                     type: "string"
                     example: "newProcess"

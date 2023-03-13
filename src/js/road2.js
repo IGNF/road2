@@ -62,13 +62,13 @@ async function start() {
         LOGGER.debug("Serveur administrateur créé");
 
         // Création des services au démarrage si demandé
-        LOGGER.info("Création des services demandés au démarrage...");
+        LOGGER.info("Création des services...");
 
-        if (!(await administrator.createServicesOnStart())) {
-          LOGGER.error("Problèmes lors du démarrage des services demandés. Reconfigurez les et relancez leur démarrage.");
+        if (!(await administrator.createServices())) {
+          LOGGER.error("Problèmes lors du démarrage des services. Reconfigurez les et relancez leur démarrage.");
           // On n'éteint pas le serveur d'administration car les services pourront être reconfiguré et démarrés par l'API
         } else {
-          LOGGER.info("Les services concernés ont été démarré");
+          LOGGER.info("Les services ont été démarré");
         }
 
       }

@@ -8,7 +8,6 @@
       {
         "id": "main",
         "configuration": "./service.json",
-        "onStart": "true",
         "creationType": "newProcess" 
       }
     ],
