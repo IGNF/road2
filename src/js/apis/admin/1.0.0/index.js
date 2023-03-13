@@ -96,6 +96,34 @@ router.route("/services")
 
   });
 
+// Services/{service}
+// Récupérer les informations d'un service
+router.route("/services/:service")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/services/:service?");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    // on récupère l'ensemble des paramètres de la requête
+    const parameters = req.params;
+    LOGGER.debug(parameters);
+
+    try {
+
+      const serviceResponse = administrator.getServiceConfiguration(parameters)
+      res.set('content-type', 'application/json');
+      res.status(200).json(serviceResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
+
 // Gestion des erreurs
 // Cette partie doit être placée après la définition des routes normales
 // ---
