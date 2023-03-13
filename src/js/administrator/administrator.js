@@ -100,134 +100,134 @@ module.exports = class Administrator {
                 LOGGER.debug("configuration.administration.services est bien un tableau");
 
                 if (configuration.administration.services.length === 0) {
-                    LOGGER.error("Mauvaise configuration: 'administration.services' est un tableau vide.");
-                    return false;
+                    LOGGER.warn("'administration.services' est un tableau vide.");
                 } else {
                     LOGGER.debug("configuration.administration.services est bien un tableau qui contient des éléments");
-                }
 
-            }
-        }
+                    // On ne veut pas que les Id soient réutilisés
+                    let checkedServiceId = new Array();
+                    let checkedServiceConf = new Array();
+                    let checkedServiceConfLocation = new Array();
 
-        // On ne veut pas que les Id soient réutilisés
-        let checkedServiceId = new Array();
-        let checkedServiceConf = new Array();
-        let checkedServiceConfLocation = new Array();
+                    for (let i = 0; i < configuration.administration.services.length; i++) {
 
-        for (let i = 0; i < configuration.administration.services.length; i++) {
+                        let curServiceConf = configuration.administration.services[i];
 
-            let curServiceConf = configuration.administration.services[i];
+                        let configurationLocation = "";
+                        let configurationContent = {};
 
-            let configurationLocation = "";
-            let configurationContent = {};
-
-            if (!curServiceConf.id) {
-                LOGGER.error("Mauvaise configuration: 'id' absent.");
-                return false;
-            } else {
-
-                if (typeof(curServiceConf.id) !== "string") {
-                    LOGGER.error("Mauvaise configuration: 'id' n'est pas une string.");
-                    return false;
-                }
-                if (curServiceConf.id === "") {
-                    LOGGER.error("Mauvaise configuration: 'id' est une string vide.");
-                    return false;
-                }
-
-                LOGGER.debug("Id présent : " + curServiceConf.id);
-
-                // On vérifie que l'id n'est pas déjà pris 
-                if (checkedServiceId.length === 0) {
-                    // On continue la suite de la vérification
-                } else {
-
-                    for (let j = 0; j < checkedServiceId.length; j++) {
-                        if (curServiceConf.id === checkedServiceId[j]) {
-                            LOGGER.error("Id de service déjà pris : " + curServiceConf.id);
+                        if (!curServiceConf.id) {
+                            LOGGER.error("Mauvaise configuration: 'id' absent.");
                             return false;
-                        } 
-                    }
+                        } else {
 
-                }
+                            if (typeof(curServiceConf.id) !== "string") {
+                                LOGGER.error("Mauvaise configuration: 'id' n'est pas une string.");
+                                return false;
+                            }
+                            if (curServiceConf.id === "") {
+                                LOGGER.error("Mauvaise configuration: 'id' est une string vide.");
+                                return false;
+                            }
 
-            }
+                            LOGGER.debug("Id présent : " + curServiceConf.id);
 
-            if (!curServiceConf.configuration) {
-                LOGGER.error("Mauvaise configuration: 'configuration' absent.");
-                return false;
-            } else {
-    
-                LOGGER.debug("configuration présent");
-                                
-                try {
-                    configurationLocation =  path.resolve(path.dirname(this._configurationPath), curServiceConf.configuration);
-                    LOGGER.debug("Chemin absolu du fichier de configuration du service : " + configurationLocation);
-                } catch (error) {
-                    LOGGER.error("Can't get absolute path of service configuration: " + curServiceConf.configuration);
-                    LOGGER.error(error);
-                    return false;
-                }
+                            // On vérifie que l'id n'est pas déjà pris 
+                            if (checkedServiceId.length === 0) {
+                                // On continue la suite de la vérification
+                            } else {
 
-                // On vérifie que ce chemin n'est pas déjà utilisé 
-                if (checkedServiceConfLocation.length !== 0) {
-                    for (let cs = 0; cs < checkedServiceConfLocation.length; cs++) {
-                        if (configurationLocation === checkedServiceConfLocation[cs]) {
-                            LOGGER.error("La configuration indiquée est déjà vérifiée. Elle ne peut être utilisée pour un autre service géré par cet administrateur.");
-                            return false;
+                                for (let j = 0; j < checkedServiceId.length; j++) {
+                                    if (curServiceConf.id === checkedServiceId[j]) {
+                                        LOGGER.error("Id de service déjà pris : " + curServiceConf.id);
+                                        return false;
+                                    } 
+                                }
+
+                            }
+
                         }
-                    }
-                }
 
-                try {
-                // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
-                configurationContent = JSON.parse(fs.readFileSync(configurationLocation));
-                LOGGER.debug("Le contenu du fichier est accessible par Road2");
-                } catch (error) {
-                LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration du service: " + configurationLocation);
-                LOGGER.error(error);
-                return false;
-                }
-
-                // On vérifie que ce contenu n'est pas déjà utilisé
-                if (checkedServiceConf.length !== 0) {
-                    for (let cs = 0; cs < checkedServiceConf.length; cs++) {
-                        try {
-                            assert.deepStrictEqual(configurationContent, checkedServiceConf[cs]);
-                            LOGGER.error("Le contenu de configuration indiqué est déjà vérifié pour un autre service. Il ne peut être utilisée pour plus d'un service géré par cet administrateur.");
+                        if (!curServiceConf.configuration) {
+                            LOGGER.error("Mauvaise configuration: 'configuration' absent.");
                             return false;
-                        } catch (err) {
-                            LOGGER.debug("Les deux configuration de service ne sont pas identiques.");
+                        } else {
+                
+                            LOGGER.debug("configuration présent");
+                                            
+                            try {
+                                configurationLocation =  path.resolve(path.dirname(this._configurationPath), curServiceConf.configuration);
+                                LOGGER.debug("Chemin absolu du fichier de configuration du service : " + configurationLocation);
+                            } catch (error) {
+                                LOGGER.error("Can't get absolute path of service configuration: " + curServiceConf.configuration);
+                                LOGGER.error(error);
+                                return false;
+                            }
+
+                            // On vérifie que ce chemin n'est pas déjà utilisé 
+                            if (checkedServiceConfLocation.length !== 0) {
+                                for (let cs = 0; cs < checkedServiceConfLocation.length; cs++) {
+                                    if (configurationLocation === checkedServiceConfLocation[cs]) {
+                                        LOGGER.error("La configuration indiquée est déjà vérifiée. Elle ne peut être utilisée pour un autre service géré par cet administrateur.");
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            try {
+                                // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                                configurationContent = JSON.parse(fs.readFileSync(configurationLocation));
+                                LOGGER.debug("Le contenu du fichier est accessible par Road2");
+                            } catch (error) {
+                                LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration du service: " + configurationLocation);
+                                LOGGER.error(error);
+                                return false;
+                            }
+
+                            // On vérifie que ce contenu n'est pas déjà utilisé
+                            if (checkedServiceConf.length !== 0) {
+                                for (let cs = 0; cs < checkedServiceConf.length; cs++) {
+                                    try {
+                                        assert.deepStrictEqual(configurationContent, checkedServiceConf[cs]);
+                                        LOGGER.error("Le contenu de configuration indiqué est déjà vérifié pour un autre service. Il ne peut être utilisée pour plus d'un service géré par cet administrateur.");
+                                        return false;
+                                    } catch (err) {
+                                        LOGGER.debug("Les deux configuration de service ne sont pas identiques.");
+                                    }
+                                }
+                            }
+
+                            
+                
                         }
+                
+                        if (!curServiceConf.creationType) {
+                            LOGGER.error("Mauvaise configuration: 'creationType' absent.");
+                            return false;
+                        } else {
+                
+                            LOGGER.debug("configuration.creationType présent");
+                
+                            if (!["sameProcess","newProcess","findByURI"].includes(curServiceConf.creationType)) {
+                                LOGGER.error("Mauvaise configuration: 'creationType' doit être parmi 'sameProcess', 'newProcess', 'findByURI'.");
+                                return false;
+                            } else {
+                                LOGGER.debug("configuration.creationType bien configuré");
+                            }
+                
+                        }
+                
+                        LOGGER.debug("Vérification du service en cours terminée");
+                        checkedServiceId.push(curServiceConf.id);
+                        checkedServiceConf.push(configurationContent);
+                        checkedServiceConfLocation.push(configurationLocation);
+
+
                     }
+
                 }
 
-                  
-    
             }
-    
-            if (!curServiceConf.creationType) {
-                LOGGER.error("Mauvaise configuration: 'creationType' absent.");
-                return false;
-            } else {
-    
-                LOGGER.debug("configuration.creationType présent");
-    
-                if (!["sameProcess","newProcess","findByURI"].includes(curServiceConf.creationType)) {
-                    LOGGER.error("Mauvaise configuration: 'creationType' doit être parmi 'sameProcess', 'newProcess', 'findByURI'.");
-                    return false;
-                } else {
-                    LOGGER.debug("configuration.creationType bien configuré");
-                }
-    
-            }
-    
-            LOGGER.debug("Vérification du service en cours terminée");
-            checkedServiceId.push(curServiceConf.id);
-            checkedServiceConf.push(configurationContent);
-            checkedServiceConfLocation.push(configurationLocation);
-
-
         }
 
         LOGGER.debug("Vérification des services terminée");
@@ -380,6 +380,11 @@ module.exports = class Administrator {
 
         LOGGER.info("Vérification de la configuration des services...");
 
+        if (this._configuration.administration.services.length === 0) {
+            LOGGER.warn("Aucun service à vérifier");
+            return true;
+        }
+
         for (let i = 0; i < this._configuration.administration.services.length; i++) {
 
             let curIASConf = this._configuration.administration.services[i];
@@ -414,7 +419,12 @@ module.exports = class Administrator {
 
     async createServices() {
 
-        LOGGER.info("Vérification et création des services");
+        LOGGER.info("Vérification et création des services...");
+
+        if (this._configuration.administration.services.length === 0) {
+            LOGGER.warn("Aucun service à créer");
+            return true;
+        }
 
         // Pour chaque service, on vérifie sa configuration puis on le démarre 
 
@@ -480,64 +490,70 @@ module.exports = class Administrator {
         // Dans ce cas là, il faudra que l'administrator ait un attribut d'état et que celui-ci soit lu dans cette fonction
         healthResponse.adminState = "green";
 
-        // Pour chaque service, on demande au serviceManager l'état du service
-        for (let i = 0; i < this._configuration.administration.services.length; i++) {
+        if (this._configuration.administration.services.length === 0) {
+            LOGGER.info("Aucun service, donc pas de status à récupérer");
+        } else {
 
-            let curServiceId = this._configuration.administration.services[i].id;
-            LOGGER.debug("Demande de l'état du service : " + curServiceId);
+            // Pour chaque service, on demande au serviceManager l'état du service
+            for (let i = 0; i < this._configuration.administration.services.length; i++) {
 
-            // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
-            let curHealthResponse = await this._serviceManager.computeRequest(curServiceId, healthRequest);
+                let curServiceId = this._configuration.administration.services[i].id;
+                LOGGER.debug("Demande de l'état du service : " + curServiceId);
 
-            if (curHealthResponse._type !== "healthResponse") {
-                // Ce n'est pas normal, on renvoit une erreur pour ce service
-                // et on met le flag rouge
-                LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse du bon type");
-                gotRed = true;
-                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
-                continue;
+                // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
+                let curHealthResponse = await this._serviceManager.computeRequest(curServiceId, healthRequest);
+
+                if (curHealthResponse._type !== "healthResponse") {
+                    // Ce n'est pas normal, on renvoit une erreur pour ce service
+                    // et on met le flag rouge
+                    LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse du bon type");
+                    gotRed = true;
+                    healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                    continue;
+                }
+
+                if (!curHealthResponse._serviceStates[0]) {
+                    // Ce n'est pas normal, on renvoit une erreur pour ce service
+                    // et on met le flag rouge
+                    LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse");
+                    gotRed = true;
+                    healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                    continue;
+                }
+
+                if (!curHealthResponse._serviceStates[0].state) {
+                    // Ce n'est pas normal, on renvoit une erreur pour ce service
+                    // et on met le flag rouge
+                    LOGGER.error("Le service " + curServiceId + " n'a pas donné d'état");
+                    gotRed = true;
+                    healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                    continue;
+                }
+
+                // Pour la suite, on note la présence d'orange et de rouge dans les services
+                if (curHealthResponse._serviceStates[0].state === "orange") {
+                    LOGGER.debug("Le service " + curServiceId + " est orange");
+                    gotOrange = true;
+                } else if (curHealthResponse._serviceStates[0].state === "red") {
+                    LOGGER.debug("Le service " + curServiceId + " est red");
+                    gotRed = true;
+                } else if (curHealthResponse._serviceStates[0].state === "green") {
+                    // Tout va bien, rien à faire
+                    LOGGER.debug("Le service " + curServiceId + " est green");
+                } else {
+                    // Cela ne devrait pas arriver, on renvoit une erreur pour ce service
+                    // et on met le flag rouge
+                    LOGGER.error("Le service " + curServiceId + " est dans un état inconnu");
+                    gotRed = true;
+                    healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
+                    continue;
+                }
+
+                // On stocke le retour de ce service 
+                curHealthResponse._serviceStates[0].id = curServiceId;
+                healthResponse.serviceStates.push(curHealthResponse._serviceStates[0]);
+
             }
-
-            if (!curHealthResponse._serviceStates[0]) {
-                // Ce n'est pas normal, on renvoit une erreur pour ce service
-                // et on met le flag rouge
-                LOGGER.error("Le service " + curServiceId + " n'a pas donné de réponse");
-                gotRed = true;
-                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
-                continue;
-            }
-
-            if (!curHealthResponse._serviceStates[0].state) {
-                // Ce n'est pas normal, on renvoit une erreur pour ce service
-                // et on met le flag rouge
-                LOGGER.error("Le service " + curServiceId + " n'a pas donné d'état");
-                gotRed = true;
-                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
-                continue;
-            }
-
-            // Pour la suite, on note la présence d'orange et de rouge dans les services
-            if (curHealthResponse._serviceStates[0].state === "orange") {
-                LOGGER.debug("Le service " + curServiceId + " est orange");
-                gotOrange = true;
-            } else if (curHealthResponse._serviceStates[0].state === "red") {
-                LOGGER.debug("Le service " + curServiceId + " est red");
-                gotRed = true;
-            } else if (curHealthResponse._serviceStates[0].state === "green") {
-                // Tout va bien, rien à faire
-                LOGGER.debug("Le service " + curServiceId + " est green");
-            } else {
-                // Cela ne devrait pas arriver, on renvoit une erreur pour ce service
-                // et on met le flag rouge
-                LOGGER.error("Le service " + curServiceId + " est dans un état inconnu");
-                gotRed = true;
-                healthResponse.serviceStates.push({"serviceId":curServiceId,"state":"unknown"});
-                continue;
-            }
-
-            // On stocke le retour de ce service 
-            curHealthResponse._serviceStates[0].id = curServiceId;
-            healthResponse.serviceStates.push(curHealthResponse._serviceStates[0]);
 
         }
 
