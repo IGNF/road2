@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.2.0
+
+DELETED:
+  - option onStart inside admin configuration is deleted 
+
 ## 2.1.0
 
 CHANGED:

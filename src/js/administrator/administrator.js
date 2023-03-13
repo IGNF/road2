@@ -205,22 +205,6 @@ module.exports = class Administrator {
     
             }
     
-            if (!curServiceConf.onStart) {
-                LOGGER.error("Mauvaise configuration: 'onStart' absent.");
-                return false;
-            } else {
-    
-                LOGGER.debug("configuration.onStart présent");
-    
-                if (curServiceConf.onStart !== "true" && curServiceConf.onStart !== "false") {
-                    LOGGER.error("Mauvaise configuration: 'onStart' doit être 'true' ou 'false'.");
-                    return false;
-                } else {
-                    LOGGER.debug("configuration.onStart bien configuré");
-                }
-    
-            }
-    
             if (!curServiceConf.creationType) {
                 LOGGER.error("Mauvaise configuration: 'creationType' absent.");
                 return false;
@@ -422,30 +406,21 @@ module.exports = class Administrator {
     /**
      *
      * @function
-     * @name createServicesOnStart
-     * @description Création des services gérés par cet administrateur dont la création a été demandé au démarrage de l'administrateur
+     * @name createServices
+     * @description Création des services gérés par cet administrateur 
      *
      */
 
-    async createServicesOnStart() {
+    async createServices() {
 
-        LOGGER.info("Vérification et création des services onStart=true...");
+        LOGGER.info("Vérification et création des services");
 
-        // Pour chaque service, on va voir s'il doit être démarré 
-        // Si oui, on vérifie sa configuration puis on le démarre 
+        // Pour chaque service, on vérifie sa configuration puis on le démarre 
 
         for (let i = 0; i < this._configuration.administration.services.length; i++) {
 
             let curIASConf = this._configuration.administration.services[i];
             LOGGER.debug("Analyse du service : " + curIASConf.id);
-
-            if (curIASConf.onStart === "false") {
-                // il n'y a rien à faire
-                LOGGER.debug("Le service " + curIASConf.id + " n'est à démarrer tout de suite");
-                continue;
-            } else {
-                LOGGER.info("Le service " + curIASConf.id + " est à démarrer");
-            }
 
             // Récupération de la configuration
             LOGGER.info("Récupération de la configuration du service");

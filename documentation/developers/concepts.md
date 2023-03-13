@@ -128,7 +128,7 @@ Le premier point d'entrée possible est le fichier `src/js/road2.js`. Ce fichier
 
 Cet administrateur permet plusieurs choses : 
 - On peut le lancer uniquement pour vérifier la bonne configuration de l'administrateur et des services associés. Dans ce cas là, le processus s'éteint après la vérification et renvoie un code d'erreur permettant de déterminer s'il y a eu un problème et son type. 
-- On peut le lancer en mode serveur pour administrer un ou plusieurs services via une API HTTP(S). Dans ce cas là, il est possible de lui demander de lancer les service à son démarrage. Il sera aussi possible de les démarrer plus tard. 
+- On peut le lancer en mode serveur pour administrer un ou plusieurs services via une API HTTP(S). Dans ce cas là, l'administrateur va lancer tous les services déjà configurés. Il sera aussi possible d'en créer d'autres plus tard. 
 
 Un administrateur a été créé pour réaliser des tâches qui auraient gêné la bonne exécution du service. 
 
