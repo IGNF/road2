@@ -746,8 +746,6 @@ components:
         error:
           type: "object"
           properties:
-            errorType:
-              type: "string"
             message:
               type: "string"
 
