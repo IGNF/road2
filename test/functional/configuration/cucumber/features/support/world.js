@@ -491,6 +491,16 @@ class road2World {
 
     }
 
+    // Creation de répertoire
+    createDir(dirname) {
+        try {
+            fs.mkdirSync(path.join(this._tmpDirConf, dirname));
+        } catch(error) {
+            throw "Can't create directory " + dirname + " : " + error;
+        }
+        return true
+    }
+
     createWrongJSONFile(relativeFilePath) {
 
         try {

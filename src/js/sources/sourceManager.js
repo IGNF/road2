@@ -175,7 +175,7 @@ module.exports = class sourceManager {
       }
 
       if (fileList.length === 0) {
-        LOGGER.warn("Le dossier " + directory + " est vide");
+        LOGGER.warn("Le dossier des sources est vide '" + directory + "'");
         return true;
       }
 

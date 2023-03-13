@@ -50,6 +50,10 @@ Given("a file {string} non readable", function(relativeFilePath) {
     this.createFile(relativeFilePath, "", false);
 });
 
+Given("an empty directory {string}", function(dirname) {
+    this.createDir(dirname);
+});
+
 Given("a server configuration non readable", function() {
     this.nonReadableServerConfiguration();
 });
