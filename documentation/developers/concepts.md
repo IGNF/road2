@@ -144,9 +144,11 @@ Ce service est l'objet qui permet de gérer les ressources proposées par l'inst
 
 Chaque ressource contient plusieurs sources. Étant donné que plusieurs ressources peuvent pointer vers des sources communes, le service contient un catalogue de sources uniques et un manager de ces sources.
 
-Lorsque l'application est lancée, on commence par lire la configuration de l'application pour être capable d'instancier le logger. Une fois que le logger est chargé, on vérifie complètement la configuration.
+Lorsque l'application est lancée, on commence par lire la configuration de l'application pour être capable d'instancier le logger. 
 
-Après cela, on charge les ressources et les sources du service indiquées dans la configuration. C'est à ce moment que les fichiers sont lus, stockés en RAM si nécessaire, et que les connexions aux bases de données sont effectuées. 
+Une fois que le logger est chargé, on vérifie complètement la configuration. Il est possible de configurer un service avec des dossiers de sources et de ressources vides. Ils pourront être remplis plus tard. Cependant, ces dossier doivent être indiqués lors de la configuration du service. 
+
+Après cela, on charge les ressources et les sources du service indiquées dans la configuration s'il y en a. C'est à ce moment que les fichiers sont lus, stockés en RAM si nécessaire, et que les connexions aux bases de données sont effectuées. 
 
 Enfin, on finit par charger les APIs exposées par le service. C'est là qu'ExpressJS crée le ou les serveurs Node et charge les routes disponibles.  
 
