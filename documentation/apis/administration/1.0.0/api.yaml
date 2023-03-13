@@ -201,6 +201,12 @@ paths:
                         id:
                           type: "string"
                     - $ref: "#/components/schemas/serviceConfiguration"
+        500:
+          description: "Internal error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
     post:
       tags:
       - "Gestion des services"
