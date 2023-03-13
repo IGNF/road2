@@ -176,7 +176,7 @@ module.exports = class sourceManager {
 
       if (fileList.length === 0) {
         LOGGER.warn("Le dossier " + directory + " est vide");
-        return false;
+        return true;
       }
 
       for (let i = 0; i < fileList.length; i++) {
@@ -1005,8 +1005,8 @@ module.exports = class sourceManager {
     LOGGER.info("Connexion de l'ensemble des sources...");
 
     if (this._loadedSourceId.length === 0) {
-      LOGGER.error("Aucune source n'est disponible");
-      return false;
+      LOGGER.warn("Aucune source n'est disponible");
+      return true;
     }
 
     try {
