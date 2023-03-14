@@ -3,6 +3,7 @@
 const errorManager = require('../../../../utils/errorManager');
 const log4js = require('log4js');
 const HealthRequest = require('../../../../requests/healthRequest');
+const Request = require('../../../../requests/request');
 
 var LOGGER = log4js.getLogger("CONTROLLER");
 
@@ -77,6 +78,41 @@ module.exports = {
     userResponse.services = healthResponse.serviceStates;
 
     return userResponse;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name checkServiceParameters
+  * @description Vérification des paramètres d'une requête sur /health
+  * @param {object} parameters - ensemble des paramètres de la requête
+  * @return {Request} request - Instance de la classe Request
+  *
+  */
+
+  checkServiceParameters: function(parameters) {
+
+    LOGGER.debug("checkServiceParameters()");
+
+    // Il n'y a aucun paramètre obligatoire donc on peut créer l'objet request
+    const request = new Request();
+
+    // Service
+    if (parameters.service) {
+
+      LOGGER.debug("Service ID:");
+      LOGGER.debug(parameters.service);
+
+      if (parameters.service !== "") {
+        request.service = parameters.service
+      } else {
+        throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
+      }
+      
+    }
+
+    return request;
 
   }
 

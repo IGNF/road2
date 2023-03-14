@@ -113,8 +113,10 @@ router.route("/services/:service")
     LOGGER.debug(parameters);
 
     try {
-
-      const serviceResponse = administrator.getServiceConfiguration(parameters)
+      // Vérification des paramètres de la requête
+      const serviceRequest = controller.checkServiceParameters(parameters);
+      LOGGER.debug(serviceRequest);
+      const serviceResponse = administrator.getServiceConfiguration(serviceRequest.service)
       res.set('content-type', 'application/json');
       res.status(200).json(serviceResponse);
 

@@ -593,20 +593,21 @@ module.exports = class Administrator {
      * @function
      * @name getServiceConfiguration
      * @description Récupération de la configuration d'un service
-     * @param {json} response - Reponse json contenant la configuration du service
+     * @param {string} serviceId - Identifiant du service à interroger
+     * @return {json} response - Réponse json contenant la configuration du service
      *
      */
 
-    getServiceConfiguration(parameters) {
+    getServiceConfiguration(serviceId) {
 
         LOGGER.info("getServiceConfiguration...");
 
-        const service = this._configuration.administration.services.find(service => service.id == parameters.service)
+        const serviceAdminConf = this._configuration.administration.services.find(service => service.id == serviceId)
 
-        if (service) {
-            return this.readServiceConfiguration(service);
+        if (serviceAdminConf) {
+            return this.readServiceConfiguration(serviceAdminConf);
         } else {
-            throw errorManager.createError(`Can't find service ${parameters.service}`, 404)
+            throw errorManager.createError(`Can't find service ${serviceId}`, 404)
         }
 
     }
