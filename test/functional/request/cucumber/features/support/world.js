@@ -174,6 +174,16 @@ class road2World {
 
     }
 
+    setPathParameters(parametersToAdd) {
+
+        for(let i = 0; i < parametersToAdd.length; i++) {
+            if (this._path.includes(`<${parametersToAdd[i].key}>`)) {
+                this._path = this._path.replace(`<${parametersToAdd[i].key}>`, parametersToAdd[i].value)
+            }
+        }
+
+    }
+
     setTableParameters(key, valuesToAdd) {
         
         let arrayParameters = new Array();
