@@ -606,7 +606,7 @@ module.exports = class Administrator {
         if (service) {
             return this.readServiceConfiguration(service);
         } else {
-            throw errorManager.createError(`Can't find service ${parameters.serviceId}`, 404)
+            throw errorManager.createError(`Can't find service ${parameters.service}`, 404)
         }
 
     }
