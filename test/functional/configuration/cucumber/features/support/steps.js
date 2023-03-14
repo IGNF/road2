@@ -50,6 +50,10 @@ Given("a file {string} non readable", function(relativeFilePath) {
     this.createFile(relativeFilePath, "", false);
 });
 
+Given("an empty directory {string}", function(dirname) {
+    this.createDir(dirname);
+});
+
 Given("a server configuration non readable", function() {
     this.nonReadableServerConfiguration();
 });
@@ -129,7 +133,7 @@ When("I test the configuration", function(done) {
 });
 
 Then("the configuration analysis should give an exit code {int}", function(code) {
-    assert.equal(this.verifyCommandExitCode(code), true);
+    assert.equal(this.returnCommandExitCode(), code);
 });
 
 Then("the server log should contain {string}", function(message) {

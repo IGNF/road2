@@ -87,8 +87,8 @@ module.exports = class resourceManager {
       }
 
       if (fileList.length === 0) {
-        LOGGER.warn("Le dossier " + directory + " est vide");
-        return false;
+        LOGGER.warn("Le dossier des resources est vide '" + directory + "'");
+        return true;
       }
 
       for (let i = 0; i < fileList.length; i++) {

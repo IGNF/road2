@@ -491,6 +491,16 @@ class road2World {
 
     }
 
+    // Creation de répertoire
+    createDir(dirname) {
+        try {
+            fs.mkdirSync(path.join(this._tmpDirConf, dirname));
+        } catch(error) {
+            throw "Can't create directory " + dirname + " : " + error;
+        }
+        return true
+    }
+
     createWrongJSONFile(relativeFilePath) {
 
         try {
@@ -631,15 +641,11 @@ class road2World {
         
     }
 
-    // Analyse du code de retour de la commande 
-    verifyCommandExitCode(code) {
+    // Retourne le code de la commande 
+    returnCommandExitCode() {
         
-        if (code === this._code) {
-            return true;
-        } else {
             return this._code;
-        }
-
+        
     }
 
     // Analyse des logs 

@@ -363,7 +363,7 @@ Feature: Road2 service configuration
     Given a valid configuration 
     And with parameter "test" for attribute "application.resources.directories.[1]" in service configuration
     When I test the configuration
-    Then the configuration analysis should give an exit code 0
+    Then the configuration analysis should give an exit code 1
     Then the server log should contain "Mauvaise configuration: Le dossier n'existe pas:"
 
     Scenario: [service.json] (resources.directories sur deux dossiers qui n'existent pas et en chemins relatifs)
@@ -395,6 +395,14 @@ Feature: Road2 service configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "Mauvaise configuration: Champ 'application:resources:directories' manquant !"
+
+  Scenario: [service.json] (resources.directories sans aucune resource)
+    Given a valid configuration 
+    And an empty directory "empty_resource"
+    And with parameter "empty_resource" for attribute "application.resources.directories.[0]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Le dossier des resources est vide"
 
   # TODO 
   # Tester un dossier de ressources dont une des ressources ne peut être lues 
@@ -434,7 +442,7 @@ Feature: Road2 service configuration
     Given a valid configuration 
     And with parameter "test" for attribute "application.sources.directories.[1]" in service configuration
     When I test the configuration
-    Then the configuration analysis should give an exit code 0
+    Then the configuration analysis should give an exit code 1
     Then the server log should contain "Mauvaise configuration: Le dossier n'existe pas:"
 
     Scenario: [service.json] (sources.directories sur deux dossiers qui n'existent pas et en chemins relatifs)
@@ -466,6 +474,24 @@ Feature: Road2 service configuration
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "Mauvaise configuration: Champ 'application:sources:directories' manquant !"
+
+  Scenario: [service.json] (sources.directories sans aucune sources)
+    Given a valid configuration 
+    And an empty directory "empty_sources"
+    And with parameter "empty_sources" for attribute "application.sources.directories.[0]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 1
+    Then the server log should contain "Le dossier des sources est vide"
+    Then the server log should contain "La ressource contient une source non disponible"
+
+  Given a valid configuration 
+    And an empty directory "empty_resource"
+    And with parameter "empty_resource" for attribute "application.resources.directories.[0]" in service configuration
+    And an empty directory "empty_sources"
+    And with parameter "empty_sources" for attribute "application.sources.directories.[0]" in service configuration
+    When I test the configuration
+    Then the configuration analysis should give an exit code 0
+    Then the server log should contain "Le dossier des resources est vide"
 
   # TODO 
   # Tester un dossier de ressources dont une des ressources ne peut être lues 
