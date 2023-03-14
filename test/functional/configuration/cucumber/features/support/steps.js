@@ -133,7 +133,7 @@ When("I test the configuration", function(done) {
 });
 
 Then("the configuration analysis should give an exit code {int}", function(code) {
-    assert.equal(this.verifyCommandExitCode(code), true);
+    assert.equal(this.returnCommandExitCode(), code);
 });
 
 Then("the server log should contain {string}", function(message) {

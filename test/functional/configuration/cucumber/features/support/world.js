@@ -641,15 +641,11 @@ class road2World {
         
     }
 
-    // Analyse du code de retour de la commande 
-    verifyCommandExitCode(code) {
+    // Retourne le code de la commande 
+    returnCommandExitCode() {
         
-        if (code === this._code) {
-            return true;
-        } else {
             return this._code;
-        }
-
+        
     }
 
     // Analyse des logs 
