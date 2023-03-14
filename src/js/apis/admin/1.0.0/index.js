@@ -86,7 +86,7 @@ router.route("/services")
 
     try {
 
-      const servicesResponse = administrator.getServicesConfigurations(parameters)
+      const servicesResponse = administrator.getServicesConfigurations()
       res.set('content-type', 'application/json');
       res.status(200).json(servicesResponse);
 

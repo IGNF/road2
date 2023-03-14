@@ -565,11 +565,11 @@ module.exports = class Administrator {
      * @function
      * @name getServicesConfigurations
      * @description Récupération de la configuration des services
-     * @param {json} response - Reponse json contenant les configuration de services
+     * @return {json} response - Reponse json contenant les configuration de services
      *
      */
 
-    getServicesConfigurations(parameters) {
+    getServicesConfigurations() {
 
         LOGGER.info("getServicesConfigurations...");
 
@@ -577,7 +577,7 @@ module.exports = class Administrator {
 
         // Pour chaque service, on récupère la configuration depuis le fichier de configuration
         for (let i = 0; i < this._configuration.administration.services.length; i++) {            
-            const configuration = this.readServiceConfiguration(this._configuration.administration.services[i]);
+            let configuration = this.readServiceConfiguration(this._configuration.administration.services[i]);
 
             // Ajout de l'id
             configuration.id = this._configuration.administration.services[i].id
