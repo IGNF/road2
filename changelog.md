@@ -4,6 +4,7 @@
 
 ADDED:
   - Ajout de la route GET /admin/1.0.0/services dans l'API d'administration
+  - Ajout de la route GET /admin/1.0.0/services/{servcie} dans l'API d'administration
   - Il est maintenant possible démarrer un administrateur sans services pré-configurés
 
 CHANGED:
