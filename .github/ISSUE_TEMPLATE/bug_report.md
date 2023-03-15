@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+### Bug (that's your part)
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
@@ -44,3 +46,22 @@ Generation of the data: [eg. docker image of route-graph-generator, other]
 
 **Additional context**
 Add any other context about the problem here.
+
+
+### Tasks (a part for developers, please left as it is)
+
+- [ ] Fix the code (see next paragraph)
+- [ ] Update tests 
+  - [ ] utest/itest if modification of a classe
+  - [ ] rtest if modification of an API 
+  - [ ] ctest if modification of a configuration
+- [ ] Run tests 
+  - [ ] Inside the docker provided by the project : rtest, ctest, utest, itest
+  - [ ] Manually if necessary
+- [ ] Update the documentation 
+  - [ ] changelog.md
+  - [ ] documentation directory
+
+### Code (a part for developers, please left as it is)
+
+Describe what could be done to fix the code. 
