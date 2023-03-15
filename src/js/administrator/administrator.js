@@ -565,38 +565,99 @@ module.exports = class Administrator {
      * @function
      * @name getServicesConfigurations
      * @description Récupération de la configuration des services
-     * @param {json} response - Reponse json contenant les configuration de services
+     * @return {object} responses - Json contenant les configuration de services gérés par l'administrateur
      *
      */
 
-    getServicesConfigurations(parameters) {
+    getServicesConfigurations() {
 
         LOGGER.info("getServicesConfigurations...");
 
         let responses = new Array();
 
+        LOGGER.debug("Récupération des configurations de chaque service");
+
         // Pour chaque service, on récupère la configuration depuis le fichier de configuration
-        for (let i = 0; i < this._configuration.administration.services.length; i++) {
+        for (let i = 0; i < this._configuration.administration.services.length; i++) { 
 
-            const curServiceId = this._configuration.administration.services[i].id;
+            let curServiceAdminConf = this._configuration.administration.services[i];
             
-            LOGGER.debug("Lecture fichier de configuration du service : " + curServiceId);
-            try {
-                const curServiceConf = this._configuration.administration.services[i].configuration
-                const configurationLocation =  path.resolve(path.dirname(this._configurationPath), curServiceConf);
-                let configuration = JSON.parse(fs.readFileSync(configurationLocation));
+            LOGGER.debug("Récupération de la configuration du service : " + curServiceAdminConf.id);
 
-                // Ajout de l'id
-                configuration.id = curServiceId
-                
-                responses.push(configuration) 
+            let configuration = this.readServiceConfiguration(curServiceAdminConf);
 
-            } catch (error) {
-                throw errorManager.createError("Can't read service configuration file : " + error)
-            }
-        }        
+            // Ajout de l'id
+            configuration.id = curServiceAdminConf.id
+
+            responses.push(configuration);
+
+        }
+
+        LOGGER.debug(responses);
 
         return responses;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name getServiceConfiguration
+     * @description Récupération de la configuration d'un service
+     * @param {string} serviceId - Identifiant du service dont on veut la configuration
+     * @return {object} response - Contenu du service.json
+     *
+     */
+
+    getServiceConfiguration(serviceId) {
+
+        LOGGER.info("getServiceConfiguration...");
+
+        // On récupère la configuration admin de ce service, s'il existe
+        const serviceAdminConf = this._configuration.administration.services.find(service => service.id == serviceId);
+
+        if (serviceAdminConf) {
+
+            LOGGER.debug("Le service " + serviceId + " a été trouvé");
+            LOGGER.debug(serviceAdminConf);
+            return this.readServiceConfiguration(serviceAdminConf);
+
+        } else {
+            throw errorManager.createError(`Can't find service ${serviceId}`, 404)
+        }
+
+    }
+
+    /**
+     *
+     * @function
+     * @name readServiceConfiguration
+     * @description Lecture de la configuration d'un service
+     * @param {object} serviceAdminConf - Configuration du service du point de vue de l'administrateur
+     * @return {json} configuration - Configuration du service
+     *
+     */
+
+    readServiceConfiguration(serviceAdminConf) {
+
+        LOGGER.info(`readServiceConfiguration...`);
+
+        LOGGER.debug(`Lecture fichier de configuration du service : ${serviceAdminConf.id}`);
+
+        try {
+
+            const configurationLocation =  path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
+            LOGGER.debug("Location à lire : " + configurationLocation);
+
+            const configuration = JSON.parse(fs.readFileSync(configurationLocation));  
+            LOGGER.debug(configuration);
+
+            return configuration;
+
+        } catch (error) {
+            throw errorManager.createError(`Can't read service configuration file : ${error}`, 500);
+        }
+
     }
 
 }

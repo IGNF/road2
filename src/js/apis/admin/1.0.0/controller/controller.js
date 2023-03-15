@@ -3,6 +3,7 @@
 const errorManager = require('../../../../utils/errorManager');
 const log4js = require('log4js');
 const HealthRequest = require('../../../../requests/healthRequest');
+const ServiceRequest = require('../../../../requests/serviceRequest');
 
 var LOGGER = log4js.getLogger("CONTROLLER");
 
@@ -13,7 +14,7 @@ module.exports = {
   * @function
   * @name checkHealthParameters
   * @description Vérification des paramètres d'une requête sur /health
-  * @param {object} parameters - ensemble des paramètres de la requête
+  * @param {object} parameters - ensemble des paramètres de la requête ExpressJS
   * @return {object} HealthRequest - Instance de la classe HealthRequest
   *
   */
@@ -77,6 +78,37 @@ module.exports = {
     userResponse.services = healthResponse.serviceStates;
 
     return userResponse;
+
+  },
+
+  /**
+  *
+  * @function
+  * @name checkServiceParameters
+  * @description Vérification des paramètres d'une requête sur /services/{service}
+  * @param {object} parameters - ensemble des paramètres de la requête ExpressJS
+  * @return {ServiceRequest} request - Instance de la classe ServiceRequest
+  *
+  */
+
+  checkServiceParameters: function(parameters) {
+
+    LOGGER.debug("checkServiceParameters()");
+
+    // Service
+    if (!parameters.service) {
+      throw errorManager.createError(" Parameter 'service' is invalid: there is no value", 400);
+    } 
+    
+    if (parameters.service === "") {
+      throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
+    }
+    
+    // TODO : vérifier ici que le service exite (appel à une fonction de la classe administrator)
+
+    const request = new ServiceRequest(parameters.service);
+
+    return request;
 
   }
 

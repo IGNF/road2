@@ -1,5 +1,5 @@
 const assert = require('assert');
-const HealthResponse = require('../../../../src/js/requests/healthResponse');
+const HealthResponse = require('../../../../src/js/responses/healthResponse');
 const logManager = require('../logManager');
 
 describe('Test de la classe HealthResponse', function() {
@@ -40,7 +40,7 @@ describe('Test de la classe HealthResponse', function() {
     });
 
     it('Set serviceStates', function() {
-        response.serviceStates.push = {"serviceId":"unknown","state":"green"};
+        response.serviceStates.push({"serviceId":"unknown","state":"green"});
         assert.deepEqual(response.serviceStates[0], {"serviceId":"unknown","state":"green"});
     });
 
