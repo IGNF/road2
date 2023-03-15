@@ -22,6 +22,7 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
     - serverManager (server, ExpressJS, log4js, fs, assert)
     - healthRequest (request)
     - healthResponse (response)
+    - serviceRequest (request)
     
 - Deuxième niveau: 
     - routeRequest (request, point)

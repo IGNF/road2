@@ -52,7 +52,7 @@ router.route("/health")
       // Vérification des paramètres de la requête
       const healthRequest = controller.checkHealthParameters(parameters);
       LOGGER.debug(healthRequest);
-      // Envoie au service et récupération de l'objet réponse
+      // Envoie à l'administrateur et récupération de l'objet réponse
       const healthResponse = await administrator.computeHealthRequest(healthRequest);
       LOGGER.debug(healthResponse);
       // Formattage de la réponse
@@ -79,10 +79,6 @@ router.route("/services")
 
     // On récupère l'instance d'Administrator pour répondre aux requêtes
     let administrator = req.app.get("administrator");
-
-    // on récupère l'ensemble des paramètres de la requête
-    let parameters = req.query;
-    LOGGER.debug(parameters);
 
     try {
 
@@ -113,10 +109,15 @@ router.route("/services/:service")
     LOGGER.debug(parameters);
 
     try {
+
       // Vérification des paramètres de la requête
       const serviceRequest = controller.checkServiceParameters(parameters);
       LOGGER.debug(serviceRequest);
-      const serviceResponse = administrator.getServiceConfiguration(serviceRequest.service)
+
+      // Envoie à l'administrateur et récupération de l'objet réponse
+      const serviceResponse = administrator.getServiceConfiguration(serviceRequest.service);
+      
+      // Formattage de la réponse
       res.set('content-type', 'application/json');
       res.status(200).json(serviceResponse);
 
