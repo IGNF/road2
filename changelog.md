@@ -4,6 +4,8 @@
 
 ADDED:
   - Ajout de la route GET /admin/1.0.0/services dans l'API d'administration
+  - Ajout de la route GET /admin/1.0.0/services/{servcie} dans l'API d'administration
+  - Il est maintenant possible démarrer un administrateur sans services pré-configurés
 
 CHANGED:
   - La documentation de l'API d'administration a été grandement enrichie. 
@@ -11,7 +13,7 @@ CHANGED:
   - Les dossiers de sources et de resources des services peuvent maintenant être vide à l'initialisation. 
 
 DELETED:
-  - option onStart inside admin configuration is deleted 
+  - L'option onStart de la configuration admin est supprimée 
 
 ## 2.0.0
 

@@ -1,12 +1,12 @@
 {
   "name": "road2",
-  "version": "2.0.0",
+  "version": "2.1.0-DEVELOP",
 
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
   "scripts": {
-    "start": "node ./src/js/road2.js",
+    "start": "env NODE_ENV=prod node ./src/js/road2.js",
     "configCheck": "node ./src/js/road2.js --configCheck",
     "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "itest": "mocha --recursive './test/integration/mocha/**/*.js'",

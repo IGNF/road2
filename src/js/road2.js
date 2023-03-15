@@ -68,7 +68,7 @@ async function start() {
           LOGGER.error("Problèmes lors du démarrage des services. Reconfigurez les et relancez leur démarrage.");
           // On n'éteint pas le serveur d'administration car les services pourront être reconfiguré et démarrés par l'API
         } else {
-          LOGGER.info("Les services ont été démarré");
+          LOGGER.info("S'il y en a, les services ont été démarré");
         }
 
       }
@@ -102,7 +102,7 @@ async function start() {
         pm.shutdown(1);
 
       } else {
-        LOGGER.info("La configuration des services est validée");
+        LOGGER.info("S'il y en a, la configuration des services est validée");
       }
 
     }
@@ -204,7 +204,7 @@ function checkAndInitLogger(userLogConfiguration) {
       }
 
       //Instanciation du logger
-      LOGGER = log4js.getLogger('SERVER');
+      LOGGER = log4js.getLogger('ROAD2');
 
       LOGGER.info("Logger charge.");
 
