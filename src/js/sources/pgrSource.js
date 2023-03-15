@@ -240,11 +240,12 @@ module.exports = class pgrSource extends Source {
         pgrRequest.coordinates = coordinatesTable;
 
         // --- waysAttributes
-        // attributes est déjà vide, on met les attributs par défaut
-        attributes = this._defaultAttributesString;
-
-        LOGGER.debug("default attributes: " + attributes);
-
+        // attributes est déjà vide, on met les attributs par défaut s'il y en a 
+        if (this._defaultAttributesString !== "") {
+          attributes = this._defaultAttributesString;
+          LOGGER.debug("default attributes: " + attributes);
+        }
+        
         // on complète avec les attributs demandés
         // TODO : refaire cette partie, et donc la manière dont l'info est stockée dans la classe
         if (request.waysAttributes.length !== 0) {
