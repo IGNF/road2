@@ -132,6 +132,73 @@ module.exports = class serviceManager {
     /**
      *
      * @function
+     * @name stopService
+     * @description Arrêt d'un service
+     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
+     * @param {string} id - Id du service pour l'administrateur
+     * @param {string} configurationLocation - Emplacement de la configuration du service à charger
+     * @param {object} options - Contenu optionnel pour le chargement de certains types de services
+     * @return {boolean} response - Retourne si le service a bien été arrêté
+     * 
+     */
+    async stopService(id) {
+
+        LOGGER.info("Arrêt du service " + id);
+
+        // On récupère le service administré
+        const administeredService = this._loadedServiceAdministeredCatalog[id];
+        if (!administeredService) {
+            LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+            throw errorManager.createError("Unknown service : " + serviceId);
+        }
+
+        if (!(await administeredService.stopService())) {
+            LOGGER.error("Impossible d'arrêter le service " + id);
+            return false;
+        }
+
+        return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name restartService
+     * @description Redémarrage d'un service
+     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
+     * @param {string} id - Id du service pour l'administrateur
+     * @param {string} configurationLocation - Emplacement de la configuration du service à charger
+     * @param {object} options - Contenu optionnel pour le chargement de certains types de services
+     * 
+     */
+    async restartService(creationType, id, configurationLocation, options) {
+
+        LOGGER.info("Redémarrage du service " + id);
+
+        // Arrêt du service
+        if (!await this.stopService(id)) {
+            LOGGER.error("Impossible d'arrêter le service : " + id);
+            return false;
+        } else {
+            LOGGER.info("Le service " + id + " a été arrêté correctement");
+        }
+
+        // Lancement du service
+        if (!await this.loadService(creationType, id, configurationLocation, options)) {
+            LOGGER.error("Impossible de démarrer le service : " + id);
+            return false;
+        } else {
+            LOGGER.info("Le service " + id + " a été démarré correctement");
+        }
+
+        return true;
+
+    }
+
+    /**
+     *
+     * @function
      * @name computeRequest
      * @description Gestion d'une requête pour un service 
      * La requête est envoyé au service puis la réponse du service est retournée

@@ -146,6 +146,25 @@ module.exports = class ServiceInsider extends ServiceAdministered {
   /**
    *
    * @function
+   * @name stopService
+   * @description Arrêter un service administré via une instanciation de la classe Service
+   * @return {boolean} status - Retourne si le service a bien été arrêté
+   *
+   */
+  async stopService() {
+
+    LOGGER.info("Arrêt d'un service dans le même processus");
+
+    const status = this._serviceInstance.stopServers();
+    this._serviceInstance = null;
+
+    return status;
+  
+  }
+
+  /**
+   *
+   * @function
    * @name computeRequest
    * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
    * @param {object} request - Instance fille de la classe Request 

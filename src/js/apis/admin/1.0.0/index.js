@@ -127,6 +127,41 @@ router.route("/services/:service")
 
   });
 
+// Services/{service}/restart
+// Récupérer les informations d'un service
+router.route("/services/:service/restart")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/services/:service/restart");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    // on récupère l'ensemble des paramètres de la requête
+    const parameters = req.params;
+    LOGGER.debug(parameters);
+
+    try {
+
+      // Vérification des paramètres de la requête
+      const serviceRequest = controller.checkServiceParameters(parameters);
+      LOGGER.debug(serviceRequest);
+
+      // Envoie à l'administrateur et récupération de l'objet réponse
+      const serviceResponse = await administrator.restartService(serviceRequest.service);
+
+      // Formattage de la réponse
+      res.set('content-type', 'application/json');
+      res.status(200).json({"status": serviceResponse});
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
+
 // Gestion des erreurs
 // Cette partie doit être placée après la définition des routes normales
 // ---

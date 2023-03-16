@@ -676,6 +676,48 @@ module.exports = class Administrator {
 
     }
 
+    /**
+     *
+     * @function
+     * @name restartService
+     * @description Redémarrage d'un service
+     * @param {string} serviceId - Identifiant du service qu'on veut redémarrer
+     * @return {boolean} status - Retourne si le service a bien été redémarré
+     *
+     */
+
+    async restartService(serviceId) {
+
+        LOGGER.info("restartService...");
+
+        // On récupère la configuration admin de ce service, s'il existe
+        const serviceAdminConf = this._configuration.administration.services.find(service => service.id == serviceId);
+
+        if (serviceAdminConf) {
+
+            // Récupération de la configuration
+            LOGGER.info("Récupération de la configuration du service");
+            let serviceConfLocation = path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
+            let serviceConfiguration = JSON.parse(fs.readFileSync(serviceConfLocation));
+
+            LOGGER.debug("Le service " + serviceId + " a été trouvé et va être redémarré");
+            LOGGER.debug(serviceAdminConf);
+            const options = {adminLogConfiguration: this._logConfiguration};
+            if (!await this._serviceManager.restartService(serviceAdminConf.creationType, serviceAdminConf.id, serviceConfLocation, options)) {
+                LOGGER.error("Impossible de créer le service "+ serviceAdminConf.id);
+                return false;
+            } else {
+                LOGGER.info("Le service " + serviceAdminConf.id + " a été redémarré correctement");
+            }
+
+        } else {
+            throw errorManager.createError(`Can't find service ${serviceId}`, 404)
+        }
+
+        return true;
+
+    }
+
 }
 
 

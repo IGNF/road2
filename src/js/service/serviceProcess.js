@@ -115,6 +115,26 @@ module.exports = class ServiceProcess extends ServiceAdministered {
     /**
      *
      * @function
+     * @name stopService
+     * @description Arrêter un service administré via une instanciation de la classe Service
+     * @return {boolean} status - Retourne si le service s'est bien arrêté
+     *
+     */
+    async stopService() {
+
+        LOGGER.info("Arrêt d'un service dans un autre processus");
+
+        // Envoi du signal SIGTERM
+        const status = this._serviceInstance.kill()
+        this._serviceInstance = null;
+
+        return status;
+    
+    }
+
+    /**
+     *
+     * @function
      * @name computeRequest
      * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
      * @param {object} request - Instance fille de la classe Request 

@@ -1006,6 +1006,13 @@ module.exports = class Service {
 
     });
 
+    process.on('SIGTERM', () => {
+      LOGGER.debug("Réception du signal SIGTERM pour arrêter le service");
+      const status = this.stopServers();
+      // TODO: ajouter la sortie du process ? (avec processManager.shutdown)
+      // process.exit(0);
+      return status;
+    });
   }
 
   /**

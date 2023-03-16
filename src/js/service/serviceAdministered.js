@@ -65,6 +65,17 @@ module.exports = class ServiceAdministered {
     
   }
 
+    /**
+  *
+  * @function
+  * @name stopService
+  * @description Fonction pour arrêter un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
+  *
+  */
+  stopService() {
+    
+  }
+
   /**
   *
   * @function
