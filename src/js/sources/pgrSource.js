@@ -59,32 +59,37 @@ module.exports = class pgrSource extends Source {
     // Attributs disponibles sur les voies dans la base 
     this._otherAttributes = new Array();
 
-    // TODO : à l'exemple des ressources, faire une fonction init() pour chaque source appelée dans le sourceManager
-    // Création des tableaux d'attributs
-    for (let i = 0; i < sourceJsonObject.storage.base.attributes.length; i++) {
-      let curAttribute = sourceJsonObject.storage.base.attributes[i];
-      if (curAttribute.default === "true") {
-        this._defaultAttributes.push(curAttribute);
-      } else if (curAttribute.default === "false") {
-        this._otherAttributes.push(curAttribute);
-      } else {
-        // cela ne doit pas arriver
-      }
-    }
-
-    // stockage des attributs dans des tableaux pour le traitement des requêtes
-    this._defaultAttributesTable = new Array();
-    this._defaultAttributesKeyTable = new Array();
-    for (let i = 0; i < this._defaultAttributes.length; i++) {
-      this._defaultAttributesTable.push("'" + this._defaultAttributes[i].column + "'");
-      this._defaultAttributesKeyTable.push(this._defaultAttributes[i].key);
-    }
-
-    // stockage des attributs par défaut en une chaîne de caractères pour le traitement des requêtes
-    this._defaultAttributesString = this._defaultAttributesTable.join(",");
-
     // Coûts disponibles 
     this._costs = {};
+
+    // TODO : à l'exemple des ressources, faire une fonction init() pour chaque source appelée dans le sourceManager
+    // -- 
+    if (sourceJsonObject.storage.base.attributes) {
+
+      // Création des tableaux d'attributs
+      for (let i = 0; i < sourceJsonObject.storage.base.attributes.length; i++) {
+        let curAttribute = sourceJsonObject.storage.base.attributes[i];
+        if (curAttribute.default === "true") {
+          this._defaultAttributes.push(curAttribute);
+        } else if (curAttribute.default === "false") {
+          this._otherAttributes.push(curAttribute);
+        } else {
+          // cela ne doit pas arriver
+        }
+      }
+
+      // stockage des attributs dans des tableaux pour le traitement des requêtes
+      this._defaultAttributesTable = new Array();
+      this._defaultAttributesKeyTable = new Array();
+      for (let i = 0; i < this._defaultAttributes.length; i++) {
+        this._defaultAttributesTable.push("'" + this._defaultAttributes[i].column + "'");
+        this._defaultAttributesKeyTable.push(this._defaultAttributes[i].key);
+      }
+
+      // stockage des attributs par défaut en une chaîne de caractères pour le traitement des requêtes
+      this._defaultAttributesString = this._defaultAttributesTable.join(",");
+
+    }
 
     // Initialisation des coûts disponibles 
     for (let i = 0; i < sourceJsonObject.costs.length; i++) {
@@ -98,6 +103,8 @@ module.exports = class pgrSource extends Source {
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "costColumn", { value: sourceJsonObject.costs[i].costColumn, configurable: true, enumerable: true, writable: true });
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "rcostColumn", { value: sourceJsonObject.costs[i].rcostColumn, configurable: true, enumerable: true, writable: true });
     }
+
+    // -- 
 
   }
 
@@ -241,61 +248,70 @@ module.exports = class pgrSource extends Source {
 
         // --- waysAttributes
         // attributes est déjà vide, on met les attributs par défaut s'il y en a 
-        if (this._defaultAttributesString !== "") {
+        if (this._defaultAttributes.length !== 0) {
           attributes = this._defaultAttributesString;
           LOGGER.debug("default attributes: " + attributes);
+        } else {
+          LOGGER.debug("no default attributes available");
         }
-        
-        // on complète avec les attributs demandés
-        // TODO : refaire cette partie, et donc la manière dont l'info est stockée dans la classe
-        if (request.waysAttributes.length !== 0) {
-          let requestedAttributes = new Array();
 
-          for (let i = 0; i < request.waysAttributes.length; i++) {
-            // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
-            let isDefault = false;
 
-            for (let j = 0; j < this._defaultAttributes.length; j++) {
-              if (request.waysAttributes[i] === this._defaultAttributes[j].key) {
-                isDefault = true;
-                break;
-              }
-            }
+        // S'il existe des attributs disponibles mais non par défaut, on complète avec les attributs demandés
+        if (this._otherAttributes.length !== 0 ) {
+          
+          // TODO : refaire cette partie, et donc la manière dont l'info est stockée dans la classe
+          if (request.waysAttributes.length !== 0) {
+            let requestedAttributes = new Array();
 
-            if (!isDefault) {
-              for (let j = 0; j < this._otherAttributes.length; j++) {
-                if (request.waysAttributes[i] === this._otherAttributes[j].key) {
-                  requestedAttributes.push("'" + this._otherAttributes[j].column + "'");
+            for (let i = 0; i < request.waysAttributes.length; i++) {
+              // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+              let isDefault = false;
+
+              for (let j = 0; j < this._defaultAttributes.length; j++) {
+                if (request.waysAttributes[i] === this._defaultAttributes[j].key) {
+                  isDefault = true;
                   break;
                 }
               }
-            } else {
-              // on passe au suivant
+
+              if (!isDefault) {
+                for (let j = 0; j < this._otherAttributes.length; j++) {
+                  if (request.waysAttributes[i] === this._otherAttributes[j].key) {
+                    requestedAttributes.push("'" + this._otherAttributes[j].column + "'");
+                    break;
+                  }
+                }
+              } else {
+                // on passe au suivant
+              }
+
             }
 
-          }
+            if (requestedAttributes.length !== 0) {
 
-          if (requestedAttributes.length !== 0) {
+              if (attributes !== "") {
+                attributes = attributes + "," + requestedAttributes.join(",");
+              } else {
+                attributes = requestedAttributes.join(",");
+              }
+              LOGGER.debug("final attributes: " + attributes);
 
-            if (attributes !== "") {
-              attributes = attributes + "," + requestedAttributes.join(",");
             } else {
-              attributes = requestedAttributes.join(",");
+              LOGGER.debug("no more attributes to add");
             }
-            LOGGER.debug("final attributes: " + attributes);
 
           } else {
-            LOGGER.debug("no more attributes to add");
+
+            // on ne fait rien
+            LOGGER.debug("no more attributes were required");
+
           }
 
-          // --- waysAttributes
-
         } else {
-
-          // on ne fait rien
-          LOGGER.debug("no more attributes were required");
-
+          LOGGER.debug("no other attributes available");
         }
+
+        // --- waysAttributes
 
         if (request.constraints.length !== 0) {
 
@@ -596,7 +612,7 @@ module.exports = class pgrSource extends Source {
 
     LOGGER.debug("attributes management");
     // On fait la liste des attributs par défaut
-    if (this._defaultAttributesKeyTable.length !== 0) {
+    if (this._defaultAttributes.length !== 0) {
       for (let i = 0; i < this._defaultAttributesKeyTable.length; i++) {
         finalAttributesKey.push(this._defaultAttributesKeyTable[i]);
         LOGGER.debug(this._defaultAttributesKeyTable[i] + " added");
@@ -607,34 +623,38 @@ module.exports = class pgrSource extends Source {
     }
 
     // On ajoute la liste des attributs demandés
-    if (routeRequest.waysAttributes.length !== 0) {
-      for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
-        // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
-        let isDefault = false;
+    if (this._otherAttributes.length !== 0) {
+      if (routeRequest.waysAttributes.length !== 0) {
+        for (let i = 0; i < routeRequest.waysAttributes.length; i++) {
+          // on récupère le nom de la colonne en fonction de l'id de l'attribut demandé
+          let isDefault = false;
 
-        for (let j = 0; j < this._defaultAttributes.length; j++) {
-          if (routeRequest.waysAttributes[i] === this._defaultAttributes[j].key) {
-            isDefault = true;
-            break;
-          }
-        }
-
-        if (!isDefault) {
-          for (let j = 0; j < this._otherAttributes.length; j++) {
-            if (routeRequest.waysAttributes[i] === this._otherAttributes[j].key) {
-              finalAttributesKey.push(this._otherAttributes[j].key);
-              LOGGER.debug(this._otherAttributes[j].key + " added");
+          for (let j = 0; j < this._defaultAttributes.length; j++) {
+            if (routeRequest.waysAttributes[i] === this._defaultAttributes[j].key) {
+              isDefault = true;
               break;
             }
           }
-        } else {
-          // on passe au suivant
-        }
 
+          if (!isDefault) {
+            for (let j = 0; j < this._otherAttributes.length; j++) {
+              if (routeRequest.waysAttributes[i] === this._otherAttributes[j].key) {
+                finalAttributesKey.push(this._otherAttributes[j].key);
+                LOGGER.debug(this._otherAttributes[j].key + " added");
+                break;
+              }
+            }
+          } else {
+            // on passe au suivant
+          }
+
+        }
+      } else {
+        // il n'y a aucun attribut demandé par l'utilisateur
+        LOGGER.debug("no attributes requested");
       }
     } else {
-      // il n'y a aucun attribut demandé par l'utilisateur
-      LOGGER.debug("no attributes requested");
+      LOGGER.debug("no other attributes");
     }
 
     // TODO: Il n'y a qu'une route pour l'instant: à changer pour plusieurs routes
