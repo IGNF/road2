@@ -913,12 +913,15 @@ module.exports = class Service {
   stopServers() {
 
     // Extinction des serveurs
-    if (!this._serverManager.stopAllServer()) {
-      LOGGER.fatal("Impossible d'eteindre les serveurs.");
-      return false;
-    }
-
-    return true;
+    return new Promise(async (resolve, reject) => {
+      if (!await this._serverManager.stopAllServer()) {
+        LOGGER.fatal("Impossible d'eteindre les serveurs.");
+        reject();
+      } else {
+        LOGGER.info("Les serveurs du service sont éteints.");
+        resolve();
+      }
+    })
 
   }
 
@@ -1008,10 +1011,13 @@ module.exports = class Service {
 
     process.on('SIGTERM', () => {
       LOGGER.debug("Réception du signal SIGTERM pour arrêter le service");
-      const status = this.stopServers();
+      this.stopServers().then(() => {
+        LOGGER.debug("Les serveurs sont bien arrêtés, on peut sortir du service (exit)")
+        process.exit(0);
+      });
       // TODO: ajouter la sortie du process ? (avec processManager.shutdown)
       // process.exit(0);
-      return status;
+      // return status;
     });
   }
 

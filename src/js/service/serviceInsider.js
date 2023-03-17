@@ -153,9 +153,13 @@ module.exports = class ServiceInsider extends ServiceAdministered {
    */
   async stopService() {
 
-    LOGGER.info("Arrêt d'un service dans le même processus");
+    LOGGER.debug("Arrêt d'un service dans le même processus");
 
-    const status = this._serviceInstance.stopServers();
+    let status = false;
+    this._serviceInstance.stopServers().then(() => {
+      LOGGER.debug("Service arrêté.");
+      status = true;
+    });
     this._serviceInstance = null;
 
     return status;

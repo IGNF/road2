@@ -309,11 +309,12 @@ module.exports = class serverManager {
   * @function
   * @name stopAllServer
   * @description Arrêter l'ensemble des serveurs disponibles dans le manager
+  * @return {boolean} allServerStatus - Renvoie si tous les serveurs se sont arrêtés correctement
   *
   */
-  stopAllServer() {
+  async stopAllServer() {
 
-    LOGGER.info("Arret de l'ensemble des serveurs.");
+    LOGGER.info("Arret de l'ensemble des serveurs du service...");
 
     if (this._loadedServerId.length === 0) {
       LOGGER.warn("Aucun serveur n'est disponible (id).");
@@ -328,17 +329,21 @@ module.exports = class serverManager {
       // On continue
     }
 
+    let allServersStatus = true;
     for (let serverId in this._serverCatalog) {
-      LOGGER.info("Serveur: " + serverId);
-      if (!this._serverCatalog[serverId].stop()) {
-        LOGGER.error("Erreur lors de l'arret du serveur.");
-        return false;
+      LOGGER.debug("Serveur: " + serverId);
+      const status = !await this._serverCatalog[serverId].stop();
+      if (!status) {
+        LOGGER.error(`Le serveur ${serverId} n'a pas été arrếté correctement : ${err}`);
+        allServersStatus = false;
+      } else {
+        LOGGER.info(`Le serveur ${serverId} a été arrêté.`)
       }
     }
+    
+    if (allServersStatus) LOGGER.debug("Les arrets de tous les serveurs se sont bien deroules.");
 
-    LOGGER.info("Les arrets se sont bien deroules.");
-
-    return true;
+    return allServersStatus;
 
   }
 

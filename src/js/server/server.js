@@ -137,10 +137,19 @@ module.exports = class Server {
   * @description Arrêter un serveur
   *
   */
-  stop(callback) {
+  stop() {
 
-    this._server.close(callback);
-    return true;
+    return new Promise((resolve, reject) => {
+      this._server.close((err) => {
+        if (err) {
+          LOGGER.error(`Erreur lors de l'arrêt du serveur : ${err}`);
+          reject();
+        } else {
+          LOGGER.debug(`Le serveur a été arrêté.`);
+          resolve();
+        }
+      })
+    });
 
   }
 

@@ -122,13 +122,32 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      */
     async stopService() {
 
-        LOGGER.info("Arrêt d'un service dans un autre processus");
+        LOGGER.debug("Arrêt d'un service dans un autre processus");
 
         // Envoi du signal SIGTERM
-        const status = this._serviceInstance.kill()
-        this._serviceInstance = null;
+        this._serviceInstance.kill();
 
-        return status;
+        // Toutes les 10ms on va voir si le child s'est éteint
+        const interval = 1000;
+
+        // On attend que le child soit killed pour récupérer son exit code
+        for await (const startTime of setInterval(interval, Date.now())) {
+
+            let exitCode = this._serviceInstance.exitCode;
+            LOGGER.debug(`exitCode = ${exitCode}`)
+            if (exitCode !== null) {
+                this._serviceInstance = null;
+                return (exitCode == 0);
+            }
+
+            // Gestion du timeout : 20sec
+            const now = Date.now();
+            if ((now - startTime) > 20000) {
+                LOGGER.info("Timeout atteint pour l'attente du code d'exit");
+                throw errorManager.createError("Kill envoyé au processus child mais pas de code de retour");
+            }
+
+        }
     
     }
 

@@ -143,7 +143,7 @@ module.exports = class serviceManager {
      */
     async stopService(id) {
 
-        LOGGER.info("Arrêt du service " + id);
+        LOGGER.info(`Arrêt du service ${id} en cours...`);
 
         // On récupère le service administré
         const administeredService = this._loadedServiceAdministeredCatalog[id];
