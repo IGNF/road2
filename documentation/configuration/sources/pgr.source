@@ -10,11 +10,6 @@
       "schema": "public",
       "attributes": [
         {
-          "key": "name",
-          "column": "way_names",
-          "default": "false"
-        },
-        {
           "key": "nom_1_gauche",
           "column": "nom_1_gauche",
           "default": "true"
