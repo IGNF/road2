@@ -8,7 +8,8 @@
                 "health": "/admin/1.0.0/health",
                 "version": "/admin/1.0.0/version",
                 "services": "/admin/1.0.0/services",
-                "services/<service>": "/admin/1.0.0/services/<service>"
+                "services/<service>": "/admin/1.0.0/services/<service>",
+                "services/<service>/restart": "/admin/1.0.0/services/<service>/restart"
             }
         }
     },
