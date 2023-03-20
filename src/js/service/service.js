@@ -887,18 +887,20 @@ module.exports = class Service {
   * @description Démarrage des serveurs du service
   *
   */
-    startServers() {
+    async startServers() {
 
     LOGGER.info("Démarrage des serveurs du service...");
 
     // Démarrage des serveurs
-    if (!this._serverManager.startAllServers()) {
-      LOGGER.fatal("Impossible de démarrer tous les serveurs.");
-      return false;
-    } else {
-      LOGGER.info("Les serveurs du service ont été démarrés");
-      return true;
-    }
+    return new Promise(async (resolve, reject) => {
+      if (!await this._serverManager.startAllServers()) {
+        LOGGER.fatal("Impossible de démarrer tous les serveurs.");
+        reject();
+      } else {
+        LOGGER.info("Les serveurs du service ont été démarrés");
+        resolve();
+      }
+    })
 
   }
 
@@ -910,7 +912,7 @@ module.exports = class Service {
   *
   */
 
-  stopServers() {
+  async stopServers() {
 
     // Extinction des serveurs
     return new Promise(async (resolve, reject) => {

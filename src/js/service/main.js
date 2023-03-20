@@ -87,9 +87,17 @@ async function startService() {
           }
 
           // On démarre les serveurs associé à ce service
-          if (!service.startServers()) {
-            pm.shutdown(5);
-          }
+          const status = await service.startServers()
+            .then(() => {
+              if (process.argv[3] === "child") {
+                LOGGER.debug("Envoi d'un message au parent");
+                process.send({status: true});
+              }
+            })
+            .catch(() => {
+              LOGGER.error("Erreur dans le démarrage des serveurs du service.")
+              pm.shutdown(5);
+            })
 
         }
 

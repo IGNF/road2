@@ -273,7 +273,7 @@ module.exports = class serverManager {
   * @description Démarrer l'ensemble des serveurs disponibles dans le manager
   *
   */
-  startAllServers() {
+  async startAllServers() {
 
     LOGGER.info("Demarrage de l'ensemble des serveurs.");
 
@@ -290,17 +290,21 @@ module.exports = class serverManager {
       // tout va bien
     }
 
+    let allServersStatus = true;
     for (let serverId in this._serverCatalog) {
       LOGGER.info("Serveur: " + serverId);
-      if (!this._serverCatalog[serverId].start()) {
-        LOGGER.error("Erreur lors du demarrage du serveur.");
-        return false;
+      const status = await this._serverCatalog[serverId].start();
+      if (!status) {
+        LOGGER.error(`Erreur lors du demarrage du serveur ${serverId}.`);
+        allServersStatus = false;
+      } else {
+        LOGGER.info(`Le serveur ${serverId} a démarré.`)
       }
     }
 
-    LOGGER.info("Les demarrages se sont bien deroules.");
+    if (allServersStatus) LOGGER.debug("Les demarrages de tous les serveurs se sont bien deroules.");
 
-    return true;
+    return allServersStatus;
 
   }
 

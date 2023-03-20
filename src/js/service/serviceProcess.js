@@ -59,7 +59,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      * @description Créer un service administré via un fork de processus
      *
      */
-    loadService() {
+    async loadService() {
 
     LOGGER.info("Création et lancement d'un service dans un autre processus");
 
@@ -98,18 +98,22 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         LOGGER.info("Processus enfant créé");
 
         // Puisqu'un processus enfant a été créé et qu'il y a un canal IPC entre eux, on instancie la gestion des messages
-        this._serviceInstance.on("message", (response) => {
-
-            LOGGER.debug("Parent got message:");
-            LOGGER.debug(response);
-
-            // On stocke la réponse 
-            this._unReadResponses[response._uuid] = response;
-
-        });
-
-        return true;
-
+        return new Promise((resolve, reject) => {
+            this._serviceInstance.on("message", (response) => {
+    
+                LOGGER.debug("Parent got message:");
+                LOGGER.debug(response);
+    
+                // On stocke la réponse 
+                this._unReadResponses[response._uuid] = response;
+    
+                if (response.status) {
+                    resolve(true);
+                } else {
+                    reject(false);
+                }
+            });
+        })
     }
 
     /**

@@ -128,10 +128,17 @@ module.exports = class ServiceInsider extends ServiceAdministered {
             LOGGER.info("Les sources connectables ont été connectées");
   
             // On démarre les serveurs associé à ce service
-            if (!this._serviceInstance.startServers()) {
-              LOGGER.error("Impossible de démarrer les serveurs. Impossible de démarrer le service");
-              return false;
-            }
+            return new Promise(async (resolve, reject) => {
+              await this._serviceInstance.startServers()
+                .then(() => {
+                  LOGGER.info("Les serveurs du service ont démarré correctement.");
+                  resolve(true);
+                })
+                .catch(() => {
+                  LOGGER.error("Impossible de démarrer les serveurs. Impossible de démarrer le service");
+                  reject(false);
+                })
+            });
   
           }
   
@@ -156,7 +163,7 @@ module.exports = class ServiceInsider extends ServiceAdministered {
     LOGGER.debug("Arrêt d'un service dans le même processus");
 
     let status = false;
-    this._serviceInstance.stopServers().then(() => {
+    await this._serviceInstance.stopServers().then(() => {
       LOGGER.debug("Service arrêté.");
       status = true;
     });

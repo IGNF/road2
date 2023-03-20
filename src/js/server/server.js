@@ -97,7 +97,7 @@ module.exports = class Server {
   * @description Démarer un serveur
   *
   */
-  start() {
+  async start() {
 
     // si le serveur n'existe pas, on le crée
     try {
@@ -123,7 +123,7 @@ module.exports = class Server {
     }
 
     // on lance l'écoute du serveur
-    this._server.listen(this._port, this._host);
+    await this._server.listen(this._port, this._host);
     LOGGER.info(this._host + ":" + this._port);
 
     return true;
