@@ -514,6 +514,122 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     And the response should have an header "content-type" with value "application/json"
     And the response should contain "Parameter 'constraints' is invalid"
 
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec les waysAttributes par défaut
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_1_droite"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec les waysAttributes par défaut
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_1_droite"
+
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec mauvais waysAttributes
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value      |
+      | waysAttributes | test       |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'waysAttributes' is invalid"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec mauvais waysAttributes
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with table parameters for "waysAttributes":
+      | value     |
+      | test      |
+    When I send the request 
+    Then the server should send a response with status 400
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain an attribute "error.message" with value "Parameter 'waysAttributes' is invalid"
+
+    
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value      |
+      | waysAttributes | cleabs     |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with table parameters for "waysAttributes":
+      | value       |
+      | cleabs      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+  Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value                 |
+      | waysAttributes | cleabs \| cleabs      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes doublé
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with table parameters for "waysAttributes":
+      | value       |
+      | cleabs      |
+      | cleabs      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with query parameters:
+      | key            | value               |
+      | waysAttributes | cleabs \| test      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+  Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec un bon waysAttributes et un faux
+    Given an "POST" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-pgr"
+    And with table parameters for "waysAttributes":
+      | value     |
+      | cleabs    |
+      | test      |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain a complete and valid road
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.cleabs"
+
+
 Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     Given an "<method>" request on operation "isochrone" in api "simple" "1.0.0"
     And with default parameters for "isochrone"
@@ -548,7 +664,7 @@ Scenario Outline: [<method>] Isochrone sur l'API simple 1.0.0
     And with default parameters for "isochrone"
     And with query parameters:
       | key       | value                |
-      | resource  | bduni-idf-osrm-2     |
+      | resource  | bduni-idf-pgr-2     |
     When I send the request
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
