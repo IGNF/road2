@@ -99,6 +99,8 @@ module.exports = class Server {
   */
   async start() {
 
+    LOGGER.info("Démarage du serveur...");
+
     // si le serveur n'existe pas, on le crée
     try {
       assert.deepStrictEqual(this._server, {});
@@ -107,6 +109,7 @@ module.exports = class Server {
       if (this._enableHttps === "true") {
 
         let options = {};
+        // TODO : modifier cette partie pour distinguer les erreurs retournées par fs et http
         options.key = fs.readFileSync(this._options.key, "utf-8");
         options.cert = fs.readFileSync(this._options.cert, "utf-8");
 
@@ -123,10 +126,22 @@ module.exports = class Server {
     }
 
     // on lance l'écoute du serveur
-    await this._server.listen(this._port, this._host);
-    LOGGER.info(this._host + ":" + this._port);
+    return new Promise((resolve, reject) => {
 
-    return true;
+      this._server.listen(this._port, this._host, (error) => {
+
+        if (error) {
+          LOGGER.error("Erreur lors du démarage du serveur : " + error);
+          reject(false);
+        } else {
+          LOGGER.info(this._host + ":" + this._port);
+          resolve(true);
+        }
+
+      });
+      
+    });
+
 
   }
 
@@ -140,15 +155,19 @@ module.exports = class Server {
   stop() {
 
     return new Promise((resolve, reject) => {
+
       this._server.close((err) => {
+
         if (err) {
           LOGGER.error(`Erreur lors de l'arrêt du serveur : ${err}`);
-          reject();
+          reject(false);
         } else {
           LOGGER.debug(`Le serveur a été arrêté.`);
-          resolve();
+          resolve(true);
         }
-      })
+
+      });
+
     });
 
   }

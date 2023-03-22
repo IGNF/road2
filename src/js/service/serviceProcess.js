@@ -5,10 +5,7 @@ const { fork } = require('child_process');
 
 const ServiceAdministered = require('./serviceAdministered');
 const errorManager = require('../utils/errorManager');
-const healthResponse = require('../responses/healthResponse');
-const {
-    setInterval,
-  } = require('node:timers/promises');
+const {setInterval} = require('node:timers/promises');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICEPRO");
@@ -61,19 +58,19 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      */
     async loadService() {
 
-    LOGGER.info("Création et lancement d'un service dans un autre processus");
+        LOGGER.info("Création et lancement d'un service dans un autre processus");
 
         // Un minimum de vérifications au cas où 
         if (typeof(this._configurationLocation) !== "string") {
             LOGGER.error("Le chemin fourni n'est pas une string");
-            return null;
+            return false;
         } else {
             LOGGER.debug("Le chemin fourni est bien une string");
         }
 
         if (this._configurationLocation === "") {
             LOGGER.error("Le chemin fourni est vide");
-            return null;
+            return false;
         } else {
             LOGGER.debug("Le chemin est renseigné : " + this._configurationLocation);
         }
@@ -93,27 +90,31 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         // Création du service via un fork : on lance simplement service/main.js
         LOGGER.info("Fork du processus pour créer le service...");
 
-        this._serviceInstance = fork("./src/js/service/main.js", [this._configurationLocation, "child"], serviceOptions);
+        try {
+            this._serviceInstance = fork("./src/js/service/main.js", [this._configurationLocation, "child"], serviceOptions);
+        } catch(error) {
+            LOGGER.error("Impossible de lancer un processus child : " + error);
+            this._serviceInstance = {};
+            return false;
+        }
 
         LOGGER.info("Processus enfant créé");
 
         // Puisqu'un processus enfant a été créé et qu'il y a un canal IPC entre eux, on instancie la gestion des messages
-        return new Promise((resolve, reject) => {
-            this._serviceInstance.on("message", (response) => {
-    
-                LOGGER.debug("Parent got message:");
-                LOGGER.debug(response);
-    
-                // On stocke la réponse 
-                this._unReadResponses[response._uuid] = response;
-    
-                if (response.status) {
-                    resolve(true);
-                } else {
-                    reject(false);
-                }
-            });
-        })
+        this._serviceInstance.on("message", (response) => {
+
+            LOGGER.debug("Parent got message:");
+            LOGGER.debug(response);
+
+            // On stocke la réponse 
+            this._unReadResponses[response._uuid] = response;
+
+        });
+
+        // TODO: Attendre de voir si le child est bien démarré et qu'il n'y ait eu pas d'erreur lors de son lancement
+
+        return true;
+
     }
 
     /**
@@ -131,24 +132,24 @@ module.exports = class ServiceProcess extends ServiceAdministered {
         // Envoi du signal SIGTERM
         this._serviceInstance.kill();
 
-        // Toutes les 10ms on va voir si le child s'est éteint
+        // Toutes les 1s on va voir si le child s'est éteint
         const interval = 1000;
 
         // On attend que le child soit killed pour récupérer son exit code
         for await (const startTime of setInterval(interval, Date.now())) {
 
             let exitCode = this._serviceInstance.exitCode;
-            LOGGER.debug(`exitCode = ${exitCode}`)
             if (exitCode !== null) {
-                this._serviceInstance = null;
-                return (exitCode == 0);
+                LOGGER.debug("Processus arrếté avec l'exit code : " + exitCode);
+                this._serviceInstance = {};
+                return true;
             }
 
             // Gestion du timeout : 20sec
             const now = Date.now();
             if ((now - startTime) > 20000) {
                 LOGGER.info("Timeout atteint pour l'attente du code d'exit");
-                throw errorManager.createError("Kill envoyé au processus child mais pas de code de retour");
+                return false;
             }
 
         }

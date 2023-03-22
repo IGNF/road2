@@ -115,16 +115,17 @@ module.exports = class serviceManager {
 
         // On le démarre par le même appel, qu'importe son type de création
         LOGGER.info("Démarrage du service " + id);
-        if (!await serviceAdministered.loadService(options)) {
+        if (!(await serviceAdministered.loadService(options))) {
             LOGGER.error("Impossible de charger le service " + id);
             return false;
         } else {
+
             // Sauvegarde du service dans le manager
             LOGGER.info(`Service ${id} démarré. Sauvegarde dans le serviceManager...`);
             this._loadedServiceAdministeredCatalog[id] = serviceAdministered;
             this._loadedServiceConfLocations[id] = configurationLocation;
-
             return true;
+
         }
 
     }
@@ -149,7 +150,7 @@ module.exports = class serviceManager {
         const administeredService = this._loadedServiceAdministeredCatalog[id];
         if (!administeredService) {
             LOGGER.error("Aucun service associé à cet ID: " + serviceId);
-            throw errorManager.createError("Unknown service : " + serviceId);
+            return false;
         }
 
         if (!(await administeredService.stopService())) {

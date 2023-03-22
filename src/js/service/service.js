@@ -891,16 +891,13 @@ module.exports = class Service {
 
     LOGGER.info("Démarrage des serveurs du service...");
 
-    // Démarrage des serveurs
-    return new Promise(async (resolve, reject) => {
-      if (!await this._serverManager.startAllServers()) {
-        LOGGER.fatal("Impossible de démarrer tous les serveurs.");
-        reject();
-      } else {
-        LOGGER.info("Les serveurs du service ont été démarrés");
-        resolve();
-      }
-    })
+    if (!(await this._serverManager.startAllServers())) {
+      LOGGER.fatal("Impossible de démarrer tous les serveurs.");
+      return false;
+    } else {
+      LOGGER.info("Les serveurs du service ont été démarrés");
+      return true;
+    }
 
   }
 
@@ -914,16 +911,15 @@ module.exports = class Service {
 
   async stopServers() {
 
-    // Extinction des serveurs
-    return new Promise(async (resolve, reject) => {
-      if (!await this._serverManager.stopAllServer()) {
-        LOGGER.fatal("Impossible d'eteindre les serveurs.");
-        reject();
-      } else {
-        LOGGER.info("Les serveurs du service sont éteints.");
-        resolve();
-      }
-    })
+    LOGGER.info("Extinction des serveurs...");
+
+    if (!(await this._serverManager.stopAllServer())) {
+      LOGGER.fatal("Impossible d'eteindre les serveurs.");
+      return false;
+    } else {
+      LOGGER.info("Les serveurs du service sont éteints.");
+      return true;
+    }
 
   }
 
@@ -1011,16 +1007,20 @@ module.exports = class Service {
 
     });
 
-    process.on('SIGTERM', () => {
+    process.on('SIGTERM', async () => {
+
       LOGGER.debug("Réception du signal SIGTERM pour arrêter le service");
-      this.stopServers().then(() => {
+
+      if (await this.stopServers()) {
         LOGGER.debug("Les serveurs sont bien arrêtés, on peut sortir du service (exit)")
         process.exit(0);
-      });
-      // TODO: ajouter la sortie du process ? (avec processManager.shutdown)
-      // process.exit(0);
-      // return status;
+      } else {
+        LOGGER.fatal("Les serveurs ne se sont pas bien arrếtés");
+        process.exit(1);
+      }
+
     });
+    
   }
 
   /**

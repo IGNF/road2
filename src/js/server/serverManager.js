@@ -271,6 +271,7 @@ module.exports = class serverManager {
   * @function
   * @name startAllServers
   * @description Démarrer l'ensemble des serveurs disponibles dans le manager
+  * @return {boolean}
   *
   */
   async startAllServers() {
@@ -291,18 +292,30 @@ module.exports = class serverManager {
     }
 
     let allServersStatus = true;
+
     for (let serverId in this._serverCatalog) {
+
       LOGGER.info("Serveur: " + serverId);
-      const status = await this._serverCatalog[serverId].start();
-      if (!status) {
-        LOGGER.error(`Erreur lors du demarrage du serveur ${serverId}.`);
-        allServersStatus = false;
-      } else {
-        LOGGER.info(`Le serveur ${serverId} a démarré.`)
+      try {
+
+        if (!(await this._serverCatalog[serverId].start())) {
+          LOGGER.error(`Erreur lors du demarrage du serveur ${serverId}.`);
+          allServersStatus = false;
+        } else {
+          LOGGER.info(`Le serveur ${serverId} a démarré.`)
+        }
+
+      } catch(error) {
+        // On récupère une erreur du start afin de continuer le démarage des autres 
+        LOGGER.error("Le serveur a renvoyé une erreur : " + error);
+        continue;
       }
+      
     }
 
-    if (allServersStatus) LOGGER.debug("Les demarrages de tous les serveurs se sont bien deroules.");
+    if (allServersStatus) {
+      LOGGER.debug("Les demarrages de tous les serveurs se sont bien deroules.");
+    } 
 
     return allServersStatus;
 
@@ -313,7 +326,7 @@ module.exports = class serverManager {
   * @function
   * @name stopAllServer
   * @description Arrêter l'ensemble des serveurs disponibles dans le manager
-  * @return {boolean} allServerStatus - Renvoie si tous les serveurs se sont arrêtés correctement
+  * @return {boolean} allServerStatus - Renvoie true si tous les serveurs se sont arrêtés correctement
   *
   */
   async stopAllServer() {
@@ -334,18 +347,31 @@ module.exports = class serverManager {
     }
 
     let allServersStatus = true;
+
     for (let serverId in this._serverCatalog) {
+
       LOGGER.debug("Serveur: " + serverId);
-      const status = !await this._serverCatalog[serverId].stop();
-      if (!status) {
-        LOGGER.error(`Le serveur ${serverId} n'a pas été arrếté correctement : ${err}`);
-        allServersStatus = false;
-      } else {
-        LOGGER.info(`Le serveur ${serverId} a été arrêté.`)
+
+      try {
+
+        if (!(await this._serverCatalog[serverId].stop())) {
+          LOGGER.error(`Le serveur ${serverId} n'a pas été arrếté correctement`);
+          allServersStatus = false;
+        } else {
+          LOGGER.info(`Le serveur ${serverId} a été arrêté.`);
+        }
+
+      } catch(error) {
+        // On récupère une erreur du stop afin de continuer l'arrêt des autres 
+        LOGGER.error("Le serveur a renvoyé une erreur : " + error);
+        continue;
       }
+
     }
     
-    if (allServersStatus) LOGGER.debug("Les arrets de tous les serveurs se sont bien deroules.");
+    if (allServersStatus) {
+      LOGGER.debug("Les arrets de tous les serveurs se sont bien deroules.");
+    }
 
     return allServersStatus;
 

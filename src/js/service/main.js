@@ -84,20 +84,17 @@ async function startService() {
           if (process.argv[3] === "child") {
             LOGGER.info("Ce service est un child d'un administrateur. Instanciation de la fonction permettant de recevoir les messages");
             service.initIPC();
+          } else {
+            LOGGER.debug("Processus parent, aucune connexion IPC à gérer");
           }
 
           // On démarre les serveurs associé à ce service
-          const status = await service.startServers()
-            .then(() => {
-              if (process.argv[3] === "child") {
-                LOGGER.debug("Envoi d'un message au parent");
-                process.send({status: true});
-              }
-            })
-            .catch(() => {
-              LOGGER.error("Erreur dans le démarrage des serveurs du service.")
-              pm.shutdown(5);
-            })
+          if (!(await service.startServers())) {
+            LOGGER.fatal("Erreur lors du démarrage des serveurs");
+            pm.shutdown(5);
+          } else {
+            LOGGER.info("Les serveurs ont bien été démarrés");
+          }
 
         }
 
