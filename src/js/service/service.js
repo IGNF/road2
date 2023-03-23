@@ -913,7 +913,7 @@ module.exports = class Service {
 
     LOGGER.info("Extinction des serveurs...");
 
-    if (!(await this._serverManager.stopAllServer())) {
+    if (!(await this._serverManager.stopAllServers())) {
       LOGGER.fatal("Impossible d'eteindre les serveurs.");
       return false;
     } else {

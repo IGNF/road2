@@ -324,12 +324,12 @@ module.exports = class serverManager {
   /**
   *
   * @function
-  * @name stopAllServer
+  * @name stopAllServers
   * @description Arrêter l'ensemble des serveurs disponibles dans le manager
   * @return {boolean} allServerStatus - Renvoie true si tous les serveurs se sont arrêtés correctement
   *
   */
-  async stopAllServer() {
+  async stopAllServers() {
 
     LOGGER.info("Arret de l'ensemble des serveurs du service...");
 

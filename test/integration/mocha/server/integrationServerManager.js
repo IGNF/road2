@@ -74,12 +74,14 @@ describe('Test de la classe ServerManager', function() {
 
   describe('Cycle de vie des serveurs gérés', function() {
 
-    it('startAllServers()', function() {
-      assert.equal(serverManager.startAllServers(), true);
+    it('startAllServers()', async function() {
+      let status = await serverManager.startAllServers();
+      assert.equal(status, true);
     });
 
-    it('stopAllServer()', function() {
-      assert.equal(serverManager.stopAllServer(), true);
+    it('stopAllServers()', async function() {
+      let status = await serverManager.stopAllServers();
+      assert.equal(status, true);
     });
 
   });
