@@ -6,6 +6,7 @@ const { fork } = require('child_process');
 const ServiceAdministered = require('./serviceAdministered');
 const errorManager = require('../utils/errorManager');
 const {setInterval} = require('node:timers/promises');
+const HealthRequest = require('../requests/healthRequest');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICEPRO");
@@ -111,8 +112,17 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
         });
 
-        // TODO: Attendre de voir si le child est bien démarré et qu'il n'y ait eu pas d'erreur lors de son lancement
-
+        // On demande au service (child) son état
+        // Cela permet de voir si le child est bien démarré et qu'il n'y ait eu pas d'erreur lors de son lancement
+        LOGGER.info("Attente de l'état du service");
+        try {
+            let healthResponse = await this.computeRequest(new HealthRequest());
+            LOGGER.debug("Le service a repondu : " + healthResponse);
+        } catch (error) {
+            LOGGER.error("Erreur lors de l'attente de l'état du service : " + error);
+            return false;
+        }
+        
         return true;
 
     }
@@ -162,6 +172,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      * @name computeRequest
      * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
      * @param {object} request - Instance fille de la classe Request 
+     * @returns {object} response - Instance fille de la classe Response
      * 
      */
     async computeRequest(request) {
