@@ -108,7 +108,11 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             LOGGER.debug(response);
 
             // On stocke la réponse 
-            this._unReadResponses[response._uuid] = response;
+            if (response._uuid) {
+                this._unReadResponses[response._uuid] = response;
+            } else {
+                // TODO voir ce qu'on fait
+            }
 
         });
 

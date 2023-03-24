@@ -695,12 +695,32 @@ module.exports = class Administrator {
 
         if (serviceAdminConf) {
 
+            LOGGER.debug("La configuration admin du service " + serviceId + " a été trouvée");
+            LOGGER.debug(serviceAdminConf);
+
             // Récupération de la configuration
             LOGGER.info("Récupération de la configuration du service");
-            let serviceConfLocation = path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
+            let serviceConfLocation = "";
+            let serviceConfiguration = {};
 
-            LOGGER.debug("Le service " + serviceId + " a été trouvé et va être redémarré");
-            LOGGER.debug(serviceAdminConf);
+            try {
+                serviceConfLocation = path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
+                serviceConfiguration = JSON.parse(fs.readFileSync(serviceConfLocation));
+            } catch (error) {
+                LOGGER.error("Impossible de récupérer la configuration du service : " + error);
+                return false;
+            }
+            
+
+            // On vérifie la configuration avant de redémarrer afin d'éviter au maximum les mauvaises surprises
+            LOGGER.info("Vérification de la configuration avant de demander un redémarrage");
+            if (!(await this._serviceManager.checkServiceConfiguration(serviceConfiguration, serviceConfLocation))) {
+                LOGGER.error("La configuration du service "+ serviceId +" est incorrecte donc il ne peut être redémarré");
+                return false;
+            } else {
+                LOGGER.info("La configuration du service "+ serviceId +" est correcte donc il peut être redémarré");
+            }
+
             const options = {adminLogConfiguration: this._logConfiguration};
             if (!await this._serviceManager.restartService(serviceAdminConf.creationType, serviceAdminConf.id, serviceConfLocation, options)) {
                 LOGGER.error("Impossible de redémarer le service "+ serviceAdminConf.id);
