@@ -63,7 +63,6 @@
           {
             "id": "waysAttributes",
             "values": [
-              "name",
               "nom_1_gauche",
               "nom_1_droite",
               "cpx_numero",
