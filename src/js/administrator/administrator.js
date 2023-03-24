@@ -676,6 +676,67 @@ module.exports = class Administrator {
 
     }
 
+    /**
+     *
+     * @function
+     * @name restartService
+     * @description Redémarrage d'un service
+     * @param {string} serviceId - Identifiant du service qu'on veut redémarrer
+     * @return {boolean} status - Retourne si le service a bien été redémarré
+     *
+     */
+
+    async restartService(serviceId) {
+
+        LOGGER.info("restartService...");
+
+        // On récupère la configuration admin de ce service, s'il existe
+        const serviceAdminConf = this._configuration.administration.services.find(service => service.id == serviceId);
+
+        if (serviceAdminConf) {
+
+            LOGGER.debug("La configuration admin du service " + serviceId + " a été trouvée");
+            LOGGER.debug(serviceAdminConf);
+
+            // Récupération de la configuration
+            LOGGER.info("Récupération de la configuration du service");
+            let serviceConfLocation = "";
+            let serviceConfiguration = {};
+
+            try {
+                serviceConfLocation = path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
+                serviceConfiguration = JSON.parse(fs.readFileSync(serviceConfLocation));
+            } catch (error) {
+                LOGGER.error("Impossible de récupérer la configuration du service : " + error);
+                return false;
+            }
+            
+
+            // On vérifie la configuration avant de redémarrer afin d'éviter au maximum les mauvaises surprises
+            LOGGER.info("Vérification de la configuration avant de demander un redémarrage");
+            if (!(await this._serviceManager.checkServiceConfiguration(serviceConfiguration, serviceConfLocation))) {
+                LOGGER.error("La configuration du service "+ serviceId +" est incorrecte donc il ne peut être redémarré");
+                return false;
+            } else {
+                LOGGER.info("La configuration du service "+ serviceId +" est correcte donc il peut être redémarré");
+            }
+
+            const options = {adminLogConfiguration: this._logConfiguration};
+            if (!await this._serviceManager.restartService(serviceAdminConf.creationType, serviceAdminConf.id, serviceConfLocation, options)) {
+                LOGGER.error("Impossible de redémarer le service "+ serviceAdminConf.id);
+                return false;
+            } else {
+                LOGGER.info("Le service " + serviceAdminConf.id + " a été redémarré correctement");
+            }
+
+        } else {
+            throw errorManager.createError(`Can't find service ${serviceId}`, 404);
+        }
+
+        return true;
+
+    }
+
 }
 
 

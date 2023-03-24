@@ -93,6 +93,25 @@ Feature: Road2 with data
     And the response should have an header "content-type" with value "application/json"
     And the response should contain "application"
 
+  Scenario: [admin/1.0.0] Redémarrage du service "main"
+    Given an "GET" request on operation "services/<service>/restart" in api "admin" "1.0.0"
+    And with path parameters:
+      | key       | value |
+      | service   | main  |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+
+  Scenario: [admin/1.0.0] Redémarrage d'un service inexistant
+    Given an "GET" request on operation "services/<service>/restart" in api "admin" "1.0.0"
+    And with path parameters:
+      | key       | value |
+      | service   | test  |
+    When I send the request
+    Then the server should send a response with status 404
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "Can't find service"
+
   Scenario: [admin/1.0.0] Configuration d'un service inexistant ne marche pas
     Given an "GET" request on operation "services/<service>" in api "admin" "1.0.0"
     And with path parameters:

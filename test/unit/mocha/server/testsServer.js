@@ -38,12 +38,14 @@ describe('Test de la classe Server', function() {
       assert.equal(server.id, httpServer.id);
     });
 
-    it('Start()', function() {
-      assert.equal(server.start(), true);
+    it('Start()', async function() {
+      let status = await server.start();
+      assert.equal(status, true);
     });
 
-    it('Stop()', function() {
-      assert.equal(server.stop(), true);
+    it('Stop()', async function() {
+      let status = await server.stop();
+      assert.equal(status, true);
     });
 
   });
@@ -56,12 +58,14 @@ describe('Test de la classe Server', function() {
       assert.equal(server.id, httpsServer.id);
     });
 
-    it('Start()', function() {
-      assert.equal(server.start(), true);
+    it('Start()', async function() {
+      let status = await server.start();
+      assert.equal(status, true);
     });
 
-    it('Stop()', function() {
-      assert.equal(server.stop(), true);
+    it('Stop()', async function() {
+      let status = await server.stop();
+      assert.equal(status, true);
     });
 
   });

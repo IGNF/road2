@@ -887,12 +887,11 @@ module.exports = class Service {
   * @description Démarrage des serveurs du service
   *
   */
-    startServers() {
+    async startServers() {
 
     LOGGER.info("Démarrage des serveurs du service...");
 
-    // Démarrage des serveurs
-    if (!this._serverManager.startAllServers()) {
+    if (!(await this._serverManager.startAllServers())) {
       LOGGER.fatal("Impossible de démarrer tous les serveurs.");
       return false;
     } else {
@@ -910,15 +909,17 @@ module.exports = class Service {
   *
   */
 
-  stopServers() {
+  async stopServers() {
 
-    // Extinction des serveurs
-    if (!this._serverManager.stopAllServer()) {
+    LOGGER.info("Extinction des serveurs...");
+
+    if (!(await this._serverManager.stopAllServers())) {
       LOGGER.fatal("Impossible d'eteindre les serveurs.");
       return false;
+    } else {
+      LOGGER.info("Les serveurs du service sont éteints.");
+      return true;
     }
-
-    return true;
 
   }
 
@@ -1006,6 +1007,20 @@ module.exports = class Service {
 
     });
 
+    process.on('SIGTERM', async () => {
+
+      LOGGER.debug("Réception du signal SIGTERM pour arrêter le service");
+
+      if (await this.stopServers()) {
+        LOGGER.debug("Les serveurs sont bien arrêtés, on peut sortir du service (exit)")
+        process.exit(0);
+      } else {
+        LOGGER.fatal("Les serveurs ne se sont pas bien arrếtés");
+        process.exit(1);
+      }
+
+    });
+    
   }
 
   /**

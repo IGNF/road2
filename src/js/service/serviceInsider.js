@@ -127,10 +127,22 @@ module.exports = class ServiceInsider extends ServiceAdministered {
   
             LOGGER.info("Les sources connectables ont été connectées");
   
-            // On démarre les serveurs associé à ce service
-            if (!this._serviceInstance.startServers()) {
-              LOGGER.error("Impossible de démarrer les serveurs. Impossible de démarrer le service");
+            // On connecte les sources
+            if (!(await this._serviceInstance.connectSources())) {
+    
+              LOGGER.error("Aucune source n'a pu être connectée");
               return false;
+            
+            } else {
+    
+              LOGGER.info("Les sources connectables ont été connectées");
+    
+              // On démarre les serveurs associé à ce service
+              if (!(await this._serviceInstance.startServers())) {
+                LOGGER.error("Impossible de démarrer les serveurs. Impossible de démarrer le service");
+                return false;
+              }
+    
             }
   
           }
@@ -141,6 +153,29 @@ module.exports = class ServiceInsider extends ServiceAdministered {
     
       return true;
 
+  }
+
+  /**
+   *
+   * @function
+   * @name stopService
+   * @description Arrêter un service administré via une instanciation de la classe Service
+   * @return {boolean} status - Retourne si le service a bien été arrêté
+   *
+   */
+  async stopService() {
+
+    LOGGER.debug("Arrêt d'un service dans le même processus");
+
+    if (await this._serviceInstance.stopServers()) {
+      LOGGER.debug("Service arrêté.");
+      this._serviceInstance = null;
+      return true;
+    } else {
+      LOGGER.error("Le service n'a pu être arrêté");
+      return false;
+    }
+      
   }
 
   /**

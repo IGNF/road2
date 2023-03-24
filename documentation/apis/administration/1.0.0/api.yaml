@@ -348,7 +348,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-                
+
+  /services/{service}/restart:
+    get:
+      tags:
+      - "Gestion des services"
+      summary: "Demander le redémarage d'un service."
+      description: |
+        Cette requête demande le redémarage du service demandé. Cette demande peut 
+        échouer et l'utilisateur en sera informé. 
+      operationId: "get-service-restart"
+      parameters:
+      - name: "service"
+        description: "Id du service concerné"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/serviceConfiguration"
+        400:
+          description: "Invalid parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+             
   /services/{service}/resources:
     get:
       tags:

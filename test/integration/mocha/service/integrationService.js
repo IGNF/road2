@@ -86,7 +86,7 @@ describe('Test de la classe Service', function() {
     const serverManager = sinon.mock(ServerManager);
     serverManager.createAllServer = sinon.stub().returns(true);
     serverManager.startAllServer = sinon.stub().returns(true);
-    serverManager.stopAllServer = sinon.stub().returns(true);
+    serverManager.stopAllServers = sinon.stub().returns(true);
     serverManager.checkConfiguration = sinon.stub().returns(true);
     service._serverManager = serverManager;
 

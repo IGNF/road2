@@ -80,15 +80,21 @@ async function startService() {
 
           LOGGER.info("Les sources connectables ont été connectées");
 
-          // Instanciation de la fonction permettant de recevoir des messages via IPC
+          // On démarre les serveurs associé à ce service
+          if (!(await service.startServers())) {
+            LOGGER.fatal("Erreur lors du démarrage des serveurs");
+            pm.shutdown(5);
+          } else {
+            LOGGER.info("Les serveurs ont bien été démarrés");
+          }
+
+          // Le service est prêt à traiter des requêtes
+          // Instanciation de la fonction permettant de recevoir des messages via IPC si besoin
           if (process.argv[3] === "child") {
             LOGGER.info("Ce service est un child d'un administrateur. Instanciation de la fonction permettant de recevoir les messages");
             service.initIPC();
-          }
-
-          // On démarre les serveurs associé à ce service
-          if (!service.startServers()) {
-            pm.shutdown(5);
+          } else {
+            LOGGER.debug("Processus parent, aucune connexion IPC à gérer");
           }
 
         }
