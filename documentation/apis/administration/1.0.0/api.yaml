@@ -1081,7 +1081,7 @@ components:
                           example: "name"
                         column: 
                           type: "string"
-                          example: "way_names"
+                          example: "concat_names"
                         default: 
                           type: "string"
                           example: "false"
@@ -1155,7 +1155,7 @@ components:
                               example: "name"
                             column: 
                               type: "string"
-                              example: "way_names"
+                              example: "concat_names"
                             default: 
                               type: "string"
                               example: "false"
