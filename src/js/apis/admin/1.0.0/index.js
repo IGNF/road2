@@ -69,6 +69,33 @@ router.route("/health")
 
   });
 
+// Configuration
+// Pour avoir ou changer la configuration de l'administrateur
+router.route("/configuration")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/configuration?");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    try {
+
+      // Envoie à l'administrateur et récupération de l'objet réponse
+      const configurationResponse = administrator.configuration;
+      LOGGER.debug(configurationResponse);
+
+      res.set('content-type', 'application/json');
+      res.status(200).json(configurationResponse);
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
+
 // Services
 // Pour avoir des informations sur les services
 router.route("/services")

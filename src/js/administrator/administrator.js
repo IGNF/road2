@@ -59,6 +59,17 @@ module.exports = class Administrator {
     /**
      *
      * @function
+     * @name get configuration
+     * @description Récupérer la configuration de l'administrateur
+     *
+     */
+    get configuration () {
+        return this._configuration;
+    }
+
+    /**
+     *
+     * @function
      * @name checkAdminConfiguration
      * @description Vérifier la partie administration de la configuration
      * @param {json} configuration - Configuration de Road2 (contenu du server.json)

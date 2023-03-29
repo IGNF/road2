@@ -66,6 +66,30 @@ Feature: Road2 with data
     Then the server should send a response with status 404
     And the response should contain "Not found"
 
+  Scenario: [admin/1.0.0] Configuration de l'administrateur
+    Given an "GET" request on operation "configuration" in api "admin" "1.0.0"
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should contain "administration"
+
+  Scenario: [admin/1.0.0] Configuration de l'administrateur avec un mauvais parametre
+    Given an "GET" request on operation "configuration" in api "admin" "1.0.0"
+    And with query parameters:
+      | key       | value           |
+      | test      | other           |
+    When I send the request 
+    Then the server should send a response with status 200
+    And the response should contain "administration"
+
+  Scenario: [admin/1.0.0] Configuration de l'administrateur en POST ne marche pas
+    Given an "POST" request on operation "configuration" in api "admin" "1.0.0"
+    And with query parameters:
+      | key       | value           |
+      | test      | other           |
+    When I send the request 
+    Then the server should send a response with status 404
+    And the response should contain "Not found"
+
   Scenario: [admin/1.0.0] Configurations des services
     Given an "GET" request on operation "services" in api "admin" "1.0.0"
     When I send the request 
