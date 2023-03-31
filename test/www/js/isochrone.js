@@ -329,9 +329,17 @@ function loadUserParameter(request) {
 // Resource
   if (document.forms["iso-form"].elements["userResource"].value !== "") {
     request.finalResource = document.forms["iso-form"].elements["userResource"].value;
+    if (request.finalResource === "otherResource") {
+      if (document.forms["iso-form"].elements["userResourceValue"].value !== "") {
+        request.finalResource = document.forms["iso-form"].elements["userResourceValue"].value;
+      } else {
+        request.finalResource = defaultResource;
+      }
+    }
   } else {
     request.finalResource = defaultResource;
   }
+
   // Profile
   if (document.forms["iso-form"].elements["userProfile"].value !== "") {
     request.finalProfile = document.forms["iso-form"].elements["userProfile"].value;
