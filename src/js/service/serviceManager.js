@@ -234,7 +234,7 @@ module.exports = class serviceManager {
         let administeredService = this._loadedServiceAdministeredCatalog[serviceId];
         if (!administeredService) {
             LOGGER.error("Aucun service associé à cet ID: " + serviceId);
-            throw errorManager.createError("Unknown service : " + serviceId);
+            throw errorManager.createError("Unknown service : " + serviceId, 404);
         }
 
         // On envoit la requête et renvoit la réponse 

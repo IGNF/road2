@@ -197,6 +197,50 @@ router.route("/services/:service/restart")
 
   });
 
+// Services/{service}/projections/{projection}
+// Récupérer une projection supportée par un service
+router.route("/services/:service/projections/:projection")
+
+  .get(async function(req, res, next) {
+
+    LOGGER.debug("requete GET sur /admin/1.0.0/services/:service/projections/:projection");
+    LOGGER.debug(req.originalUrl);
+
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+
+    // on récupère l'ensemble des paramètres de la requête
+    const parameters = req.params;
+    LOGGER.debug(parameters);
+
+    try {     
+
+      // Vérification des paramètres de la requête
+      const projectionRequest = controller.checkProjectionParameters(parameters);
+      LOGGER.debug(projectionRequest);
+      
+      // Envoie à l'administrateur et récupération de l'objet réponse
+      const projectionResponse = await administrator.computeRequest(projectionRequest.service, projectionRequest);
+      LOGGER.debug(projectionResponse);
+
+      // Vérification de l'id retourné (utilisation attribut car communication IPC)
+      if (projectionResponse._id == "") {
+        next(errorManager.createError("Unknown projection", 404));
+      }else{           
+        // Formattage de la réponse
+        const userResponse = controller.writeProjectionResponse(projectionResponse);
+        LOGGER.debug(userResponse);
+
+        res.set('content-type', 'application/json');
+        res.status(200).json(userResponse);
+      }  
+
+    } catch (error) {
+      return next(error);
+    }
+
+  });
+
 // Gestion des erreurs
 // Cette partie doit être placée après la définition des routes normales
 // ---

@@ -390,7 +390,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-             
+
+  /services/{service}/projections/{projection}:
+    get:
+      tags:
+      - "Gestion des services"
+      - "Projection"
+      summary: "Récupération d'une projection supportée par un service."
+      description: |
+        Cette requête retourne une projection supportée par un service.
+      operationId: "get-service-projection"
+      parameters:
+      - name: "service"
+        description: "Id du service concerné"
+        in: "path"
+        required: true
+        schema:
+          type: "string"      
+      - name: "projection"
+        description: "Id de la projection concernée"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/projectionConfiguration"
+        400:
+          description: "Invalid parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        404:
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+        500:
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+
   /services/{service}/resources:
     get:
       tags:
@@ -953,6 +1001,14 @@ components:
                   version: 
                     type: "string"
                     example: "1.0.0"
+
+    projectionConfiguration:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          example: "EPSG:4326"
+          required: true
     
     resourceConfiguration:
       type: "object"

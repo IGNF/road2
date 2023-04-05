@@ -16,6 +16,8 @@ const LogManager = require('../utils/logManager');
 const log4js = require('log4js');
 const errorManager = require('../utils/errorManager');
 const HealthResponse = require('../responses/healthResponse');
+const ProjectionResponse = require('../responses/projectionResponse');
+const projectionRequest = require('../requests/projectionRequest');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -1045,6 +1047,8 @@ module.exports = class Service {
     // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper. 
     if (request._type === "healthRequest") {
       return this.computeHealthRequest(request);
+    }else if (request._type === "projectionRequest") {
+      return this.computeProjectionRequest(request);
     } else {
       throw errorManager.createError("Unknown request type");
     }
@@ -1107,6 +1111,35 @@ module.exports = class Service {
     healthResponse.serviceStates.push(serviceState);
     return healthResponse;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name computeProjectionRequest
+  * @description Fonction utilisée pour connaitre une projection utilisée par un service
+  * @param {projectionRequest} projectionRequest - Instance de la classe projectionRequest 
+  *
+  */
+
+  computeProjectionRequest(projectionRequest) {
+
+    LOGGER.info("computeProjectionRequest...");
+
+    // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
+    let projectionResponse = new ProjectionResponse();
+    if ( !this._projectionManager.isProjectionLoaded(projectionRequest._projection)){      
+      projectionResponse.id = "";
+      // Le lancement d'exception n'est pas possible car il n'y aura dans ce cas pas de réponse IPC envoyé avec l'uuid de la requete
+      // On envoie donc une réponse avec un id vide pour le traiter comme 404 dans l'administrateur
+      //throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404)
+    }  
+    else{
+
+      projectionResponse.id = projectionRequest._projection;
+    }
+
+    return projectionResponse;
   }
 
 }

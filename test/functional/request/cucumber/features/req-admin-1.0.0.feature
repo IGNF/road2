@@ -144,3 +144,33 @@ Feature: Road2 with data
     When I send the request 
     Then the server should send a response with status 404
     And the response should contain "Can't find service"
+
+  Scenario: [admin/1.0.0] Projection valide du service "main"
+    Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
+    And with path parameters:
+      | key        | value     |
+      | service    | main      |
+      | projection | EPSG:4326 |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should have an header "content-type" with value "application/json"
+    And the response should contain "id"
+
+  Scenario: [admin/1.0.0] Projection invalide du service "main"
+    Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
+    And with path parameters:
+      | key        | value     |
+      | service    | main      |
+      | projection | ftii   |
+    When I send the request
+    Then the server should send a response with status 404
+  
+  Scenario: [admin/1.0.0] Projection invalide du service "main"
+    Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
+    And with path parameters:
+      | key        | value     |
+      | service    | Unknown      |
+      | projection | Unknown   |
+    When I send the request
+    Then the server should send a response with status 404
+    
