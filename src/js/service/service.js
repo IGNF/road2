@@ -992,6 +992,8 @@ module.exports = class Service {
         response = this.computeAdminRequest(request);
       } catch(error) {
         LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        error._uuid = request._uuid;
+        error._errorFlag = true
         process.send(error);
         return false;
       }
@@ -1000,7 +1002,10 @@ module.exports = class Service {
         response._uuid = request._uuid;
         process.send(response);
       } catch(error) {
-        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        // TODO : gestion plus fine du renvoi d'un message, il faudrait que l'administrateur vérifie l'état du canal
+        LOGGER.error("Erreur lors de l'envoi de la réponse à la requête: " + error);
+        error._uuid = request._uuid;
+        error._errorFlag = true
         process.send(error);
         return false;
       }
@@ -1119,20 +1124,18 @@ module.exports = class Service {
   * @name computeProjectionRequest
   * @description Fonction utilisée pour connaitre une projection utilisée par un service
   * @param {projectionRequest} projectionRequest - Instance de la classe projectionRequest 
+  * @returns {projectionResponse} response - Instance de la classe projectionResponse
   *
   */
 
-  computeProjectionRequest(projectionRequest) {
+  computeProjectionRequest(projectionRequest){
 
     LOGGER.info("computeProjectionRequest...");
 
     // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
     let projectionResponse = new ProjectionResponse();
     if ( !this._projectionManager.isProjectionLoaded(projectionRequest._projection)){      
-      projectionResponse.id = "";
-      // Le lancement d'exception n'est pas possible car il n'y aura dans ce cas pas de réponse IPC envoyé avec l'uuid de la requete
-      // On envoie donc une réponse avec un id vide pour le traiter comme 404 dans l'administrateur
-      //throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404)
+      throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404);
     }  
     else{
 

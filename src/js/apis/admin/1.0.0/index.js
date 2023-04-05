@@ -222,18 +222,13 @@ router.route("/services/:service/projections/:projection")
       // Envoie à l'administrateur et récupération de l'objet réponse
       const projectionResponse = await administrator.computeRequest(projectionRequest.service, projectionRequest);
       LOGGER.debug(projectionResponse);
+               
+      // Formattage de la réponse
+      const userResponse = controller.writeProjectionResponse(projectionResponse);
+      LOGGER.debug(userResponse);
 
-      // Vérification de l'id retourné (utilisation attribut car communication IPC)
-      if (projectionResponse._id == "") {
-        next(errorManager.createError("Unknown projection", 404));
-      }else{           
-        // Formattage de la réponse
-        const userResponse = controller.writeProjectionResponse(projectionResponse);
-        LOGGER.debug(userResponse);
-
-        res.set('content-type', 'application/json');
-        res.status(200).json(userResponse);
-      }  
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);        
 
     } catch (error) {
       return next(error);

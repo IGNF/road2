@@ -203,6 +203,12 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
             // On attend la réponse et on la renvoit
             let response = await this.waitResponse(request._uuid);
+
+            // On vérifie s'il s'agit d'une erreur
+            if (response._errorFlag) {
+                // TODO : voir si on fait une fonction pour ajouter la récupération de la stack
+                throw errorManager.createError(response.error, response.status)
+            }
             
             return response;
 

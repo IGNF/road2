@@ -161,7 +161,7 @@ Feature: Road2 with data
     And with path parameters:
       | key        | value     |
       | service    | main      |
-      | projection | ftii   |
+      | projection | unknown   |
     When I send the request
     Then the server should send a response with status 404
   
