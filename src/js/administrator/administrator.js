@@ -73,10 +73,11 @@ module.exports = class Administrator {
      * @name checkAdminConfiguration
      * @description Vérifier la partie administration de la configuration
      * @param {json} configuration - Configuration de Road2 (contenu du server.json)
+     * @param {object} options - Options pour préciser le comportement de cette fonction
      *
      */
 
-    checkAdminConfiguration(configuration) {
+    checkAdminConfiguration(configuration, options) {
 
         LOGGER.info("Verification de la configuration de l'administrateur...");
 
@@ -273,7 +274,7 @@ module.exports = class Administrator {
             LOGGER.debug("configuration.administration.network.server présent");
         }
 
-        if (!this._serverManager.checkServerConfiguration(configuration.administration.network.server)){
+        if (!this._serverManager.checkServerConfiguration(configuration.administration.network.server, options)){
             LOGGER.fatal("Mauvaise configuration: 'administration.network.server' mal configuré.");
             return false;
         } else {
@@ -743,6 +744,92 @@ module.exports = class Administrator {
         } else {
             throw errorManager.createError(`Can't find service ${serviceId}`, 404);
         }
+
+        return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name computeConfigurationRequest
+     * @description Redémarrage d'un service
+     * @param {ConfigurationRequest} request - Instance de la classe ConfigurationRequest
+     * @return {boolean} status - Indique si les changements ont bien été pris en compte
+     *
+     */
+
+    async computeConfigurationRequest(request) {
+
+        LOGGER.info("computeConfigurationRequest...");
+
+        // Vérification de la requête
+        if (!request) {
+            LOGGER.error("Pas de configurationRequest");
+            return false;
+        }
+
+        if (request.type !== "configurationRequest") {
+            LOGGER.error("Mauvais type d'objet");
+            return false;
+        }
+
+        // On va analyser chaque grande partie de la configuration demandée pour voir ce qu'il y a à faire
+        // À savoir, en théorie : les parties api, services, network et logs
+        // À savoir, dans la pratique : il n'y a que les services d'implémentés
+
+        // Gestion des services via le serviceManager
+        // On garde un aspect synchrone dans l'écriture du code afin de faciliter le debug
+        // --- 
+        LOGGER.info("Classification des services pour savoir quoi en faire");
+        let oldIds = this._configuration.administration.services.map(serviceConf => serviceConf.id);
+        let newIds = request.newConfiguration.administration.services.map(serviceConf => serviceConf.id);
+        
+        let idsToDelete = oldIds.filter(id => !newIds.includes(id));
+        LOGGER.debug("ids à supprimer : " + idsToDelete);
+        let idsToCreate = newIds.filter(id => !oldIds.includes(id));
+        LOGGER.debug("ids à créer : " + idsToCreate);
+        let idsToReload = newIds.filter(id => oldIds.includes(id));
+        LOGGER.debug("ids à redéployer si différent : " + idsToReload);
+
+        LOGGER.info("Suppression des services concernés");
+        for (let i = 0; i < idsToDelete.length; i++) {
+            LOGGER.info("Suppression du service : " + idsToDelete[i]);
+            // Qu'importe le statut, on continue
+            if (!await this._serviceManager.deleteService(idsToDelete[i])) {
+                LOGGER.error("Problème lors de la suppresion");
+            }
+        }
+
+        LOGGER.info("Création des services concernés");
+        for (let i = 0; i < idsToCreate.length; i++) {
+            LOGGER.info("Création du service : " + idsToCreate[i]);
+            // Qu'importe le statut, on continue
+            if (!await this._serviceManager.loadService(idsToCreate[i])) {
+                LOGGER.error("Problème lors de la création");
+            }
+        }
+
+        LOGGER.info("Rdéploiement des services concernés si besoin");
+        for (let i = 0; i < idsToReload.length; i++) {
+            LOGGER.info("Analyse du service : " + idsToReload[i]);
+            try {
+                assert.deepStrictEqual();
+                LOGGER.info("Aucun changement, on passe au suivant");
+                continue;
+            } catch(error) {
+                LOGGER.info("");
+                LOGGER.debug(error);
+            }
+            // Qu'importe le statut, on continue
+            if (!await this._serviceManager.loadService(idsToReload[i])) {
+                LOGGER.error("Problème lors de la création");
+            }
+        }
+        // --- 
+
+        // Si tout est ok, on finit par attribuer la nouvelle configuration au service
+        this._configuration = request.newConfiguration;
 
         return true;
 

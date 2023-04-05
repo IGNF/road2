@@ -10,6 +10,36 @@ const controller = require('./controller/controller');
 var LOGGER = log4js.getLogger("ADMIN");
 var router = express.Router();
 
+// POST
+// ---
+// Pour cette API, on va permettre la lecture des requêtes POST/PATCH en parsant les contenus du type application/json
+router.use(express.json(
+  // Fonctions utilisées pour vérifier le body d'un POST et ainsi récupérer les erreurs
+  {
+    type: (req) => {
+      // Le seul content-type accepté a toujours été application/json, on rend cela plus explicite
+      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct. 
+      // Sans elle, le traitement continue.
+      if (req.get('Content-Type') !== "application/json") {
+        throw errorManager.createError(" Wrong Content-Type. Must be 'application/json' ", 400);
+      } else {
+        return true;
+      }
+    },
+    verify: (req, res, buf, encoding) => {
+      // Cette fonction permet de vérifier que le JSON envoyé est valide. 
+      // Si ce n'est pas le cas, le traitement de la requête est arrêté. 
+      try {
+        JSON.parse(buf);
+      } catch (error) {
+        throw errorManager.createError("Invalid request body. Error during the parsing of the body: " + error.message, 400);
+      }
+    }
+  }
+)); 
+// ---
+
+
 // Accueil de l'API
 router.all("/", function(req, res) {
   LOGGER.debug("requete sur /admin/1.0.0/");
@@ -94,6 +124,45 @@ router.route("/configuration")
       return next(error);
     }
 
+  })
+  
+  .patch(async function(req, res, next) {
+  
+    LOGGER.debug("requete PATCH sur /admin/1.0.0/configuration?");
+    LOGGER.debug(req.originalUrl);
+  
+    // On récupère l'instance d'Administrator pour répondre aux requêtes
+    let administrator = req.app.get("administrator");
+  
+    // On récupère le body qui contient les paramètres
+    const userConfiguration = req.body;
+    LOGGER.debug(userConfiguration);
+  
+    try {
+  
+      // Vérification des paramètres 
+      const configurationRequest = controller.checkConfigurationParameters(userConfiguration, administrator);
+      LOGGER.debug(configurationRequest);
+      // Envoie à l'administrateur et récupération du statut 
+      const status = await administrator.computeConfigurationRequest(configurationRequest);
+
+      if (status) {
+
+        // On récupère la nouvelle configuration qui doit être celle de la requête
+        const configurationResponse = administrator.configuration;
+        // Formattage de la réponse
+        res.set('content-type', 'application/json');
+        res.status(200).json(configurationResponse);
+
+      } else {
+        next(errorManager.createError("Unknown error during the reload"));
+      } 
+
+  
+    } catch (error) {
+      return next(error);
+    }
+  
   });
 
 // Services

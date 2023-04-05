@@ -51,9 +51,21 @@ module.exports = class serverManager {
   * @name checkServerConfiguration
   * @description Vérifier la configuration d'un serveur
   * @param {object} config - Configuration à vérifier
+  * @param {object} options - Options pour préciser le comportement de cette fonction
   *
   */
-  checkServerConfiguration(config) {
+  checkServerConfiguration(config, options) {
+
+    LOGGER.info("checkServerConfiguration()...");
+
+    let onlyForm = false;
+
+    // Gestion des options
+    if (options) {
+        if (options.onlyForm) {
+            onlyForm = true;
+        }
+    }
 
     if (!config) {
       LOGGER.error("Aucune configuration n'a ete fournie");
@@ -67,24 +79,32 @@ module.exports = class serverManager {
       return false;
     } else {
       
-      // On vérifie que l'id n'est pas déjà chargé
-      if (this._loadedServerId.length !== 0) {
-        for (let i = 0; i < this._loadedServerId.length; i++) {
-          if (config.id === this._loadedServerId[i]) {
-            LOGGER.error("Un serveur contenant l'id " + config.id + " est deja chargé.");
-            return false;
-          }
-        }
-      }
+      if (!onlyForm) {
 
-      // On vérifie que l'id n'est pas déjà pris par le check courant
-      if (this._checkedServerId.length !== 0) {
-        for (let i = 0; i < this._checkedServerId.length; i++) {
-          if (config.id === this._checkedServerId[i]) {
-            LOGGER.error("Un serveur contenant l'id " + config.id + " est déjà verifié.");
-            return false;
+        LOGGER.info("On vérifie l'utilisation de la configuration car onlyForm=false");
+
+        // On vérifie que l'id n'est pas déjà chargé
+        if (this._loadedServerId.length !== 0) {
+          for (let i = 0; i < this._loadedServerId.length; i++) {
+            if (config.id === this._loadedServerId[i]) {
+              LOGGER.error("Un serveur contenant l'id " + config.id + " est deja chargé.");
+              return false;
+            }
           }
         }
+
+        // On vérifie que l'id n'est pas déjà pris par le check courant
+        if (this._checkedServerId.length !== 0) {
+          for (let i = 0; i < this._checkedServerId.length; i++) {
+            if (config.id === this._checkedServerId[i]) {
+              LOGGER.error("Un serveur contenant l'id " + config.id + " est déjà verifié.");
+              return false;
+            }
+          }
+        }
+
+      } else {
+        LOGGER.info("On ne vérifie pas l'utilisation de la configuration car options.onlyForm=true");
       }
 
     }

@@ -147,9 +147,11 @@ paths:
       - "Gestion de l'administrateur"
       summary: "Modifier la configuration de l'administrateur."
       description: | 
-        Dans la configuration de l'administrateur, tout est modifiable. 
+        Dans la configuration de l'administrateur, tout est modifiable en théorie. 
         Cela permet notamment de créer, modifier et supprimer les services 
-        gérés par cet administrateur. 
+        gérés par cet administrateur. En pratique, ce sont les seules modifications 
+        implémentées pour le moment. N'hésitez pas à contribuer ici https://github.com/IGNF/road2 
+        pour en ajouter d'autres.
       operationId: "patch-admin-configuration"
       requestBody:
         required: true

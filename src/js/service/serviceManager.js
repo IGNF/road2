@@ -135,10 +135,7 @@ module.exports = class serviceManager {
      * @function
      * @name stopService
      * @description Arrêt d'un service
-     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
      * @param {string} id - Id du service pour l'administrateur
-     * @param {string} configurationLocation - Emplacement de la configuration du service à charger
-     * @param {object} options - Contenu optionnel pour le chargement de certains types de services
      * @return {boolean} response - Retourne si le service a bien été arrêté
      * 
      */
@@ -159,6 +156,39 @@ module.exports = class serviceManager {
         }
 
         return true;
+
+    }
+
+    /**
+     *
+     * @function
+     * @name deleteService
+     * @description Suppression d'un service
+     * @param {string} id - Id du service pour l'administrateur
+     * @return {boolean} response - Retourne si le service a bien été supprimé
+     * 
+     */
+    async deleteService(id) {
+
+        LOGGER.info("Demande de suppression du service " + id);
+
+        // On vérifie le service existe pour ce manager
+        if (!this._loadedServiceAdministeredCatalog[id]) {
+            LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+            return false;
+        }
+
+        // On demande son arrêt
+        if (!await this.stopService(id)) {
+            LOGGER.error("Le service n'a pas être arrêté");
+            return false;
+        } else {
+            // Puis on le supprime du catalogue
+            LOGGER.info("Le service a bien été arrêté");
+            delete this._loadedServiceAdministeredCatalog[id];
+            delete this._loadedServiceConfLocations[id];
+            return true;
+        }
 
     }
 
