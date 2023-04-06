@@ -172,5 +172,24 @@ Feature: Road2 with data
       | service    | Unknown      |
       | projection | Unknown   |
     When I send the request
-    Then the server should send a response with status 404
+    Then the server should send a response with status 404  
+  
+  Scenario: [admin/1.0.0] Projection sur service non défini
+    Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
+    And with path parameters:
+      | key        | value     |
+      | service    | %20       |
+      | projection | EPSG:4326 |
+    When I send the request
+    Then the server should send a response with status 400
+
+      
+  Scenario: [admin/1.0.0] Projection non définie sur service "main"
+    Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
+    And with path parameters:
+      | key        | value     |
+      | service    | main      |
+      | projection | %20       |
+    When I send the request
+    Then the server should send a response with status 400
     

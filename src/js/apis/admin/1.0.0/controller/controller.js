@@ -101,7 +101,7 @@ module.exports = {
       throw errorManager.createError(" Parameter 'service' is invalid: there is no value", 400);
     } 
     
-    if (parameters.service === "") {
+    if (parameters.service.trim() === "") {
       throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
     }
     
@@ -133,7 +133,7 @@ module.exports = {
       throw errorManager.createError(" Parameter 'service' is invalid: there is no value", 400);
     } 
     
-    if (parameters.service === "") {
+    if (parameters.service.trim() === "") {
       throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
     }
 
@@ -142,7 +142,7 @@ module.exports = {
       throw errorManager.createError(" Parameter 'projection' is invalid: there is no value", 400);
     } 
     
-    if (parameters.projection === "") {
+    if (parameters.projection.trim() === "") {
       throw errorManager.createError(" Parameter 'projection' is invalid: value should not be empty", 400);
     }
     

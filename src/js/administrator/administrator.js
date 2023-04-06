@@ -482,6 +482,7 @@ module.exports = class Administrator {
      * @description Gestion de la requête pour une route d'administration sur un serveur 
      * @param {string} serviceId - Id du service selon l'administrateur
      * @param {object} request - Instance fille de la classe Request 
+     * @return {object} responses - Json contenant la réponse du service à la requête
      *
      */
 
