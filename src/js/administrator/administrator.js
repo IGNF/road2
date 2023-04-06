@@ -478,6 +478,25 @@ module.exports = class Administrator {
     /**
      *
      * @function
+     * @name computeRequest
+     * @description Gestion de la requête pour une route d'administration sur un serveur 
+     * @param {string} serviceId - Id du service selon l'administrateur
+     * @param {object} request - Instance fille de la classe Request 
+     * @return {object} responses - Json contenant la réponse du service à la requête
+     *
+     */
+
+    async computeRequest(serviceId, request) {
+
+        LOGGER.info("computeRequest...");
+        LOGGER.debug("Compute request pour le service : " + serviceId);
+        const response = await this._serviceManager.computeRequest(serviceId, request);
+        return response;
+    }
+
+    /**
+     *
+     * @function
      * @name computeHealthRequest
      * @description Gestion de la requête d'état du serveur 
      * Cette fonction ne suit pas le m$eme chemin que les autres car elle est globale 

@@ -4,6 +4,7 @@ const errorManager = require('../../../../utils/errorManager');
 const log4js = require('log4js');
 const HealthRequest = require('../../../../requests/healthRequest');
 const ServiceRequest = require('../../../../requests/serviceRequest');
+const ProjectionRequest = require('../../../../requests/projectionRequest');
 
 var LOGGER = log4js.getLogger("CONTROLLER");
 
@@ -100,7 +101,7 @@ module.exports = {
       throw errorManager.createError(" Parameter 'service' is invalid: there is no value", 400);
     } 
     
-    if (parameters.service === "") {
+    if (parameters.service.trim() === "") {
       throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
     }
     
@@ -109,6 +110,69 @@ module.exports = {
     const request = new ServiceRequest(parameters.service);
 
     return request;
+
+  },
+
+
+  /**
+  *
+  * @function
+  * @name checkProjectionParameters
+  * @description Vérification des paramètres d'une requête sur /services/{service}/projections/{projection}
+  * @param {object} parameters - ensemble des paramètres de la requête ExpressJS
+  * @return {ProjectionRequest} request - Instance de la classe ProjectionRequest
+  *
+  */
+
+  checkProjectionParameters: function(parameters) {
+
+    LOGGER.debug("checkProjectionParameters()");
+
+    // Service
+    if (!parameters.service) {
+      throw errorManager.createError(" Parameter 'service' is invalid: there is no value", 400);
+    } 
+    
+    if (parameters.service.trim() === "") {
+      throw errorManager.createError(" Parameter 'service' is invalid: value should not be empty", 400);
+    }
+
+    // Projection
+    if (!parameters.projection) {
+      throw errorManager.createError(" Parameter 'projection' is invalid: there is no value", 400);
+    } 
+    
+    if (parameters.projection.trim() === "") {
+      throw errorManager.createError(" Parameter 'projection' is invalid: value should not be empty", 400);
+    }
+    
+    // TODO : vérifier ici que le service existe (appel à une fonction de la classe administrator)
+
+    const request = new ProjectionRequest(parameters.service, parameters.projection);
+
+    return request;
+
+  },
+  /**
+  *
+  * @function
+  * @name writeProjectionResponse
+  * @description Ré-écriture de la réponse pour une requête sur /services/<service>/projections/<projection>
+  * @param {object} projectionResponse - Instance de la classe ProjectionResponse
+  * @return {object} userResponse - Réponse envoyée à l'utilisateur
+  *
+  */
+
+  writeProjectionResponse: function(projectionResponse) {
+
+    let userResponse = {};
+
+    LOGGER.debug("writeProjectionResponse()");
+
+    // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
+    userResponse.id = projectionResponse._id;
+
+    return userResponse;
 
   }
 

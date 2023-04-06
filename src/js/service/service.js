@@ -16,6 +16,8 @@ const LogManager = require('../utils/logManager');
 const log4js = require('log4js');
 const errorManager = require('../utils/errorManager');
 const HealthResponse = require('../responses/healthResponse');
+const ProjectionResponse = require('../responses/projectionResponse');
+const projectionRequest = require('../requests/projectionRequest');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVICE");
@@ -989,7 +991,15 @@ module.exports = class Service {
       try {
         response = this.computeAdminRequest(request);
       } catch(error) {
-        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        // C'est un cas particulier : on veut retrouver l'usage des controller d'APIs 
+        // => comme c'est une requête, on fait du throw en cas d'erreur et c'est normal
+        // ce n'est pas une vraie erreur. Cependant, on veut renvoyer l'erreur au parent
+        // donc on copie le message  
+        LOGGER.info("Erreur lors de l'exécution de la requête: " + error.message);
+        error._uuid = request._uuid;
+        error._errorFlag = true;
+        error._message = error.message;
+        error._stack = error.stack;
         process.send(error);
         return false;
       }
@@ -998,7 +1008,12 @@ module.exports = class Service {
         response._uuid = request._uuid;
         process.send(response);
       } catch(error) {
-        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        // TODO : gestion plus fine du renvoi d'un message, il faudrait que l'administrateur vérifie l'état du canal
+        LOGGER.error("Erreur lors de l'envoi de la réponse à la requête: " + error);
+        error._uuid = request._uuid;
+        error._errorFlag = true;
+        error._message = error.message;
+        error._stack = error.stack;
         process.send(error);
         return false;
       }
@@ -1045,6 +1060,8 @@ module.exports = class Service {
     // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper. 
     if (request._type === "healthRequest") {
       return this.computeHealthRequest(request);
+    }else if (request._type === "projectionRequest") {
+      return this.computeProjectionRequest(request);
     } else {
       throw errorManager.createError("Unknown request type");
     }
@@ -1106,6 +1123,33 @@ module.exports = class Service {
 
     healthResponse.serviceStates.push(serviceState);
     return healthResponse;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name computeProjectionRequest
+  * @description Fonction utilisée pour connaitre une projection utilisée par un service
+  * @param {projectionRequest} projectionRequest - Instance de la classe projectionRequest 
+  * @returns {projectionResponse} response - Instance de la classe projectionResponse
+  *
+  */
+
+  computeProjectionRequest(projectionRequest){
+
+    LOGGER.info("computeProjectionRequest...");
+
+    // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
+    let projectionResponse = new ProjectionResponse();
+
+    if (!this._projectionManager.isProjectionLoaded(projectionRequest._projection)) {      
+      throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404);
+    } else {
+      projectionResponse.id = projectionRequest._projection;
+    }
+
+    return projectionResponse;
 
   }
 
