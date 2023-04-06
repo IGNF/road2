@@ -206,8 +206,8 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
             // On vérifie s'il s'agit d'une erreur
             if (response._errorFlag) {
-                // TODO : voir si on fait une fonction pour ajouter la récupération de la stack
-                throw errorManager.createError(response.error, response.status)
+                // TODO : voir ce qu'on fait de la stack dispo dans response._stack
+                throw errorManager.createError(response._message, response.status);
             }
             
             return response;

@@ -991,9 +991,15 @@ module.exports = class Service {
       try {
         response = this.computeAdminRequest(request);
       } catch(error) {
-        LOGGER.error("Erreur lors de l'exécution de la requête: " + error);
+        // C'est un cas particulier : on veut retrouver l'usage des controller d'APIs 
+        // => comme c'est une requête, on fait du throw en cas d'erreur et c'est normal
+        // ce n'est pas une vraie erreur. Cependant, on veut renvoyer l'erreur au parent
+        // donc on copie le message  
+        LOGGER.info("Erreur lors de l'exécution de la requête: " + error.message);
         error._uuid = request._uuid;
-        error._errorFlag = true
+        error._errorFlag = true;
+        error._message = error.message;
+        error._stack = error.stack;
         process.send(error);
         return false;
       }
@@ -1005,7 +1011,9 @@ module.exports = class Service {
         // TODO : gestion plus fine du renvoi d'un message, il faudrait que l'administrateur vérifie l'état du canal
         LOGGER.error("Erreur lors de l'envoi de la réponse à la requête: " + error);
         error._uuid = request._uuid;
-        error._errorFlag = true
+        error._errorFlag = true;
+        error._message = error.message;
+        error._stack = error.stack;
         process.send(error);
         return false;
       }
@@ -1134,15 +1142,15 @@ module.exports = class Service {
 
     // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
     let projectionResponse = new ProjectionResponse();
-    if ( !this._projectionManager.isProjectionLoaded(projectionRequest._projection)){      
-      throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404);
-    }  
-    else{
 
+    if (!this._projectionManager.isProjectionLoaded(projectionRequest._projection)) {      
+      throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404);
+    } else {
       projectionResponse.id = projectionRequest._projection;
     }
 
     return projectionResponse;
+
   }
 
 }
