@@ -50,7 +50,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Vérification d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let file = "/home/docker/app/test/unit/mocha/config/projections/projection.json";
+    let file = "/home/docker/app/test/unit/mocha/config/projections/france.json";
 
     it('checkProjectionFile()', function() {
       assert.equal(projManager.checkProjectionFile(file), true);
@@ -107,7 +107,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Chargement d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let file = "/home/docker/app/test/unit/mocha/config/projections/projection.json";
+    let file = "/home/docker/app/test/unit/mocha/config/projections/france.json";
 
     it('loadProjectionFile()', function() {
       assert.equal(projManager.loadProjectionFile(file), true);
