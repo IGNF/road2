@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.2.0
+
+CHANGED:
+  - GET /admin/1.0.0/services/{service}/projections/{projection} renvoit aussi les paramétres de la projection
+
 ## 2.1.1
 
 CHANGED: 

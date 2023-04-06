@@ -172,6 +172,8 @@ module.exports = {
     // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
     userResponse.id = projectionResponse._id;
 
+    userResponse.parameters = projectionResponse._parameters;
+
     return userResponse;
 
   }

@@ -18,15 +18,20 @@ module.exports = class projectionResponse extends Response {
   * @function
   * @name constructor
   * @description Constructeur de la classe projectionResponse
+  * @params {string} id - Id de la projection 
+  * @params {string} parameters - Paramétres de la projection 
   *
   */
-  constructor() {
+  constructor(id, parameters) {
 
     // Type de la réponse 
     super("projectionResponse");
 
     // Identifiant
-    this._id = "";
+    this._id = id;
+
+    // Paramétres 
+    this._parameters = parameters;
 
   }
 
@@ -44,13 +49,14 @@ module.exports = class projectionResponse extends Response {
   /**
   *
   * @function
-  * @name set id
-  * @description Attribuer l'identifiant
-  * @param {string} id - identifiant
+  * @name get parameters
+  * @description Récupérer les paramétres
   *
   */
-  set id (id) {
-    this._id = id;
+   get parameters () {
+    return this._parameters;
   }
+
+
 
 }

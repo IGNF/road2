@@ -53,7 +53,7 @@ Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui 
 Démarche à suivre pour chaque projet:
 
 1. Tester `develop` et corriger si nécessaire.
-2. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `develop` à 1.0.1.
 3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` et corriger si nécessaire.
