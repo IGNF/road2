@@ -220,7 +220,7 @@ function computeIso() {
   // --
 
   // ---- Requete envoyée au nouveau service
-  let requestStr = road2Url +
+  let requestStr = request.finalUrl  +
     "resource=" + request.finalResource +
     "&profile=" + request.finalProfile +
     "&costType=" + request.finalCostType +
@@ -325,6 +325,12 @@ function computeOtherRoad(request) {
 function loadUserParameter(request) {
 
   let constraintObject = {};
+  // Url 
+  if (document.forms["iso-form"].elements["userUrl"].value !== "") {
+    request.finalUrl = document.forms["route-form"].elements["userUrl"].value;
+  } else {
+    request.finalUrl = road2Url;
+  }
 
 // Resource
   if (document.forms["iso-form"].elements["userResource"].value !== "") {
