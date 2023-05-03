@@ -14,7 +14,14 @@ Route Graph Generator et PGRouting Procedures sont indépendants en tant que pro
 
 Sur ces trois projets ont une branche `master` et `develop`. La première permet de gérer les versions mises en production. La seconde permet de réaliser les développements. 
 
-On veillera à partir de `develop` et de créer une branche du type `feature-*` pour réaliser de nouvelles fonctionnalités. 
+On veillera à partir de `develop` et de créer une branche du type 
+- `feat/*` pour réaliser de nouvelles fonctionnalités,
+- `fix/*` pour effectuer une correction sur le code source,
+- `docker/*` pour modifier la partie docker uniquement,
+- `test/*` pour modifier uniquement les tests, 
+- `ci/*` pour modifier la CI Github
+
+Pour fusionner une branche avec `develop`, on veillera à avoir fait un rebase de develop sur cette branche. Et sur la méthode de merge, on fera un squash. Ainsi, la branche `develop` aura un commit par fonctionnalité, correction, etc...
 
 ## Versions et tags
 
@@ -31,6 +38,8 @@ Par exemple, on veillera à toujours avoir, pour chaque projet, un état similai
 On veillera à tagger les commits de chaque projet avec les bonnes versions. Et cela sur la branche `master` principalement. Cela est utile pour deux raisons: 
 - On doit être capable d'identifier, par les tags, les versions du code utilisées en production. 
 - On doit pouvoir faire fonctionner tous les projets ensemble à partir des tags sur `master` et `develop`. 
+
+Lorsque l'on fusionnera `develop` sur `master`, on veillera à ne pas faire de squash afin de faciliter les futurs fusions (comme cela est préconisé par [github](https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squashing-and-merging-a-long-running-branch)). 
 
 ### PGRouting Procedures et Route Graph Generator
 

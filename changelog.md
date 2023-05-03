@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2.1.1
+
+CHANGED: 
+  - reference de la doc à la branche master
+  - modification de la ci github pour prendre en compte la branche master
+
+FIXED:
+- correction pour éviter de publier github pages sur un tag
+
 ## 2.1.0
 
 ADDED:
