@@ -129,8 +129,19 @@ Fonctionnalité explicite.
 
 ### Obtenir l'état de santé du serveur via l'API 
 
-Fonctionnalité en cours d'implémentation. L'objectif est de récupérer l'état de chaque [source](./concepts.md) du serveur et d'en faire un compte-rendu. 
+L'objectif est de récupérer l'état de chaque [source](./concepts.md) de chaque service et d'en faire un compte-rendu. 
 
+### Obtenir la configuration de l'administrateur
+
+### Obtenir la configuration des services gérés par un administrateur
+
+### Obtenir la configuration d'un service via son id
+
+### Redémarrer un service via son id
+
+### Obtenir la liste des projections gérés par un service
+
+### Obtenir la présence d'une projection via son id
 
 
 ## Groupe de fonctionnalités 5 : Fonctionnalités spécifiques à OSRM 
