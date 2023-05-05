@@ -11,47 +11,64 @@ describe('Test de la classe ApisManager', function() {
     logManager.manageLogs();
   });
 
-  let apisManager = new ApisManager();
-  let referenceApp = express();
-  let app = express();
-  let referenceApi = new Api("simple","1.0.0","/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/index.js");
-  referenceApi.initFile = "/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/init.js";
-  referenceApi.updateFile = "/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/update.js";
-  referenceApi.initialize("/simple/1.0.0", referenceApp);
+  describe('Test du constructeur et des attributs', function() {
 
-  describe('Test du constructeur et des getters', function() {
+    let apisManager = new ApisManager();
+
+    it('Get apisDirectory', function() {
+      assert.deepEqual(apisManager._apisDirectory, "../apis/");
+    });
 
     it('Get listOfRoutes', function() {
-      assert.deepEqual(apisManager.listOfRoutes, new Array());
+      assert.deepEqual(apisManager._listOfRoutes, new Array());
     });
 
     it('Get apisCatalog', function() {
-      assert.deepEqual(apisManager.apisCatalog, {});
+      assert.deepEqual(apisManager._apisCatalog, {});
     });
 
   });
 
-  describe('Test de la fonction loadAPISDirectory()', function() {
+  describe('Test de la fonction checkApiConfiguration()', function() {
 
-    it('loadAPISDirectory() avec les bons parametres', function() {
-      assert.equal(apisManager.loadAPISDirectory(app, "../../../test/integration/mocha/config/apis/", ""), true);
+    let apisManager = new ApisManager("../../../test/integration/mocha/config/apis/");
+
+    it('checkApiConfiguration() avec les bons parametres', function() {
+      let configuration = {"name" : "simple","version" : "1.0.0"};
+      assert.equal(apisManager.checkApiConfiguration(configuration), true);
+    });
+
+    it('checkApiConfiguration() avec des mauvais parametres', function() {
+      let configuration = {"nam" : "todo","versio" : "2.0.0"};
+      assert.equal(apisManager.checkApiConfiguration(configuration), false);
     });
 
   });
 
-  describe('Test de la fonction verifyRouteExistanceById()', function() {
+  describe('Test de la fonction loadApiConfiguration()', function() {
 
-    it('verifyRouteExistanceById() avec une route qui existe', function() {
-      assert.equal(apisManager.verifyRouteExistanceById("/simple/1.0.0"), true);
-    });
+    let apisManager = new ApisManager("../../../test/integration/mocha/config/apis/");
+    let app = express();
+    let configuration = {"name" : "simple","version" : "1.0.0"};
 
-    it('verifyRouteExistanceById() avec une route qui n\'existe pas', function() {
-      assert.equal(apisManager.verifyRouteExistanceById("/test/1.0.3"), false);
+    it('loadApiConfiguration() avec les bons parametres', function() {
+      assert.equal(apisManager.loadApiConfiguration(app, configuration), true);
     });
 
   });
 
   describe('Test de la fonction getApi()', function() {
+
+    let apisManager = new ApisManager("../../../test/integration/mocha/config/apis/");
+    let app = express();
+    let configuration = {"name" : "simple","version" : "1.0.0"};
+    apisManager.loadApiConfiguration(app, configuration);
+    let referenceApp = express();
+    let referenceApi = new Api("simple","1.0.0","/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/index.js");
+    referenceApi.initFile = "/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/init.js";
+    referenceApi.updateFile = "/home/docker/app/test/integration/mocha/config/apis/simple/1.0.0/update.js";
+    referenceApi.initialize("/simple/1.0.0", referenceApp);
+  
 
     it('getApi()', function() {
       assert.deepEqual(apisManager.getApi("simple", "1.0.0"), referenceApi);

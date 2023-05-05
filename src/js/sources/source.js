@@ -1,5 +1,7 @@
 'use strict';
 
+const errorManager = require('../utils/errorManager');
+
 /**
 *
 * @class
@@ -18,10 +20,9 @@ module.exports = class Source {
   * @description Constructeur de la classe source
   * @param {string} id - Identifiant de la source
   * @param {string} type - Type de la source
-  * @param {Topology} topology - Topologie dont dérive la source (classe fille de topology)
   *
   */
-  constructor(id, type, topology) {
+  constructor(id, type, description, projection, bbox) {
 
     // Id d'une source. Il doit être unique.
     this._id = id;
@@ -29,19 +30,24 @@ module.exports = class Source {
     // Type de la source
     this._type = type;
 
+    // Description de la source
+    this._description = description;
+
+    // Projection de la source 
+    this._projection = projection;
+
+    // Emprise de la source 
+    this._bbox = bbox;
+
     // État de la connexion de la source
     this._connected = false;
 
-    // Liste d'opérations possibles sur la source
-    this._availableOperations = new Array();
-
-    // Topologie dont dérive la source
-    this._topology = topology;
-
-    // État de la source (même si connectée, elle peut être disfonctionnelle)
-    // Peut être : "green" si la dernière requête a fonctionnée, "orange" si la source est connectée mais injoignable, "red" à l'initialisation ou si plus gros problème
+    // État de la source (même si connectée, elle peut être dysfonctionnelle)
+    // "green" si la dernière requête a fonctionnée, 
+    // "red" si la donnée n'est plus accessible, 
+    // "init" à sa création (utile pour une requête /health de l'administrateur)
     // Ajouter la gestion de ce paramètre dans chaque classe fille
-    this._state = "red";
+    this._state = "init";
 
   }
 
@@ -65,6 +71,28 @@ module.exports = class Source {
   */
   get type () {
     return this._type;
+  }
+
+  /**
+  *
+  * @function
+  * @name get description
+  * @description Récupérer la description de la source
+  *
+  */
+   get description () {
+    return this._description;
+  }
+
+  /**
+  *
+  * @function
+  * @name get projection
+  * @description Récupérer la projection de la source
+  *
+  */
+   get projection () {
+    return this._projection;
   }
 
   /**
@@ -111,45 +139,6 @@ module.exports = class Source {
   */
   set state (st) {
     this._state = st;
-  }
-
-  /**
-  *
-  * @function
-  * @name get availableOperations
-  * @description Récupérer la liste des opérations possibles sur la source
-  *
-  */
-  get availableOperations () {
-    return this._availableOperations;
-  }
-
-  /**
-  *
-  * @function
-  * @name get topology
-  * @description Récupérer la topologie de la source
-  *
-  */
-  get topology () {
-    return this._topology;
-  }
-
-  /**
-  *
-  * @function
-  * @name isOperationAvailable
-  * @description Savoir si une opération est disponible sur la source
-  * @param {string} operationId - Id de l'opération
-  *
-  */
-  isOperationAvailable (operationId) {
-    for (let i = 0; i < this._availableOperations.length; i++ ) {
-      if (this._availableOperations[i] === operationId) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

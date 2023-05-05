@@ -1,0 +1,22 @@
+{
+    "url": "localhost",
+    "port": 8079,
+    "protocol": "http",
+    "apisUrl": {
+        "admin": {
+            "1.0.0": {
+                "health": "/admin/1.0.0/health",
+                "version": "/admin/1.0.0/version",
+                "configuration": "/admin/1.0.0/configuration",
+                "services": "/admin/1.0.0/services",
+                "services/<service>": "/admin/1.0.0/services/<service>",
+                "services/<service>/restart": "/admin/1.0.0/services/<service>/restart",
+                "services/<service>/projections/<projection>": "/admin/1.0.0/services/<service>/projections/<projection>"
+            }
+        }
+    },
+    "defaultParameters": [],
+    "alternativeParameters" : {
+        "url" : "127.0.0.1"
+    }
+}

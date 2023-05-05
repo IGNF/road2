@@ -29,8 +29,9 @@
           </div>
 
           <div class="col">
-            
+
             <form id="iso-form">
+              <label for="userUrl"><strong>Url du service : </strong></label><input type="text" name="userUrl" id="userUrl" placeholder="http://localhost:8080/simple/1.0.0/isochrone?"/><br>
               <p><strong>Paramètres de l'isochrone</strong></p>
               <p>
                 <label for="userPoint">Point</label> : <input type="text" name="userPoint" id="userPoint" placeholder="Ex. 2.354715 , 48.831063 "/><br>
@@ -39,7 +40,12 @@
                 <label for="bduni-idf-pgr">BDUni sur l'Île-de-France via PGR</label>
                 <input type="radio" id="bduni-idf-smartpgr" name="userResource" value="bduni-idf-smartpgr">
                 <label for="bduni-idf-smartpgr">BDUni sur l'Île-de-France via PGR et Smartrouting</label>
+                <input type="radio" id="bdtopo-idf-valhalla" name="userResource" value="bdtopo-idf-valhalla">
+                <label for="bdtopo-idf-valhalla">BDUni sur l'Île-de-France via Valhalla</label>
                 <br>
+                <input type="radio" id="otherResource" name="userResource" value="otherResource">
+                <label for="otherResource">Autre ressource</label>
+                <input type="text" name="userResourceValue" id="otherResourceValue" placeholder="Autre ressource"/><br>
                 <p>Mode de déplacement : </p>
                 <input type="radio" id="car" name="userProfile" value="car" checked>
                 <label for="car">Voiture</label>
@@ -96,7 +102,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="request">
-            
+
         </div>
         <div class="container-fluid row">
           <p>
@@ -106,7 +112,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="response">
-            
+
         </div>
 
       </div>
@@ -120,7 +126,7 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="request-other">
-            
+
         </div>
 
         <div class="container-fluid row">
@@ -131,10 +137,10 @@
           </p>
         </div>
         <div class="container-fluid row collapse" id="response-other">
-            
+
         </div>
       </div>
-      
+
     </div>
 
     <!-- Optional JavaScript -->
@@ -150,7 +156,7 @@
     <!-- Script pour le chargement de la carte et l'utilisation du service -->
     <script src="js/isochrone.js"></script>
     <!-- Script pour le menu contextuel personnalisé -->
-    <script src="https://cdn.jsdelivr.net/npm/ol-contextmenu"></script>
+    <script src="https://unpkg.com/ol-contextmenu@4.1.0/dist/ol-contextmenu.js"></script>
 
   </body>
 </html>

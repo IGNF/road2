@@ -2,7 +2,7 @@
 
 const log4js = require('log4js');
 const nconf = require('nconf');
-const Service = require('./service/service');
+const Administrator = require('./administrator/administrator');
 const path = require('path');
 const fs = require('fs');
 const pm = require('./utils/processManager.js');
@@ -21,7 +21,7 @@ var LOGGER;
 async function start() {
 
   console.log("===========================");
-  console.log("ROAD2 - Calcul d'itineraire");
+  console.log("ROAD2 - Administrator");
   console.log("===========================");
 
   // Chargement de la configuration
@@ -32,61 +32,85 @@ async function start() {
   let logConfiguration = getLoggerConfiguration(configuration, configurationPath);
   checkAndInitLogger(logConfiguration);
 
-  // Création du service
-  let service = new Service();
+  LOGGER.info("Logger de l'administrateur initialisé");
 
-  // Vérification de la configuration globale du service et sauvegarde
-  if (!service.checkAndSaveGlobalConfiguration(configuration, configurationPath)) {
-    pm.shutdown(1);
-  }
+  // Création de l'administrateur car il sera utilisé dans tous les cas
+  let administrator = new Administrator();
 
-  // Sauvegarde de la configuration des logs
-  service.logConfiguration = logConfiguration;
+  if (!nconf.argv().get('configCheck')) {
 
-  // Chargement des opérations rendues disponibles sur le service
-  if (!service.loadOperations()) {
-    pm.shutdown(1);
-  }
+    // Cas général de l'utilisation de Road2 
+    LOGGER.info("Lancement classique de Road2");
 
-  // Chargement des projections
-  if (!service.loadProjections()) {
-    pm.shutdown(1);
-  }
+    // Récupération de la configuration de l'administrateur
+    if (!administrator.checkAdminConfiguration(configuration, configurationPath)) {
+      LOGGER.fatal("La configuration de l'administrateur n'est pas validée");
+      pm.shutdown(11);
+    } else {
 
-  // Chargement des ressources
-  if (!(await service.loadResources())) {
-    pm.shutdown(1);
-  }
+      LOGGER.info("La configuration de l'administrateur est validée. On la sauvegarde.");
 
-  // En mode check de configuration, fermeteure du serveur sans code d'erreur
-  if (nconf.argv().get('configCheck')) {
+      // On aura besoin de cette configuration plus tard
+      administrator.saveAdminConfiguration(configuration, configurationPath, logConfiguration);
 
-    LOGGER.info("La vérification de la configuration est terminée");
-    pm.shutdown(0);
+      // Création du serveur d'administration
+      if (!administrator.createServer()) {
+        LOGGER.fatal("Le serveur de l'administrateur ne peut être créé");
+        pm.shutdown(12);
+      } else {
+        
+        LOGGER.debug("Serveur administrateur créé");
+
+        // Création des services au démarrage si demandé
+        LOGGER.info("Création des services...");
+
+        if (!(await administrator.createServices())) {
+          LOGGER.error("Problèmes lors du démarrage des services. Reconfigurez les et relancez leur démarrage.");
+          // On n'éteint pas le serveur d'administration car les services pourront être reconfiguré et démarrés par l'API
+        } else {
+          LOGGER.info("S'il y en a, les services ont été démarré");
+        }
+
+      }
+
+    }
 
   } else {
 
-    // Chargement des topologies
-    if (!service.loadTopologies()) {
-      pm.shutdown(1);
-    }
+    // Cas particulier 
+    LOGGER.info("Lancement de Road2 pour vérification des configurations");
 
-    // Chargement des sources uniques
-    try {
-      await service.loadSources();
-    } catch (err) {
-      LOGGER.fatal("Impossible de charger les sources", err);
-      pm.shutdown(1);
-    }
+    // On commence par vérifier la configuration du service 
+    if (!administrator.checkAdminConfiguration(configuration, configurationPath)) {
 
-    // Création du serveur web
-    if (!service.createServer("../apis/", "")) {
-      pm.shutdown(1);
+      // La configuration de l'administrateur n'est pas validée
+      LOGGER.fatal("La configuration de l'administrateur n'est pas validée");
+      pm.shutdown(11);
+
+    } else {
+
+      LOGGER.info("La configuration de l'administrateur a été vérifiée et validée");
+      
+      // On la sauvegarde pour la suite
+      administrator.saveAdminConfiguration(configuration, configurationPath, logConfiguration);
+      
+      // On vérifie la configuration du service 
+      if (!(await administrator.checkServicesConfiguration())) {
+
+        // La configuration du service n'est pas validée
+        LOGGER.fatal("La configuration des services n'est pas validée");
+        pm.shutdown(1);
+
+      } else {
+        LOGGER.info("S'il y en a, la configuration des services est validée");
+      }
+
     }
     
-  }
+    LOGGER.info("La vérification des différentes configurations est terminée");
+    pm.shutdown(0);
 
-  
+  }
 
 }
 
@@ -120,31 +144,31 @@ function loadGlobalConfiguration() {
     } catch (error) {
       console.log("Impossible de recuperer le chemin absolu du fichier de configuration:");
       console.log(error);
-      process.exit(1);
+      process.exit(11);
     }
 
     // vérification de l'exitence du fichier
     if (fs.existsSync(configurationPath)) {
       
-      // chargement dans une variable pour la classe Service
+      // chargement dans une variable pour la classe Administrateur
       try {
         globalConfiguration = JSON.parse(fs.readFileSync(configurationPath));
       } catch (error) {
         console.log("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration de Road2:");
         console.log(error);
-        process.exit(1);
+        process.exit(11);
       }
 
     } else {
       console.log("Mauvaise configuration: fichier de configuration global inexistant: " + configurationPath);
       console.log("Utilisez le paramètre ROAD2_CONF_FILE en ligne de commande ou en variable d'environnement pour le préciser.");
-      process.exit(1);
+      process.exit(11);
     }
 
   } else {
     //si aucun fichier n'a été précisé on renvoie une erreur
     console.log("Aucun fichier de configuration. Utiliser la variable d'environnement $ROAD2_CONF_FILE ou l'option --ROAD2_CONF_FILE lors de l'initialisation du serveur.");
-    process.exit(1);
+    process.exit(11);
   }
 
   console.log("Configuration chargee.")
@@ -156,9 +180,9 @@ function loadGlobalConfiguration() {
 /**
 *
 * @function
-* @name initLogger
+* @name checkAndInitLogger
 * @description Initialiser le logger
-* @param {json} userLogConfigurationFile - Configuration des logs de l'application
+* @param {json} userLogConfiguration - Configuration des logs de l'administrateur
 *
 */
 
@@ -176,49 +200,49 @@ function checkAndInitLogger(userLogConfiguration) {
       } catch (error) {
         console.log("Mauvaise configuration des logs dans mainConf");
         console.log(error);
-        process.exit(1);
+        process.exit(11);
       }
 
       //Instanciation du logger
-      LOGGER = log4js.getLogger('SERVER');
+      LOGGER = log4js.getLogger('ROAD2');
 
       LOGGER.info("Logger charge.");
 
     } else {
       console.log("Mausvaise configuration pour les logs: 'mainConf' absent.");
-      process.exit(1);
+      process.exit(11);
     }
 
     if (userLogConfiguration.httpConf) {
 
       if (!userLogConfiguration.httpConf.level) {
         console.log("Mausvaise configuration pour les logs: 'httpConf.level' absent.");
-        process.exit(1);
+        process.exit(11);
       } else {
         if (typeof userLogConfiguration.httpConf.level !== "string") {
           console.log("Mausvaise configuration pour les logs: 'httpConf.level' n'est pas une chaine de caracteres");
-          process.exit(1);
+          process.exit(11);
         }
       }
 
       if (!userLogConfiguration.httpConf.format) {
         console.log("Mausvaise configuration pour les logs: 'httpConf.format' absent.");
-        process.exit(1);
+        process.exit(11);
       } else {
         if (typeof userLogConfiguration.httpConf.format !== "string") {
           console.log("Mausvaise configuration pour les logs: 'httpConf.format' n'est pas une chaine de caracteres");
-          process.exit(1);
+          process.exit(11);
         }
       }
 
     } else {
       console.log("Mausvaise configuration pour les logs: 'httpConf' absent.");
-      process.exit(1);
+      process.exit(11);
     }
 
   } else {
     console.log("Aucune configuration pour les logs.");
-    process.exit(1);
+    process.exit(11);
   }
 
 }
@@ -227,9 +251,9 @@ function checkAndInitLogger(userLogConfiguration) {
 *
 * @function
 * @name getLoggerConfiguration
-* @description Récupérer la configuration des logs du serveur
-* @param {json} userConfiguration - Configuration de l'application
-* @param {string} userConfigurationPath - CHemin absolu du fichier de configuration
+* @description Récupérer la configuration des logs du serveur d'administration
+* @param {json} userConfiguration - Configuration de l'administrateur
+* @param {string} userConfigurationPath - Chemin absolu du fichier de configuration
 * @return {json} Configuration des logs du serveur
 *
 */
@@ -243,13 +267,13 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
 
   if (userConfiguration) {
 
-    if (userConfiguration.application) {
+    if (userConfiguration.administration) {
 
-      if (userConfiguration.application.logs) {
+      if (userConfiguration.administration.logs) {
 
-        if (userConfiguration.application.logs.configuration) {
+        if (userConfiguration.administration.logs.configuration) {
 
-          userLogConfigurationFile = userConfiguration.application.logs.configuration;
+          userLogConfigurationFile = userConfiguration.administration.logs.configuration;
 
           // chemin absolu du fichier
           let file = "";
@@ -262,7 +286,7 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
 
             console.log("Impossible de recuperer le chemin absolu du fichier de log:");
             console.log(error);
-            process.exit(1);
+            process.exit(11);
 
           }
                     
@@ -274,33 +298,33 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
             } catch (error) {
               console.log("Mauvaise configuration: impossible de lire ou de parser le fichier de configuration des logs:");
               console.log(error);
-              process.exit(1);
+              process.exit(11);
             }
           } else {
             console.log("Mauvaise configuration: fichier de configuration des logs inexistant:");
             console.log(file);
-            process.exit(1);
+            process.exit(11);
           }
 
         } else {
-          console.log("Mauvais configuration: 'application.logs.configuration' absent.");
-          process.exit(1);
+          console.log("Mauvaise configuration: 'administration.logs.configuration' absent.");
+          process.exit(11);
         }
 
       } else {
-        console.log("Mauvais configuration: 'application.logs' absent.");
-        process.exit(1);
+        console.log("Mauvaise configuration: 'administration.logs' absent.");
+        process.exit(11);
       }
 
     } else {
-      console.log("Mauvais configuration: 'application' absent.");
-      process.exit(1);
+      console.log("Mauvaise configuration: 'administration' absent.");
+      process.exit(11);
     }
 
   } else {
     // cela ne doit arriver que si cette fonction est appelée sans paramètre
-    console.log("Absence de configuration pour l'application.");
-    process.exit(1);
+    console.log("Absence de configuration pour l'administration.");
+    process.exit(11);
   }
 
   return logsConf;

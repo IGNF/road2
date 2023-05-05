@@ -29,7 +29,7 @@ module.exports = class BoolParameter extends ResourceParameter {
   */
   constructor(parameter) {
 
-    // id
+    // Paramètre de service
     super(parameter);
 
     // defaultValueContent
@@ -84,16 +84,15 @@ module.exports = class BoolParameter extends ResourceParameter {
   /**
   *
   * @function
-  * @name check
+  * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {object} options - Options
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
   *
   */
-  specificCheck(userValue, options) {
+  specificCheck(userValue) {
 
     LOGGER.debug("specificCheck()");
 
@@ -109,6 +108,8 @@ module.exports = class BoolParameter extends ResourceParameter {
       LOGGER.debug("user value is ok");
       return validationManager.createValidationMessage("");
     }
+
+    
 
   }
 

@@ -5,6 +5,7 @@ const turf = require('@turf/turf');
 const axios = require('axios');
 const tunnel = require('tunnel');
 const https = require('https');
+const polyline = require('@mapbox/polyline');
 
 
 /**
@@ -173,6 +174,16 @@ class road2World {
 
     }
 
+    setPathParameters(parametersToAdd) {
+
+        for(let i = 0; i < parametersToAdd.length; i++) {
+            if (this._path.includes(`<${parametersToAdd[i].key}>`)) {
+                this._path = this._path.replace(`<${parametersToAdd[i].key}>`, parametersToAdd[i].value)
+            }
+        }
+
+    }
+
     setTableParameters(key, valuesToAdd) {
         
         let arrayParameters = new Array();
@@ -317,7 +328,12 @@ class road2World {
 
     getConfigurationValueof(key) {
 
-        return this.getJsonContentByKey(this._configuration, key);
+        let response = this.getJsonContentByKey(this._configuration, key);
+        if (response.status === "found") {
+            return response.content;
+        } else {
+            return false;
+        }
 
     }
 
@@ -334,13 +350,18 @@ class road2World {
                     responseJSON = this._response;
                 }
 
-                let jsonValue = this.getJsonContentByKey(responseJSON, key);
-
-                if (jsonValue.includes(value)) {
-                    return true;
+                let result = this.getJsonContentByKey(responseJSON, key);
+                if (result.status === "found") {
+                    if (result.content.includes(value)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
+
+                
 
             } catch(error) {
                 console.log(error);
@@ -366,9 +387,8 @@ class road2World {
                     responseJSON = this._response;
                 }
 
-                let jsonValue = this.getJsonContentByKey(responseJSON, key);
-                
-                if (jsonValue) {
+                let result = this.getJsonContentByKey(responseJSON, key);
+                if (result.status === "found") {
                     return true;
                 } else {
                     return false;
@@ -397,10 +417,13 @@ class road2World {
                     responseJSON = this._response;
                 }
 
-                let jsonValue = this.getJsonContentByKey(responseJSON, key);
-                
-                if (typeof jsonValue === "string") {
-                    return true;
+                let result = this.getJsonContentByKey(responseJSON, key);
+                if (result.status = "found") {
+                    if (typeof result.content === "string") {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
@@ -417,6 +440,11 @@ class road2World {
 
     getJsonContentByKey(jsonContent, key) {
 
+        let returnObject = {
+            status: "not found",
+            content: {}
+        };
+
         let keysTable = new Array();
 
         keysTable = key.split('.');
@@ -424,18 +452,29 @@ class road2World {
         let tmpJson = jsonContent;
 
         for (let i = 0; i < keysTable.length; i++) {
-            tmpJson = this.getJsonContentByKeyLO(tmpJson, keysTable[i]);
+            let response = this.getJsonContentByKeyLO(tmpJson, keysTable[i]);
             // Gérer le cas vide
-            if (tmpJson === false) {
-                return false;
+            if (response.status === "not found") {
+                returnObject.status = "not found";
+                returnObject.content = {};
+                return returnObject;
+            } else {
+                returnObject.status = "found";
+                returnObject.content = response.content;
+                tmpJson = response.content;
             }
         }
-        // à enlever
-        return tmpJson;
+
+        return returnObject;
 
     }
 
     getJsonContentByKeyLO(jsonContent, key) {
+
+        let returnObject = {
+            status: "not found",
+            content: {}
+        };
 
         // Gérer les tableaux 
         if (Array.isArray(jsonContent)) {
@@ -446,90 +485,94 @@ class road2World {
 
                 let indiceNum = parseInt(indiceTable[0]);
                 if (jsonContent.length > indiceNum) {
-                    return jsonContent[indiceNum];
+                    returnObject.status = "found";
+                    returnObject.content = jsonContent[indiceNum];
+                    return returnObject;
                 } else {
-                    return false;
+                    return returnObject;
                 }
 
             } else {
-                return false;
+                return returnObject;
             }
 
         } else {
 
             for (let tmpKey in jsonContent) {
                 if (tmpKey === key) {
-                    return jsonContent[tmpKey];
+                    returnObject.status = "found";
+                    returnObject.content = jsonContent[tmpKey];
+                    return returnObject;
                 }
             }
 
         }
 
-        return false;
+        return returnObject;
 
     }
 
     checkCompleteRoad() {
 
         if (!this.checkResponseAttribut("resource")) {
-            return false;
+            return 1;
         }
         if (!this.checkResponseAttribut("profile")) {
-            return false;
+            return 2;
         }
         if (!this.checkResponseAttribut("optimization")) {
-            return false;
+            return 3;
         }
         if (!this.checkResponseAttribut("distanceUnit")) {
-            return false;
+            return 4;
         }
         if (!this.checkResponseAttribut("timeUnit")) {
-            return false;
+            return 5;
         }
         if (!this.checkResponseAttribut("crs")) {
-            return false;
+            return 6;
         }
         if (!this.checkResponseAttribut("geometry")) {
-            return false;
+            return 7;
         }
         if (!this.checkResponseAttribut("bbox")) {
-            return false;
+            return 8;
         }
         if (!this.checkResponseAttribut("distance")) {
-            return false;
+            return 9;
         }
         if (!this.checkResponseAttribut("duration")) {
-            return false;
+            return 10;
         }
         if (!this.checkResponseAttribut("portions.[0]")) {
-            return false;
+            return 11;
         }
         if (!this.checkResponseAttribut("portions.[0].start")) {
-            return false;
+            return 12;
         }
         if (!this.checkResponseAttribut("portions.[0].end")) {
-            return false;
+            return 13;
         }
         if (!this.checkResponseAttribut("portions.[0].distance")) {
-            return false;
+            return 14;
         }
         if (!this.checkResponseAttribut("portions.[0].duration")) {
-            return false;
+            return 15;
         }
         if (!this.checkResponseAttribut("portions.[0].steps.[0]")) {
-            return false;
+            return 16;
         }
         if (!this.checkResponseAttribut("portions.[0].steps.[0].geometry")) {
-            return false;
+            return 17;
         }
         if (!this.checkResponseAttribut("portions.[0].steps.[0].attributes")) {
-            return false;
+            return 18;
         }
         if (!this.checkResponseAttribut("portions.[0].steps.[0].distance")) {
-            return false;
+            return 19;
         }
         if (!this.checkResponseAttribut("portions.[0].steps.[0].duration")) {
-            return false;
+            return 20;
         }
 
         return true; 
@@ -539,31 +582,31 @@ class road2World {
     checkCompleteIso() {
 
         if (!this.checkResponseAttribut("point")) {
-            return false;
+            return 1;
         }
         if (!this.checkResponseAttribut("resource")) {
-            return false;
+            return 2;
         }
         if (!this.checkResponseAttribut("resourceVersion")) {
-            return false;
+            return 3;
         }
         if (!this.checkResponseAttribut("profile")) {
-            return false;
+            return 4;
         }
         if (!this.checkResponseAttribut("costType")) {
-            return false;
+            return 5;
         }
         if (!this.checkResponseAttribut("costValue")) {
-            return false;
+            return 6;
         }
         if (!this.checkResponseAttribut("crs")) {
-            return false;
+            return 7;
         }
         if (!this.checkResponseAttribut("geometry")) {
-            return false;
+            return 8;
         }
         if (!this.checkResponseAttribut("direction")) {
-            return false;
+            return 9;
         }
         
         return true; 
@@ -606,6 +649,8 @@ class road2World {
         let refDurationMin = 0;
         let refDurationMax = 0;
         let responseJSON = {};
+        let tablePoint = new Array();
+        let curPoint = {};
                 
         if (typeof this._response === "string") {
             responseJSON = JSON.parse(this._response);
@@ -638,15 +683,25 @@ class road2World {
             return "Duration is out of boundaries";
         }
 
-        let bufferStart = turf.buffer(turf.point(referenceRoad.start.split(",")), 0.01, {units: "kilometers"});
+        tablePoint = referenceRoad.start.split(",");
+        curPoint = turf.point([Number(tablePoint[0]), Number(tablePoint[1])]);
+        let bufferStart = turf.buffer(curPoint, 0.01, {units: "kilometers"});
 
-        if (!turf.booleanWithin(turf.point(responseJSON.start.split(",")), bufferStart)) {
+        tablePoint = responseJSON.start.split(",");
+        curPoint = turf.point([Number(tablePoint[0]), Number(tablePoint[1])]);
+        
+        if (!turf.booleanWithin(curPoint, bufferStart)) {
             return "Start is out of the buffer";
         }
 
-        let bufferEnd = turf.buffer(turf.point(referenceRoad.end.split(",")), 0.01, {units: "kilometers"});
+        tablePoint = referenceRoad.end.split(",");
+        curPoint = turf.point([Number(tablePoint[0]), Number(tablePoint[1])]);
+        let bufferEnd = turf.buffer(curPoint, 0.01, {units: "kilometers"});
 
-        if (!turf.booleanWithin(turf.point(responseJSON.end.split(",")), bufferEnd)) {
+        tablePoint = responseJSON.end.split(",");
+        curPoint = turf.point([Number(tablePoint[0]), Number(tablePoint[1])]);
+
+        if (!turf.booleanWithin(curPoint, bufferEnd)) {
             return "End is out of the buffer";
         }
 
@@ -660,7 +715,65 @@ class road2World {
         
     }
 
+    checkIsoContent(filePath) {
 
+        let referenceResponse = {};
+        let responseJSON = {};
+
+                
+        if (typeof this._response === "string") {
+            responseJSON = JSON.parse(this._response);
+        } else {
+            responseJSON = this._response;
+        }
+
+        try {
+            referenceResponse = JSON.parse(fs.readFileSync(path.resolve(__dirname,filePath)));
+        } catch (error) {
+            return "Can't parse JSON file";
+        }
+
+        let refIso = referenceResponse.geometry;
+        let curIso = this._response.geometry;
+
+        if (typeof(refIso) === "string") {
+
+            if (refIso === curIso) {
+                return true;
+            }
+
+            // On part du principe que c'est du polyline
+            refIso = turf.polygon(polyline.decode(refIso));
+            curIso = turf.polygon(polyline.decode(curIso));
+
+        } else {
+
+            // On part du principe que c'est du GeoJSON
+            // TODO : ajouter la gestion du polyline
+            if (curIso.coordinates) {
+
+                refIso = turf.polygon(refIso.coordinates);
+                try {
+                    curIso = turf.polygon(curIso.coordinates);
+                } catch(error) {
+                    return "Can't convert curIso into polygon with turfJS";
+                }
+
+            } else {
+                return "curIso doesn't have coordinates";
+            }
+            
+        }
+
+        let buffer = turf.buffer(refIso, 0.1, {units: 'kilometers'});
+
+        if (!turf.booleanWithin(curIso, buffer)) {
+            return "Iso is out of the buffer";
+        } else {
+            return true;
+        }
+
+    }
 
 }
 

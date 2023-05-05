@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Operation = require('../../../../src/js/operations/operation');
 const Parameter = require('../../../../src/js/parameters/parameter');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 describe('Test de la classe Operation', function() {
 

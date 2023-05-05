@@ -1,7 +1,7 @@
 const assert = require('assert');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
 const OperationManager = require('../../../../src/js/operations/operationManager');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const Source = require('../../../../src/js/sources/source');
 
 const sinon = require('sinon');
@@ -63,14 +63,14 @@ describe('Test de la classe SourceManager', function() {
           {
             "id": "start",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
           {
             "id": "end",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
@@ -91,7 +91,7 @@ describe('Test de la classe SourceManager', function() {
           {
             "id": "intermediates",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },

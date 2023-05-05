@@ -1,0 +1,155 @@
+# Description d'un fichier de configuration de service
+
+# Une application est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
+"application":
+	type: object
+	required: true
+	properties:
+		# Nom de l'application qui va apparaître dans le getcap
+		"name":
+			type: string
+			required: true
+		# Titre qui va apparaître dans le getcap
+		"title":
+			type: string
+			required: true
+		# Description qui va apparaître dans le getcap
+		"description":
+			type: string
+			required: true
+    # Url du service qui va apparaître dans le getcap
+    "url":
+      type: string
+      required: true
+		# Information sur le fournisseur du service
+		"provider":
+			type: object
+			required: false
+			properties:
+				# Nom du fournisseur
+				"name":
+					type: string
+					required: true
+				# Site web du fournisseur
+				"site":
+					type: string
+					required: false
+				# Adresse mail du fournisseur
+				"mail":
+					type: string
+					required: true
+		# Configuration des logs de l'application
+		"logs":
+			type: object
+			required: true
+			properties:
+				# Emplacement du fichier de configuration
+				"configuration":
+					type: string
+					required: true
+    # Configuration des opérations autorisées dans le service
+    "operations":
+      type: object
+      required: true
+      properties:
+        # Dossier contenant la configuration des ressources
+        "directory":
+          type: string
+          required: true
+        # Configuration des paramètres
+        "parameters":
+          type: object
+          required: true
+          properties:
+            # Dossier contenant la configuration des paramètres
+            "directory":
+              type: string
+              required: true
+		# Configuration des ressources diffusées sur le service
+		"resources":
+			type: object
+			required: true
+			properties:
+				# Dossiers contenant l'ensemble des fichiers de configuration des ressources.
+				"directories":
+					type: array
+					required: true
+					minItems: 1
+					items:
+						type: string
+		# Configuration du network
+		"network":
+			type: object
+			required: true
+			properties:
+				# Liste des serveurs que l'on veut instancier
+				"servers":
+					type: array
+					required: true
+					minItems: 1
+					items:
+						type: object
+						properties:
+							# Id du serveur 
+							"id":
+								type: string
+								required: true
+							# Host
+							"host":
+								type: string
+								required: true
+							# Port
+							"port":
+								type: string
+								required: true
+							# Utilisation du HTTPS
+							"https":
+								type: string 
+								enum: ["true", "false"]
+								required: true
+							# Options pour le HTTPS (nécessaire si https="true")
+							"options":
+								type: object
+								required: false
+								properties:
+									# Chemin du fichier .key
+									"key":
+										type: string
+										required: true
+									# Chemin du fichier .cert
+									"cert":
+										type: string
+										required: true
+				# Configuration des cors
+				"cors":	
+					type: object 
+					required: false
+					properties:
+						# Fichier de configuration des cors 
+						"configuration": 
+							type: string 
+							required: true
+    # Configuration des projections disponibles
+    "projections":
+      type: object
+      required: true
+      properties:
+        # Dossier contenant les configurations
+        "directory":
+          type: string
+          required: true
+		# Indication des apis utilisées pour cette instance. Cela doit correspondre avec un dossier présent dans les APIs du projet
+		"apis":
+			required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+					# Nom de l'api
+					"name":
+						type: string
+						required: true
+					# Version de l'api
+					"version":
+						type: string
+						required: true

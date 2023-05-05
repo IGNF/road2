@@ -44,11 +44,17 @@ class road2World {
         // Contenu du server.json pour le test en cours
         this._serverConf = {};
 
+        // Contenu du service.json pour le test en cours
+        this._serviceConf = {};
+
         // Boolean pour savoir si le fichier de conf sera lisible ou pas 
         this._serverReadable = true;
 
-        // Contenu du log4js.json pour le test en cours
-        this._logConf = {};
+        // Contenu du log4js-administration.json pour le test en cours
+        this._logAdminConf = {};
+
+        // Contenu du log4js-service.json pour le test en cours
+        this._logServiceConf = {};
 
         // Contenu du cors.json pour le test en cours
         this._corsConf = {};
@@ -67,6 +73,9 @@ class road2World {
 
         // Dossier temporaire pour le test en cours
         this._tmpDirConf = "";
+
+        // Instance de childProcess pour le test en cours
+        this._childProcess;
 
         // Code de retour de Road2 pour le test en cours
         this._code;
@@ -152,22 +161,36 @@ class road2World {
             throw "Can't parse server conf: "  + error;
         }
 
-        // Lecture du log4js.json
+        // Lecture du log4js-administration.json
         try {
-            this._logConf = JSON.parse(fs.readFileSync(this._serverConf.application.logs.configuration));
+            this._logAdminConf = JSON.parse(fs.readFileSync(this._serverConf.administration.logs.configuration));
+        } catch(error) {
+            throw "Can't parse log4js admin conf: "  + error;
+        }
+
+        // Lecture du service.json
+        try {
+            this._serviceConf = JSON.parse(fs.readFileSync(this._serverConf.administration.services[0].configuration));
+        } catch(error) {
+            throw "Can't parse log conf: "  + error;
+        }
+
+        // Lecture du log4js-service.json
+        try {
+            this._logServiceConf = JSON.parse(fs.readFileSync(this._serviceConf.application.logs.configuration));
         } catch(error) {
             throw "Can't parse log conf: "  + error;
         }
 
         // Lecture du cors.json
         try {
-            this._corsConf = JSON.parse(fs.readFileSync(this._serverConf.application.network.cors.configuration));
+            this._corsConf = JSON.parse(fs.readFileSync(this._serviceConf.application.network.cors.configuration));
         } catch(error) {
             throw "Can't parse cors conf: "  + error;
         }
 
         // Lecture des projections 
-        let projDir = this._serverConf.application.projections.directory;
+        let projDir = this._serviceConf.application.projections.directory;
 
         try {
             projDirFiles = fs.readdirSync(projDir);
@@ -184,7 +207,7 @@ class road2World {
         }
 
         // Lecture des operations 
-        let operationsDir = this._serverConf.application.operations.directory;
+        let operationsDir = this._serviceConf.application.operations.directory;
 
         try {
             operationsDirFiles = fs.readdirSync(operationsDir);
@@ -201,7 +224,7 @@ class road2World {
         }
 
         // Lecture des parametres 
-        let parametersDir = this._serverConf.application.operations.parameters.directory;
+        let parametersDir = this._serviceConf.application.operations.parameters.directory;
 
         try {
             parametersDirFiles = fs.readdirSync(parametersDir);
@@ -218,7 +241,7 @@ class road2World {
         }
 
         // Lecture des ressources 
-        let resourceDir = this._serverConf.application.resources.directories;
+        let resourceDir = this._serviceConf.application.resources.directories;
 
         // Pour chaque dossier, on récupère l'ensemble des fichiers 
         for (let i = 0; i < resourceDir.length; i++) {
@@ -248,29 +271,35 @@ class road2World {
         // 3. On modifie la configuration pour qu'elle puisse être copiée dans l'espace temporaire 
         // mais elle pourra de nouveau être modifiée dans la suite du scénario
 
-        // Emplacement du log4js.json
-        this._serverConf.application.logs.configuration = path.join(this._tmpDirConf, "log4js.json");
+        // Emplacement du service.json
+        this._serverConf.administration.services[0].configuration = path.join(this._tmpDirConf, "service.json");
+
+        // Emplacement du log4js-administration.json
+        this._serverConf.administration.logs.configuration = path.join(this._tmpDirConf, "log4js-administration.json");
+
+        // Emplacement du log4js-service.json
+        this._serviceConf.application.logs.configuration = path.join(this._tmpDirConf, "log4js-service.json");
 
         // Emplacement des ressources 
-        this._serverConf.application.resources.directories = newResourcesDirectories;
+        this._serviceConf.application.resources.directories = newResourcesDirectories;
 
         // Emplacement des projections 
         let curProjDir = path.join(this._tmpDirConf, "projections");
-        this._serverConf.application.projections.directory = curProjDir;
+        this._serviceConf.application.projections.directory = curProjDir;
         if (!fs.existsSync(curProjDir)) {
             fs.mkdirSync(curProjDir, {recursive: true, mode: "766"});
         }
 
         // Emplacement des operations 
         let curOperationsDir = path.join(this._tmpDirConf, "operations");
-        this._serverConf.application.operations.directory = curOperationsDir;
+        this._serviceConf.application.operations.directory = curOperationsDir;
         if (!fs.existsSync(curOperationsDir)) {
             fs.mkdirSync(curOperationsDir, {recursive: true, mode: "766"});
         }
 
         // Emplacement des parameters 
         let curParametersDir = path.join(this._tmpDirConf, "parameters");
-        this._serverConf.application.operations.parameters.directory = curParametersDir;
+        this._serviceConf.application.operations.parameters.directory = curParametersDir;
         if (!fs.existsSync(curParametersDir)) {
             fs.mkdirSync(curParametersDir, {recursive: true, mode: "766"});
         }
@@ -292,8 +321,12 @@ class road2World {
         // 1. On commence par déterminer sur quelle élément de la configuration on va faire des modifications
         if (configurationType === "server") {
             modification = this._serverConf;
-        } else if (configurationType === "log") {
-            modification = this._logConf;
+        } else if (configurationType === "log-admin") {
+            modification = this._logAdminConf;
+        } else if (configurationType === "service") {
+            modification = this._serviceConf;
+        } else if (configurationType === "log-service") {
+            modification = this._logServiceConf;
         } else if (configurationType === "cors") {
             modification = this._corsConf;
         } else if (configurationType === "projection") {
@@ -458,6 +491,16 @@ class road2World {
 
     }
 
+    // Creation de répertoire
+    createDir(dirname) {
+        try {
+            fs.mkdirSync(path.join(this._tmpDirConf, dirname));
+        } catch(error) {
+            throw "Can't create directory " + dirname + " : " + error;
+        }
+        return true
+    }
+
     createWrongJSONFile(relativeFilePath) {
 
         try {
@@ -489,9 +532,21 @@ class road2World {
         } 
 
         try {
-            fs.writeFileSync(path.join(this._tmpDirConf, "log4js.json"), JSON.stringify(this._logConf));
+            fs.writeFileSync(path.join(this._tmpDirConf, "log4js-administration.json"), JSON.stringify(this._logAdminConf));
         } catch(error) {
-            throw "Can't write log4js.json : " + error;
+            throw "Can't write log4js-administration.json : " + error;
+        }
+
+        try {
+            fs.writeFileSync(path.join(this._tmpDirConf, "service.json"), JSON.stringify(this._serviceConf));
+        } catch(error) {
+            throw "Can't write service.json : " + error;
+        }
+
+        try {
+            fs.writeFileSync(path.join(this._tmpDirConf, "log4js-service.json"), JSON.stringify(this._logServiceConf));
+        } catch(error) {
+            throw "Can't write log4js-service.json : " + error;
         }
 
         try {
@@ -562,21 +617,21 @@ class road2World {
         // On lance l'analyse de la conf par Road2 
         return new Promise ( (resolve, reject) => {
 
-            const command = spawn("node", options);
+            this._childProcess = spawn("node", options);
 
-            command.stdout.on("data", (data) => {
+            this._childProcess.stdout.on("data", (data) => {
                 this._stdout += data.toString();
             });
               
-            command.stderr.on("data", (data) => {
+            this._childProcess.stderr.on("data", (data) => {
                 this._stderr += data.toString();
             });
 
-            command.on("error", (err) => {
+            this._childProcess.on("error", (err) => {
                 reject(err);
             });
               
-            command.on("close", (code) => {
+            this._childProcess.on("close", (code) => {
                 this._code = code;
                 resolve();
             });
@@ -586,15 +641,11 @@ class road2World {
         
     }
 
-    // Analyse du code de retour de la commande 
-    verifyCommandExitCode(code) {
+    // Retourne le code de la commande 
+    returnCommandExitCode() {
         
-        if (code === this._code) {
-            return true;
-        } else {
-            return false;
-        }
-
+            return this._code;
+        
     }
 
     // Analyse des logs 
@@ -617,7 +668,7 @@ class road2World {
 
         if (this._cleanTmpDirectories) {
 
-            fs.rmdir(this._tmpDirConf, {
+            fs.rm(this._tmpDirConf, {
                 "recursive": true
             }, (err) => { return err;});
             
@@ -626,6 +677,18 @@ class road2World {
         }
         
     }
+
+    // Gestion du processus enfant 
+    // killChildProcess() {
+
+    //     if (this._childProcess.exitCode === null) {
+    //         // On va killer le process pour passer au test suivant 
+    //         this._childProcess.kill(9);
+    //     } else {
+    //         // Le processus est déjà mort, donc il n'y a rien à faire
+    //     }
+
+    // }
  
 }
 

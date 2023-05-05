@@ -1,7 +1,6 @@
 const assert = require('assert');
 const ResourceManager = require('../../../../src/js/resources/resourceManager');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
-const TopologyManager = require('../../../../src/js/topology/topologyManager');
 const OperationManager = require('../../../../src/js/operations/operationManager');
 const logManager = require('../logManager');
 
@@ -42,7 +41,7 @@ describe('Test de la classe ResourceManager', function() {
         "file": "/home/docker/internal/corse-latest.osm.pbf"
       },
       "projection": "EPSG:4326",
-      "bbox": "-90,-180,90,180"
+      "bbox": "-180,-90,180,90"
     },
     "sources": [
       {
@@ -75,14 +74,14 @@ describe('Test de la classe ResourceManager', function() {
           {
             "id": "start",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
           {
             "id": "end",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
@@ -103,7 +102,7 @@ describe('Test de la classe ResourceManager', function() {
           {
             "id": "intermediates",
             "values": {
-              "bbox": "-90,-180,90,180",
+              "bbox": "-180,-90,180,90",
               "projection": "EPSG:4326"
             }
           },
@@ -163,13 +162,11 @@ describe('Test de la classe ResourceManager', function() {
 
   let resourceManager = new ResourceManager();
   let sourceManager = sinon.mock(SourceManager);
-  let topologyManager = sinon.mock(TopologyManager);
   let operationManager = sinon.mock(OperationManager);
 
   // Comportements attendus
   sourceManager.checkSource = sinon.stub().withArgs(resourceConfiguration).returns(true);
   sourceManager.sourceTopology = new Array();
-  topologyManager.checkTopology = sinon.stub().returns(true);
   operationManager.checkResourceOperationConf = sinon.stub().returns(true);
   operationManager.getResourceOperationConf = sinon.stub().returns(true);
   operationManager.createResourceOperation = sinon.stub().returns(true);
@@ -185,7 +182,7 @@ describe('Test de la classe ResourceManager', function() {
   describe('Test de checkResource() et checkResourceOsrm()', function() {
 
     it('Avec les bons parametres', function() {
-      assert.equal(resourceManager.checkResource(resourceConfiguration, sourceManager, operationManager, topologyManager), true);
+      assert.equal(resourceManager.checkResource(resourceConfiguration, sourceManager, operationManager), true);
     });
 
     it('checkResource() avec un mauvais id', function() {

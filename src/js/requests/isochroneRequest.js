@@ -9,16 +9,18 @@ const Request = require('./request');
 * @description Classe modélisant une requête d'isochrone.
 * Chaque requête reçue par le service doit être transformée en requête de cette forme
 * pour le proxy
+*
 */
 
 module.exports = class isochroneRequest extends Request {
+
   /**
   *
   * @function
   * @name constructor
   * @description Constructeur de la classe isochroneRequest
   * @param {string} resource - Ressource.
-  * @param {string} point - Point de départ.
+  * @param {Point} point - Point de départ ou d'arrivée
   * @param {string} costType - Type du coût.
   * @param {string} costValue - Valeur du coût.
   * @param {string} profile - Profil utilisé pour le calcul.
@@ -29,36 +31,60 @@ module.exports = class isochroneRequest extends Request {
   * @param {string} distanceUnit - Unité de distance utilisée pour le calcul.
   *
   */
-  constructor(
-    resource,
-    point,
-    costType,
-    costValue,
-    profile,
-    direction,
-    askedProjection,
-    geometryFormat,
-    timeUnit,
-    distanceUnit
-  ) {
+
+  constructor(resource, point, costType, costValue, profile, direction, askedProjection, geometryFormat, timeUnit, distanceUnit) {
 
     // Constructeur parent
-    super("isochrone", resource, "isochroneRequest");
+    super("isochrone", "isochroneRequest");
 
-    /* Initialisation du reste des paramètres. */
+    // Ressource concernée
+    this._resource = resource;
+
+    // Initialisation du reste des paramètres
     this._point = point;
+
     this._costType = costType;
+
     this._costValue = costValue;
+
     this._profile = profile;
+
     this._direction = direction;
+
     this._askedProjection = askedProjection;
+
     this._geometryFormat = geometryFormat;
+
     this._timeUnit = timeUnit;
+
     this._distanceUnit = distanceUnit;
 
     // Gestion des contraintes 
     this._constraints = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la requête
+  *
+  */
+  get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

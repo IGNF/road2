@@ -13,7 +13,7 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
-const wkt = require('wkt');
+const wkt = require('../geometry/formats/wkt');
 const httpQuery = require('../utils/httpQuery');
 
 
@@ -42,17 +42,14 @@ module.exports = class smartroutingSource extends Source {
   constructor(sourceJsonObject) {
 
     // Constructeur parent
-    super(sourceJsonObject.id,sourceJsonObject.type, undefined);
-
-    // Ajout des opérations possibles sur ce type de source
-    this.availableOperations.push("route");
-    this.availableOperations.push("isochrone");
+    super(sourceJsonObject.id, "smartrouting", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
 
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
     // Opérateur pour les requêtes http
     this._httpQuery = new httpQuery({prefixUrl: this._configuration.storage.url});
+    
   }
 
   /**
@@ -198,7 +195,7 @@ module.exports = class smartroutingSource extends Source {
 
         // Coordonnées
         // location
-        smartroutingRequest.location = request.point.lon + "," + request.point.lat;
+        smartroutingRequest.location = request.point.x + "," + request.point.y;
 
         // optimization
         const mapMethods = {
@@ -333,7 +330,7 @@ module.exports = class smartroutingSource extends Source {
     // ---
 
     // convertion de la geometry
-    const wayGeojson = wkt.parse(smartroutingResponse.geometryWkt);
+    const wayGeojson = wkt.toGeoJSON(smartroutingResponse.geometryWkt);
     let way = new Line(wayGeojson, 'geojson', askedProjection);
 
     // start et end
@@ -446,7 +443,7 @@ module.exports = class smartroutingSource extends Source {
     location = new Point(locationCoords[0], locationCoords[1], projection);
 
     // Geometrie
-    const rawGeometry = wkt.parse(smartroutingResponse.wktGeometry);
+    let rawGeometry = wkt.toGeoJSON(smartroutingResponse.wktGeometry);
 
     // Cas où il n'y a pas d'isochrone car costValue trop faible
     if (rawGeometry === null) {

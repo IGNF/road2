@@ -185,13 +185,6 @@ module.exports = {
 
     }
 
-
-    // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
-    if (!resource.linkedSource[profile+optimization]) {
-      throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
-    } else {
-      LOGGER.debug("profile et optimization compatibles");
-    }
     // ---
 
 
@@ -200,6 +193,12 @@ module.exports = {
 
     LOGGER.debug(routeRequest);
 
+    // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
+    if (!resource.checkSourceAvailibilityFromRequest(routeRequest)) {
+      throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
+    } else {
+      LOGGER.debug("profile et optimization compatibles");
+    }
 
     // On va vérifier la présence des paramètres non obligatoires pour l'API et l'objet RouteRequest
 
@@ -218,7 +217,7 @@ module.exports = {
 
         finalIntermediates = this.convertPostArrayToGetParameters(parameters.intermediates, routeOperation.getParameterById("intermediates").serviceParameter, "intermediates");
         LOGGER.debug("POST intermediates:");
-        LOGGER.debug(parameters.intermediates);
+        LOGGER.debug(finalIntermediates);
 
       } else {
         finalIntermediates = parameters.intermediates;
@@ -486,12 +485,11 @@ module.exports = {
   * @description Vérification des paramètres d'une requête sur /nearest
   * @param {object} parameters - ensemble des paramètres de la requête
   * @param {object} service - Instance de la classe Service
-  * @param {string} method - Méthode de la requête
   * @return {object} NearestRequest - Instance de la classe NearestRequest
   *
   */
 
-   checkNearestParameters: function(parameters, service, method) {
+   checkNearestParameters: function(parameters, service) {
 
     let resource;
     let coordinates = {};
@@ -710,15 +708,15 @@ module.exports = {
 
       /* Vérification de la validité des coordonnées fournies. */
       let validity = isochroneOperation.getParameterById("point").check(parameters.point, askedProjection);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'point' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("point valide");
-        //TODO: passer par la classe Point
-        const tmpStringCoordinates = parameters.point.split(",");
-        point.lon = Number(tmpStringCoordinates[0]);
-        point.lat = Number(tmpStringCoordinates[1]);
+        let tmpStringCoordinates = parameters.point.split(",");
+        point = new Point(Number(tmpStringCoordinates[0]), Number(tmpStringCoordinates[1]), askedProjection);
+        LOGGER.debug("user point in road2' object:");
+        LOGGER.debug(point);
 
       }
 
@@ -734,7 +732,7 @@ module.exports = {
 
       /* Vérification de la validité du paramètre fourni. */
       let validity = isochroneOperation.getParameterById("costType").check(parameters.costType);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'costType' is invalid: " + validity.message, 400);
       } else {
         costType = parameters.costType;
@@ -753,7 +751,7 @@ module.exports = {
 
       /* Vérification de la validité du paramètre fourni. */
       let validity = isochroneOperation.getParameterById("costValue").check(parameters.costValue);
-      if (validity.code != "ok") {
+      if (validity.code !== "ok") {
         throw errorManager.createError("Parameter 'costValue' is invalid: " + validity.message, 400);
       } else {
 
@@ -850,13 +848,6 @@ module.exports = {
 
     }
 
-    /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
-    if (!resource.linkedSource[profile+costType]) {
-      throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
-    } else {
-      LOGGER.debug("Parameters 'profile' and 'costType' are compatible");
-    }
-
     /* Paramètre 'direction'. */
     if (parameters.direction) {
 
@@ -913,6 +904,13 @@ module.exports = {
       timeUnit,
       distanceUnit
     );
+
+    /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
+    if (!resource.checkSourceAvailibilityFromRequest(isochroneRequest)) {
+      throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
+    } else {
+      LOGGER.debug("Parameters 'profile' and 'costType' are compatible");
+    }
 
     // Contraintes
     // ---

@@ -1,0 +1,18 @@
+{ "mainConf":
+  {
+   "appenders": {
+     "console": { "type": "console", "layout": {"type": "pattern", "pattern": "%[[%d] [%p] %c %z -%] %m"} },
+     "file": { "type": "file", "filename": "/var/log/road2/road2-admin.log", "layout": {"type": "pattern", "pattern": "[%d] [%p] %c %z - %m%n"} },
+     "http": { "type": "file", "filename": "/var/log/road2/access-admin.log"}
+   },
+   "categories": {
+     "default": { "appenders": ["console","file"], "level": "debug" },
+     "request": { "appenders": ["console","http"], "level": "info" }
+   },
+   "disableClustering": true
+ },
+ "httpConf": {
+     "level": "info",
+     "format": ":remote-addr - :method :url HTTP/:http-version :status :content-length :referrer :user-agent"
+ }
+}

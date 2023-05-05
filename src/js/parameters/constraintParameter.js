@@ -31,7 +31,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   */
   constructor(parameter) {
 
-    // id
+    // Paramètre de service
     super(parameter);
 
     // defaultValueContent
@@ -188,6 +188,21 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
           }
 
+      } else if (this._values[i].keyType === "name-valhalla") {
+
+        this._verification[this._values[i].key.toLowerCase()].keyType = "name-valhalla";
+
+        currentKeyDescription.availableOperators = new Array();
+        currentKeyDescription.availableOperators.push("=");
+        currentKeyDescription.values = new Array();
+
+        for(let l = 0; l < this._values[i].availableValues.length; l++) {
+
+          this._verification[this._values[i].key.toLowerCase()][this._values[i].availableValues[l].value] = this._values[i].availableValues[l].field;
+          currentKeyDescription.values.push(this._values[i].availableValues[l].value);
+
+        }
+
       } else {
         return false;
       }
@@ -206,13 +221,12 @@ module.exports = class ConstraintParameter extends ResourceParameter {
   * @name specificCheck
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {object} options - Options
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
   *
   */
-  specificCheck(userValue, options) {
+  specificCheck(userValue) {
 
     LOGGER.debug("specificCheck()");
 
@@ -279,7 +293,7 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       }
 
       // Gestion du champ costRatio pour contraintes préférentielles
-      if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
+      if (userJson.constraintType === 'avoid' || userJson.constraintType === 'prefer') {
 
         if (userJson.costRatio) {
 
@@ -304,9 +318,10 @@ module.exports = class ConstraintParameter extends ResourceParameter {
 
     }
 
-    if (this._verification[userJson.key.toLowerCase()].keyType === "name-pgr" || this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
+    let nameTable = ["name-pgr","name-osrm","name-valhalla"];
+    if (nameTable.includes(this._verification[userJson.key.toLowerCase()].keyType)) {
 
-      LOGGER.debug("keyType is name-pgr ror name-osrm");
+      LOGGER.debug("keyType is name-pgr ror name-osrm ror name-valhalla");
 
       // Vérification de l'opérateur
       if (!userJson.operator) {
@@ -466,6 +481,12 @@ module.exports = class ConstraintParameter extends ResourceParameter {
       // field = the_geom
       // condition = { type: "intersection", value: "ST_fromGeoJson( truc_par_rapport_a_userJson )" }
     } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-osrm") {
+      let field = this._verification[userJson.key.toLowerCase()][userJson.value];
+
+      if (userJson.constraintType === 'banned') {
+        constraint = new Constraint(userJson.constraintType, userJson.key.toLowerCase(), field, userJson.operator, userJson.value);
+      }
+    } else if (this._verification[userJson.key.toLowerCase()].keyType === "name-valhalla") {
       let field = this._verification[userJson.key.toLowerCase()][userJson.value];
 
       if (userJson.constraintType === 'banned') {

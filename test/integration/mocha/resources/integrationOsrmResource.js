@@ -1,7 +1,7 @@
 const assert = require('assert');
 const OsrmResource = require('../../../../src/js/resources/osrmResource');
 const RouteRequest = require('../../../../src/js/requests/routeRequest');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 
 const sinon = require('sinon');
 
@@ -46,7 +46,7 @@ describe('Test de la classe OsrmResource', function() {
 
     ],
     "defaultSourceId": "corse-car-fastest",
-    "boundingBox": "-90,-180,90,180",
+    "boundingBox": "-180,-90,180,90",
     "defaultProjection": "EPSG:4326",
     "availableProjections": ["EPSG:4326","EPSG:2154"]
     }

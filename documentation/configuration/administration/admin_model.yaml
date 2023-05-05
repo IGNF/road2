@@ -1,0 +1,90 @@
+# Description d'un fichier de configuration d'administration
+
+# Une application est un objet qui contient toutes les informations utiles pour que l'application puisse diffuser ses services.
+"administration":
+	type: object
+	required: true
+	properties:
+		# Indication de l'api utilisée pour cette instance. Cela doit correspondre avec un dossier présent dans les APIs du projet
+		"api":
+			type: object
+			required: true
+			properties:
+				# Nom de l'api
+				"name":
+					type: string
+					required: true
+				# Version de l'api
+				"version":
+					type: string
+					required: true
+		# Configurations des services gérés par l'administrateur
+		"services":
+			type: array
+			required: true
+			minItems: 1
+			items:
+				type: object
+				properties: 
+					# Id du service. Utile pour administrer le serivce via l'API
+					"id":
+						type: string
+						required: true
+					# Configuration du service. Pour le moment, c'est le fichier de configuration du service (service.json)
+					"configuration":
+						type: string
+						required: true
+					# Type de création du service. Pour le moment, il seul 'newProcess' est accepté. On crée un nouveau processus pour le service. 
+					"creationType":
+						type: string
+						required: true
+		# Configuration des logs de l'application
+		"logs":
+			type: object
+			required: true
+			properties:
+				# Emplacement du fichier de configuration
+				"configuration":
+					type: string
+					required: true
+		# Configuration du network
+		"network":
+			type: object
+			required: true
+			properties:
+				# Liste des serveurs que l'on veut instancier
+				"server":
+					type: object
+					properties:
+						# Id du serveur 
+						"id":
+							type: string
+							required: true
+						# Host
+						"host":
+							type: string
+							required: true
+						# Port
+						"port":
+							type: string
+							required: true
+						# Utilisation du HTTPS
+						"https":
+							type: string 
+							enum: ["true", "false"]
+							required: true
+						# Options pour le HTTPS (nécessaire si https="true")
+						"options":
+							type: object
+							required: false
+							properties:
+								# Chemin du fichier .key
+								"key":
+									type: string
+									required: true
+								# Chemin du fichier .cert
+								"cert":
+									type: string
+									required: true
+
+

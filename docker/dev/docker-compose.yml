@@ -4,7 +4,7 @@ services:
   road2:
     build:
       context: ../..
-      dockerfile: ./docker/demonstration/Dockerfile
+      dockerfile: ./docker/distributions/debian/Dockerfile
     image: road2
     container_name: road2-server
     depends_on:
@@ -14,7 +14,9 @@ services:
     command : "npm run debug -- --ROAD2_CONF_FILE=../config/road2.json"
     ports:
       - 8080:8080
+      - 8079:8079
       - 9229:9229
+      - 9230:9230
       - 443:443
     volumes:
       - iti-data-volume:/home/docker/data
@@ -72,6 +74,7 @@ volumes:
 
 networks:
   iti-network:
+    # Nom utilisé ailleurs dans ce projet
     name: iti-network
     driver: bridge
     ipam:

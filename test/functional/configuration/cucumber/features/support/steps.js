@@ -3,6 +3,7 @@ const assert = require('assert');
 
 After( function () {
     this.cleanTmpDirectory();
+    // this.killChildProcess();
 });
 
 Given("I have loaded all my test configuration", function() {
@@ -29,6 +30,14 @@ Given("with parameter {string} for attribute {string} in server configuration", 
     this.modifyServerConfiguration(value, attribute, "", "server", "modify");
 });
 
+Given("with parameter {string} for attribute {string} in service configuration", function(value, attribute) {
+    this.modifyServerConfiguration(value, attribute, "", "service", "modify");
+});
+
+Given("without attribute {string} in service configuration", function(attribute) {
+    this.modifyServerConfiguration("", attribute, "", "service", "delete");
+});
+
 Given("without attribute {string} in server configuration", function(attribute) {
     this.modifyServerConfiguration("", attribute, "", "server", "delete");
 });
@@ -41,6 +50,10 @@ Given("a file {string} non readable", function(relativeFilePath) {
     this.createFile(relativeFilePath, "", false);
 });
 
+Given("an empty directory {string}", function(dirname) {
+    this.createDir(dirname);
+});
+
 Given("a server configuration non readable", function() {
     this.nonReadableServerConfiguration();
 });
@@ -49,12 +62,12 @@ Given("a wrong JSON file {string}", function(relativeFilePath) {
     this.createWrongJSONFile(relativeFilePath);
 });
 
-Given("with parameter {string} for attribute {string} in log configuration", function(value, attribute) {
-    this.modifyServerConfiguration(value, attribute, "", "log", "modify");
+Given("with parameter {string} for attribute {string} in service log configuration", function(value, attribute) {
+    this.modifyServerConfiguration(value, attribute, "", "log-service", "modify");
 });
 
-Given("without attribute {string} in log configuration", function(attribute) {
-    this.modifyServerConfiguration("", attribute, "", "log", "delete");
+Given("without attribute {string} in service log configuration", function(attribute) {
+    this.modifyServerConfiguration("", attribute, "", "log-service", "delete");
 });
 
 Given("with parameter {string} for attribute {string} in cors configuration", function(value, attribute) {
@@ -120,7 +133,7 @@ When("I test the configuration", function(done) {
 });
 
 Then("the configuration analysis should give an exit code {int}", function(code) {
-    assert.equal(this.verifyCommandExitCode(code), true);
+    assert.equal(this.returnCommandExitCode(), code);
 });
 
 Then("the server log should contain {string}", function(message) {
@@ -131,7 +144,7 @@ Then("the server log should not contain {string}", function(message) {
     assert.equal(this.findInServerLog(message), false);
 });
 
-Then("the server log should not contain error", function() {
+Then("the command log should not contain error", function() {
     assert.equal(this._stderr, "");
 });
 

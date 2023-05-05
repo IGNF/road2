@@ -9,16 +9,12 @@ describe('Test de la classe Request', function() {
     logManager.manageLogs();
   });
 
-  let request = new Request("route", "corse-osm", "routeRequest");
+  let request = new Request("route", "routeRequest");
 
   describe('Test du constructeur et des getters', function() {
 
     it('Get Operation', function() {
       assert.equal(request.operation, "route");
-    });
-
-    it('Get Resource', function() {
-      assert.equal(request.resource, "corse-osm");
     });
 
     it('Get Type', function() {
@@ -34,14 +30,10 @@ describe('Test de la classe Request', function() {
       assert.equal(request.operation, "nearest");
     });
 
-    it('Set Resource', function() {
-      request.resource = "corse-osm-2";
-      assert.equal(request.resource, "corse-osm-2");
-    });
-
-    it('Set Type', function() {
+    // Le type ne devrait pas changer car il dépend de la classe fille appelée
+    it('Set Type ne change rien', function() {
       request.type = "otherRequest";
-      assert.equal(request.type, "otherRequest");
+      assert.equal(request.type, "routeRequest");
     });
 
   });

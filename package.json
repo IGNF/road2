@@ -1,49 +1,45 @@
 {
   "name": "road2",
-  "version": "1.1.2",
+  "version": "2.1.1",
 
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
   "scripts": {
-    "start": "node ./src/js/road2.js",
+    "start": "env NODE_ENV=prod node ./src/js/road2.js",
     "configCheck": "node ./src/js/road2.js --configCheck",
     "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
     "itest": "mocha --recursive './test/integration/mocha/**/*.js'",
-    "rtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestTest.feature",
-    "crtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestComplementTest.feature",
-    "drtest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestDataTest.feature",
-    "artest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/requestAdminTest.feature",
-    "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationTest.feature",
-    "cctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/configurationComplementTest.feature",
+    "rtest": "HTTP_PROXY='' ./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/req*.feature",
+    "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/conf*.feature",
     "lint": "eslint -c eslint.json ./src/",
     "jsdoc": "jsdoc -c jsdoc.json",
-    "debug": "node --inspect=0.0.0.0:9229 ./src/js/road2.js"
+    "debug": "env NODE_ENV=debug node --inspect=0.0.0.0:9229 ./src/js/road2.js"
   },
   "dependencies": {
     "@mapbox/polyline": "1.1.1",
-    "@turf/turf": "5.1.6",
+    "@turf/turf": "6.5.0",
     "assert": "2.0.0",
     "cors": "2.8.5",
-    "express": "4.16.4",
+    "express": "4.18.2",
     "got": "11.8.2",
-    "helmet": "3.21.2",
-    "https-proxy-agent": "5.0.0",
-    "log4js": "6.1.0",
-    "nconf": "0.10.0",
-    "proj4": "2.6.0",
-    "wkt": "0.1.1"
+    "helmet": "6.0.1",
+    "https-proxy-agent": "5.0.1",
+    "log4js": "6.7.1",
+    "nconf": "0.12.0",
+    "proj4": "2.8.0"
   },
   "optionalDependencies": {
-    "osrm": "5.25.0",
-    "pg": "7.17.1"
+    "osrm": "5.26.0",
+    "pg": "8.8.0"
   },
   "devDependencies": {
     "sinon": "^7.2.7",
     "mock-fs": "^4.9.0",
     "cucumber": "5.1.0",
     "axios": "^0.21.1",
-    "tunnel": "^0.0.6"
+    "tunnel": "^0.0.6",
+    "esprima":"4.0.1"
   },
   "bundledDependencies": [
     "cors",
@@ -57,7 +53,6 @@
     "proj4",
     "assert",
     "helmet",
-    "wkt",
     "got",
     "http-proxy-agent"
   ]

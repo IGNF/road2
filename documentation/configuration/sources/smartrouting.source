@@ -1,0 +1,10 @@
+{
+    "id": "bdtopo-smartrouting",                                     
+    "type": "smartrouting",
+    "description":"test",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",                                          
+    "storage": {                                                     
+        "url": "https://wxs.ign.fr/calcul"                             
+    }                                                                
+}

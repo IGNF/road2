@@ -24,18 +24,44 @@ module.exports = class nearestRequest extends Request {
   * @param {integer} number - Type du coût.
   *
   */
-  constructor(
-    resource,
-    coordinates
-  ) {
+
+  constructor(resource, coordinates) {
 
     // Constructeur parent
-    super("nearest", resource, "nearestRequest");
+    super("nearest", "nearestRequest");
 
-    // Initialisation du reste des paramètres.
+    // Ressource concernée
+    this._resource = resource;
+
+    // Coordonnées du point fourni
     this._coordinates = coordinates;
+
+    // Nombre de points attendus en retour 
     this._number = 1;
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la requête
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**

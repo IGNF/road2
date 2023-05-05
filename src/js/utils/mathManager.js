@@ -14,7 +14,7 @@ module.exports = {
 
   isFloat: function(value) {
 
-    if (/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value)) {
+    if (/^(-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/.test(value)) {
         return true;
     } else {
         return false;

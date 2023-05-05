@@ -33,11 +33,17 @@ module.exports = class parameterManager  {
   */
   constructor() {
 
+    // Liste des ids appartenant aux paramètres chargés par le manager
+    this._loadedParameterId = new Array();
+
     // Liste des ids appartenant aux paramètres vérifiés par le manager
-    this._listOfVerifiedParameterId = new Array();
+    this._checkedParameterId = new Array();
 
     // Stockage des configurations des paramètres de service
     this._parametersConfiguration = {};
+
+    // Stockage des configurations des paramètres de service vérifiés par le manager
+    this._checkedParametersConfiguration = {};
 
     // Stockage des paramètres de service
     this._parameters = {};
@@ -47,55 +53,27 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name get listOfVerifiedParameterId
+  * @name get loadedParameterId
   * @description Récupérer l'ensemble des ids appartenant aux paramètres vérifiés par le manager
   *
   */
-  get listOfVerifiedParameterId() {
-    return this._listOfVerifiedParameterId;
+  get loadedParameterId() {
+    return this._loadedParameterId;
   }
 
   /**
   *
   * @function
-  * @name get parametersConfiguration
-  * @description Récupérer l'ensemble des configurations appartenant aux paramètres vérifiés par le manager
-  *
-  */
-  get parametersConfiguration() {
-    return this._parametersConfiguration;
-  }
-
-  /**
-  *
-  * @function
-  * @name getParameterConfigurationById
-  * @description Récupérer la configuration d'un paramètre via son id
-  * @param {string} id - Id du paramètre de service
-  * @return {object} Instance de Parameter, paramètre de service
-  *
-  */
-  getParameterConfigurationById(id) {
-    if (this._parametersConfiguration[id]) {
-      return this._parametersConfiguration[id];
-    } else {
-      return {};
-    }
-  }
-
-  /**
-  *
-  * @function
-  * @name isParameterAvailable
+  * @name isParameterLoaded
   * @description Permet de savoir si un paramètre est disponible, via son id
   * @param {string} id - Id du paramètre de service
   * @return {boolean}
   *
   */
-  isParameterAvailable(id) {
-    if (this._listOfVerifiedParameterId.length !== 0) {
-      for (let i=0; i < this._listOfVerifiedParameterId.length; i++) {
-        if (id === this._listOfVerifiedParameterId[i]) {
+  isParameterLoaded(id) {
+    if (this._loadedParameterId.length !== 0) {
+      for (let i=0; i < this._loadedParameterId.length; i++) {
+        if (id === this._loadedParameterId[i]) {
           return true;
         } else {
           // on continue
@@ -110,53 +88,79 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name loadParameterDirectory
-  * @description Charger les paramètres du dossier
-  * @param {string} parametersDirectory - Dossier contenant la description des paramètres
+  * @name isParameterChecked
+  * @description Permet de savoir si un paramètre a été vérifié, via son id
+  * @param {string} id - Id du paramètre de service
   * @return {boolean}
   *
   */
-  loadParameterDirectory(parametersDirectory) {
-
-    LOGGER.info("Chargement des parametres...");
-
-    // Vérification de l'existence du dossier /dir/parameters
-    if (!fs.statSync(parametersDirectory).isDirectory()) {
-      LOGGER.error("Le dossier contenant la configuration des parametres n'existe pas: " + parametersDirectory);
+  isParameterChecked(id) {
+    if (this._checkedParameterId.length !== 0) {
+      for (let i=0; i < this._checkedParameterId.length; i++) {
+        if (id === this._checkedParameterId[i]) {
+          return true;
+        } else {
+          // on continue
+        }
+      }
+    } else {
       return false;
     }
+    return false;
+  }
 
-    // Chargement des paramètres
-    // On les charge en premier pour qu'au moment du chargement des opérations, on connaisse déjà les identifiants des paramètres
-    fs.readdirSync(parametersDirectory).forEach(parameterConfFileName => {
+  /**
+  *
+  * @function
+  * @name get checkParameterDirectory
+  * @description Vérifier les configurations de paramètre d'un dossier 
+  * @param {string} directory - Dossier qui contient les configurations de paramètre à vérifier
+  *
+  */
+  checkParameterDirectory(directory) {
 
-      let parameterConfFile = parametersDirectory + "/" + parameterConfFileName;
+    if (!fs.existsSync(directory)) {
+      LOGGER.fatal("Mauvaise configuration: Le dossier des parametres n'existe pas : " + directory);
+      return false;
+    } 
 
-      if (fs.statSync(parameterConfFile).isFile()) {
+    // On vérifie que l'application peut lire les fichiers du dossier
+    if (!fs.readdirSync(directory).every(parameter => {
 
-        LOGGER.info("Chargement du parametre depuis " + parameterConfFile);
+      let parameterFile = "";
 
-        // on récupère le contenu du fichier puis on le vérifie et enfin on stocke l'id si tout va bien
-        let parameterConf = JSON.parse(fs.readFileSync(parameterConfFile));
-
-        if (this.checkParameterConf(parameterConf)) {
-
-          this._listOfVerifiedParameterId.push(parameterConf.id);
-          this._parametersConfiguration[parameterConf.id] = parameterConf;
-
-        } else {
-          // s'il y a une erreur dans le fichier on arrête
-          LOGGER.error("La configuration d'un parametres est incorrecte: " + parameterConfFile);
-          return false;
-        }
-
-      } else {
-        // On ne fait rien
+      try {
+        parameterFile = directory + "/" + parameter;
+        fs.accessSync(parameterFile, fs.constants.R_OK);
+      } catch (err) {
+        LOGGER.error("Le fichier de parametres ne peut etre lu: " + parameterFile);
       }
 
-    });
+      let contentFile = {};
+      try {
+        // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+        contentFile = JSON.parse(fs.readFileSync(parameterFile));
+      } catch (error) {
+        LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de parametres: " + parameterFile);
+        LOGGER.error(error);
+        return false;
+      }
 
-    LOGGER.info("Parametres charges.");
+      if (!this.checkParameterConfiguration(contentFile)) {
+        LOGGER.error("Parametre mal configuré");
+        return false;
+      } else {
+        this._checkedParameterId.push(contentFile.id);
+        this._checkedParametersConfiguration[contentFile.id] = contentFile;
+        LOGGER.info("Parametre bien configurée");
+        return true;
+      }
+
+    })
+    ) {
+      LOGGER.error("Un des paramètres est mal configuré");
+      return false;
+    }
 
     return true;
 
@@ -165,13 +169,13 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name checkParameterConf
+  * @name checkParameterConfiguration
   * @description Vérifier la configuration d'un paramètre
   * @param {json} parametersConf - Configuration du paramètre de service
   * @return {boolean}
   *
   */
-  checkParameterConf(parameterConf) {
+   checkParameterConfiguration(parameterConf) {
 
     let tmpMin;
     let tmpMax;
@@ -184,12 +188,28 @@ module.exports = class parameterManager  {
       return false;
     } else {
       LOGGER.info(parameterConf.id);
-      // On vérifie que l'id n'est pas déjà pris.
-      if (this._listOfVerifiedParameterId.length !== 0) {
+      // On vérifie que l'id n'est pas déjà chargé.
+      if (this._loadedParameterId.length !== 0) {
 
-        for (let i = 0; i < this._listOfVerifiedParameterId.length; i++ ) {
-          if (this._listOfVerifiedParameterId[i] === parameterConf.id) {
-            LOGGER.info("Le parametre contenant l'id " + parameterConf.id + " est deja reference.");
+        for (let i = 0; i < this._loadedParameterId.length; i++ ) {
+          if (this._loadedParameterId[i] === parameterConf.id) {
+            LOGGER.info("Le parametre contenant l'id " + parameterConf.id + " est deja chargé.");
+            return false;
+          } else {
+            // on continue de vérifier
+          }
+        }
+
+      } else {
+        // C'est le premier paramètre. On ne fait rien, on continue la vérification
+      }
+
+      // On vérifie que l'id n'est pas déjà vérifié.
+      if (this._checkedParameterId.length !== 0) {
+
+        for (let i = 0; i < this._checkedParameterId.length; i++ ) {
+          if (this._checkedParameterId[i] === parameterConf.id) {
+            LOGGER.info("Le parametre contenant l'id " + parameterConf.id + " est deja vérifié.");
             return false;
           } else {
             // on continue de vérifier
@@ -340,45 +360,157 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name createParameters
+  * @name flushCheckedParameter
+  * @description Vider la liste des paramètres déjà vérifiés 
+  *
+  */
+  flushCheckedParameter() {
+
+    this._checkedParameterId = new Array();
+    this._checkedParametersConfiguration = {};
+  
+  }
+
+  /**
+  *
+  * @function
+  * @name loadParameterDirectory
+  * @description Charger les paramètres du dossier
+  * @param {string} parametersDirectory - Dossier contenant la description des paramètres
+  * @return {boolean}
+  *
+  */
+  loadParameterDirectory(parametersDirectory) {
+
+    LOGGER.info("Chargement des parametres du dossier...");
+
+    // Vérification de l'existence du dossier /dir/parameters
+    if (!fs.statSync(parametersDirectory).isDirectory()) {
+      LOGGER.error("Le dossier contenant la configuration des parametres n'existe pas: " + parametersDirectory);
+      return false;
+    }
+
+    // Chargement des paramètres
+    // On les charge en premier pour qu'au moment du chargement des opérations, on connaisse déjà les identifiants des paramètres
+    if (!fs.readdirSync(parametersDirectory).every(parameterConfFileName => {
+
+      let parameterConfFile = parametersDirectory + "/" + parameterConfFileName;
+
+      if (fs.statSync(parameterConfFile).isFile()) {
+
+        LOGGER.info("Chargement du parametre depuis " + parameterConfFile);
+
+        // on récupère le contenu du fichier puis on le vérifie et enfin on stocke l'id si tout va bien
+        let parameterConf = {};
+        try {
+          parameterConf = JSON.parse(fs.readFileSync(parameterConfFile));
+        } catch(error) {
+          LOGGER.error("Impossible de lire " + parameterConfFile);
+          LOGGER.error(error);
+          return false;
+        }
+        
+        if (!this.loadParameterConfiguration(parameterConf)) {
+          LOGGER.error("Impossible de charger le parametre");
+          return false;
+        }
+
+      } else {
+        // On ne fait rien
+      }
+
+      return true;
+
+    })
+    ) {
+      LOGGER.error("Un des paramètres n'a pas pu être chargé");
+      return false;
+    }
+
+    LOGGER.info("Parametres charges.");
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadParameterConfiguration
+  * @description Créer un paramètre à partir de sa configuration 
+  * @param {json} configuration - Configuration d'un parametre
+  * @return {boolean}
+  *
+  */
+   loadParameterConfiguration(configuration) {
+
+    LOGGER.info("Chargement d'un parametre à partir de sa configuration...");
+
+    let parameterId = configuration.id;
+    let parameterConf = configuration;
+
+    if (this._parameters[parameterId]) {
+      LOGGER.info("Le parametre existe déjà");
+      return true;
+    }
+
+    let parameter = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.defaultValue);
+
+    if (parameterConf.example) {
+      parameter.example = parameterConf.example;
+    }
+
+    if (parameterConf.min) {
+      parameter.min = parameterConf.min;
+    }
+
+    if (parameterConf.max) {
+      parameter.max = parameterConf.max;
+    }
+
+    if (parameterConf.explode) {
+      parameter.explode = parameterConf.explode;
+    }
+
+    if (parameterConf.style) {
+      parameter.style = parameterConf.style;
+    }
+
+    // Stocakge du paramètre
+    this._parameters[parameterId] = parameter;
+    this._loadedParameterId.push(parameterId);
+    this._parametersConfiguration[parameterId] = parameterConf;
+
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name getParameters
   * @description Créer les objets paramètres à partir de la configuration d'une opération
   * @param {json} operationConf - Configuration d'une opération de service
   * @return {table} Tableau d'instance de Parameter, paramètre de service
   *
   */
-  createParameters(operationConf) {
+  getParameters(operationConf) {
+
+    LOGGER.info("Récupération des parametres d'une operation...");
 
     let parametersTable = {};
 
     for (let i = 0; i < operationConf.parameters.length; i++ ) {
 
       let parameterId = operationConf.parameters[i];
-      let parameterConf = this._parametersConfiguration[parameterId];
 
-      parametersTable[parameterId] = new Parameter(parameterId, parameterConf.type, parameterConf.name, parameterConf.description, parameterConf.required, parameterConf.defaultValue);
-
-      if (parameterConf.example) {
-        parametersTable[parameterId].example = parameterConf.example;
+      if (this._parameters[parameterId]) {
+        parametersTable[parameterId] = this._parameters[parameterId];
+        LOGGER.debug("Parametre " + parameterId + " récupéré");
+      } else {
+        LOGGER.error("Le parametre " + parameterId + " n'existe pas");
+        return null;
       }
-
-      if (parameterConf.min) {
-        parametersTable[parameterId].min = parameterConf.min;
-      }
-
-      if (parameterConf.max) {
-        parametersTable[parameterId].max = parameterConf.max;
-      }
-
-      if (parameterConf.explode) {
-        parametersTable[parameterId].explode = parameterConf.explode;
-      }
-
-      if (parameterConf.style) {
-        parametersTable[parameterId].style = parameterConf.style;
-      }
-
-      // Stocakge du paramètre
-      this._parameters[parameterId] = parametersTable[parameterId];
 
     }
 
@@ -389,13 +521,13 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name checkResourceParameterConf
+  * @name checkResourceParameterConfiguration
   * @description Vérifier la configuration d'un paramètre de ressource
   * @param {json} resourceParameterJsonObject - Configuration d'un paramètre de ressource
   * @return {boolean}
   *
   */
-  checkResourceParameterConf(resourceParameterJsonObject) {
+  checkResourceParameterConfiguration(resourceParameterJsonObject) {
 
     LOGGER.info("Verification du parametre de la ressource");
 
@@ -407,7 +539,7 @@ module.exports = class parameterManager  {
     }
 
     // on vérifie qu'il est bien disponible pour cette instance du service
-    if (!this.isParameterAvailable(resourceParameterJsonObject.id)) {
+    if (!this.isParameterChecked(resourceParameterJsonObject.id)) {
       LOGGER.error("Le parametre indique n'est pas disponible");
       return false;
     } else {
@@ -415,7 +547,7 @@ module.exports = class parameterManager  {
     }
 
     // on récupère la configuration du paramètre
-    let serviceParameterConf = this._parametersConfiguration[resourceParameterJsonObject.id];
+    let serviceParameterConf = this._checkedParametersConfiguration[resourceParameterJsonObject.id];
     if (!serviceParameterConf) {
       LOGGER.fatal("La configuration du parametre de service est introuvable !");
       return false;
@@ -621,7 +753,7 @@ module.exports = class parameterManager  {
             LOGGER.error("Le type de la cle contrainte n'est pas precise");
             return false;
           } else {
-            if ( !(["name-pgr", "numerical-pgr", "name-osrm"].includes(key.keyType)) ) {
+            if ( !(["name-pgr", "numerical-pgr", "name-osrm","name-valhalla"].includes(key.keyType)) ) {
               LOGGER.error("Le type de la cle contrainte est invalide");
               return false;
             } else {
@@ -713,7 +845,7 @@ module.exports = class parameterManager  {
               }
 
             }
-          } else if (key.keyType === "name-osrm") {
+          } else if (key.keyType === "name-osrm" || key.keyType === "name-valhalla") {
 
             if (!key.availableValues) {
               LOGGER.error("Les valeurs de la cle contrainte ne sont pas precisees");
@@ -776,14 +908,14 @@ module.exports = class parameterManager  {
   /**
   *
   * @function
-  * @name createResourceParameter
+  * @name loadResourceParameterConfiguration
   * @description Créer l'ensemble des opérations d'une ressource
   * @param {object} resourceParameterHash - Objet contenant l'ensemble des paramètres de ressource pour une ressource
   * @param {json} currentOperationConf - Configuraton de l'opération de ressource pour une ressource
   * @return {boolean}
   *
   */
-  createResourceParameter(resourceParameterHash, currentOperationConf) {
+  loadResourceParameterConfiguration(resourceParameterHash, currentOperationConf) {
 
     LOGGER.info("Creation des parametres de l'operation");
 

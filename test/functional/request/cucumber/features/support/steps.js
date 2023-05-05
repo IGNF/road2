@@ -34,6 +34,10 @@ Given('with query parameters:', function (table) {
     this.setQueryParameters(table.hashes());
 });
 
+Given('with path parameters:', function (table) {
+    this.setPathParameters(table.hashes());
+});
+
 Given('with table parameters for {string}:', function (key, table) {
     this.setTableParameters(key, table.hashes());
 });

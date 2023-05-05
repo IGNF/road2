@@ -14,7 +14,14 @@ Route Graph Generator et PGRouting Procedures sont indépendants en tant que pro
 
 Sur ces trois projets ont une branche `master` et `develop`. La première permet de gérer les versions mises en production. La seconde permet de réaliser les développements. 
 
-On veillera à partir de `develop` et de créer une branche du type `feature-*` pour réaliser de nouvelles fonctionnalités. 
+On veillera à partir de `develop` et de créer une branche du type 
+- `feat/*` pour réaliser de nouvelles fonctionnalités,
+- `fix/*` pour effectuer une correction sur le code source,
+- `docker/*` pour modifier la partie docker uniquement,
+- `test/*` pour modifier uniquement les tests, 
+- `ci/*` pour modifier la CI Github
+
+Pour fusionner une branche avec `develop`, on veillera à avoir fait un rebase de develop sur cette branche. Et sur la méthode de merge, on fera un squash. Ainsi, la branche `develop` aura un commit par fonctionnalité, correction, etc...
 
 ## Versions et tags
 
@@ -32,6 +39,8 @@ On veillera à tagger les commits de chaque projet avec les bonnes versions. Et 
 - On doit être capable d'identifier, par les tags, les versions du code utilisées en production. 
 - On doit pouvoir faire fonctionner tous les projets ensemble à partir des tags sur `master` et `develop`. 
 
+Lorsque l'on fusionnera `develop` sur `master`, on veillera à ne pas faire de squash afin de faciliter les futurs fusions (comme cela est préconisé par [github](https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squashing-and-merging-a-long-running-branch)). 
+
 ### PGRouting Procedures et Route Graph Generator
 
 Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui suit décrit le processus de mise à jour des projets, mais sans passer par les submodules de GIT*. Si on souhaite passer par les submodules, on pourra se référer à la documentation [proposée par GIT](https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules).
@@ -44,8 +53,8 @@ Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui 
 Démarche à suivre pour chaque projet:
 
 1. Tester `develop` et corriger si nécessaire.
-2. Merge de `develop` sur `master`.
-3. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `master` à 1.0.1.
+3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` et corriger si nécessaire.
 6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.
@@ -63,8 +72,8 @@ Démarche à suivre pour Road2:
 
 0. Réaliser les montée de version et les merge sur Route Graph Generator et PGRouting Procedures. 
 1. Tester `develop` avec les `develop` des autres projets, et corriger si nécessaire.
-2. Merge de `develop` sur `master`.
-3. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `develop` à 1.0.1.
+3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` avec les `master` des autres projets, et corriger si nécessaire.
 6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.

@@ -77,7 +77,7 @@ describe('Test de la classe osrmSource', function() {
       "file": "/home/docker/internal/corse-latest.osm.pbf"
     },
     "projection": "EPSG:4326",
-    "bbox": "-90,-180,90,180",
+    "bbox": "-180,-90,180,90",
 
   };
 

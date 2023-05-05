@@ -29,7 +29,10 @@ module.exports = class routeRequest extends Request {
   constructor(resource, start, end, profile, optimization) {
 
     // Constructeur parent
-    super("route", resource, "routeRequest");
+    super("route", "routeRequest");
+
+    // Ressource concernée
+    this._resource = resource;
 
     // Point de départ
     this._start = start;
@@ -56,7 +59,7 @@ module.exports = class routeRequest extends Request {
 
     // geometryFormat
     // type des géométries demandé
-    this._geometryFormat = "geojson"
+    this._geometryFormat = "geojson";
 
     // bbox
     this._bbox = true;
@@ -71,6 +74,29 @@ module.exports = class routeRequest extends Request {
     // Tableau contenant des instances de Constraint
     this._constraints = new Array();
 
+  }
+
+  /**
+  *
+  * @function
+  * @name get resource
+  * @description Récupérer la ressource de la requête
+  *
+  */
+   get resource () {
+    return this._resource;
+  }
+
+  /**
+  *
+  * @function
+  * @name set resource
+  * @description Attribuer la ressource de la requête
+  * @param {string} res - Id de la ressource
+  *
+  */
+  set resource (res) {
+    this._resource = res;
   }
 
   /**
@@ -266,6 +292,17 @@ module.exports = class routeRequest extends Request {
   */
   get waysAttributes () {
     return this._waysAttributes;
+  }
+
+  /**
+  *
+  * @function
+  * @name set waysAttributes
+  * @description Attribuer la liste des attributs disponibles pour les voies empruntées.
+  *
+  */
+   set waysAttributes (wa) {
+    this._waysAttributes = wa;
   }
 
   /**

@@ -18,44 +18,17 @@ module.exports = class Request {
   * @name constructor
   * @description Constructeur de la classe Request
   * @param {string} operation - Type d'opération concernée
-  * @param {string} resource - Ressource concernée
   * @param {string} type - Type de la requête
   *
   */
-  constructor(operation, resource, type) {
+  constructor(operation, type) {
 
     // Opération concernée
     this._operation = operation;
 
-    // Ressource concernée
-    this._resource = resource;
-
-    // Type de la requête
+    // Type de la requête (ne doit pas être modifié)
     this._type = type;
 
-  }
-
-  /**
-  *
-  * @function
-  * @name get resource
-  * @description Récupérer la ressource de la requête
-  *
-  */
-  get resource () {
-    return this._resource;
-  }
-
-  /**
-  *
-  * @function
-  * @name set resource
-  * @description Attribuer la ressource de la requête
-  * @param {string} res - Id de la ressource
-  *
-  */
-  set resource (res) {
-    this._resource = res;
   }
 
   /**
@@ -91,20 +64,5 @@ module.exports = class Request {
   get type () {
     return this._type;
   }
-
-  /**
-  *
-  * @function
-  * @name set type
-  * @description Attribuer le type de la requête
-  * @param {string} ty - Type de la requête 
-  *
-  */
-  set type (ty) {
-    this._type = ty;
-  }
-
-
-
 
 }

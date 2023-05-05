@@ -16,37 +16,25 @@ module.exports = class Response {
   * @function
   * @name constructor
   * @description Constructeur de la classe Response
-  * @param {string} resource - Nom de la ressource
+  * @param {string} type - Type de la réponse
   *
   */
-  constructor(resource) {
+  constructor(type) {
 
     // Nom de la ressource concernée par la réponse 
-    this._resource = resource;
+    this._type = type;
 
   }
 
   /**
   *
   * @function
-  * @name get resource
+  * @name get type
   * @description Récupérer la ressource de la requête
   *
   */
-  get resource () {
-    return this._resource;
-  }
-
-  /**
-  *
-  * @function
-  * @name set resource
-  * @description Attribuer la ressource de la requête
-  * @param {string} res - Nom de la ressource
-  *
-  */
-  set resource (res) {
-    this._resource = res;
+  get type () {
+    return this._type;
   }
 
 

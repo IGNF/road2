@@ -39,14 +39,21 @@ Il est possible d'utiliser des données au format d'OSRM. La seule contrainte es
 
 ### Données PGRouting 
 
-Si des données au format PGRouting sont disponibles, il est possible de les utiliser avec Road2. A priori, il n'y a pas de fortes contraintes sur la version de PGRouting utilisée. La seule contrainte est au niveau logiciel. Il est nécessaire d'installer les procédures du projet GIT `pgrouting-procedures` afin que Road2 puisse requêter la base qui héberge les données et les fonctions de PGRouting.
+Si des données au format PGRouting sont disponibles, il est possible de les utiliser avec Road2. A priori, il n'y a pas de fortes contraintes sur la version de PGRouting utilisée. La seule contrainte est au niveau logiciel. Il est nécessaire d'installer les procédures du projet [GIT](https://github.com/IGNF/pgrouting-procedures) `pgrouting-procedures` afin que Road2 puisse requêter la base qui héberge les données et les fonctions de PGRouting.
+
+### Données Valhalla
+
+De la même manière, il est possible d'utiliser Road2 avec des données Valhalla. 
 
 ### Les autres données 
 
-Lorsque les données ne sont pas dans l'un des formats gérés par Road2, il reste possible de les convertir. Chacun peut le faire comme il le souhaite pour aboutir à l'un des formats cités précédemment. Cependant, si certains le veulent, un projet GIT a été mis en place, `route-graph-generator`, afin de convertir les données. 
+Lorsque les données ne sont pas dans l'un des formats gérés par Road2, il reste possible de les convertir. Chacun peut le faire comme il le souhaite pour aboutir à l'un des formats cités précédemment. Cependant, si certains le veulent, un projet [GIT](https://github.com/IGNF/route-graph-generator) a été mis en place, `route-graph-generator`, afin de convertir les données. 
 
-`route-graph-generator` est un ensemble de scripts python qui lisent des données dans une base postgreSQL et la convertissent dans un format pivot. À partir de la base pivot, il est possible de convertir les données dans n'importe quel format géré par Road2. Ainsi, une même donnée d'entrée peut permettre des calculs par l'ensemble des moteurs. 
-Pour information, la conversion de données quelconques dans le format pivot est effectué par des scripts SQL. Pour le moment, il n'y en a qu'un seul qui permet de convertir des données IGN. Cependant, il est facile d'en ajouter de nouveaux pour partir d'un format différent et d'aboutir au format pivot. À partir de ce format pivot, tout les outils existent déjà pour aboutir aux formats gérés par Road2. 
+`route-graph-generator` est un ensemble de scripts python qui lisent des données dans différents formats et la convertissent dans un format pivot au sein d'une base de données. À partir de la base pivot, il est possible de convertir les données dans n'importe quel format géré par Road2. Ainsi, une même donnée d'entrée peut permettre des calculs par l'ensemble des moteurs. 
+
+Les formats d'entrée possibles pour les scripts sont une base de données ou le format OSM. 
+
+Dans le cas d'une base, la conversion de données dans le format pivot est effectué par des scripts SQL. Pour le moment, il n'y en a qu'un seul qui permet de convertir des données IGN. Cependant, il est facile d'en ajouter de nouveaux pour partir d'un format différent et d'aboutir au format pivot. À partir de ce format pivot, tout les outils existent déjà pour aboutir aux formats gérés par Road2. 
 
 
 

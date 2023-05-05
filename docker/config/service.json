@@ -1,0 +1,64 @@
+{
+  "application": {
+    "name": "Road2",
+    "title": "Service de calcul d'itinéraire",
+    "description": "Ce service permet de calculer des itinéraires sur les données du Géoportail.",
+    "url": "https://localhost/",
+    "provider": {
+      "name": "IGN",
+      "site": "www.ign.fr",
+      "mail": "contact.geoservices@ign.fr"
+    },
+    "logs": {
+      "configuration": "/home/docker/config/log4js-service.json"
+    },
+    "operations":{
+      "directory": "/home/docker/app/src/resources/operations",
+      "parameters": {
+        "directory": "/home/docker/app/src/resources/parameters"
+      }
+    },
+    "resources": {
+      "directories": [
+        "/home/docker/data/resources/"
+      ]
+    },
+    "sources": {
+      "directories": [
+        "/home/docker/data/sources/"
+      ]
+    },
+    "network": {
+      "servers": [
+        {
+          "id": "internalServer",
+          "https": "false",
+          "host": "0.0.0.0",
+          "port": "8080"
+        },
+        {
+          "id": "externalServer",
+          "https": "true",
+          "host": "0.0.0.0",
+          "port": "443",
+          "options": {
+            "key": "/run/secrets/key",
+            "cert": "/run/secrets/cert"
+          }
+        }
+      ],
+      "cors": {
+        "configuration": "/home/docker/config/cors.json"
+      }
+    }, 
+    "projections": {
+      "directory": "/home/docker/config/projections/"
+    },
+    "apis": [
+      {
+        "name" : "simple",
+        "version" : "1.0.0"
+      }
+    ]
+  }
+}

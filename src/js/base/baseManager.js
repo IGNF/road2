@@ -1,7 +1,6 @@
 'use strict';
 
 const log4js = require('log4js');
-const path = require('path');
 const fs = require('fs');
 const Base = require('./base');
 
@@ -26,8 +25,12 @@ module.exports = class baseManager {
   */
   constructor() {
 
-    // Liste des descriptions de bases vérifiées et validées par le manager
-    this._listOfVerifiedDbConfig = new Array();
+    // Liste des descriptions de bases déjà chargées par le manager
+    this._loadedBaseConfiguration = new Array();
+
+    // Liste des descriptions de bases déjà vérifiées par le manager et qui doivent être cohérentes avec les prochaines qui seront vérifiés
+    // Cet objet doit être vidé quand l'ensemble des configurations a été vérifié
+    this._checkedBaseConfiguration = new Array();
 
     // Le catalogue des bases créées par le manager
     this._baseCatalog = {};
@@ -37,42 +40,45 @@ module.exports = class baseManager {
   /**
   *
   * @function
-  * @name get listOfVerifiedDbConfig
-  * @description Récupérer la liste des configurations
+  * @name getBase
+  * @description Récupérer une base par sa configuration
+  * @param {string} configPath - Chemin de la configuration
   *
   */
-  get listOfVerifiedDbConfig() {
-    return this._listOfVerifiedDbConfig;
+   getBase(configPath) {
+    return this._baseCatalog[configPath];
   }
 
   /**
   *
   * @function
-  * @name get baseCatalog
-  * @description Récupérer le catalogue des bases
-  *
-  */
-  get baseCatalog() {
-    return this._baseCatalog;
-  }
-
-  /**
-  *
-  * @function
-  * @name checkBase
+  * @name checkBaseConfiguration
   * @description Vérification de la description de la configuration à une base de données.
   * @param{string} dbConfigPath - Nom du fichier contenant les informations de connexion à la base (chemin absolu)
   *
   */
-  async checkBase(dbConfigPath) {
+  async checkBaseConfiguration(dbConfigPath) {
 
     LOGGER.info("Verification de la configuration de la base de donnees...");
 
-    if (this._listOfVerifiedDbConfig.length !== 0) {
+    if (this._loadedBaseConfiguration.length !== 0) {
 
-      for (let i = 0; i < this._listOfVerifiedDbConfig.length; i++) {
-        if (dbConfigPath === this._listOfVerifiedDbConfig[i]) {
-          LOGGER.info("Configuration deja verifiee.")
+      for (let i = 0; i < this._loadedBaseConfiguration.length; i++) {
+        if (dbConfigPath === this._loadedBaseConfiguration[i]) {
+          LOGGER.info("Configuration deja chargée.")
+          return true;
+        }
+      }
+
+    } else {
+      // C'est le premier, donc on continue
+    }
+
+    if (this._checkedBaseConfiguration.length !== 0) {
+
+      for (let i = 0; i < this._checkedBaseConfiguration.length; i++) {
+        if (dbConfigPath === this._checkedBaseConfiguration[i]) {
+          LOGGER.info("Configuration deja vérifiée.")
           return true;
         }
       }
@@ -105,7 +111,7 @@ module.exports = class baseManager {
       return false;
     }
 
-    const base = new Base(configuration);
+    let base = new Base(configuration);
 
     try {
       LOGGER.info("Test de connexion à la base de donnees...");
@@ -116,9 +122,6 @@ module.exports = class baseManager {
       return false;
     }
 
-    // on stocke le chemin du fichier
-    this._listOfVerifiedDbConfig.push(dbConfigPath);
-
     LOGGER.info("Configuration de la base de donnees valide.");
     return true;
 
@@ -127,20 +130,49 @@ module.exports = class baseManager {
   /**
   *
   * @function
-  * @name createBase
-  * @description Création de la connexion à une base de données
+  * @name flushCheckedBaseConfiguration
+  * @description Vider la liste des configurations de bases déjà vérifiées 
+  *
+  */
+  flushCheckedBaseConfiguration() {
+
+    this._checkedBaseConfiguration = new Array();
+  
+  }
+
+  /**
+  *
+  * @function
+  * @name saveCheckedBaseConfiguration
+  * @description Sauvegarde de la description de la configuration à une base de données.
+  * @param {string} dbConfigPath - Nom du fichier contenant les informations de connexion à la base (chemin absolu)
+  *
+  */
+  saveCheckedBaseConfiguration(dbConfigPath) {
+
+    this._checkedBaseConfiguration.push(dbConfigPath);
+
+  }
+
+  /**
+  *
+  * @function
+  * @name loadBaseConfiguration
+  * @description Création de la base de données
   * @param{string} dbConfigPath - Nom du fichier contenant les informations de connexion à la base (chemin absolu)
   *
   */
-  createBase(dbConfigPath) {
+  loadBaseConfiguration(dbConfigPath) {
 
     let base;
 
     // on vérifie d'abord que la base n'a pas déjà été créée
     if (this._baseCatalog[dbConfigPath]) {
-      return this._baseCatalog[dbConfigPath];
+      return true;
     } else {
-      // la base n'existe pas, on continue
+      // TODO la base n'existe pas, on vérifie que le contenu de la conf n'est pas le même qu'une base déjà chargée.
+      // Cela permet d'éviter de créer des connexions inutiles.
+      // Si elle existe déjà, il faut bien veiller à renvoyer le this._baseCatalog[dbConfigPath] correspondant. 
     }
 
     let configuration = {}; 
@@ -155,8 +187,9 @@ module.exports = class baseManager {
     base = new Base(configuration);
 
     this._baseCatalog[dbConfigPath] = base;
+    this._loadedBaseConfiguration = dbConfigPath;
 
-    return base;
+    return true;
 
   }
 

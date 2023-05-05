@@ -1,0 +1,26 @@
+{
+  "administration":{
+    "api" : {
+      "name" : "admin",
+      "version" : "1.0.0"
+    },
+    "services": [
+      {
+        "id": "main",
+        "configuration": "./service.json",
+        "creationType": "newProcess" 
+      }
+    ],
+    "network" : {
+      "server" : {
+        "id": "administrator",
+        "https": "false",
+        "host": "0.0.0.0",
+        "port": "8078"
+      }
+    },
+    "logs": {
+      "configuration": "./log4js.json"
+    }
+  }
+}

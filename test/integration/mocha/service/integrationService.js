@@ -4,11 +4,10 @@ const RouteRequest = require('../../../../src/js/requests/routeRequest');
 const ApisManager = require('../../../../src/js/apis/apisManager');
 const ResourceManager = require('../../../../src/js/resources/resourceManager');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
-const TopologyManager = require('../../../../src/js/topology/topologyManager');
 const ServerManager = require('../../../../src/js/server/serverManager');
 const Resource = require('../../../../src/js/resources/resource');
 const Source = require('../../../../src/js/sources/source');
-const logManager = require('../../../unit/mocha/logManager');
+const logManager = require('../logManager');
 const path = require('path');
 const fs = require('fs');
 
@@ -70,7 +69,6 @@ describe('Test de la classe Service', function() {
       sourceManager.getSourceTopology = sinon.stub().returns("toto");
       service._sourceManager = sourceManager;
 
-      const topologyManager = sinon.mock(TopologyManager);
       topologyManager.getTopologyById = sinon.stub().returns("toto");
       service._topologyManager = topologyManager;
 
@@ -82,13 +80,13 @@ describe('Test de la classe Service', function() {
 
   describe('Test de createServer() et stopServer()', function() {
     const apisManager = sinon.mock(ApisManager);
-    apisManager.loadAPISDirectory = sinon.stub().returns(true);
+    apisManager.loadApiDirectory = sinon.stub().returns(true);
     service._apisManager = apisManager;
 
     const serverManager = sinon.mock(ServerManager);
     serverManager.createAllServer = sinon.stub().returns(true);
     serverManager.startAllServer = sinon.stub().returns(true);
-    serverManager.stopAllServer = sinon.stub().returns(true);
+    serverManager.stopAllServers = sinon.stub().returns(true);
     serverManager.checkConfiguration = sinon.stub().returns(true);
     service._serverManager = serverManager;
 

@@ -1,0 +1,43 @@
+# Description d'un fichier de source pour Road2
+
+# id de la source, utile pour la charger une seule fois dans Road2.  
+"id":
+  type: string
+  required: true
+# Description de la source 
+"description":
+  type: string
+  required: true
+# Type de la source
+"type":
+  type: string
+  required: true
+  enum: ["osrm","pgr","smartrouting","valhalla"]
+# Projection des données sources
+"projection":
+  type: string
+  required: true
+# Bbox des données dans la projection précisée
+"bbox":
+  type: string
+  required: true 
+# Stockage de la source. Elle dépend de son type
+# TODO : finir de spécifier (en attendant, voir les exemples)
+"storage":
+  type: object
+  required: true
+# Coûts calculés sur la topologie précisée précedemment. On peut en avoir plusieurs. 
+# TODO : finir de spécifier (en attendant, regarder les exemples de fichier)
+"cost":
+  type: object
+  required: true
+  properties:
+      # Chaque coût correspond à un profil
+      "profile":
+        type: string
+        required: true
+      # Chaque coût correspond à un profil
+      "optmization":
+        type: string
+        required: true
+      

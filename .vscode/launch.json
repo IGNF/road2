@@ -6,7 +6,7 @@
     "configurations": [
 
         {
-            "name": "Docker: Attach to Node",
+            "name": "Docker: Attach to Road2 Administrator",
             "type": "node",
             "request": "attach",
             "port": 9229,
@@ -14,6 +14,17 @@
             "protocol": "inspector",
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/home/docker/app/"
+        },
+        {
+            "name": "Docker: Attach to Road2 Service",
+            "type": "node",
+            "request": "attach",
+            "port": 9230,
+            "address": "localhost",
+            "protocol": "inspector",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/home/docker/app/"
         }
+        
     ]
 }

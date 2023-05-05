@@ -1,6 +1,10 @@
 'use strict';
 
 const Resource = require('./resource');
+const log4js = require('log4js');
+
+// Création du LOGGER
+var LOGGER = log4js.getLogger("OSRMRESOURCE");
 
 /**
 *
@@ -33,19 +37,9 @@ module.exports = class osrmResource extends Resource {
     // Correspondance entre profile/optimization et sourceId
     this._linkedSource = {};
 
-    // Instanciation de la correspondance entre profile/optimization et sourceId
-    // et instanciation du profile et de l'optimisation par défaut
-    for (let i=0; i < this._configuration.sources.length; i++) {
-
-      let linkedId = this._configuration.sources[i].cost.profile + this._configuration.sources[i].cost.optimization;
-      this._linkedSource[linkedId] = this._configuration.sources[i].id;
-
-    }
-
-    // id de la source utilisée pour l'opération nearest
-    // on prend la première de la configuration 
-    // TODO : à voir si on rend cela plus configurable
-    this._nearestSource = this._configuration.sources[0].id;
+    // Correspondance pour l'opération nearest
+    // Il s'agit de l'id de la source utilisée pour l'opération nearest
+    this._nearestSource = "";
 
     // Attribut des voies
     // Par défaut, OSRM ne renvoit que le nom des voies empruntées.
@@ -68,23 +62,60 @@ module.exports = class osrmResource extends Resource {
   /**
   *
   * @function
-  * @name get linkedSource
-  * @description Récupérer la correspondance entre profile/optimization et sourceId de la ressource
-  *
-  */
-  get linkedSource () {
-    return this._linkedSource;
-  }
-
-  /**
-  *
-  * @function
   * @name get waysAttributes
   * @description Récupérer la liste des attributs disponibles pour les voies empruntées.
   *
   */
   get waysAttributes () {
     return this._waysAttributes;
+  }
+
+  /**
+  *
+  * @function
+  * @name initResource
+  * @description Créer les liens entre divers éléments d'une ressource et les sources associées
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * @param {SourceManager} sourceManager - Manager des sources du service 
+  * @return {boolean} 
+  *
+  */
+   initResource (sourceManager) {
+
+    // Instanciation de la correspondance entre profile/optimization et sourceId
+    for (let i=0; i < this._configuration.sources.length; i++) {
+
+      if (!sourceManager.isLoadedSourceAvailable(this._configuration.sources[i])) {
+        LOGGER.error("La source n'a pas été chargée");
+        return false;
+      } else {
+
+        LOGGER.debug("La source est bien disponible");
+
+        let source = sourceManager.getSourceById(this._configuration.sources[i]);
+
+        // TODO : faire cette vérification aussi pendant le check de la ressource
+        if (source.type !== "osrm") {
+          LOGGER.error("La source n'est pas de type 'osrm'");
+          return false;
+        }
+
+        let linkedId = source.configuration.cost.profile + source.configuration.cost.optimization;
+        this._linkedSource[linkedId] = source.configuration.id;
+
+        if (i === 0) {
+          // Gestion de nearest
+          // on prend la première de la configuration 
+          // TODO : à voir si on rend cela plus configurable
+          this._nearestSource = source.configuration.id;
+        }
+
+      }
+
+    }
+
+    return true;
+
   }
 
   /**
@@ -124,9 +155,7 @@ module.exports = class osrmResource extends Resource {
   */
   getSourceIdFromRequest (request) {
 
-    const currentOperation = request.operation;
-
-    if (currentOperation === "nearest") {
+    if (request.operation === "nearest") {
       return this._nearestSource;
     } else {
       if (this._linkedSource[request.profile+request.optimization]) {
@@ -136,34 +165,33 @@ module.exports = class osrmResource extends Resource {
       }
     }
 
-    
-
   }
 
   /**
   *
   * @function
-  * @name removeSource
-  * @description Supprimer les references à une source au sein de la ressource
-  * @param {string} sourceId - Id de la source 
+  * @name checkSourceAvailibilityFromRequest
+  * @description Savoir s'il y a une source disponible pour répondre à la requête. Par exemple, pour un itinéraire, il s'agira de savoir si un couple profile/optimization est disponible.
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
   * @return {boolean} 
   *
   */
-  removeSource (sourceId) {
-
-    let keysToDelete = new Array();
-    for (let key in this._linkedSource) {
-      if (this._linkedSource[key] === sourceId) {
-        keysToDelete.push(key);
-      }
-    }
-    if(keysToDelete.length !== 0) {
-      for (let i = 0; i < keysToDelete.length; i++) {
-        delete this._linkedSource[keysToDelete[i]];
-      }
-    }
+   checkSourceAvailibilityFromRequest (request) {
     
-    return true;
+    if (request.operation === "nearest") {
+      // On utilise toujours la première source. Il y en a forcément une. 
+      return true;
+    } else if (request.operation === "route") {
+      if (this._linkedSource[request.profile+request.optimization]) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+
   }
 
 }

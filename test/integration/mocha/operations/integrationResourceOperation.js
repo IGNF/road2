@@ -1,9 +1,8 @@
 const assert = require('assert');
 const ResourceOperation = require('../../../../src/js/operations/resourceOperation');
-const Parameter = require('../../../../src/js/parameters/parameter');
 const ResourceParameter = require('../../../../src/js/parameters/resourceParameter');
 const logManager = require('../logManager');
-const sinon = require('sinon');
+const Parameter = require('../../../../src/js/parameters/parameter');
 
 describe('Test de la classe ResourceOperation', function() {
 
@@ -12,17 +11,11 @@ describe('Test de la classe ResourceOperation', function() {
     logManager.manageLogs();
   });
 
-  // Pour ne pas dépendre de la classe Parameter et resourceParameter
-  let serviceParameter = sinon.mock(Parameter);
-  serviceParameter.id = "start";
-
-  let resourceParameter = sinon.mock(ResourceParameter);
-  resourceParameter.serviceParameter = serviceParameter;
-
-  let parameters = {};
-  parameters["start"] = serviceParameter;
-
-  let resourceOperation = new ResourceOperation("route", parameters);
+  let serviceParameter = new Parameter("start","point","start","Points de départ","true","false")
+  let resourceParameter = new ResourceParameter(serviceParameter);
+  let parameterHash = {};
+  parameterHash["start"] = resourceParameter;
+  let resourceOperation = new ResourceOperation("route", parameterHash);
 
   describe('Test du constructeur et des getters', function() {
 
@@ -31,11 +24,19 @@ describe('Test de la classe ResourceOperation', function() {
     });
 
     it('Get resourceParameters', function() {
-      assert.deepEqual(resourceOperation.resourceParameters, parameters);
+      assert.deepEqual(resourceOperation.resourceParameters, parameterHash);
     });
 
-    it('getParameterById()', function() {
-      assert.deepEqual(resourceOperation.getParameterById("start"), parameters["start"]);
+  });
+
+  describe('Test du constructeur et des getters', function() {
+
+    it('getParameterById() d\'un paramètre existant', function() {
+      assert.deepEqual(resourceOperation.getParameterById("start"), parameterHash["start"]);
+    });
+
+    it('getParameterById() d\'un paramètre non existant', function() {
+      assert.deepEqual(resourceOperation.getParameterById("end"), {});
     });
 
   });

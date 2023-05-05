@@ -1,5 +1,9 @@
 'use strict';
 
+const log4js = require('log4js');
+
+var LOGGER = log4js.getLogger("RESOURCE");
+
 /**
 *
 * @class
@@ -95,23 +99,42 @@ module.exports = class Resource {
   */
   getSourceIdFromRequest (request) {
     let sourceId = "";
+    LOGGER.debug(request.toString());
     return sourceId;
   }
 
   /**
   *
   * @function
-  * @name removeSource
-  * @description Supprimer les references à une source au sein de la ressource
+  * @name checkSourceAvailibilityFromRequest
+  * @description Savoir s'il y a une source disponible pour répondre à la requête. Par exemple, pour un itinéraire, il s'agira de savoir si un couple profile/optimization est disponible.
   * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
   * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
   * dans chacune des classes filles.
-  * @param {string} sourceId - Id de la source 
+  * @param {Request} request - Objet Request ou ou dérivant de la classe Request
   * @return {boolean} 
   *
   */
-  removeSource (sourceId) {
-    return true;
+   checkSourceAvailibilityFromRequest (request) {
+    LOGGER.debug(request.toString());
+    return false;
+  }
+
+  /**
+  *
+  * @function
+  * @name initResource
+  * @description Créer les liens entre divers éléments d'une ressource et les sources associées
+  * Ce traitement est placé ici car c'est la ressource qui sait quelle source est concernée par la requête.
+  * Dans la classe actuelle, ce n'est que pour indiquer qu'il faut implémenter la fonction
+  * dans chacune des classes filles.
+  * @param {SourceManager} sourceManager - Manager des sources du service 
+  * @return {boolean} 
+  *
+  */
+   initResource (sourceManager) {
+    LOGGER.debug(sourceManager.toString());
+    return false;
   }
 
   /**

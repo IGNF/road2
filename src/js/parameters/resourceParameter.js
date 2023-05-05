@@ -23,12 +23,12 @@ module.exports = class ResourceParameter {
   * @function
   * @name constructor
   * @description Constructeur de la classe ResourceParameter
-  * @param {object} parameter - Référence au paramètre de service
+  * @param {Parameter} parameter - Référence au paramètre de service, instance de la classe Parameter
   *
   */
   constructor(parameter) {
 
-    // id
+    // paramètre du service
     this._serviceParameter = parameter;
 
   }
@@ -49,14 +49,13 @@ module.exports = class ResourceParameter {
   * @function
   * @name load
   * @description Charger la configuration
-  * @param {string} parameterConf - Configuration d'un paramètre
+  * @param {object} parameterConf - Configuration d'un paramètre
   * @return {boolean}
   *
   */
   load(parameterConf) {
-
+    LOGGER.debug("configuration du parametre : " + parameterConf.toString());
     return false;
-
   }
 
   /**
@@ -65,7 +64,7 @@ module.exports = class ResourceParameter {
   * @name check
   * @description Vérifier la validité d'une valeur par rapport au paramètre
   * @param {string} userValue - Valeur à vérifier
-  * @param {object} options - Options
+  * @param {object|string} options - Options
   * @return {object} result.code - "ok" si tout s'est bien passé et "error" sinon
   *                  result.message - "" si tout s'est bien passé et la raison de l'erreur sinon
   *
@@ -116,16 +115,12 @@ module.exports = class ResourceParameter {
           userTable = userValue.split("|");
 
         } else {
-          //TODO: ce n'est pas censé arriver, que fait-on ? 
-          return errorManager.createErrorMessage("");
+          return errorManager.createErrorMessage("style non reconnu");
         }
 
       } else {
 
-        // on peut avoir simplement un float 
-        // TODO: vérification du float ? 
-        LOGGER.debug("user parameter is NOT a string");
-        userTable = userValue;
+        return errorManager.createErrorMessage("user parameter is NOT a string");
 
       }
 
@@ -167,6 +162,10 @@ module.exports = class ResourceParameter {
   specificCheck(userValue, options) {
 
     LOGGER.debug("specificCheck()");
+    LOGGER.debug("user value : " + userValue);
+    if (options) {
+      LOGGER.debug("options: " + options.toString());
+    }
     return errorManager.createErrorMessage("");
 
   }
@@ -227,6 +226,11 @@ module.exports = class ResourceParameter {
   */
   specificConvertion(userValue, options) {
 
+    LOGGER.debug("specificConversion()");
+    LOGGER.debug("user value : " + userValue);
+    if (options) {
+      LOGGER.debug("options: " + options.toString());
+    }
     return null;
 
   }
