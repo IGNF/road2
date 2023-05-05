@@ -44,7 +44,7 @@ Il est possible de visualiser ces documentations d'API localement en suivant les
 
 ### Pré-requis
 
-Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée pendant les développements est *12.14.0*. 
+Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée pendant les développements est *16*. 
 
 ### Installation des modules
 
@@ -78,7 +78,7 @@ node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/administration.
 
 ### Pour plus de détails
 
-On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Debian 10 est disponible. 
+On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Debian 11 est disponible. 
 
 ## Participer aux développements 
 
