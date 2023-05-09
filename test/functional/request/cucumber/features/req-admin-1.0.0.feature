@@ -154,7 +154,8 @@ Feature: Road2 with data
     When I send the request
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain "id"
+    And the response should contain an attribute "id" with value "EPSG:4326"
+    And the response should contain an attribute "parameters"
 
   Scenario: [admin/1.0.0] Projection invalide du service "main"
     Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
@@ -164,6 +165,7 @@ Feature: Road2 with data
       | projection | unknown   |
     When I send the request
     Then the server should send a response with status 404
+    And the response should contain an attribute "error"
   
   Scenario: [admin/1.0.0] Projection invalide du service "main"
     Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
@@ -172,7 +174,8 @@ Feature: Road2 with data
       | service    | Unknown      |
       | projection | Unknown   |
     When I send the request
-    Then the server should send a response with status 404  
+    Then the server should send a response with status 404
+    And the response should contain an attribute "error"
   
   Scenario: [admin/1.0.0] Projection sur service non défini
     Given an "GET" request on operation "services/<service>/projections/<projection>" in api "admin" "1.0.0"
@@ -182,6 +185,7 @@ Feature: Road2 with data
       | projection | EPSG:4326 |
     When I send the request
     Then the server should send a response with status 400
+    And the response should contain an attribute "error"
 
       
   Scenario: [admin/1.0.0] Projection non définie sur service "main"
@@ -192,4 +196,5 @@ Feature: Road2 with data
       | projection | %20       |
     When I send the request
     Then the server should send a response with status 400
+    And the response should contain an attribute "error"
     

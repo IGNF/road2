@@ -1009,6 +1009,10 @@ components:
           type: "string"
           example: "EPSG:4326"
           required: true
+        parameters:
+          type: "string"
+          example: "+proj=longlat +datum=WGS84 +no_defs"
+          required: true
     
     resourceConfiguration:
       type: "object"

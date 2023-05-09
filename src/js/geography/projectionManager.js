@@ -30,6 +30,9 @@ module.exports = class ProjectionManager {
     // Liste des ids de projections disponibles car déjà chargées dans proj4
     this._loadedProjectionId = new Array();
 
+    // Liste des paramètres de projection
+    this._loadedProjectionParameters = {};
+
     // Liste des ids des projections déjà vérifiées et qui doivent être cohérentes avec les prochaines qui seront vérifiés
     // Cet objet doit être vidé quand l'ensemble des configurations a été vérifié
     this._checkedProjectionId = new Array();
@@ -45,6 +48,17 @@ module.exports = class ProjectionManager {
   */
   get loadedProjectionId () {
     return this._loadedProjectionId;
+  }
+
+  /**
+  *
+  * @function
+  * @name get loadedProjectionParameters
+  * @description Récupérer la liste des parametres de projections disponibles
+  *
+  */
+   get loadedProjectionParameters () {
+    return this._loadedProjectionParameters;
   }
 
   /**
@@ -71,6 +85,20 @@ module.exports = class ProjectionManager {
     }
 
     return false;
+
+  }
+
+  /**
+  *
+  * @function
+  * @name getProjectionParameters
+  * @description Récupérer les paramètres d'une projection
+  * @param {string} id - ID de la projection 
+  *
+  */
+   getProjectionParameters (id) {
+
+    return this._loadedProjectionParameters[id];
 
   }
 
@@ -506,8 +534,9 @@ module.exports = class ProjectionManager {
     try {
 
       proj4.defs(configuration.id, configuration.parameters);
-      // On stocke l'id
+      // On stocke l'id et ces paramétres
       this._loadedProjectionId.push(configuration.id);
+      this._loadedProjectionParameters[configuration.id] = configuration.parameters;
 
     } catch(error) {
       LOGGER.error("Impossible de charger la projection dans proj4: ");
