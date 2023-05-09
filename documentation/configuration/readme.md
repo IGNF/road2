@@ -49,7 +49,7 @@ On peut trouver un [exemple](../../docker/config/cors.json) de ce fichier au for
 
 Le fichier *service.json* indique un dossier de projections. Ce dossier peut contenir plusieurs fichiers JSON. Ces fichiers seront lus, indépendamment de leur extension, pour obtenir les informations nécessaires permettant à [PROJ4](http://proj4js.org/) d'effectuer des reprojections. 
 
-On peut trouver un [exemple](../../docker/config/projections/projection.json) de ce fichier et le [modèle](./projections/projection_model.yaml) au format YAML.
+On peut trouver un [exemple](../../docker/config/projections/world.json) de ce fichier et le [modèle](./projections/projection_model.yaml) au format YAML.
 
 ## Les sources 
 

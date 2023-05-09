@@ -14,83 +14,77 @@ Feature: Road2 configuration
 
   Scenario: [projection.json] JSON vide
     Given a valid configuration 
-    And without attribute "projectionsList" in "projection.json" projection
+    And without attribute "projectionsList" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La fichier des projections ne contient pas de liste"
 
   Scenario: [projection.json] projectionsList absent
     Given a valid configuration 
-    And without attribute "projectionsList" in "projection.json" projection
-    And with parameter "test" for attribute "projections" in "projection.json" projection
+    And without attribute "projectionsList" in "world.json" projection
+    And with parameter "test" for attribute "projections" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La fichier des projections ne contient pas de liste"
 
   Scenario: [projection.json] projectionsList different
     Given a valid configuration 
-    And with parameter "test" for attribute "projectionsList" in "projection.json" projection
+    And with parameter "test" for attribute "projectionsList" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "L'attribut projectionsList de la configuration n'est pas un tableau"
 
   Scenario: [projection.json] projectionsList est un tableau vide
     Given a valid configuration 
-    And without attribute "projectionsList.[6]" in "projection.json" projection
-    And without attribute "projectionsList.[5]" in "projection.json" projection
-    And without attribute "projectionsList.[4]" in "projection.json" projection
-    And without attribute "projectionsList.[3]" in "projection.json" projection
-    And without attribute "projectionsList.[2]" in "projection.json" projection
-    And without attribute "projectionsList.[1]" in "projection.json" projection
-    And without attribute "projectionsList.[0]" in "projection.json" projection
+    And without attribute "projectionsList.[0]" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "L'attribut projectionsList de la configuration est un tableau vide"
 
   Scenario: [projection.json] une configuration de projection vide
     Given a valid configuration 
-    And without attribute "projectionsList.[0].id" in "projection.json" projection
-    And without attribute "projectionsList.[0].parameters" in "projection.json" projection
+    And without attribute "projectionsList.[0].id" in "world.json" projection
+    And without attribute "projectionsList.[0].parameters" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas d'id"
 
   Scenario: [projection.json] une configuration de projection sans id
     Given a valid configuration 
-    And without attribute "projectionsList.[0].id" in "projection.json" projection
+    And without attribute "projectionsList.[0].id" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas d'id"
 
   Scenario: [projection.json] une configuration de projection sans parametre
     Given a valid configuration 
-    And without attribute "projectionsList.[0].parameters" in "projection.json" projection
+    And without attribute "projectionsList.[0].parameters" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas de parametres"
 
   Scenario: [projection.json] une configuration de projection différentes
     Given a valid configuration 
-    And with parameter "test" for attribute "projectionsList.[0]" in "projection.json" projection
+    And with parameter "test" for attribute "projectionsList.[0]" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas d'id"
 
   Scenario: [projection.json] projection.id différent pour une projection inutilisée dans les topologies
     Given a valid configuration 
-    And with parameter "test" for attribute "projectionsList.[2].id" in "projection.json" projection
+    And with parameter "test" for attribute "projectionsList.[2].id" in "france.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 0
 
   Scenario: [projection.json] projection.id différent pour une projection utilisée dans les topologies
     Given a valid configuration 
-    And with parameter "test" for attribute "projectionsList.[0].id" in "projection.json" projection
+    And with parameter "test" for attribute "projectionsList.[0].id" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
 
   Scenario: [projection.json] projection.id vide
     Given a valid configuration 
-    And with parameter "" for attribute "projectionsList.[2].id" in "projection.json" projection
+    And with parameter "" for attribute "projectionsList.[2].id" in "france.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas d'id"
@@ -98,13 +92,13 @@ Feature: Road2 configuration
   #TODO : Voir si on peut mieux vérifier 
   Scenario: [projection.json] projection.parameters différent
     Given a valid configuration 
-    And with parameter "test" for attribute "projectionsList.[0].parameters" in "projection.json" projection
+    And with parameter "test" for attribute "projectionsList.[0].parameters" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 0
 
   Scenario: [projection.json] projection.parameters vide
     Given a valid configuration 
-    And with parameter "" for attribute "projectionsList.[0].parameters" in "projection.json" projection
+    And with parameter "" for attribute "projectionsList.[0].parameters" in "world.json" projection
     When I test the configuration
     Then the configuration analysis should give an exit code 1
     Then the server log should contain "La configuration de la projection n'a pas de parametres"
