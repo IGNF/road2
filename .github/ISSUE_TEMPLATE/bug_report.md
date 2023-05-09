@@ -7,61 +7,42 @@ assignees: ''
 
 ---
 
-### Bug (that's your part)
+### Bug 
 
-**Describe the bug**
+#### Describe the bug
 A clear and concise description of what the bug is.
 
-**Type of use (choose between):**
+#### Type of use (choose between):
 - `service` provided by Road2 (ex. bug with a request from the API simple/1.0.0)
 - `administration` of the services provided by Road2 
 - `other`, please add a helpful description
 
-**Type of bug (choose between):**
+#### Type of bug (choose between):
 - `request`, for bugs with an API
 - `load`, for bugs during the creation of the server
 - `checkConfig`, for bugs with this option
 
-**To Reproduce**
+#### To Reproduce
 Steps to reproduce the behavior:
 1. Load server with this configuration
 2. Request the server
 
-**Expected behavior**
+#### Expected behavior
 A clear and concise description of what you expected to happen.
 
-**Environment (please complete the following information):**
+#### Environment (please complete the following information):
  - OS: [e.g. Debian]
  - OS Version: [e.g. 11]
  - Node version: [e.g. 16]
  - Road2 commit: [sha]
 
-**Configuration:**
+#### Configuration:
 - the configuration was generated inside the docker image: [eg. yes/no]
 - if no, please, provide us the any differences you find useful
 
-**Data:**
+#### Data:
 Type of data: [eg. osrm, pgrouting, valhalla]
 Generation of the data: [eg. docker image of route-graph-generator, other]
 
-**Additional context**
+#### Additional context
 Add any other context about the problem here.
-
-
-### Tasks (a part for developers, please left as it is)
-
-- [ ] Fix the code (see next paragraph)
-- [ ] Update tests 
-  - [ ] utest/itest if modification of a classe
-  - [ ] rtest if modification of an API 
-  - [ ] ctest if modification of a configuration
-- [ ] Run tests 
-  - [ ] Inside the docker provided by the project : rtest, ctest, utest, itest
-  - [ ] Manually if necessary
-- [ ] Update the documentation 
-  - [ ] changelog.md
-  - [ ] documentation directory
-
-### Code (a part for developers, please left as it is)
-
-Describe what could be done to fix the code. 
