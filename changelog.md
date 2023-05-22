@@ -9,6 +9,7 @@ CHANGED:
 
 ADDED:
   - A Github PR template was added
+  - A code of conduct was adapted from the contributor covenant 
 
 ## 2.1.1
 
