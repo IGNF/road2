@@ -1,40 +1,40 @@
-# Démonstration locale de Road2 
+# Local demonstration of Road2
 
-Ce fichier décrit les instructions à suivre pour avoir une démonstration locale de Road2 limitée aux moteurs OSRM et PGRouting. 
+This file describes the instructions to follow to have a local demo of Road2 limited to OSRM and PGRouting engines.
 
-## Principe 
+## Principle
 
-Nous proposons des images docker qui permettent de tester le service en local. Nous prévoyons de mettre ces images sur DockerHub. 
+We offer docker images that allow you to test the service locally. We plan to put these images on DockerHub.
 
-## Utilisation des images pré-construites et disponibles sur DockerHub
+## Using pre-built images available on DockerHub
 
-## Construction des images en local 
+## Building images locally
 
-Ce sont les mêmes images que l'on peut vouloir construire localement. 
+These are the same images that we may want to build locally.
 
-Pour construire l'image, il suffit de se placer à la racine du projet Road2 et de lancer la commande suivante : 
+To build the image, simply go to the root of the Road2 project and run the following command:
 ```
 docker build -t road2-demonstration -f docker/demonstration/Dockerfile .
 ```
 
-## Utilisation 
+## Use
 
-### Récupération des données 
+### Data recovery
 
-Il est nécessaire d'avoir des données pour que Road2 puisse calculer des itinéraires. 
+Data is required for Road2 to calculate routes.
 
-### Lancement de l'application 
+### Launching the application
 
-On pourra lancer l'application avec la commande suivante : 
+You can launch the application with the following command:
 ```
 docker run --rm road2-demonstration
 ```
 
-## Documentation 
+## Documentation
 
-### APIs 
+### APIs
 
-Il est possible de visualiser les documentations des APIs en local. On lancera la commande suivante :
+It is possible to view API documentation locally. We will run the following command:
 ```
 docker run --rm -p 8083:8080 -e SWAGGER_JSON=/api.yaml -v {path/to/yaml/directory}/api.yaml:/api.yaml swaggerapi/swagger-ui
 ```

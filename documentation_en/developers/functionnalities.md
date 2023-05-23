@@ -1,177 +1,173 @@
-# Liste des fonctionnalités 
+# List of features
 
-Road2 propose un ensemble de fonctionnalités regroupées dans plusieurs groupes. 
+Road2 offers a set of features spread across several groups.
 
 
 
-## Groupe de fonctionnalités 1 : Interface pour calculer des itinéraires 
+## Function group 1: Interface for calculating routes
 
-### Définir un point de départ, un point d'arrivée et des points intermédiaires 
+### Define a start point, an end point and intermediate points
 
-Fonctionnalités classiques et inévitables, elles ne seront pas détaillées ici. Précision : il est possible de préciser autant de point intermédiaire que l'on souhaite. 
+Classic and unavoidable functionalities, they will not be detailed here. Precision: it is possible to specify as many intermediate points as desired.
 
-### Définir des contraintes 
+### Define Constraints
 
-La notion de contrainte est définie dans les [concepts](./concepts.md). Pour faire simple, il s'agit de spécifier des conditions que l'itinéraire devra remplir. La plus connue est certainement l'interdiction de prendre des autoroutes. Mais on peut avoir des conditions beaucoup plus complexes et on peut en appliquer plusieurs au calcul d'un itinéraire. 
+The notion of constraint is defined in the [concepts](./concepts.md). Basically, it's about specifying conditions that the route must meet. The best known is certainly the prohibition to take highways. But we can have much more complex conditions and we can apply several of them to the calculation of a route.
 
-### Préciser la ressource employée 
+### Specify the resource used
 
-Comme précisé dans les [concepts](./concepts.md), Road2 gère des ressources. Chaque requête doit préciser la ressources qu'elle interroge. 
+As specified in the [concepts](./concepts.md), Road2 manages resources. Each request must specify the resources it is querying.
 
-### Préciser le profile voulu
+### Specify the desired profile
 
-Il est possible de préciser quel moyen de transport, l'itinéraire concerne. 
+It is possible to specify which means of transport the itinerary concerns.
 
-### Préciser l'optimisation voulue 
+### Specify the desired optimization
 
-Il est possible de préciser l'optimisation que l'on veut appliquer lors du calcul. 
+It is possible to specify the optimization to be applied during the calculation.
 
-### Ajouter des informations sur chaque tronçons 
+### Add information on each section
 
-Selon les données présentes dans les graphes, il est possible de choisir les informations que l'on souhaite récupérer dans la réponse du calcul. 
+Depending on the data present in the graphs, it is possible to choose the information to be retrieved in the calculation response.
 
-### Préciser le contenu de la réponse 
+### Specify the content of the response
 
-Par l'intermédiaire de plusieurs paramètres, il est possible de préciser le contenu de la réponse : 
-- La présence ou non des étapes du parcours. 
-- Le format des géométries dans la réponse. Pour le moment, geojson, polyline et wkt sont disponibles. 
-- La présence ou non d'une bbox dans la réponse. 
+Via several parameters, it is possible to specify the content of the response:
+- The presence or not of the steps of the course.
+- The format of the geometries in the response. At the moment, geojson, polyline and wkt are available.
+- Whether or not a bbox is present in the response.
 
-### Choisir les unités de la requête et de la réponse 
+### Choose request and response units
 
-Grâce à des paramètres de la requête, il est possible d'influencer le format de la requête elle-même, et de la réponse : 
-- Il est possible de définir la projection employée. 
-- Le format des durées est modifiable. 
-- Le format des distances est modifiable.  
+Using request parameters, it is possible to influence the format of the request itself, and of the response:
+- You can define the projection used.
+- The format of the durations can be modified.
+- The format of the distances is modifiable.
 
 
 
 
-## Groupe de fonctionnalités 2 : Interface pour calculer des isochrones et des isodistances 
+## Feature group 2: Interface for calculating isochrones and isodistances
 
-### Définir un point de départ ou d'arrivée 
+### Define a start or end point
 
-Fonctionnalité inévitable pour le calcul d'un isochrone. 
+Inevitable functionality for the calculation of an isochrone.
 
-### Préciser la ressource employée 
+### Specify the resource used
 
-Comme précisé dans les [concepts](./concepts.md), Road2 gère des ressources. Chaque requête doit préciser la ressources qu'elle interroge. 
+As specified in the [concepts](./concepts.md), Road2 manages resources. Each request must specify the resources it is querying.
 
-### Préciser le type de coût employé 
+### Specify the type of cost used
 
-Divers coûts sont possibles pour le calcul, il s'agit donc de le préciser. 
+Various costs are possible for the calculation, so it should be specified.
 
-### Définir la valeur du coût employée 
+### Set cost value used
 
-Fonctionnalités inévitable pour un tel calcul. 
+Inevitable features for such a calculation.
 
-### Préciser le profil voulu 
+### Specify the desired profile
 
-Il est possible de préciser quel moyen de transport, l'isochrone concerne. 
+It is possible to specify which means of transport the isochrone concerns.
 
-### Indiquer la direction considérée pour le résultat du calcul
+### Indicate the direction considered for the calculation result
 
-Un isochrone peut se définir dans deux directions : départ ou arrivée. Il s'agit donc de préciser laquelle.
+An isochrone can be defined in two directions: departure or arrival. It is therefore a question of specifying which one.
 
-### Définir des contraintes 
+### Define Constraints
 
-La notion de contrainte est définie dans les [concepts](./concepts.md). Elle est limitée aux interdictions, comme par exemple, l'interdiction de prendre des autoroutes. 
+The notion of constraint is defined in the [concepts](./concepts.md). It is limited to prohibitions, such as, for example, the prohibition to take motorways.
 
-### Préciser le contenu de la réponse 
+### Specify the content of the response
 
-Par l'intermédiaire de plusieurs paramètres, un seul pour le moment, il est possible de préciser le contenu de la réponse : 
-- Le format des géométrie dans la réponse. Pour le moment, geojson, polyline et wkt sont disponibles. 
+Via several parameters, only one for the moment, it is possible to specify the content of the response:
+- The format of the geometries in the response. At the moment, geojson, polyline and wkt are available.
 
-### Choisir les unités de la requête et de la réponse 
+### Choose request and response units
 
-Grâce à des paramètres de la requête, il est possible d'influencer le format de la requête elle-même, et de la réponse : 
-- Il est possible de définir la projection employée. 
-- Le format des durées est modifiable. 
-- Le format des distances est modifiable. 
+Using request parameters, it is possible to influence the format of the request itself, and of the response:
+- It is possible to define the projection used.
+- The format of the durations can be modified.
+- The format of the distances is modifiable.
 
 
-## Groupe de fonctionnalités 3 : Proposer un service web 
+## Feature group 3: Provide a web service
 
-Road2 prend la forme d'un serveur web qui fournit un service de calcul d'itinéraire. Il possède donc plusieurs fonctionnalités liées à cela. 
+Road2 takes the form of a web server which provides a route calculation service. So it has several features related to that.
 
-### Utiliser les protocoles HTTP et HTTPS 
+### Use HTTP and HTTPS protocols
 
-Fonctionnalité explicite. 
+Self-explanatory feature.
 
-### Configurer les CORS 
+### Configure CORS
 
-Fonctionnalité explicite. 
+Self-explanatory feature.
 
-### Disposer de plusieurs APIs 
+### Have several APIs
 
-Comme présenté dans les [concepts](./concepts.md), Road2 offre la possibilité de proposer aux clients différentes APIs simultanément. 
+As presented in the [concepts](./concepts.md), Road2 offers the possibility of offering customers different APIs simultaneously.
 
-### Disposer de plusieurs moteurs 
+### Have multiple engines
 
-Comme présenté dans les [concepts](./concepts.md), Road2 offre la possibilité de proposer aux clients différents moteurs simultanément. 
+As presented in the [concepts](./concepts.md), Road2 offers the possibility of offering customers different engines simultaneously.
 
 
-## Groupe de fonctionnalités 4 : Administrer le service 
+## Feature Group 4: Administer Service
 
-Le service peut être administrer de deux manières : la configuration et une API dédiée. 
+The service can be administered in two ways: configuration and a dedicated API.
 
-### Configurer les ressources via la configuration
+### Configure resources via configuration
 
-Via la configuration fichier du serveur, il est possible de créer des [ressources](./concepts.md) qui se baseront sur une ou plusieurs [sources](./concepts.md).
+Via the configuration file of the server, it is possible to create [resources](./concepts.md) which will be based on one or more [sources](./concepts.md).
 
-### Limiter certains usages via la configuration 
+### Limit certain uses via configuration
 
-Les APIs de Road2 proposent plusieurs options, comme la possibilité de calculer des itinéraires avec des points intermédiaires. Il peut être intéressant de limiter l'usage de ces options afin de ne pas surcharger le service. 
+Road2's APIs offer several options, such as the ability to calculate routes with intermediate points. It may be interesting to limit the usage of these options so as not to overload the service.
 
-### Obtenir la version du serveur via l'API
+### Get server version via API
 
-Fonctionnalité explicite. 
+Self-explanatory feature.
 
-### Obtenir l'état de santé du serveur via l'API 
+### Get server health status via API
 
-Fonctionnalité en cours d'implémentation. L'objectif est de récupérer l'état de chaque [source](./concepts.md) du serveur et d'en faire un compte-rendu. 
+Feature being implemented. The goal is to retrieve the status of each [source](./concepts.md) from the server and report it.
 
+## Feature Group 5: OSRM Specific Features
 
+### Graph optimization for faster responses
 
-## Groupe de fonctionnalités 5 : Fonctionnalités spécifiques à OSRM 
+Self-explanatory feature.
 
-### Optimisation des graphes pour des réponses plus rapides
+### Route calculation
 
-Fonctionnalité explicite. 
+Self-explanatory feature.
 
-### Calcul des itinéraires
+### Management of simple constraints or exclusions
 
-Fonctionnalité explicite. 
+The exclusions are the classic constraints such as the prohibition to use certain types of roads (eg motorways). These are the only constraints available through OSRM.
 
-### Gestions des contraintes simples ou exclusions 
+### Determine the nearest graph point
 
-Les exclusions sont les contraintes classiques comme l'interdiction d'emprunter certains type de voies (ex. autoroutes). Ce sont les seuls contraintes disponibles via OSRM. 
+For a given point, OSRM can return the nearest points of the graph.
 
-### Déterminer le point du graphe le plus proche
+## Feature Group 6: PGRouting Specific Features
 
-Pour un point donnée, OSRM peut renovyer les points les plus proches du graphe. 
+### Route calculation
 
+Self-explanatory feature.
 
+### Isochrone calculation
 
-## Groupe de fonctionnalités 6 : Fonctionnalités spécifiques à PGRouting
+Self-explanatory feature.
 
-### Calcul d'itinéraire
+### Management of complex constraints
 
-Fonctionnalité explicite. 
+PGRouting manages all types of constraints, from the simplest to the most complex. We can therefore prohibit access to motorways or prefer roads that have a width greater than 5 meters.
 
-### Calcul d'isochrone 
 
-Fonctionnalité explicite. 
+## Feature Group 7: Simple API/1.0.0 Specific Features
 
-### Gestion de contraintes complexes 
+### Getting a GetCapabilities
 
-PGRouting gère tout les types de contraintes, des plus simples au plus complexes. On peut donc interdire l'accès aux autoroutes ou préférer les routes qui ont une largeur supérieure à 5 mètres. 
+The GetCapabilities is a JSON response that describes the parameters for each operation and the values available for an instance of Road2.
 
-
-## Groupe de fonctionnalités 7 : Fonctionnalités spécifiques à l'API simple/1.0.0
-
-### Obtenir un GetCapabilities 
-
-Le GetCapabilities est une réponse JSON qui décrit les paramètres de chaque opérations et les valeurs disponibles pour une instance de Road2. 
-
-On trouvera un exemple dans la {{ '[documentation]({}/tree/{}/documentation/apis/simple/1.0.0/)'.format(repo_url, repo_branch) }}. 
+An example can be found in {{ '[documentation]({}/tree/{}/documentation/apis/simple/1.0.0/)'.format(repo_url, repo_branch) }}.
