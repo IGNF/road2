@@ -188,7 +188,14 @@ This ensures that your working branch has the latest changes from the develop br
 
 #### Step 6 : Test
 
+Bug fixes and features should always come with tests.
 
+There are a lot of tests in this project. They are written to be run with the docker-compose of the project. 
+
+The `/test` directory contains : 
+- unit tests : those tests must all be validated. 
+- integration tests : it is a WIP so create or update, and run the tests concerned by your developments. 
+- functionnal tests : those tests must all be validated. To run them, you will have to generate data. 
 
 #### Step 7 : Push 
 
