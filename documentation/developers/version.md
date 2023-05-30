@@ -14,7 +14,8 @@ Route Graph Generator et PGRouting Procedures sont indépendants en tant que pro
 
 Sur ces trois projets ont une branche `master` et `develop`. La première permet de gérer les versions mises en production. La seconde permet de réaliser les développements. 
 
-On veillera à partir de `develop` et de créer une branche du type 
+On veillera à partir de `develop` et de créer une branche du type :
+- `doc/*` pour modifier ou ajouter de la documentation uniquement,
 - `feat/*` pour réaliser de nouvelles fonctionnalités,
 - `fix/*` pour effectuer une correction sur le code source,
 - `docker/*` pour modifier la partie docker uniquement,
