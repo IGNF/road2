@@ -17,7 +17,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ## Report bugs
 
-If you spot a bug with the code or the any other part of this project, you can create an issue. 
+If you spot a bug in the code or in any other part of this project, you can create an issue. 
 
 But before you open a new issue, please [search](https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-the-title-body-or-comments) for older ones that cover the same issue. If you find one, please, avoid "me too" comments. You can add a +1 emoji reaction to the issue if you want to express interest in this. 
 
@@ -36,7 +36,7 @@ If you would love to have something new in this projet, or if you want to code i
 
 When using the issue tracker, you will have an issue template for features. Please, fill in what you can. It will be an area of discussions between you and the project's developers. 
 
-But take a moment to find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Please provide as much detail and context as possible.
+But take a moment to find out whether your idea fits within the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Please provide as much detail and context as possible.
 
 ## No-Code contributions 
 
@@ -134,7 +134,7 @@ When you are using a class instance, respect its attributes (getters/setters). A
 
 Don't make callbacks but promises. 
 
-If you use a librairy with callbacks, encapsulate each one in its promise. 
+If you use a library with callbacks, encapsulate each one in its promise. 
 
 We make Promises at the lowest level and then we only manage with async/await/try/catch in order to have a code that is easier to understand and easier to maintain.
 The try/catch only takes place at the second level, the one using the lowest level returning a Promise. Thus, all higher levels are not at risk of having an unexpected error, but they simply manage the return of the function of level N-1.
@@ -152,7 +152,7 @@ Comment the code as much as possible to facilitate its understanding.
 
 There are different levels of logs. You can use each of them. The easiest way is to take a look at what is currently being done in the code. 
 
-For instance, `fatal` is reserved for a shutdown of the server,`error` for an unexpected error, `warn` for a non-problematic event, `info` is the most used level, and `debug` is usefull for adding a lot of informations like object content. 
+For instance, `fatal` is reserved for a shutdown of the server,`error` for an unexpected error, `warn` for a non-problematic event, `info` is the most used level, and `debug` is useful for adding a lot of informations like object content. 
 
 ###### Engines 
 
@@ -184,7 +184,7 @@ git checkout my-branch
 git rebase develop
 ```
 
-This ensures that your working branch has the latest changes from the develop branch of the origin repository. Moreover, It will be easier to merge your Pull Request. 
+This ensures that your working branch has the latest changes from the develop branch of the origin repository. Moreover, your Pull Request will be easier to merge. 
 
 #### Step 6 : Test
 
@@ -217,7 +217,7 @@ Breaking changes need to have a BREAKING prefix.
 
 #### Step 9 : Discuss and update
 
-You will probably get feedback or requests for changes to your pull request. This is a big part of the submission process so don't be discouraged! Some contributors may sign off on the pull request right away, others may have more detailed comments or feedback. This is a necessary part of the process in order to evaluate whether the changes are correct and necessary.
+You will probably get feedback or requests for changes to your pull request. This is a big part of the submission process so don't be discouraged! Some contributors may sign off on the pull request right away, others may have more detailed comments or feedback. This is a necessary part of the process in order to evaluate whether the proposed changes are correct and necessary.
 
 To make changes to an existing pull request, make the changes to your local branch, add a new commit with those changes, and push those to your fork. GitHub will automatically update the pull request.
 
@@ -249,4 +249,4 @@ Try not to be discouraged. If you feel that a particular review is unfair, say s
 
 In order to land, a pull request needs to be reviewed and approved by at least two Road2 administrators and pass a CI (Continuous Integration) test run.
 
-When an administrators lands your pull request, GitHub might show the pull request as Closed at this point, but don't worry. If you look at the branch you raised your pull request against, you should see a commit with your name on it. Congratulations and thanks for your contribution!
+When an administrator lands your pull request, GitHub might show the pull request as Closed at this point, but don't worry. If you look at the branch you raised your pull request against, you should see a commit with your name on it. Congratulations and thanks for your contribution!
