@@ -25,6 +25,8 @@ Configuration <configuration/readme>
 Données <data/readme>
 Production <production/readme>
 Changelog <developers/history>
+Contribuer <developers/contributing>
+Code de conduite <developers/conduct>
 ```
 
 ----
