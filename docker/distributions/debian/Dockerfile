@@ -43,6 +43,8 @@ COPY /docker/config /home/docker/config/
 ### Dossier de l'application
 WORKDIR /home/docker/app
 COPY src ./src/
+### Dossier documentation apis
+COPY documentation/apis ./documentation/apis
 ### Récupération des sources de l'application
 COPY *.json ./
 

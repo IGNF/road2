@@ -1,10 +1,14 @@
 'use strict';
 
 
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const log4js = require('log4js');
 const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yaml')
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -43,6 +47,14 @@ router.all("/", function(req, res) {
   LOGGER.debug("requete sur /simple/1.0.0/");
   res.send("Road2 via l'API simple 1.0.0");
 });
+
+
+// swagger-ui
+var apiYamlPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','simple', '1.0.0', 'api.yaml')
+LOGGER.info("Utilisation fichier .yaml '"+ apiYamlPath + "' pour initialisation swagger-ui de l'API simple en version 1.0.0");
+var file  = fs.readFileSync(apiYamlPath, 'utf8')
+var swaggerDocument = YAML.parse(file)
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
