@@ -1497,13 +1497,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "EPSG:4326",
-            "required": true
+            "example": "EPSG:4326"
           },
           "parameters": {
             "type": "string",
-            "example": "+proj=longlat +datum=WGS84 +no_defs",
-            "required": true
+            "example": "+proj=longlat +datum=WGS84 +no_defs"
           }
         }
       },

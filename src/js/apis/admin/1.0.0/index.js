@@ -19,7 +19,7 @@ router.all("/", function(req, res) {
 });
 
 // swagger-ui
-var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','administration', '1.0.0', 'api.json')
+var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','administration', '1.0.0', 'api.json');
 LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API administration en version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
 router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
