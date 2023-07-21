@@ -22,7 +22,7 @@ router.all("/", function(req, res) {
 var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','administration', '1.0.0', 'api.json')
 LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API administration en version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Version
 // Pour avoir la version de Road2 utilisée 

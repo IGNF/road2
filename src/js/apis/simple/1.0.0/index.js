@@ -1,7 +1,6 @@
 'use strict';
 
 
-const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const log4js = require('log4js');
@@ -52,7 +51,7 @@ router.all("/", function(req, res) {
 var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','simple', '1.0.0', 'api.json')
 LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API simple en version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
