@@ -30,7 +30,7 @@ On pourra tester Road2 sur le lien suivant: http://localhost:8080/road2/
 
 # Visualiser la documentation de l'API
 
-L'API est décrite via un fichier YAML qui est visualisable avec Swagger. Ce fichier est disponible via le lien http://localhost:8080/api/api.yaml.
+L'API est décrite via un fichier JSON qui est visualisable avec Swagger. Ce fichier est disponible via le lien http://localhost:8080/api/api.json.
 
 Pour le visualiser ou l'éditer, il est possible d'utiliser les dockers proposés par Swagger.
 ```
@@ -41,7 +41,7 @@ docker run --rm -d -p 8081:8080 swaggerapi/swagger-editor
 docker run --rm -d -p 8081:8080 swaggerapi/swagger-ui
 ```
 
-Une fois le docker swagger et le docker web lancés, il suffit de se rendre sur l'URL suivante: http://localhost:8081/?url=http://localhost:8080/api/api.yaml.
+Une fois le docker swagger et le docker web lancés, il suffit de se rendre sur l'URL suivante: http://localhost:8081/?url=http://localhost:8080/api/api.json.
 
 Il est donc possible de visualiser et d'éditer la documentation. Mais pour que les changements soient pris en compte, il faut modifier le vrai fichier manuellement dans de dépôt de code. 
 
