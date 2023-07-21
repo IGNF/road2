@@ -1,11 +1,13 @@
 'use strict';
 
 
+const path = require('path');
 const express = require('express');
 const log4js = require('log4js');
 const packageJSON = require('../../../../../package.json');
 const errorManager = require('../../../utils/errorManager');
 const controller = require('./controller/controller');
+const swaggerUi = require('swagger-ui-express');
 
 var LOGGER = log4js.getLogger("ADMIN");
 var router = express.Router();
@@ -15,6 +17,12 @@ router.all("/", function(req, res) {
   LOGGER.debug("requete sur /admin/1.0.0/");
   res.send("Road2 via l'API admin 1.0.0");
 });
+
+// swagger-ui
+var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','administration', '1.0.0', 'api.json');
+LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API administration en version 1.0.0");
+var swaggerDocument = require(apiJsonPath);
+router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Version
 // Pour avoir la version de Road2 utilisée 
