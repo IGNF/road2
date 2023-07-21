@@ -6,6 +6,7 @@ CHANGED:
   - GET /admin/1.0.0/services/{service}/projections/{projection} renvoit aussi les paramétres de la projection
   - Projections were added for France and a file was created to separate them from the world wide projections
   - Github issue templates were modified
+  - Use swagger-ui-express to display simple and administration openapi documentation
 
 ADDED:
   - A Github PR template was added
