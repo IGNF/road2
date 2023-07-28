@@ -1,7 +1,6 @@
 {
   "name": "road2",
-  "version": "2.1.1",
-
+  "version": "2.2.0",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
@@ -27,7 +26,8 @@
     "https-proxy-agent": "5.0.1",
     "log4js": "6.7.1",
     "nconf": "0.12.0",
-    "proj4": "2.8.0"
+    "proj4": "2.8.0",
+    "swagger-ui-express": "4.6.3"
   },
   "optionalDependencies": {
     "osrm": "5.26.0",
@@ -54,6 +54,7 @@
     "assert",
     "helmet",
     "got",
-    "http-proxy-agent"
+    "http-proxy-agent",
+    "swagger-ui-express"
   ]
 }

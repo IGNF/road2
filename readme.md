@@ -36,7 +36,7 @@ L'IGN propose une visualisation de l'API utilisateur pour [l'itinéraire](https:
 
 L'IGN propose également des pages pour tester une instance du service sur l'ensemble de la France, avec une visualisation cartographique. Il y a une page pour l'[itinéraire](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires) et une page pour l'[isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrones).
 
-Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.yaml) YAML utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/administration/1.0.0/api.yaml) YAML suivant le même formalisme. 
+Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.json) JSON utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/administration/1.0.0/api.json) JSON suivant le même formalisme. 
 
 Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./documentation/docker/demonstration/readme.md). 
 
@@ -82,7 +82,7 @@ On trouvera dans le dossier [docker/distrubutions](./docker/distributions) diff�
 
 ## Participer aux développements 
 
-Les participations à ce projet sont encouragées. Il vous est demandé de réaliser vos développements en partant de la branche *develop*. 
+Les participations à ce projet sont encouragées (votre notre [charte](./CODE_OF_CONDUCT.md) à ce sujet). Nous avons mis en place un [guide](./CONTRIBUTING.md) des contributions pour vous accompagner dans cette démarche. 
 
 On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
 

@@ -1,0 +1,8 @@
+{
+  "projectionsList": [
+    {
+      "id": "EPSG:4326",
+      "parameters": "+proj=longlat +datum=WGS84 +no_defs"
+    }
+  ]
+}

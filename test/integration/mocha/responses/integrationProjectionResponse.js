@@ -9,7 +9,7 @@ describe('Test de la classe ProjectionResponse', function() {
     logManager.manageLogs();
   });
 
-  let response = new ProjectionResponse();
+  let response = new ProjectionResponse("EPSG:4326","+proj=longlat +datum=WGS84 +no_defs");
 
   describe('Test du constructeur et des getters/setters', function() {
 
@@ -18,12 +18,11 @@ describe('Test de la classe ProjectionResponse', function() {
     });
 
     it('Get id', function() {
-      assert.equal(response.id, "");
+      assert.equal(response.id, "EPSG:4326");
     });
 
-    it('Set id', function() {
-        response.id = "EPSG:4326";
-        assert.equal(response.id, "EPSG:4326");
+    it('Get parameters', function() {
+        assert.equal(response.parameters, "+proj=longlat +datum=WGS84 +no_defs");
     });
 
   });

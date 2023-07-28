@@ -14,7 +14,8 @@ Route Graph Generator et PGRouting Procedures sont indépendants en tant que pro
 
 Sur ces trois projets ont une branche `master` et `develop`. La première permet de gérer les versions mises en production. La seconde permet de réaliser les développements. 
 
-On veillera à partir de `develop` et de créer une branche du type 
+On veillera à partir de `develop` et à créer une branche du type :
+- `doc/*` pour modifier ou ajouter de la documentation uniquement,
 - `feat/*` pour réaliser de nouvelles fonctionnalités,
 - `fix/*` pour effectuer une correction sur le code source,
 - `docker/*` pour modifier la partie docker uniquement,
@@ -53,7 +54,7 @@ Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui 
 Démarche à suivre pour chaque projet:
 
 1. Tester `develop` et corriger si nécessaire.
-2. Update de la version sur `master` à 1.0.1.
+2. Update de la version sur `develop` à 1.0.1.
 3. Merge de `develop` sur `master`.
 4. Update de la version sur `develop` à 1.0.2-DEVELOP.
 5. Faire des tests sur `master` et corriger si nécessaire.

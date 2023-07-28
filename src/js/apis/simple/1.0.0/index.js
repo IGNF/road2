@@ -1,10 +1,12 @@
 'use strict';
 
 
+const path = require('path');
 const express = require('express');
 const log4js = require('log4js');
 const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
+const swaggerUi = require('swagger-ui-express');
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -43,6 +45,13 @@ router.all("/", function(req, res) {
   LOGGER.debug("requete sur /simple/1.0.0/");
   res.send("Road2 via l'API simple 1.0.0");
 });
+
+
+// swagger-ui
+var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','simple', '1.0.0', 'api.json');
+LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API simple en version 1.0.0");
+var swaggerDocument = require(apiJsonPath);
+router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {

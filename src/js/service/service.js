@@ -1141,15 +1141,19 @@ module.exports = class Service {
     LOGGER.info("computeProjectionRequest...");
 
     // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
-    let projectionResponse = new ProjectionResponse();
+    let projectionIdAsked = projectionRequest._projection;
 
-    if (!this._projectionManager.isProjectionLoaded(projectionRequest._projection)) {      
-      throw errorManager.createError(`Can't find projection ${projectionRequest._projection}`, 404);
+    if (!this._projectionManager.isProjectionLoaded(projectionIdAsked)) {      
+      throw errorManager.createError(`Can't find projection ${projectionIdAsked}`, 404);
     } else {
-      projectionResponse.id = projectionRequest._projection;
-    }
 
-    return projectionResponse;
+      LOGGER.debug("La projection " + projectionIdAsked + " existe");
+      let param = this._projectionManager.getProjectionParameters(projectionIdAsked);
+      LOGGER.debug("Paramétres de la projection : " + param);
+      
+      return new ProjectionResponse(projectionIdAsked, param);
+
+    }
 
   }
 
