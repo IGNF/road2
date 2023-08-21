@@ -43,27 +43,27 @@ module.exports = class pgrSource extends Source {
 
     // Constructeur parent
     super(sourceJsonObject.id, "pgr", sourceJsonObject.description, sourceJsonObject.projection, sourceJsonObject.bbox);
-    
+
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
     // Base de données PGRouting
     this._base = base;
 
-    // Schéma contenant les données dans la base 
+    // Schéma contenant les données dans la base
     this._schema = sourceJsonObject.storage.base.schema;
 
-    // Attributs par défaut sur les voies dans la base 
+    // Attributs par défaut sur les voies dans la base
     this._defaultAttributes = new Array();
 
-    // Attributs disponibles sur les voies dans la base 
+    // Attributs disponibles sur les voies dans la base
     this._otherAttributes = new Array();
 
-    // Coûts disponibles 
+    // Coûts disponibles
     this._costs = {};
 
     // TODO : à l'exemple des ressources, faire une fonction init() pour chaque source appelée dans le sourceManager
-    // -- 
+    // --
     if (sourceJsonObject.storage.base.attributes) {
 
       // Création des tableaux d'attributs
@@ -91,7 +91,7 @@ module.exports = class pgrSource extends Source {
 
     }
 
-    // Initialisation des coûts disponibles 
+    // Initialisation des coûts disponibles
     for (let i = 0; i < sourceJsonObject.costs.length; i++) {
       if (!this._costs[sourceJsonObject.costs[i].profile]) {
         Object.defineProperty(this._costs, sourceJsonObject.costs[i].profile, { value: new Object(), configurable: true, enumerable: true, writable: true });
@@ -104,7 +104,7 @@ module.exports = class pgrSource extends Source {
       Object.defineProperty(this._costs[sourceJsonObject.costs[i].profile][sourceJsonObject.costs[i].costType], "rcostColumn", { value: sourceJsonObject.costs[i].rcostColumn, configurable: true, enumerable: true, writable: true });
     }
 
-    // -- 
+    // --
 
   }
 
@@ -247,7 +247,7 @@ module.exports = class pgrSource extends Source {
         pgrRequest.coordinates = coordinatesTable;
 
         // --- waysAttributes
-        // attributes est déjà vide, on met les attributs par défaut s'il y en a 
+        // attributes est déjà vide, on met les attributs par défaut s'il y en a
         if (this._defaultAttributes.length !== 0) {
           attributes = this._defaultAttributesString;
           LOGGER.debug("default attributes: " + attributes);
@@ -258,7 +258,7 @@ module.exports = class pgrSource extends Source {
 
         // S'il existe des attributs disponibles mais non par défaut, on complète avec les attributs demandés
         if (this._otherAttributes.length !== 0 ) {
-          
+
           // TODO : refaire cette partie, et donc la manière dont l'info est stockée dans la classe
           if (request.waysAttributes.length !== 0) {
             let requestedAttributes = new Array();
@@ -470,7 +470,7 @@ module.exports = class pgrSource extends Source {
         }
 
         const queryString = `SELECT * FROM ${this._schema}.generateIsochrone(ARRAY ${point}, $1, $2, $3, $4, $5)`;
-        
+
         const SQLParametersTable = [
           request.costValue,
           request.direction,
@@ -791,6 +791,10 @@ module.exports = class pgrSource extends Source {
         turf.lineSlice(legStart, legStop, leg.geometry),
         {precision: 6}
       ).geometry.coordinates;
+      // Reverse geometry order if end point closer to start of geometry than end
+      if (turf.distance(legStart, turf.point(leg.geometry.coordinates[0]) > turf.distance(legStop, turf.point(leg.geometry.coordinates[0])))) {
+        leg.geometry.coordinates.reverse();
+      }
 
       routeGeometry.coordinates.push(...leg.geometry.coordinates);
     }
@@ -912,6 +916,14 @@ module.exports = class pgrSource extends Source {
               {precision: 6}
             ).geometry.coordinates;
 
+            // Reverse geometry order if end point closer to start of geometry than end
+            if (
+              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              ) {
+              currentPgrRouteStep.geometry.coordinates.reverse();
+            }
+
             // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
             if (currentPgrRouteStep.geometry.coordinates.length > 2) {
               currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
@@ -921,17 +933,25 @@ module.exports = class pgrSource extends Source {
           // Troncature de la géométrie : cas de début de leg
           else if (k === 0){
             let stepStart = turf.point(response.waypoints[j].location);
+            let stepEnd = turf.point(gisManager.arraysIntersection(
+              currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
+              currentPgrRouteStep.geometry.coordinates
+            )[0]);
             currentPgrRouteStep.geometry.coordinates = turf.truncate(
               turf.lineSlice(
                 stepStart,
-                gisManager.arraysIntersection(
-                  currentPgrRouteLeg.steps[k + 1].geometry.coordinates,
-                  currentPgrRouteStep.geometry.coordinates
-                )[0],
+                stepEnd,
                 currentPgrRouteStep.geometry
               ),
               {precision: 6}
             ).geometry.coordinates;
+            // Reverse geometry order if end point closer to start of geometry than end
+            if (
+              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              ) {
+              currentPgrRouteStep.geometry.coordinates.reverse();
+            }
 
             // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
             if (currentPgrRouteStep.geometry.coordinates.length > 2) {
@@ -988,10 +1008,17 @@ module.exports = class pgrSource extends Source {
               turf.lineSlice(
                 common_point,
                 stepEnd,
-                  currentPgrRouteStep.geometry
+                currentPgrRouteStep.geometry
               ),
               {precision: 6}
             ).geometry.coordinates;
+            // Reverse geometry order if end point closer to start of geometry than end
+            if (
+              turf.distance(common_point, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              ) {
+              currentPgrRouteStep.geometry.coordinates.reverse();
+            }
 
             // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
             if (currentPgrRouteStep.geometry.coordinates.length > 2) {
@@ -1105,15 +1132,15 @@ module.exports = class pgrSource extends Source {
       LOGGER.debug(point);
     }
 
-    let rawGeometry = null; 
-    
+    let rawGeometry = null;
+
     try {
       rawGeometry = JSON.parse(pgrResponse.rows[0].geometry);
     } catch(error) {
       LOGGER.debug(error);
       throw errorManager.createError("Impossible de parser la réponse de PGRouting");
     }
-    
+
     // Création d'un objet Polygon à partir de la géométrie brute
     if (rawGeometry === null) {
       // Potentiellement le cas où il n'y a pas d'isochrone car costValue trop faible
