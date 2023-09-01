@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## x.y.z
+
+FIXED:
+  - Sometimes, the geometries of pgr sources were in the wrong order.
+
 ## 2.2.0
 
 CHANGED:
