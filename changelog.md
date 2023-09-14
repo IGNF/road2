@@ -1,9 +1,8 @@
 # CHANGELOG
 
-## x.y.z
-
 FIXED:
-  - Sometimes, the geometries of pgr sources were in the wrong order.
+- Wrong geometry order on pgr results #88
+- BBox check not working with negative coordinates #89
 
 ## 2.2.0
 
@@ -15,12 +14,12 @@ CHANGED:
 
 ADDED:
   - A Github PR template was added
-  - A code of conduct was adapted from the contributor covenant 
+  - A code of conduct was adapted from the contributor covenant
   - A contributing was added
 
 ## 2.1.1
 
-CHANGED: 
+CHANGED:
   - reference de la doc à la branche master
   - modification de la ci github pour prendre en compte la branche master
 
@@ -38,28 +37,28 @@ ADDED:
   - Il est maintenant possible démarrer un administrateur sans services pré-configurés
 
 CHANGED:
-  - La documentation de l'API d'administration a été grandement enrichie. 
+  - La documentation de l'API d'administration a été grandement enrichie.
   - La route /health a une réponse plus complète et est vraiment codée pour prendre en compte l'état de chaque service et chaque source disponibles.
-  - Les dossiers de sources et de resources des services peuvent maintenant être vide à l'initialisation. 
+  - Les dossiers de sources et de resources des services peuvent maintenant être vide à l'initialisation.
 
 DELETED:
-  - L'option onStart de la configuration admin est supprimée 
+  - L'option onStart de la configuration admin est supprimée
 
 ## 2.0.0
 
 ADDED:
-  - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible. 
-    - Cette classe est configurée par un nouveau fichier de configuration. 
-    - Les classes service* sont des interfaces pour permettre à l'administrateur de gérer les services associés. Elles permettent de gérer un service dans le même processus ou dans un nouveau (méthode conseillée). 
+  - La classe Administrator permet de gérer le service via une API. Notamment la création, la suppression et la modification d'un service seront possible.
+    - Cette classe est configurée par un nouveau fichier de configuration.
+    - Les classes service* sont des interfaces pour permettre à l'administrateur de gérer les services associés. Elles permettent de gérer un service dans le même processus ou dans un nouveau (méthode conseillée).
   - Ajout du moteur Valhalla pour les itinéraires et les isochrones
   - Le module `wkt` a été remplacé par une implémentation interne
   - Le format wkt est disponible pour le paramètre geometryFormat de l'API simple/1.0.0
 
 CHANGED:
-  - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement. 
-  - Le fichier server.json permet maintenant de configurer l'administrateur et donc n'a plus le même contenu. Ce dernier est dans service.json. 
-  - Les sources ne sont plus configurées dans le même fichier que les ressources. Chaque source est configurée dans son fichier. L'ensemble est placé dans un dossier de sources. Il peut y en avoir plusieurs. 
-  - Les sources PGRouting et Valhalla ne sont plus configurées de la même manière : chaque source de ces types peut contenir plusieurs coûts. 
+  - L'option --configCheck au démarrage de Road2 n'a plus exactement le même comportement.
+  - Le fichier server.json permet maintenant de configurer l'administrateur et donc n'a plus le même contenu. Ce dernier est dans service.json.
+  - Les sources ne sont plus configurées dans le même fichier que les ressources. Chaque source est configurée dans son fichier. L'ensemble est placé dans un dossier de sources. Il peut y en avoir plusieurs.
+  - Les sources PGRouting et Valhalla ne sont plus configurées de la même manière : chaque source de ces types peut contenir plusieurs coûts.
 
 FIXED:
   - Les reprojections des isochrones fonctionnent

@@ -66,7 +66,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name isProjectionLoaded
   * @description Savoir si une projection est disponible dans l'instance de proj4
-  * @param {string} id - ID de la projection 
+  * @param {string} id - ID de la projection
   *
   */
   isProjectionLoaded (id) {
@@ -93,7 +93,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name getProjectionParameters
   * @description Récupérer les paramètres d'une projection
-  * @param {string} id - ID de la projection 
+  * @param {string} id - ID de la projection
   *
   */
    getProjectionParameters (id) {
@@ -107,7 +107,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name isProjectionChecked
   * @description Savoir si une projection a été validé durant l'étape de vérification
-  * @param {string} id - ID de la projection 
+  * @param {string} id - ID de la projection
   *
   */
    isProjectionChecked (id) {
@@ -171,12 +171,12 @@ module.exports = class ProjectionManager {
       return false;
     }
 
-    if (bboxArray[1] >= bboxArray[3]) {
+    if (Number(bboxArray[1]) >= Number(bboxArray[3])) {
       LOGGER.error("Mauvaise configuration : Xmin est supérieur ou égal à Xmax");
       return false;
     }
 
-    if (bboxArray[2] >= bboxArray[4]) {
+    if (Number(bboxArray[2]) >= Number(bboxArray[4])) {
       LOGGER.error("Mauvaise configuration : Ymin est supérieur ou égal à Ymax");
       return false;
     }
@@ -191,7 +191,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name checkProjectionDirectory
   * @description Vérifier les projections d'un dossier
-  * @param {string} projectionDirectory - Chemin absolu d'un dossier de projections 
+  * @param {string} projectionDirectory - Chemin absolu d'un dossier de projections
   *
   */
   checkProjectionDirectory(projectionDirectory) {
@@ -230,7 +230,7 @@ module.exports = class ProjectionManager {
 
     } else {
       LOGGER.fatal("Mauvaise configuration: Dossier de projections inexistant : " + projectionDirectory);
-      return false; 
+      return false;
     }
 
   }
@@ -241,7 +241,7 @@ module.exports = class ProjectionManager {
   * @function
   * @name checkProjectionFile
   * @description Vérifier les projections d'un fichier
-  * @param {string} projectionFile - Chemin absolu d'un fichier de projections 
+  * @param {string} projectionFile - Chemin absolu d'un fichier de projections
   *
   */
   checkProjectionFile(projectionFile) {
@@ -308,7 +308,7 @@ module.exports = class ProjectionManager {
     if (!configuration) {
       LOGGER.error("La configuration de la projection est vide");
       return false;
-    } 
+    }
 
     // id de la projection
     if (!configuration.id) {
@@ -323,7 +323,7 @@ module.exports = class ProjectionManager {
       LOGGER.error("La configuration de la projection n'a pas de parametres");
       return false;
     } else {
-      
+
       if (typeof configuration.parameters !== "string") {
         LOGGER.error("Les parametres de la projection ne sont pas une string");
         return false;
@@ -361,7 +361,7 @@ module.exports = class ProjectionManager {
   *
   * @function
   * @name flushCheckedProjection
-  * @description Vider la liste des projections déjà vérifiées 
+  * @description Vider la liste des projections déjà vérifiées
   *
   */
   flushCheckedProjection() {
@@ -401,12 +401,12 @@ module.exports = class ProjectionManager {
     if (!Array.isArray(contentDir)) {
       LOGGER.error("Erreur lors de la lecture du dossier " + directory);
       return false;
-    } 
+    }
 
     if (contentDir.length === 0) {
       LOGGER.error("Le dossier " + directory + " ne contient aucun fichier.");
       return false;
-    } 
+    }
 
     for (let i = 0; i < contentDir.length; i++) {
       let pathFile = directory + "/" + contentDir[i];
@@ -501,7 +501,7 @@ module.exports = class ProjectionManager {
     if (!configuration) {
       LOGGER.error("La configuration de la projection est vide");
       return false;
-    } 
+    }
 
     // id de la projection
     if (!configuration.id) {
