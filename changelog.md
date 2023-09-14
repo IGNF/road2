@@ -1,7 +1,5 @@
 # CHANGELOG
 
-## 2.2.1
-
 FIXED:
 - Wrong geometry order on pgr results #88
 - BBox check not working with negative coordinates #89
