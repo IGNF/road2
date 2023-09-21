@@ -792,7 +792,7 @@ module.exports = class pgrSource extends Source {
         {precision: 6}
       ).geometry.coordinates;
       // Reverse geometry order if end point closer to start of geometry than end
-      if (turf.distance(legStart, turf.point(leg.geometry.coordinates[0]) > turf.distance(legStop, turf.point(leg.geometry.coordinates[0])))) {
+      if (turf.distance(legStart, turf.point(leg.geometry.coordinates[0])) > turf.distance(legStop, turf.point(leg.geometry.coordinates[0]))) {
         leg.geometry.coordinates.reverse();
       }
 
@@ -918,8 +918,8 @@ module.exports = class pgrSource extends Source {
 
             // Reverse geometry order if end point closer to start of geometry than end
             if (
-              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
-              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0])) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0]))
               ) {
               currentPgrRouteStep.geometry.coordinates.reverse();
             }
@@ -947,8 +947,8 @@ module.exports = class pgrSource extends Source {
             ).geometry.coordinates;
             // Reverse geometry order if end point closer to start of geometry than end
             if (
-              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
-              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              turf.distance(stepStart, turf.point(currentPgrRouteStep.geometry.coordinates[0])) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0]))
               ) {
               currentPgrRouteStep.geometry.coordinates.reverse();
             }
@@ -1014,8 +1014,8 @@ module.exports = class pgrSource extends Source {
             ).geometry.coordinates;
             // Reverse geometry order if end point closer to start of geometry than end
             if (
-              turf.distance(common_point, turf.point(currentPgrRouteStep.geometry.coordinates[0]) >
-              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0])))
+              turf.distance(common_point, turf.point(currentPgrRouteStep.geometry.coordinates[0])) >
+              turf.distance(stepEnd, turf.point(currentPgrRouteStep.geometry.coordinates[0]))
               ) {
               currentPgrRouteStep.geometry.coordinates.reverse();
             }
