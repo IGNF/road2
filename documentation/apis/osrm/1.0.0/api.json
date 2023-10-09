@@ -1,0 +1,262 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Description of the OSRM API available via Road2. Only route operation in its v1 is available.",
+    "version": "1.0.0",
+    "title": "OSRM API inside Road2",
+    "contact": {
+      "email": "contact.geoservices@ign.fr"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/osrm/1.0.0/",
+      "description": "Local server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Discover",
+      "description": "Discover the resources available on this instance."
+    },
+    {
+      "name": "Route",
+      "description": "Ask for one or multiple routes."
+    }
+  ],
+  "paths": {
+    "/resources": {
+      "get": {
+        "tags": [
+          "Discover"
+        ],
+        "summary": "Request used to discover the resources available on this instance.",
+        "description": "",
+        "operationId": "resources",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resources"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/resource/{resourceId}/{profileId}/{optimizationId}/route/v1/profile/{coordinates}": {
+      "get": {
+        "tags": [
+          "Route"
+        ],
+        "summary": "Compute a route",
+        "description": "This API route is the same of [the OSRM v1 route](http://project-osrm.org/docs/v5.5.1/api/#route-service). But the profile parameter is separated in three parameters : resourceId, profileId and optimizationId. It allows us to have the concepts of Road2 and a better compatibility with the native OSRM API.",
+        "operationId": "route",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "description": "The resource used for the compute. The list of resources is available on /resources. A resource is a concept of Road2, it is an agregation of multiple graphs. For instance, an unique topology with multiple costs.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdtopo-osrm"
+          },
+          {
+            "name": "coordinates",
+            "in": "query",
+            "description": "String of format {longitude},{latitude};{longitude},{latitude}[;{longitude},{latitude} ...] or polyline({polyline}).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2.337306,48.849319"
+          },
+          {
+            "name": "profileId",
+            "in": "path",
+            "description": "The profile used for the compute. The list of profiles per resource is available on /resources.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "car"
+          },
+          {
+            "name": "optimizationId",
+            "in": "path",
+            "description": "The optimization used for the compute. The list of optimizations per resource is available on /resources.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "fastest"
+          },
+          {
+            "name": "alternatives",
+            "in": "query",
+            "description": "Search for alternative routes and return as well. Please note that even if an alternative route is requested, a result cannot be guaranteed.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "false"
+          },
+          {
+            "name": "steps",
+            "in": "query",
+            "description": "Return route steps for each route leg.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "false"
+          },
+          {
+            "name": "annotations",
+            "in": "query",
+            "description": "Returns additional metadata for each coordinate along the route geometry.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "false"
+          },
+          {
+            "name": "geometries",
+            "in": "query",
+            "description": "Returned route geometry format (influences overview and per step). Values can be : polyline (default), polyline6 , geojson.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "polyline"
+          },
+          {
+            "name": "overview",
+            "in": "query",
+            "description": "Add overview geometry either full, simplified according to highest zoom level it could be display on, or not at all. Values can be : simplified (default), full , false.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "simplified"
+          },
+          {
+            "name": "continue_straight",
+            "in": "query",
+            "description": "Forces the route to keep going straight at waypoints constraining uturns there even if it would be faster. Default value depends on the profile. Values can be : default (default), true , false. ",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "default"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. For all the details, see [the OSRM documentation](http://project-osrm.org/docs/v5.5.1/api/#route-service).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/osrmValidResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. For all the details, see [the OSRM documentation](http://project-osrm.org/docs/v5.5.1/api/#route-service).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/osrmErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "osrmErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "osrmValidResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description" : "if the request was successful Ok otherwise see the service dependent and general status codes on the [the OSRM documentation](http://project-osrm.org/docs/v5.5.1/api/#route-service)."
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+            "type": "object",
+            "description": "For all the details, see the OSRM documentation of a [route object](http://project-osrm.org/docs/v5.5.1/api/#route-object)."
+            }
+          },
+          "waypoints": {
+            "type": "array",
+            "items": {
+            "type": "object",
+            "description": "For all the details, see the OSRM documentation of a [waypoint object](http://project-osrm.org/docs/v5.5.1/api/#waypoint-object)."
+            }
+          }
+        }
+      },
+      "resources": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "profiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "optimizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
