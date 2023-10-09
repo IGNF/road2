@@ -1,0 +1,178 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "Description of the Valhalla API available via Road2. Only the isochrone API is available for now.",
+      "version": "1.0.0",
+      "title": "Valhalla API inside Road2",
+      "contact": {
+        "email": "contact.geoservices@ign.fr"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8080/valhalla/1.0.0/",
+        "description": "Local server"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Discover",
+        "description": "Discover the resources available on this instance."
+      },
+      {
+        "name": "Isolines",
+        "description": "Ask for one or multiple isolines."
+      }
+    ],
+    "paths": {
+      "/resources": {
+        "get": {
+          "tags": [
+            "Discover"
+          ],
+          "summary": "Request used to discover the resources available on this instance.",
+          "description": "",
+          "operationId": "resources",
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/resources"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found"
+            }
+          }
+        }
+      },
+      "/resource/{resourceId}/{profileId}/{optimizationId}/isochrone": {
+        "get": {
+          "tags": [
+            "Isolines"
+          ],
+          "summary": "Compute a route",
+          "description": "This API route is the same of [the valhalla isochrone](https://valhalla.github.io/valhalla/api/isochrone/api-reference/). But there are three additional parameters : resourceId, profileId and optimizationId. It allows us to have the concepts of Road2 and a better compatibility with the native Valhalla API.",
+          "operationId": "isochrone",
+          "parameters": [
+            {
+              "name": "resourceId",
+              "in": "path",
+              "description": "The resource used for the compute. The list of resources is available on /resources. A resource is a concept of Road2, it is an agregation of multiple graphs. For instance, an unique topology with multiple costs.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "bdtopo-osrm"
+            },
+            {
+              "name": "profileId",
+              "in": "path",
+              "description": "The profile used for the compute. The list of profiles per resource is available on /resources.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "car"
+            },
+            {
+              "name": "optimizationId",
+              "in": "path",
+              "description": "The optimization used for the compute. The list of optimizations per resource is available on /resources.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": "fastest"
+            },
+            {
+              "name": "json",
+              "in": "query",
+              "description": "That is a JSON which contains all the parameters for the computation. The parameter costing is always cost and the real value is given with resourceId/profileId/optimizationId. For all the details, see [the valhalla docmentation](https://valhalla.github.io/valhalla/api/isochrone/api-reference/)",
+              "required": false,
+              "schema": {
+                "type": "string"
+              },
+              "example": "{\"locations\":[{\"lat\":40.744014,\"lon\":-73.990508}],\"costing\":\"cost\",\"contours\":[{\"time\":15.0,\"color\":\"ff0000\"}]}&id=Walk_From_Office"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation. The service returns a [GeoJSON](http://geojson.org/). For more details, see [the valhalla documentation](https://valhalla.github.io/valhalla/api/isochrone/api-reference/).",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "4XX": {
+              "description": "Error. For more details, see [the valhalla documentation](https://valhalla.github.io/valhalla/api/turn-by-turn/api-reference/#http-status-codes-and-conditions).",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "5XX": {
+              "description": "Error. For more details, see [the valhalla documentation](https://valhalla.github.io/valhalla/api/turn-by-turn/api-reference/#http-status-codes-and-conditions).",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "optimizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
