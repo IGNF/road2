@@ -140,8 +140,11 @@ module.exports = class pgrSource extends Source {
   */
   async connect() {
 
+    LOGGER.debug("Connexion to the base asked from a pgrSource...");
+
     if (!this._base.connected) {
 
+      LOGGER.debug("pgrSource need to connect itself to the base");
       // Connection à la base de données
       try {
 
@@ -157,6 +160,7 @@ module.exports = class pgrSource extends Source {
 
     } else {
       // Road2 est déjà connecté à la base
+      LOGGER.debug("pgrSource's already connected to the base");
       this._connected = true;
     }
 

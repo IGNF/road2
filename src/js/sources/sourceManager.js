@@ -942,6 +942,7 @@ module.exports = class sourceManager {
         return false;
       } else {
         base = this._baseManager.getBase(sourceJsonObject.storage.base.dbConfig);
+        LOGGER.debug("Récuperation de la base configurée dans : " + sourceJsonObject.storage.base.dbConfig);
       }
       // Création de la source
       source = new pgrSource(sourceJsonObject, base);

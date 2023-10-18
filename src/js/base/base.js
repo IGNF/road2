@@ -80,7 +80,7 @@ module.exports = class Base {
 
       if (this._pool) {
         await this._pool.connect();
-        LOGGER.info("Connecte a la base de données");
+        LOGGER.info("Pool connecté à la base");
         this._connected = true;
       } else {
         throw errorManager.createError("PG is not available");
