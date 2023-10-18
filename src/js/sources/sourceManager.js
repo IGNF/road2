@@ -997,6 +997,33 @@ module.exports = class sourceManager {
   /**
   *
   * @function
+  * @name disconnectSource
+  * @description Fonction utilisée pour déconnecter une source. 
+  * @param {string} sourceId - Id de la source que l'on veut déconnecter
+  *
+  */
+  async disconnectSource(sourceId) {
+
+    LOGGER.info("Déconnection de la source: " + sourceId);
+
+    try {
+
+      await this._sources[sourceId].disconnect();
+      LOGGER.info("Source déconnectee.");
+      return true;
+
+    } catch (err) {
+
+      LOGGER.error("Impossible de déconnecter la source.", err);
+      return false;
+
+    }
+
+  }
+
+  /**
+  *
+  * @function
   * @name connectAllSources
   * @description Connecter l'ensemble des sources disponibles dans le manager
   *
@@ -1047,6 +1074,62 @@ module.exports = class sourceManager {
       return false;
     } else {
       LOGGER.info("Au moins une source a été connectée");
+      return true;
+    }
+
+  }
+
+  /**
+  *
+  * @function
+  * @name disconnectAllSources
+  * @description Déconnecter l'ensemble des sources disponibles dans le manager
+  *
+  */
+  async disconnectAllSources() {
+
+    LOGGER.info("Déconnection de l'ensemble des sources...");
+
+    if (this._loadedSourceId.length === 0) {
+      LOGGER.warn("Aucune source n'est disponible");
+      return true;
+    }
+
+    try {
+      assert.deepStrictEqual(this._loadedSourceConfiguration, {});
+      LOGGER.error("Aucune source n'a été préalablement chargée");
+      return false;
+    } catch (err) {
+      // tout va bien
+    }
+
+    let nbSourceDisconnected = 0;
+
+    for (let i = 0; i < this._loadedSourceId.length; i++) {
+      
+      LOGGER.info("Source : " + this._loadedSourceId[i]);
+
+      if (!(await this.disconnectSource(this._loadedSourceId[i]))) {
+
+        LOGGER.error("Source " + this._loadedSourceId[i] + " non déconnectée");
+        return false;
+
+      } else {
+
+        LOGGER.info("Source " + this._loadedSourceId[i] + " déconnectée");
+        nbSourceDisconnected++;
+        
+      }
+      
+    }
+
+    LOGGER.info("Les déconnections se sont bien déroulés.");
+
+    if (nbSourceDisconnected === 0) {
+      LOGGER.error("Aucune source n'a pu être déconnectée");
+      return false;
+    } else {
+      LOGGER.info("Au moins une source a été déconnectée");
       return true;
     }
 

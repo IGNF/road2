@@ -898,7 +898,7 @@ module.exports = class Service {
       LOGGER.fatal("Impossible de déconnecter toutes les sources du service");
       return false;
     } else {
-      LOGGER.info("Les sources du service potentiellement connectables ont été déconnectées");
+      LOGGER.info("Les sources du service potentiellement déconnectables ont été déconnectées");
       return true;
     }
 
