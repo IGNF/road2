@@ -1004,7 +1004,7 @@ module.exports = class sourceManager {
   */
   async disconnectSource(sourceId) {
 
-    LOGGER.info("Déconnection de la source: " + sourceId);
+    LOGGER.info("Déconnexion de la source: " + sourceId);
 
     try {
 
@@ -1088,7 +1088,7 @@ module.exports = class sourceManager {
   */
   async disconnectAllSources() {
 
-    LOGGER.info("Déconnection de l'ensemble des sources...");
+    LOGGER.info("Déconnexion de l'ensemble des sources...");
 
     if (this._loadedSourceId.length === 0) {
       LOGGER.warn("Aucune source n'est disponible");
@@ -1123,7 +1123,7 @@ module.exports = class sourceManager {
       
     }
 
-    LOGGER.info("Les déconnections se sont bien déroulés.");
+    LOGGER.info("Les déconnexions se sont bien déroulés.");
 
     if (nbSourceDisconnected === 0) {
       LOGGER.error("Aucune source n'a pu être déconnectée");

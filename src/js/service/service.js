@@ -891,7 +891,7 @@ module.exports = class Service {
   */
    async disconnectSources() {
 
-    LOGGER.info("Déonnexion des sources du service...");
+    LOGGER.info("Déconnexion des sources du service...");
 
     // Connexion des sources
     if (!(await this._sourceManager.disconnectAllSources())) {

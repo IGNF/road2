@@ -171,24 +171,24 @@ module.exports = class pgrSource extends Source {
   *
   * @function
   * @name disconnect
-  * @description Déconnection à la base pgRouting
+  * @description Déconnexion à la base pgRouting
   *
   */
   async disconnect() {
 
-    LOGGER.info("Tentative de deconnection de la base...");
+    LOGGER.info("Tentative de déconnexion de la base...");
 
     if (this._base.connected) {
 
       try {
 
         await this._base.disconnect();
-        LOGGER.info("Deconnection de la base effectuee");
+        LOGGER.info("Déconnexion de la base effectuee");
         this._connected = false;
 
       } catch(err) {
 
-        LOGGER.error('deconnection error', err.stack);
+        LOGGER.error('disconnection error', err.stack);
         throw errorManager.createError("Cannot disconnect to source database");
 
       }

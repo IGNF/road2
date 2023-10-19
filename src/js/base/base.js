@@ -101,19 +101,19 @@ module.exports = class Base {
   *
   * @function
   * @name disconnect
-  * @description Déconnection à la base pgRouting
+  * @description Déconnexion à la base pgRouting
   *
   */
   async disconnect() {
 
     try {
 
-      LOGGER.info("Deconnection de la base...");
+      LOGGER.info("Déconnexion de la base...");
 
       if (this._pool) {
 
         await this._pool.end(() => {
-          LOGGER.info("Deconnection du pool effectuee");
+          LOGGER.info("Déconnexion du pool effectuee");
         });
 
         this._connected = false;
