@@ -140,7 +140,7 @@ module.exports = class pgrSource extends Source {
   */
   async connect() {
 
-    LOGGER.debug("Connexion to the base asked from a pgrSource...");
+    LOGGER.debug("Connection to the base asked from a pgrSource...");
 
     if (!this._base.connected) {
 
