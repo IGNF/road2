@@ -168,6 +168,7 @@ module.exports = class baseManager {
 
     // on vérifie d'abord que la base n'a pas déjà été créée
     if (this._baseCatalog[dbConfigPath]) {
+      LOGGER.debug("Base's already loaded");
       return true;
     } else {
       // TODO la base n'existe pas, on vérifie que le contenu de la conf n'est pas le même qu'une base déjà chargée.

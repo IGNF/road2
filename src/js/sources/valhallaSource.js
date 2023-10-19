@@ -96,7 +96,7 @@ module.exports = class valhallaSource extends Source {
   *
   * @function
   * @name disconnect
-  * @description Déconnection
+  * @description Déconnexion
   *
   */
   async disconnect() {
