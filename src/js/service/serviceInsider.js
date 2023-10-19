@@ -168,7 +168,14 @@ module.exports = class ServiceInsider extends ServiceAdministered {
     LOGGER.debug("Arrêt d'un service dans le même processus");
 
     if (await this._serviceInstance.stopServers()) {
-      LOGGER.debug("Service arrêté.");
+      LOGGER.debug("Servers arrêtés.");
+    } else {
+      LOGGER.error("Le service n'a pu être arrêté");
+      return false;
+    }
+
+    if (await this._serviceInstance.disconnectSources()) {
+      LOGGER.debug("Sources déconnectées.");
       this._serviceInstance = null;
       return true;
     } else {

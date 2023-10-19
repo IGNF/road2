@@ -885,6 +885,28 @@ module.exports = class Service {
   /**
   *
   * @function
+  * @name disconnectSources
+  * @description Déconnecter toutes les sources du service
+  *
+  */
+   async disconnectSources() {
+
+    LOGGER.info("Déconnexion des sources du service...");
+
+    // Connexion des sources
+    if (!(await this._sourceManager.disconnectAllSources())) {
+      LOGGER.fatal("Impossible de déconnecter toutes les sources du service");
+      return false;
+    } else {
+      LOGGER.info("Les sources du service potentiellement déconnectables ont été déconnectées");
+      return true;
+    }
+
+  }
+
+  /**
+  *
+  * @function
   * @name startServers
   * @description Démarrage des serveurs du service
   *
@@ -1027,11 +1049,18 @@ module.exports = class Service {
       LOGGER.debug("Réception du signal SIGTERM pour arrêter le service");
 
       if (await this.stopServers()) {
-        LOGGER.debug("Les serveurs sont bien arrêtés, on peut sortir du service (exit)")
-        process.exit(0);
+        LOGGER.debug("Les serveurs sont bien arrêtés");
       } else {
         LOGGER.fatal("Les serveurs ne se sont pas bien arrếtés");
         process.exit(1);
+      }
+
+      if (await this.disconnectSources()) {
+        LOGGER.debug("Les sources sont bien déconnectées, on peut sortir du service (exit)");
+        process.exit(0);
+      } else {
+        LOGGER.fatal("Les sources ne se sont pas bien déconnectées");
+        process.exit(2);
       }
 
     });
