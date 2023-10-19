@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.3
+FIXED:
+- Sources were not disconnected during a restart #93
+
 ## 2.2.2
 FIXED:
 - Route requests not working with pgr resources
