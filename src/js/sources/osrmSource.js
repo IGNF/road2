@@ -265,7 +265,7 @@ module.exports = class osrmSource extends Source {
 
           } catch (error) {
             // Pour une raison que l'on ignore, la source n'est plus joignable
-            this.state = "orange";
+            this.state = "red";
             LOGGER.error(error);
             reject("Internal OSRM error");
           }
@@ -328,7 +328,7 @@ module.exports = class osrmSource extends Source {
 
           } catch (error) {
             // Pour une raison que l'on ignore, la source n'est plus joignable
-            this.state = "orange";
+            this.state = "red";
             LOGGER.error(error);
             reject("Internal OSRM error");
           }

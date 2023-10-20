@@ -167,9 +167,9 @@ C'est l'approche bottom-up qui a été choisie pour ces tests. On va tester les 
 
 - pg {Pool}
     - base/base.js
-        - ()
-        - connect()
-        - end()
+        - Pool()
+        - pool.on('error')
+        - pool.end()
     - base/baseManager.js
     - sources/sourcesManager.js
     - sources/pgrSource.js
