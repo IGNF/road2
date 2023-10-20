@@ -390,8 +390,6 @@ module.exports = class pgrSource extends Source {
 
             this._base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
-              this.state = "green";
-
               if (err) {
 
                 LOGGER.error("pgr error:");
@@ -399,12 +397,14 @@ module.exports = class pgrSource extends Source {
 
                 // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé de routes
                 if (err.code === "38001") {
+                  this.state = "green";
                   reject(errorManager.createError(" No path found ", 404));
                 } else if (err.code === "42703") {
                   // cette erreur remonte quand il n'y a pas de données dans PGR
                   this.state = "red";
                   reject(errorManager.createError(" No data found ", 503));
                 } else {
+                  this.state = "red";
                   reject(err);
                 }
 
@@ -412,6 +412,7 @@ module.exports = class pgrSource extends Source {
 
                 LOGGER.debug("pgr response:");
                 LOGGER.debug(result);
+                this.state = "green";
 
                 try {
                   resolve(this.writeRouteResponse(request, pgrRequest, result));
@@ -425,7 +426,7 @@ module.exports = class pgrSource extends Source {
 
           } catch (error) {
             // Pour une raison que l'on ignore, la source n'est plus joignable
-            this.state = "orange";
+            this.state = "red";
             LOGGER.error(error);
             reject("Internal PGR error");
           }
@@ -495,17 +496,17 @@ module.exports = class pgrSource extends Source {
 
               this._base.pool.query(queryString, SQLParametersTable, (err, result) => {
 
-                this.state = "green";
-
                 if (err) {
 
                   // Traitement spécifique de certains codes pour dire au client qu'on n'a pas trouvé d'iso
                   if (err.code === "XX000") {
                     // Cette erreur remonte souvent quand PGR n'a pas assez de données pour créer ou calculer une iso (ex. costValue trop petit)
+                    this.state = "green";
                     reject(errorManager.createError(" No iso found ", 404));
                   }  else {
                     LOGGER.error("pgr error:");
                     LOGGER.error(err);
+                    this.state = "red";
                     reject(err);
                   }
 
@@ -513,6 +514,7 @@ module.exports = class pgrSource extends Source {
 
                   LOGGER.debug("pgr response:");
                   LOGGER.debug(result);
+                  this.state = "green";
 
                   try {
                     resolve(this.writeIsochroneResponse(request, result));
@@ -526,7 +528,7 @@ module.exports = class pgrSource extends Source {
 
             } catch (error) {
               // Pour une raison que l'on ignore, la source n'est plus joignable
-              this.state = "orange";
+              this.state = "red";
               LOGGER.error(error);
               reject("Internal PGR error");
             }
