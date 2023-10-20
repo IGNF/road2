@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.2.4
+FIXED:
+- The pg module can emit error event and they were not catched and so it caused some crashs of Road2
+- Some orange states were deleted from pgrSource and osrmSource 
+
 ## 2.2.3
 FIXED:
 - Sources were not disconnected during a restart #93

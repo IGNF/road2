@@ -23,19 +23,23 @@ describe('Test de la classe Base', function() {
     });
 
     it('Get pool', function() {
-        assert.equal(base.pool.options.host, "pgrouting");
+        assert.equal(base.pool, null);
+    });
+
+    it('Get configuration', function() {
+      assert.equal(base.configuration, configuration);
     });
 
   });
 
   describe('Test de la connexion et de la deconnexion', function() {
 
-    xit('Connect()', async function() {
+    it('Connect()', async function() {
         await base.connect();
         assert.equal(base.connected, true);
     });
 
-    xit('Disconnect()', async function() {
+    it('Disconnect()', async function() {
       await base.disconnect();
       assert.equal(base.connected, false);
     });

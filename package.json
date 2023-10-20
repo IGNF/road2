@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
@@ -31,7 +31,7 @@
   },
   "optionalDependencies": {
     "osrm": "5.26.0",
-    "pg": "8.8.0"
+    "pg": "8.9.0"
   },
   "devDependencies": {
     "sinon": "^7.2.7",
