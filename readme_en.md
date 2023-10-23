@@ -32,7 +32,7 @@ Otherwise, for a first grip of the service locally, it is possible to use the [a
 
 ### Discover and test the service's APIs
 
-IGN offers a visualization of the user API for [the itinerary](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires/api) and [the isochrone] (https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api).
+IGN offers a visualization of the user API for [the itinerary](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires/api) and [the isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api).
 
 IGN also offers pages for testing an instance of the service throughout France, with map visualization. There is a page for the [itinerary](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires) and a page for the [isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrones).
 
