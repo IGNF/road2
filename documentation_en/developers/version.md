@@ -14,7 +14,15 @@ Route Graph Generator and PGRouting Procedures are independent as GIT projects. 
 
 On these three projects have a `master` and `develop` branch. The first allows you to manage the versions put into production. The second makes it possible to carry out the developments.
 
-We will make sure to start from `develop` and create a branch of the `feature-*` type to create new features.
+We will make sure to start from `develop` and create a branch like this:
+- `doc/*` to modify or add documentation only,
+- `feat/*` to create new features,
+- `fix/*` to make a correction to the source code,
+- `docker/*` to modify the docker part only,
+- `test/*` to modify only the tests,
+- `ci/*` to modify the Github CI
+
+To merge a branch with `develop`, we will make sure to have done a rebase of develop on this branch. And on the merge method, we will do a squash. So, the `develop` branch will have one commit per feature, fix, etc...
 
 ## Versions and tags
 
@@ -32,6 +40,8 @@ We will make sure to tag the commits of each project with the right versions. An
 - We must be able to identify, by the tags, the versions of the code used in production.
 - We must be able to make all the projects work together from the tags on `master` and `develop`.
 
+When we merge `develop` on `master`, we will take care not to squash in order to facilitate future merges (as recommended by [github](https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squashing-and-merging-a-long-running-branch)).
+
 ### PGRouting Procedures and Route Graph Generator
 
 It is advisable to start by managing the versions of these two. *The following describes the process for updating projects, but without going through the GIT* submodules. If you want to use submodules, you can refer to the documentation [proposed by GIT](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
@@ -44,7 +54,7 @@ Initial state for each project:
 Steps to follow for each project:
 
 1. Test `develop` and correct if necessary.
-2. Update version on `master` to 1.0.1.
+2. Update version on `develop` to 1.0.1.
 3. Merge of `develop` on `master`.
 4. Update version on `develop` to 1.0.2-DEVELOP.
 5. Run tests on `master` and correct if necessary.

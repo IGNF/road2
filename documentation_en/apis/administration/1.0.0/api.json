@@ -1,0 +1,1862 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "Description de l'API d'administration de Road2.",
+      "version": "1.0.0",
+      "title": "Administration de Road2",
+      "contact": {
+        "email": "contact.geoservices@ign.fr"
+      }
+    },
+    "servers": [
+      {
+        "url": "https://localhost:8079/admin/1.0.0/",
+        "description": "Serveur de test local"
+      }
+    ],
+    "tags": [
+      {
+        "name": "État du serveur",
+        "description": "Connaître l'état de l'instance globale (administrateur et services)"
+      },
+      {
+        "name": "Gestion de l'administrateur",
+        "description": "Administrer l'administrateur"
+      },
+      {
+        "name": "Gestion des services",
+        "description": "Administrer des services"
+      },
+      {
+        "name": "Gestion des ressources",
+        "description": "Administrer les ressources sur un service spécifique."
+      },
+      {
+        "name": "Gestion des sources",
+        "description": "Administrer les sources sur un service spécifique."
+      }
+    ],
+    "paths": {
+      "/version": {
+        "get": {
+          "tags": [
+            "État du serveur"
+          ],
+          "summary": "Obtenir la version du serveur.",
+          "description": "Cette requête retourne la version de Road2 utilisée par cette instance \nde l'administrateur.\n",
+          "operationId": "version",
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "description": "Version de Road2 utilisée"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/health": {
+        "get": {
+          "tags": [
+            "État du serveur"
+          ],
+          "summary": "Obtenir l'état du serveur.",
+          "description": "Cette requête retourne l'état du serveur d'administration et \nde l'ensemble des services qu'il administre. Cet état fait principalement \nréférence à la disponibilité des données. Chaque service a un état lié à la \ndisponibilité de ses sources. Chaque source a un état lié à la disponibilité de ses données. \n",
+          "operationId": "health",
+          "parameters": [
+            {
+              "name": "verbose",
+              "description": "\"Par défaut, puisque verbose=false, la requête retourne seulement l'état global \nde l'administrateur et de ses services. Si on souhaite récupérer plus d'information \nsur l'état de chaque service, on met verbose à true.\"\n",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "boolean"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "enum": [
+                          "green",
+                          "yellow",
+                          "red"
+                        ],
+                        "description": "\"Lorsque tout va bien: 'green'. Si un des services a \nun problème:yellow. Si aucun service n'est disponible:red. Seule information retournée\nsi verbose=false. \"\n",
+                        "example": "green"
+                      },
+                      "administrator": {
+                        "type": "object",
+                        "properties": {
+                          "state": {
+                            "type": "string",
+                            "example": "green",
+                            "enum": [
+                              "green",
+                              "yellow",
+                              "red"
+                            ],
+                            "description": "\"Pour le moment, seul green est disponible car soit le serveur est disponible pour\nrépondre aux requêtes d'administration, soit il ne l'est pas du tout.\"\n"
+                          }
+                        }
+                      },
+                      "services": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "main",
+                              "description": "\"Id du service pour l'administrateur\"\n"
+                            },
+                            "state": {
+                              "type": "string",
+                              "example": "green",
+                              "enum": [
+                                "green",
+                                "yellow",
+                                "red"
+                              ],
+                              "description": "\"Lorsque toutes les sources sont disponibles : 'green'. Si une des sources a \nun problème:yellow. Si aucune source n'est disponible:red.\"\n"
+                            },
+                            "sources": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "bduni-idf-car-fastest",
+                                    "description": "\"Id de la source pour le service\"\n"
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "example": "green",
+                                    "enum": [
+                                      "green",
+                                      "red"
+                                    ],
+                                    "description": "\"Lorsque les données sont disponibles : 'green'. Si les données ne le sont plus: 'red'.\"\n"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/configuration": {
+        "get": {
+          "tags": [
+            "Gestion de l'administrateur"
+          ],
+          "summary": "Obtenir la configuration de l'administrateur.",
+          "description": "Cette requête retourne la configuration de l'administrateur.\n",
+          "operationId": "get-admin-configuration",
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/adminConfiguration"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Gestion de l'administrateur"
+          ],
+          "summary": "Modifier la configuration de l'administrateur.",
+          "description": "Dans la configuration de l'administrateur, tout est modifiable. \nCela permet notamment de créer, modifier et supprimer les services \ngérés par cet administrateur. \n",
+          "operationId": "patch-admin-configuration",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/adminConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services": {
+        "get": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Obtenir la liste des services proposés par l'administrateur",
+          "description": "Cette requête retourne l'ensemble des services connus par l'administrateur. \nCette liste peut être vide si aucun service n'a été configuré.\n",
+          "operationId": "services",
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "$ref": "#/components/schemas/serviceConfiguration"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Créer un service.",
+          "description": "Si un service n'existe pas, il est possible de le créer \nen fournissant sa configuration. \n",
+          "operationId": "post-service",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serviceConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "$ref": "#/components/schemas/serviceConfiguration"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}": {
+        "get": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Obtenir la configuration d'un service.",
+          "description": "Cette requête retourne la configuration du service demandé.\n",
+          "operationId": "get-service",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/serviceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Modifier la configuration d'un service existant.",
+          "description": "Il s'agit de modifier des paramètres de configuration d'un service \ndéjà existant. Il faut fournir la configuration du service à modifier.\nSi un redémarrage du service est nécessaire, il sera de fait \ntemporairement indisponible.\n",
+          "operationId": "patch-service",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serviceConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/serviceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Supprimer un service.",
+          "description": "Pour supprimer un service, il sera nécessaire d'avoir d'abord \nsupprimé les sources et ressources associées. Une fois supprimés, \nun service et sa configuration ne peuvent être récupérés. \n",
+          "operationId": "delete-service",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/restart": {
+        "get": {
+          "tags": [
+            "Gestion des services"
+          ],
+          "summary": "Demander le redémarage d'un service.",
+          "description": "Cette requête demande le redémarage du service demandé. Cette demande peut \néchouer et l'utilisateur en sera informé. \n",
+          "operationId": "get-service-restart",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/serviceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/projections/{projection}": {
+        "get": {
+          "tags": [
+            "Gestion des services",
+            "Projection"
+          ],
+          "summary": "Récupération d'une projection supportée par un service.",
+          "description": "Cette requête retourne une projection supportée par un service.\n",
+          "operationId": "get-service-projection",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "projection",
+              "description": "Id de la projection concernée",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/projectionConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/resources": {
+        "get": {
+          "tags": [
+            "Gestion des ressources"
+          ],
+          "summary": "Obtenir la liste des ressources proposées par un service.",
+          "description": "Cette requête retourne la liste des ressources sur le service indiqué.\n",
+          "operationId": "get-resources",
+          "parameters": [
+            {
+              "name": "service",
+              "in": "path",
+              "description": "Id du service concerné",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "source",
+              "description": "Filtre pour avoir les ressources qui utilisent cette source\n",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/resourceConfiguration"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Gestion des ressources"
+          ],
+          "summary": "Intégrer une nouvelle ressource. Il faut fournir la configuration de la ressource à intégrer.",
+          "description": "Les sources indiquées doivent déjà exister.",
+          "operationId": "post-resource",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/resources/{resource}": {
+        "get": {
+          "tags": [
+            "Gestion des ressources"
+          ],
+          "summary": "Obtenir la configuration d'une ressource.",
+          "description": "Cette requête retourne la configuration d'une ressource.",
+          "operationId": "get-resource",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "resource",
+              "in": "path",
+              "description": "Id de la ressource concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/resourceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Gestion des ressources"
+          ],
+          "summary": "Modifier une ressource existante. Il faut fournir la configuration de la ressource à modifier.",
+          "description": "Les sources indiquées doivent déjà exister.",
+          "operationId": "patch-resource",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "resource",
+              "in": "path",
+              "description": "Id de la ressource concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resourceConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/resourceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Gestion des ressources"
+          ],
+          "summary": "Supprimer une ressource. Il faut fournir l'id de la ressource à supprimer.",
+          "description": "",
+          "operationId": "delete-resource",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "resource",
+              "in": "path",
+              "description": "Id de la ressource concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/sources": {
+        "get": {
+          "tags": [
+            "Gestion des sources"
+          ],
+          "summary": "Obtenir la liste des sources proposées par un service.",
+          "description": "Cette requête retourne la liste des sources sur le service indiqué.",
+          "operationId": "get-sources",
+          "parameters": [
+            {
+              "name": "service",
+              "in": "path",
+              "description": "Id du service concerné",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "sources": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/sourceConfiguration"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Gestion des sources"
+          ],
+          "summary": "Intégrer une nouvelle source. Il faut fournir la configuration de la source à intégrer.",
+          "description": "La donnée doit déjà exister.",
+          "operationId": "post-source",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sourceConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/sourceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/services/{service}/sources/{source}": {
+        "get": {
+          "tags": [
+            "Gestion des sources"
+          ],
+          "summary": "Obtenir la configuration d'une source.",
+          "description": "Cette requête retourne la configuration d'une source déjà existante.",
+          "operationId": "get-source",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "source",
+              "in": "path",
+              "description": "Id de la source concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/sourceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Gestion des sources"
+          ],
+          "summary": "Modifier une source existante. Il faut fournir la configuration de la source à modifier.",
+          "description": "La donnée doit déjà exister.",
+          "operationId": "patch-source",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "source",
+              "in": "path",
+              "description": "Id de la source concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sourceConfiguration"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/sourceConfiguration"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Gestion des sources"
+          ],
+          "summary": "Surpprimer une source. Il faut fournir l'id de la source à supprimer.",
+          "description": "La suppression de la donnée doit être faite autrement. \nOn doit avoir supprimé son usage dans les ressources avant.\n",
+          "operationId": "delete-source",
+          "parameters": [
+            {
+              "name": "service",
+              "description": "Id du service concerné",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "source",
+              "in": "path",
+              "description": "Id de la source concernée",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "successful operation"
+            },
+            "400": {
+              "description": "Invalid parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/errorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "errorResponse": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "adminConfiguration": {
+          "type": "object",
+          "properties": {
+            "administration": {
+              "type": "object",
+              "properties": {
+                "api": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "admin"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    }
+                  }
+                },
+                "services": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "main"
+                      },
+                      "configuration": {
+                        "type": "string",
+                        "example": "/home/docker/config/service.json"
+                      },
+                      "creationType": {
+                        "type": "string",
+                        "example": "newProcess"
+                      }
+                    }
+                  }
+                },
+                "network": {
+                  "type": "object",
+                  "properties": {
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "administrator"
+                        },
+                        "https": {
+                          "type": "string",
+                          "example": "false"
+                        },
+                        "host": {
+                          "type": "string",
+                          "example": "0.0.0.0"
+                        },
+                        "port": {
+                          "type": "string",
+                          "example": "8079"
+                        }
+                      }
+                    }
+                  }
+                },
+                "logs": {
+                  "type": "object",
+                  "properties": {
+                    "configuration": {
+                      "type": "string",
+                      "example": "/home/docker/config/log4js-administration.json"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "serviceConfiguration": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Road2"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Service de calcul d'itinéraire"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Ce service permet de calculer des itinéraires sur les données du Géoportail."
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://localhost/"
+                },
+                "provider": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "IGN"
+                    },
+                    "site": {
+                      "type": "string",
+                      "example": "www.ign.fr"
+                    },
+                    "mail": {
+                      "type": "string",
+                      "example": "contact.geoservices@ign.fr"
+                    }
+                  }
+                },
+                "logs": {
+                  "type": "object",
+                  "properties": {
+                    "configuration": {
+                      "type": "string",
+                      "example": "/home/docker/config/log4js-service.json"
+                    }
+                  }
+                },
+                "operations": {
+                  "type": "object",
+                  "properties": {
+                    "directory": {
+                      "type": "string",
+                      "example": "/home/docker/app/src/resources/operations"
+                    },
+                    "parameters": {
+                      "type": "object",
+                      "properties": {
+                        "directory": {
+                          "type": "string",
+                          "example": "/home/docker/app/src/resources/parameters"
+                        }
+                      }
+                    }
+                  }
+                },
+                "resources": {
+                  "type": "object",
+                  "properties": {
+                    "directories": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "/home/docker/data/resources/"
+                      }
+                    }
+                  }
+                },
+                "sources": {
+                  "type": "object",
+                  "properties": {
+                    "directories": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "/home/docker/data/sources/"
+                      }
+                    }
+                  }
+                },
+                "network": {
+                  "type": "object",
+                  "properties": {
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "internalServer"
+                          },
+                          "https": {
+                            "type": "string",
+                            "example": "false"
+                          },
+                          "host": {
+                            "type": "string",
+                            "example": "0.0.0.0"
+                          },
+                          "port": {
+                            "type": "string",
+                            "example": "8080"
+                          }
+                        }
+                      }
+                    },
+                    "cors": {
+                      "type": "object",
+                      "properties": {
+                        "configuration": {
+                          "type": "string",
+                          "example": "/home/docker/config/cors.json"
+                        }
+                      }
+                    }
+                  }
+                },
+                "projections": {
+                  "type": "object",
+                  "properties": {
+                    "directory": {
+                      "type": "string",
+                      "example": "/home/docker/config/projections/"
+                    }
+                  }
+                },
+                "apis": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "simple"
+                      },
+                      "version": {
+                        "type": "string",
+                        "example": "1.0.0"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "projectionConfiguration": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "EPSG:4326"
+            },
+            "parameters": {
+              "type": "string",
+              "example": "+proj=longlat +datum=WGS84 +no_defs"
+            }
+          }
+        },
+        "resourceConfiguration": {
+          "type": "object",
+          "properties": {
+            "resource": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "my-resource"
+                },
+                "type": {
+                  "type": "string",
+                  "example": "osrm"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Exemple d'une ressource."
+                },
+                "resourceVersion": {
+                  "type": "string",
+                  "example": "yyyy-mm-dd"
+                },
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": "data-car-fastest"
+                  }
+                },
+                "availableOperations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "route"
+                      },
+                      "parameters": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "resource"
+                            },
+                            "defaultValueContent": {
+                              "type": "string"
+                            },
+                            "values": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sourceConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/osrmSourceConfiguration"
+            },
+            {
+              "$ref": "#/components/schemas/pgrSourceConfiguration"
+            },
+            {
+              "$ref": "#/components/schemas/valhallaSourceConfiguration"
+            }
+          ]
+        },
+        "osrmSourceConfiguration": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "bduni-idf-car-fastest"
+            },
+            "description": {
+              "type": "string",
+              "example": "test osrm"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "osrm"
+              ]
+            },
+            "projection": {
+              "type": "string",
+              "example": "EPSG:4326"
+            },
+            "bbox": {
+              "type": "string",
+              "example": "1.748.43.349.1"
+            },
+            "storage": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "example": "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"
+                }
+              }
+            },
+            "cost": {
+              "type": "object",
+              "properties": {
+                "cost": {
+                  "type": "object",
+                  "properties": {
+                    "profile": {
+                      "type": "string",
+                      "example": "car"
+                    },
+                    "optimization": {
+                      "type": "string",
+                      "example": "fastest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "pgrSourceConfiguration": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "bduni-idf-car-fastest"
+            },
+            "description": {
+              "type": "string",
+              "example": "test osrm"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "pgrouting"
+              ]
+            },
+            "projection": {
+              "type": "string",
+              "example": "EPSG:4326"
+            },
+            "bbox": {
+              "type": "string",
+              "example": "1.748.43.349.1"
+            },
+            "storage": {
+              "type": "object",
+              "properties": {
+                "base": {
+                  "type": "object",
+                  "properties": {
+                    "dbConfig": {
+                      "type": "string",
+                      "example": "/home/docker/data/output_base.json"
+                    },
+                    "schema": {
+                      "type": "string",
+                      "example": "public"
+                    },
+                    "attributes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "example": "name"
+                          },
+                          "column": {
+                            "type": "string",
+                            "example": "concat_names"
+                          },
+                          "default": {
+                            "type": "string",
+                            "example": "false"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "costs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cost": {
+                    "type": "object",
+                    "properties": {
+                      "profile": {
+                        "type": "string",
+                        "example": "car"
+                      },
+                      "optimization": {
+                        "type": "string",
+                        "example": "fastest"
+                      },
+                      "costType": {
+                        "type": "string",
+                        "example": "time"
+                      },
+                      "costColumn": {
+                        "type": "string",
+                        "example": "cost_s_car"
+                      },
+                      "rcostColumn": {
+                        "type": "string",
+                        "example": "reverse_cost_s_car"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "valhallaSourceConfiguration": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "bduni-idf-car-fastest"
+            },
+            "description": {
+              "type": "string",
+              "example": "test osrm"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "valhalla"
+              ]
+            },
+            "projection": {
+              "type": "string",
+              "example": "EPSG:4326"
+            },
+            "bbox": {
+              "type": "string",
+              "example": "1.748.43.349.1"
+            },
+            "storage": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "example": "/home/docker/data/bduni-idf-car-fastest/bduni-idf-car-fastest.osrm"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "base": {
+                      "type": "object",
+                      "properties": {
+                        "dbConfig": {
+                          "type": "string",
+                          "example": "/home/docker/data/output_base.json"
+                        },
+                        "schema": {
+                          "type": "string",
+                          "example": "public"
+                        },
+                        "attributes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "example": "name"
+                              },
+                              "column": {
+                                "type": "string",
+                                "example": "concat_names"
+                              },
+                              "default": {
+                                "type": "string",
+                                "example": "false"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tar": {
+                      "type": "string",
+                      "example": "/home/docker/data/bdtopo-valhalla-tiles.tar"
+                    },
+                    "dir": {
+                      "type": "string",
+                      "example": "/home/docker/data/bdtopo-valhalla-tiles/"
+                    },
+                    "config": {
+                      "type": "string",
+                      "example": "/home/docker/data/valhalla.json"
+                    }
+                  }
+                }
+              ]
+            },
+            "costs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cost": {
+                    "type": "object",
+                    "properties": {
+                      "profile": {
+                        "type": "string",
+                        "example": "car"
+                      },
+                      "optimization": {
+                        "type": "string",
+                        "example": "fastest"
+                      },
+                      "costType": {
+                        "type": "string",
+                        "example": "time"
+                      },
+                      "costing": {
+                        "type": "string",
+                        "example": "auto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
