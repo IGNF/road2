@@ -1,0 +1,1300 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Description de l'API du service d'itinéraire.",
+    "version": "1.0.0",
+    "title": "Service d'itinéraire",
+    "contact": {
+      "email": "contact.geoservices@ign.fr"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://wxs.ign.fr/calcul/geoportail/itineraire/rest/1.0.0/",
+      "description": "Serveur de test IGN pour l'itinéraire"
+    },
+    {
+      "url": "https://wxs.ign.fr/calcul/geoportail/isochrone/rest/1.0.0/",
+      "description": "Serveur de test IGN pour l'isochrone"
+    },
+    {
+      "url": "http://localhost:8080/simple/1.0.0/",
+      "description": "Serveur de test local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Découverte",
+      "description": "Découvrir le service et les ressources disponibles"
+    },
+    {
+      "name": "Utilisation",
+      "description": "Utiliser le service d'itinéraire"
+    }
+  ],
+  "paths": {
+    "/getcapabilities": {
+      "get": {
+        "tags": [
+          "Découverte"
+        ],
+        "summary": "Découvrir le service",
+        "description": "Découvrir le service: les opérations possibles, les ressources disponibles et les options proposées.",
+        "operationId": "getcapabilities",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/getcapabilities"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/route": {
+      "get": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Calculer un itinéraire",
+        "description": "Calculer un itinéraire en fournissant un point de départ et un point d'arrivé. Plusieurs options peuvent être fournies.",
+        "operationId": "routeItineraire-get",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver l'itinéraire le plus court pour une voiture. ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdtopo-osrm"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Point de départ. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities).",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/point"
+            },
+            "example": "2.337306,48.849319"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "Point d'arrivée. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities).",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/point"
+            },
+            "example": "2.367776,48.852891"
+          },
+          {
+            "name": "intermediates",
+            "in": "query",
+            "description": "Points intermédiaires. Ils devront être exprimés dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities).",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/coordinates"
+            },
+            "explode": false,
+            "style": "pipeDelimited",
+            "example": "2.368776,48.852890"
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "car"
+          },
+          {
+            "name": "optimization",
+            "in": "query",
+            "description": "Mode de calcul utilisé pour déterminer l'itinéraire. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "fastest"
+          },
+          {
+            "name": "geometryFormat",
+            "in": "query",
+            "description": "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "geojson",
+                "polyline",
+                "wkt"
+              ]
+            }
+          },
+          {
+            "name": "constraints",
+            "in": "query",
+            "description": "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute','threshold':{'key':'delta_time','operator':'<','value':'10'}}"
+            ],
+            "explode": false,
+            "style": "pipeDelimited"
+          },
+          {
+            "name": "getSteps",
+            "in": "query",
+            "description": "Présence des étapes dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true
+          },
+          {
+            "name": "getBbox",
+            "in": "query",
+            "description": "Présence de l'emprise de l'itinéraire dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true
+          },
+          {
+            "name": "distanceUnit",
+            "in": "query",
+            "description": "Unité des distances renvoyées. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "kilometer"
+          },
+          {
+            "name": "timeUnit",
+            "in": "query",
+            "description": "Unité du temps renvoyé. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "hour"
+          },
+          {
+            "name": "crs",
+            "in": "query",
+            "description": "Projection des géometries. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "EPSG:4326"
+          },
+          {
+            "name": "waysAttributes",
+            "in": "query",
+            "description": "Attributs des tronçons à afficher dans la réponse. Les valeurs disponibles et les valeurs par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": "name",
+            "explode": false,
+            "style": "pipeDelimited"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/itineraire"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Calculer un itinéraire",
+        "description": "Calculer un itinéraire en fournissant un point de départ et un point d'arrivé. Plusieurs options peuvent être fournies. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête.",
+        "operationId": "routeItineraire-post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/routeBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/itineraire"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nearest": {
+      "get": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Récupérer les points les plus proche d'une paire de coordonnées.",
+        "description": "Trouver les points les plus proche d'une paire de coordonnées fournie. Plusieurs options peuvent être fournies.",
+        "operationId": "nearestItineraire-get",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Ressource utilisée pour le calcul. Les valeurs disponibles sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver l'itinéraire le plus court pour une voiture. ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdtopo-osrm"
+          },
+          {
+            "name": "coordinates",
+            "in": "query",
+            "description": "Point de référence dont on cherche les points du graphe les plus proche. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities).",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/point"
+            },
+            "example": "2.337306,48.849319"
+          },
+          {
+            "name": "crs",
+            "in": "query",
+            "description": "Projection des géometries. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "EPSG:4326"
+          },
+          {
+            "name": "nbPoints",
+            "in": "query",
+            "description": "Nombre de points que l'on souhaite récupérer. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "EPSG:4326"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nearest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Récupérer les points les plus proche d'une paire de coordonnées.",
+        "description": "Trouver les points les plus proche d'une paire de coordonnées fournie. Plusieurs options peuvent être fournies. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête.",
+        "operationId": "nearestItineraire-post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nearestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nearest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/isochrone": {
+      "get": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Calculer une isochrone ou une isodistance",
+        "description": "Obtenir une surface géo-localisée représentant l’ensemble des points atteignables à partir d’un point de départ. Les points de départ et d’arrivée peuvent être inversés: on obtient alors la liste des points de départs possibles permettant d’atteindre un point d’arrivée donné. On peut aussi fournir un critère de distance plutôt que de temps: on parle alors de calcul d’iso-distances.",
+        "operationId": "isochrone",
+        "parameters": [
+          {
+            "name": "point",
+            "in": "query",
+            "description": "Coordonnées d'une position ponctuelle. C'est le point à partir duquel seront fait les calculs. Il devra être exprimé dans le CRS, par défaut, de la ressource (voir le paramètre 'crs' dans le GetCapabilities).",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/point"
+            },
+            "example": "2.337306,48.849319"
+          },
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Ressource utilisée pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. Une ressource est un graphe de navigation qui peut potentiellement avoir plusieurs modes de transports et de calculs. La ressource va plutôt parler du graphe, de la topologie de la donnée. Par exemple, il pourra s'agir d'un graphe de navigation issu de la BDTOPO v3 permettant de trouver des isochrones ou des isodistances.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdtopo-pgr"
+          },
+          {
+            "name": "costValue",
+            "in": "query",
+            "description": "Valeur du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. On pourra, par exemple, préciser une distance ou un temps, selon l'optimisation choisie. L'unité dépendra aussi des paramètres distanceUnit et timeUnit.",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "example": "1.0"
+          },
+          {
+            "name": "costType",
+            "in": "query",
+            "description": "Type du coût utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities. On pourra, par exemple, préciser une distance ou un temps, selon l'optimisation choisie. L'unité dépendra aussi des paramètres distanceUnit et timeUnit.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "time"
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "description": "Mode de déplacement utilisé pour le calcul. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "car"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "Sens du parcours. Cela permet de définir le sens du parcours. Soit on définit un point de départ et on obtient les points d'arrivé potentiels. Soit on définit un point d'arrivé et on otient les points de départ potentiels. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "departure",
+                "arrival"
+              ]
+            },
+            "example": "départ"
+          },
+          {
+            "name": "constraints",
+            "in": "query",
+            "description": "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}"
+            ]
+          },
+          {
+            "name": "geometryFormat",
+            "in": "query",
+            "description": "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "geojson",
+                "polyline",
+                "wkt"
+              ]
+            }
+          },
+          {
+            "name": "distanceUnit",
+            "in": "query",
+            "description": "Unité des distances renvoyées. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "kilometer"
+          },
+          {
+            "name": "timeUnit",
+            "in": "query",
+            "description": "Unité du temps renvoyé. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "hour"
+          },
+          {
+            "name": "crs",
+            "in": "query",
+            "description": "Projection des géometries. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "EPSG:4326"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/isochrone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Utilisation"
+        ],
+        "summary": "Calculer une isochrone ou une isodistance",
+        "description": "Obtenir une surface géo-localisée représentant l’ensemble des points atteignables à partir d’un point de départ. Les points de départ et d’arrivée peuvent être inversés: on obtient alors la liste des points de départs possibles permettant d’atteindre un point d’arrivée donné. On peut aussi fournir un critère de distance plutôt que de temps: on parle alors de calcul d’iso-distances. Il est nécessaire de mettre 'Content-Type: application/json' dans le header de la requête.",
+        "operationId": "isochrone-post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/isochroneBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/isochrone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "point": {
+        "type": "string",
+        "pattern": "^(\\-?\\d+(\\.\\d+)?),\\s*(\\-?\\d+(\\.\\d+)?)$"
+      },
+      "coordinates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/point"
+        }
+      },
+      "constraint": {
+        "type": "object",
+        "properties": {
+          "constraintType": {
+            "type": "string",
+            "enum": [
+              "banned",
+              "preferred",
+              "unpreferred"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "threshold": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "constraintIso": {
+        "type": "object",
+        "properties": {
+          "constraintType": {
+            "type": "string",
+            "enum": [
+              "banned"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "routeBody": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "start": {
+            "$ref": "#/components/schemas/point"
+          },
+          "end": {
+            "$ref": "#/components/schemas/point"
+          },
+          "intermediates": {
+            "$ref": "#/components/schemas/coordinates"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "optimization": {
+            "type": "string"
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/constraint"
+            }
+          },
+          "getSteps": {
+            "type": "boolean"
+          },
+          "geometryFormat": {
+            "type": "string",
+            "enum": [
+              "geojson",
+              "polyline",
+              "wkt"
+            ]
+          },
+          "getBbox": {
+            "type": "boolean"
+          },
+          "distanceUnit": {
+            "type": "string"
+          },
+          "timeUnit": {
+            "type": "string"
+          },
+          "crs": {
+            "type": "string"
+          },
+          "waysAttributes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "nearestBody": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/point"
+          },
+          "nbPoints": {
+            "type": "integer"
+          },
+          "crs": {
+            "type": "string"
+          }
+        }
+      },
+      "isochroneBody": {
+        "type": "object",
+        "properties": {
+          "point": {
+            "$ref": "#/components/schemas/point"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "costType": {
+            "type": "string",
+            "enum": [
+              "temps",
+              "distance"
+            ]
+          },
+          "costValue": {
+            "type": "number",
+            "format": "float"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "départ",
+              "arrivé"
+            ]
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/constraintIso"
+            }
+          },
+          "geometryFormat": {
+            "type": "string",
+            "enum": [
+              "geojson",
+              "polyline",
+              "wkt"
+            ]
+          },
+          "distanceUnit": {
+            "type": "string"
+          },
+          "timeUnit": {
+            "type": "string"
+          },
+          "crs": {
+            "type": "string"
+          }
+        }
+      },
+      "errorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "errorType": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "itineraire": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "$ref": "#/components/schemas/point"
+          },
+          "end": {
+            "$ref": "#/components/schemas/point"
+          },
+          "geometry": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "format": "float"
+          },
+          "distance": {
+            "type": "number",
+            "format": "float"
+          },
+          "bbox": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "resourceVersion": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "optimization": {
+            "type": "string"
+          },
+          "crs": {
+            "type": "string"
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/constraint"
+            }
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "portions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "$ref": "#/components/schemas/point"
+                },
+                "end": {
+                  "$ref": "#/components/schemas/point"
+                },
+                "duration": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "distance": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "bbox": {
+                  "type": "string"
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "attributs": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "duration": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "distance": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "geometry": {
+                        "type": "string"
+                      },
+                      "instruction": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "modifyer": {
+                            "type": "string"
+                          },
+                          "exit": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "alerts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "nearest": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "resourceVersion": {
+            "type": "string"
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/point"
+          },
+          "crs": {
+            "type": "string"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "geometry": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "distance": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "isochrone": {
+        "type": "object",
+        "properties": {
+          "point": {
+            "$ref": "#/components/schemas/point"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "resourceVersion": {
+            "type": "string"
+          },
+          "costType": {
+            "type": "string"
+          },
+          "costValue": {
+            "type": "number"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "constraints": {
+            "$ref": "#/components/schemas/constraintIso"
+          },
+          "crs": {
+            "type": "string"
+          },
+          "geometry": {
+            "type": "string"
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "getcapabilities": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          },
+          "api": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "simple"
+              },
+              "version": {
+                "type": "string",
+                "example": "1.0.0"
+              }
+            }
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "methods": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "GET",
+                      "POST",
+                      "PUT",
+                      "DELETE"
+                    ]
+                  }
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "in": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "required": {
+                        "type": "boolean"
+                      },
+                      "default": {
+                        "type": "boolean"
+                      },
+                      "schema": {
+                        "type": "string"
+                      },
+                      "example": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "availableOperations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "availableParameters": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "values": {
+                              "type": "string"
+                            },
+                            "default": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

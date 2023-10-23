@@ -129,7 +129,19 @@ Self-explanatory feature.
 
 ### Get server health status via API
 
-Feature being implemented. The goal is to retrieve the status of each [source](./concepts.md) from the server and report it.
+Feature being implemented. The goal is to retrieve the status of each [source](./concepts.md) from each service and report it.
+
+### Get administrator configuration
+
+### Get configuration for services managed by an administrator
+
+### Obtain the configuration of a service via its id
+
+### Restart a service via its id
+
+### Obtain the list of projections managed by a service
+
+### Obtain the presence of a projection via its id
 
 ## Feature Group 5: OSRM Specific Features
 
