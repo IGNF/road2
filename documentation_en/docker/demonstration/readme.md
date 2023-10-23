@@ -85,6 +85,7 @@ docker run --rm road2-demonstration
 It is possible to view API documentation locally. We will run the following command:
 ```
 docker run --rm -p 8083:8080 -e SWAGGER_JSON=/api.json -v {path/to/json/directory}/api.json:/api.json swaggerapi/swagger-ui
+<<<<<<< HEAD
 =======
 ## Documentation 
 =======
@@ -97,4 +98,6 @@ It is possible to view API documentation locally. We will run the following comm
 ```
 docker run --rm -p 8083:8080 -e SWAGGER_JSON=/api.yaml -v {path/to/yaml/directory}/api.yaml:/api.yaml swaggerapi/swagger-ui
 >>>>>>> a8e7531 (First draft on english documentation)
+=======
+>>>>>>> d01080c (Adding modifications from fr develop doc)
 ```

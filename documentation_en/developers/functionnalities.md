@@ -203,6 +203,7 @@ Feature being implemented. The goal is to retrieve the status of each [source](.
 ### Obtain the list of projections managed by a service
 
 ### Obtain the presence of a projection via its id
+<<<<<<< HEAD
 
 ## Feature Group 5: OSRM Specific Features
 
@@ -331,6 +332,8 @@ Self-explanatory feature.
 ### Get server health status via API
 
 Feature being implemented. The goal is to retrieve the status of each [source](./concepts.md) from the server and report it.
+=======
+>>>>>>> d01080c (Adding modifications from fr develop doc)
 
 ## Feature Group 5: OSRM Specific Features
 
