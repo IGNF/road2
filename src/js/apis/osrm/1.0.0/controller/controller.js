@@ -36,7 +36,8 @@ module.exports = {
     let profile;
     let optimization;
     let tmpStringCoordinates;
-    let askedProjection;
+    let coordinatesSequence;
+    let defaultProjection;
 
     LOGGER.debug("checkRouteParameters()");
 
@@ -66,6 +67,8 @@ module.exports = {
 
     // On récupère l'opération route pour faire des vérifications
     let routeOperation = resource.getOperationById("route");
+    defaultProjection = routeOperation.getParameterById("projection").defaultValueContent;
+    LOGGER.debug("default crs: " + defaultProjection);
 
 
     // Profile and Optimization
@@ -108,19 +111,85 @@ module.exports = {
     } else {
       LOGGER.debug("raw coordinates:");
       LOGGER.debug(parameters.coordinates);
-y
-      let raw_string_pattern = /(-?\d+(\.\d+)?,-?\d+(\.\d+)?;){1,}-?\d+(\.\d+)?,-?\d+(\.\d+)?/;
-      let polyline_pattern = /polyline\(\S+\)/;
+
+      let rawStringPattern = /^(-?\d+(\.\d+)?,-?\d+(\.\d+)?;){1,}-?\d+(\.\d+)?,-?\d+(\.\d+)?$/;
+      let polylinePattern = /^polyline\(\S+\)$/;
 
       // TODO : extract coordinates in a single format
-      if (raw_string_pattern.test(parameters.coordinates)) {
-
-      } else if (polyline_pattern.test(parameters.coordinates)) {
-
+      if (rawStringPattern.test(parameters.coordinates)) {
+        coordinatesSequence = []
+        const coordinatesMatchList = parameters.coordinates.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)
+        for (const matchItem in coordinatesMatchList) {
+          coordinatesSequence.push([parseFloat(matchItem[1]), parseFloat(matchItem[2])]);
+        }
+      } else if (polylinePattern.test(parameters.coordinates)) {
+        coordinatesSequence = polyline.decode(parameters.coordinates);
       } else {
         throw errorManager.createError(" Parameter 'coordinates' is invalid: does not match allowed formats", 400);
       }
+      LOGGER.debug("coordinates sequence:");
+      LOGGER.debug(coordinatesSequence);
 
+      if (coordinatesSequence.length >= 2) {
+        // Route start point
+        parameters.start = coordinatesSequence[0].join(",");
+        LOGGER.debug("user start:");
+        LOGGER.debug(parameters.start);
+        let validity = routeOperation.getParameterById("start").check(parameters.start, defaultProjection);
+        if (validity.code !== "ok") {
+          throw errorManager.createError(" Parameter 'start' is invalid: " + validity.message, 400);
+        } else {
+          LOGGER.debug("user start valide")
+          start = new Point(coordinatesSequence[0][0], coordinatesSequence[0][1], defaultProjection);
+          LOGGER.debug("user start in road2' object:");
+          LOGGER.debug(start);
+        }
+        validity = null;
+
+        // Route end point
+        parameters.end = coordinatesSequence[coordinatesSequence.length-1].join(",");
+        LOGGER.debug("user end:");
+        LOGGER.debug(parameters.end);
+        validity = routeOperation.getParameterById("end").check(parameters.end, askedProjection);
+        if (validity.code !== "ok") {
+          throw errorManager.createError(" Parameter 'end' is invalid: " + validity.message, 400);
+        } else {
+          LOGGER.debug("user end valide")
+          end = new Point(coordinatesSequence[coordinatesSequence.length-1][0], coordinatesSequence[coordinatesSequence.length-1][1], defaultProjection);
+          LOGGER.debug("user end in road2' object:");
+          LOGGER.debug(end);
+        }
+      } else {
+        throw errorManager.createError(" Parameter 'coordinates' is invalid: it must contain at least two points");
+      }
+
+      if (coordinatesSequence.length > 2) {
+
+        LOGGER.debug("user intermediates:");
+        LOGGER.debug(coordinatesSequence.slice(1, coordinatesSequence.length-1));
+
+        let finalIntermediates = "";
+        for (let i = 1; i < (coordinatesSequence.length - 2); i++) {
+          finalIntermediates = finalIntermediates.concat(coordinatesSequence[i].join(","), "|");
+        }
+        finalIntermediates = finalIntermediates.concat(coordinatesSequence[coordinatesSequence.length - 2].join(","));
+
+        // Vérification de la validité des coordonnées fournies
+        let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, defaultProjection);
+        if (validity.code !== "ok") {
+          throw errorManager.createError(" Parameter 'coordinates' is invalid: " + validity.message, 400);
+        } else {
+
+          LOGGER.debug("intermediates valides");
+
+          if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, defaultProjection)) {
+            throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
+          } else {
+            LOGGER.debug("intermediates in a table:");
+            LOGGER.debug(routeRequest.intermediates);
+          }
+        }
+      }
     }
 
 
