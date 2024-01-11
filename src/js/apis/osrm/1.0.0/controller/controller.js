@@ -20,11 +20,11 @@ module.exports = {
   *
   * @function
   * @name checkRouteParameters
-  * @description Vérification des paramètres d'une requête sur /route
-  * @param {object} parameters - ensemble des paramètres de la requête
-  * @param {object} service - Instance de la classe Service
-  * @param {string} method - Méthode de la requête
-  * @return {object} RouteRequest - Instance de la classe RouteRequest
+  * @description Check parameters for a request on /route
+  * @param {object} parameters - request parameters
+  * @param {object} service - Service class' instance
+  * @param {string} method - request method
+  * @return {object} RouteRequest - RouteRequest class' instance
   *
   */
 
@@ -49,13 +49,13 @@ module.exports = {
       LOGGER.debug("user resource:");
       LOGGER.debug(parameters.resource);
 
-      // Vérification de la disponibilité de la ressource et de la compatibilité de son type avec la requête
+      // Check resource availability, and compatibility between its type and the request
       if (!service.verifyResourceExistenceById(parameters.resource)) {
         throw errorManager.createError(" Parameter 'resourceId' is invalid: it does not exist on this service ", 400);
       } else {
 
         resource = service.getResourceById(parameters.resource);
-        // On vérifie que la ressource peut accepter cette opération
+        // Check if this operation is allowed for this resource
         if (!resource.verifyAvailabilityOperation("route")){
           throw errorManager.createError(" Operation 'route' is not permitted on this resource ", 400);
         } else {
@@ -65,7 +65,7 @@ module.exports = {
       }
     }
 
-    // On récupère l'opération route pour faire des vérifications
+    // Get route operation to check some things
     let routeOperation = resource.getOperationById("route");
     defaultProjection = routeOperation.getParameterById("projection").defaultValueContent;
     LOGGER.debug("default crs: " + defaultProjection);
@@ -79,7 +79,7 @@ module.exports = {
     } else {
       LOGGER.debug("user profile:");
       LOGGER.debug(parameters.profile);
-      // Vérification de la validité du paramètre
+      // Parameter's validity check
       let validity = routeOperation.getParameterById("profile").check(parameters.profile);
       if (validity.code !== "ok") {
         throw errorManager.createError(" Parameter 'profileId' is invalid: " + validity.message, 400);
@@ -94,7 +94,7 @@ module.exports = {
     } else {
       LOGGER.debug("user optimization:");
       LOGGER.debug(parameters.optimization);
-      // Vérification de la validité du paramètre
+      // Parameter's validity check
       let validity = routeOperation.getParameterById("optimization").check(parameters.optimization);
       if (validity.code !== "ok") {
         throw errorManager.createError(" Parameter 'optimizationId' is invalid: " + validity.message, 400);
@@ -104,7 +104,7 @@ module.exports = {
       }
     }
 
-    // Paramètres spécifiques à l'API OSRM
+    // OSRM API specific parameters
     // coordinates (2 possible formats)
     if (!parameters.coordinates) {
         throw errorManager.createError(" Parameter 'coordinates' not found", 400);
@@ -162,63 +162,117 @@ module.exports = {
       } else {
         throw errorManager.createError(" Parameter 'coordinates' is invalid: it must contain at least two points");
       }
-
-      if (coordinatesSequence.length > 2) {
-
-        LOGGER.debug("user intermediates:");
-        LOGGER.debug(coordinatesSequence.slice(1, coordinatesSequence.length-1));
-
-        let finalIntermediates = "";
-        for (let i = 1; i < (coordinatesSequence.length - 2); i++) {
-          finalIntermediates = finalIntermediates.concat(coordinatesSequence[i].join(","), "|");
-        }
-        finalIntermediates = finalIntermediates.concat(coordinatesSequence[coordinatesSequence.length - 2].join(","));
-
-        // Vérification de la validité des coordonnées fournies
-        let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, defaultProjection);
-        if (validity.code !== "ok") {
-          throw errorManager.createError(" Parameter 'coordinates' is invalid: " + validity.message, 400);
-        } else {
-
-          LOGGER.debug("intermediates valides");
-
-          if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, defaultProjection)) {
-            throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
-          } else {
-            LOGGER.debug("intermediates in a table:");
-            LOGGER.debug(routeRequest.intermediates);
-          }
-        }
-      }
     }
 
-
-    // alternatives
-
-    // steps
-
-    // annotations
-
-    // geometries
-
-    // overview
-
-    // continue_straight
-
-
-    // On définit la routeRequest avec les paramètres obligatoires
+    // Instanciate routeRequest with mandatory parameters
     let routeRequest = new RouteRequest(parameters.resource, start, end, profile, optimization);
 
     LOGGER.debug(routeRequest);
 
-    // Vérification de la validité du profile et de sa compatibilité avec l'optimisation
+    // Check profile's validity and compatibility with the chosen optimization
     if (!resource.checkSourceAvailibilityFromRequest(routeRequest)) {
       throw errorManager.createError(" Parameters 'profile' and 'optimization' are not compatible ", 400);
     } else {
       LOGGER.debug("profile et optimization compatibles");
     }
 
+    // Intermediate points
+    if (coordinatesSequence.length > 2) {
 
+      LOGGER.debug("user intermediates:");
+      LOGGER.debug(coordinatesSequence.slice(1, coordinatesSequence.length-1));
+
+      let finalIntermediates = "";
+      for (let i = 1; i < (coordinatesSequence.length - 2); i++) {
+        finalIntermediates = finalIntermediates.concat(coordinatesSequence[i].join(","), "|");
+      }
+      finalIntermediates = finalIntermediates.concat(coordinatesSequence[coordinatesSequence.length - 2].join(","));
+
+      // Check coordinates validity
+      let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, defaultProjection);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'coordinates' is invalid: " + validity.message, 400);
+      } else {
+
+        LOGGER.debug("valid intermediates");
+
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, defaultProjection)) {
+          throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
+        } else {
+          LOGGER.debug("intermediates in a table:");
+          LOGGER.debug(routeRequest.intermediates);
+        }
+      }
+    }
+
+    // steps (OSRM) / getSteps (Road2)
+    if (parameters.steps) {
+      LOGGER.debug("user getSteps:");
+      LOGGER.debug(parameters.steps);
+
+      // Check coordinates validity
+      let validity = routeOperation.getParameterById("getSteps").check(parameters.steps);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'steps' is invalid: " + validity.message, 400);
+      } else {
+
+        routeRequest.computeSteps = routeOperation.getParameterById("getSteps").specificConvertion(parameters.steps)
+        if (routeRequest.computeSteps === null) {
+          throw errorManager.createError(" Parameter 'steps' is invalid ", 400);
+        } else {
+          LOGGER.debug("converted getSteps: " + routeRequest.computeSteps);
+        }
+
+    } else if ("defaultValueContent" in routeOperation.getParameterById("getSteps") && typeof(routeOperation.getParameterById("getSteps").defaultValueContent) !== "undefined") {
+      // Default value from configuration
+      routeRequest.computeSteps = routeOperation.getParameterById("getSteps").defaultValueContent;
+      LOGGER.debug("configuration default getSteps: " + routeRequest.computeSteps);
+    } else {
+      routeRequest.computeSteps = false;
+      LOGGER.debug("general default getSteps: " + routeRequest.computeSteps);
+    }
+
+    // geometries (OSRM) / geometryFormat (Road2)
+    if (parameters.geometries) {
+
+      LOGGER.debug("user geometryFormat:");
+      LOGGER.debug(parameters.geometries);
+
+      // Check coordinates validity
+      let validity = routeOperation.getParameterById("geometryFormat").check(parameters.geometries);
+      if (validity.code !== "ok") {
+        throw errorManager.createError(" Parameter 'geometries' is invalid: " + validity.message, 400);
+      } else {
+        LOGGER.debug("geometryFormat valide");
+      }
+
+      routeRequest.geometryFormat = parameters.geometries;
+
+    } else {
+
+      // Default value from configuration
+      routeRequest.geometryFormat = routeOperation.getParameterById("geometryFormat").defaultValueContent;
+      LOGGER.debug("default geometryFormat used: " + routeRequest.geometryFormat);
+
+    }
+
+    /* The following OSRM optional parameters are ignored for now, as they don't seem to match any routeRequest property:
+       - alternatives
+       - annotations
+       - bearings
+       - continue_straight (can maybe be converted to a "constraints" routeRequest property)
+       - format
+       - hints
+       - overview (always "full" in road2)
+       - radiuses
+    */
+    // optional routeRequest parameters with no OSRM equivalent are ignored or fixed
+
+    routeRequest.bbox = false
+    routeRequest.distanceUnit = "meter"
+    routeRequest.timeUnit = "second"
+
+    return routeRequest;
 
   },
 
@@ -236,77 +290,53 @@ module.exports = {
 
   writeRouteResponse: function(routeRequest, routeResponse, service) {
 
-    
-  },
+    LOGGER.debug("writeRouteResponse()");
 
-  /**
-  *
-  * @function
-  * @name convertPostArrayToGetParameters
-  * @description Transformation d'un paramètre POST en chaîne de caractères pour avoir l'équivalent d'un paramètre GET.
-  * @param {object} userParameter - Paramètre POST donné par l'utilisateur
-  * @param {Parameter} serviceParameter - Instance de la classe Parameter
-  * @param {string} parameterName - Nom du paramètre converti
-  * @return {string|array} Paramètre en GET
-  *
-  */
+    let userResponse = {
+      "code": "",
+      "routes": [],
+      "waypoints": []
+    };
+    for (let route in routeResponse.routes) {
+      let outputRoute = {
+        "distance": route.distance,
+        "duration": route.duration,
+        "geometry": route.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
+        "legs": []
+      };
 
-  convertPostArrayToGetParameters: function(userParameter, serviceParameter, parameterName) {
+      for (let i = 0; i < route.portions.length; i++) {
+        let portion = route.portions[i]
+        let leg = {
+          "distance": portion.distance,
+          "duration": portion.duration,
+          "steps": []
+        };
+        if (userResponse.waypoints.length < (route.portions.length + 1)) {
+          let coordsPattern = /^(\-?\d+(?:\.\d+)?),\s*(\-?\d+(?:\.\d+)?)$/;
+          let waypoint = {
+            "hint": "",
+            "distance": NaN,
+            "name": "",
+            "location": portion.start.match(coordsPattern).slice(1, 2)
+          };
+          userResponse.waypoints.push(waypoint);
 
-    LOGGER.debug("convertPostArrayToGetParameters() for " + parameterName);
-
-    let finalParameter = "";
-    let separator = "";
-
-    if (serviceParameter.explode === "false") {
-      if (serviceParameter.style === "pipeDelimited") {
-        separator = "|";
-        LOGGER.debug("separateur trouve pour ce parametre");
-      } else {
-        // ne doit pas arriver
-        throw errorManager.createError(" Error in parameter configuration. ");
-      }
-    } else {
-      // C'est déjà un tableau qu'on retourne car c'est ce qu'on attend pour le GET
-      LOGGER.debug("nothing to do for this parameter");
-      return userParameter;
-    }
-
-    if (!Array.isArray(userParameter)) {
-      throw errorManager.createError(" The parameter " + parameterName + " is not an array. ", 400);
-    } else {
-      LOGGER.debug("Le parametre est un tableau");
-    }
-    if (userParameter.length === 0) {
-      throw errorManager.createError(" The parameter " + parameterName + " is an empty array. ", 400);
-    } else {
-      LOGGER.debug("Le parametre est un tableau non vide");
-    }
-
-    try {
-      if (typeof userParameter[0] !== "object") {
-        finalParameter = userParameter[0];
-      } else {
-        finalParameter = JSON.stringify(userParameter[0]);
-      }
-    } catch(err) {
-      throw errorManager.createError(" The parameter " + parameterName + " can't be converted to a string. ", 400);
-    }
-
-    for (let i = 1; i < userParameter.length; i++) {
-      try {
-        //TODO: vérifier que l'on peut mettre i à la place de 0
-        if (typeof userParameter[0] !== "object") {
-          finalParameter = finalParameter + separator + userParameter[i];
-        } else {
-          finalParameter = finalParameter + separator + JSON.stringify(userParameter[i]);
+          if (i == (route.portions.length - 1)) {
+            let finalWaypoint= {
+              "hint": "",
+              "distance": NaN,
+              "name": "",
+              "location": portion.end.match(coordsPattern).slice(1, 2)
+            };
+            userResponse.waypoints.push(finalWaypoint);
+          }
         }
-      } catch(err) {
-        throw errorManager.createError(" The parameter " + parameterName + " can't be converted to a string. ", 400);
       }
+
+      userResponse.routes.push(outputRoute)
     }
 
-    return finalParameter;
 
   }
 
