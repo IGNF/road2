@@ -50,7 +50,7 @@
         }
       }
     },
-    "/resource/{resourceId}/{profileId}/{optimizationId}/route/v1/profile/{coordinates}": {
+    "/{resourceId}/{profileId}/{optimizationId}/route/v1/_/{coordinates}": {
       "get": {
         "tags": [
           "Route"

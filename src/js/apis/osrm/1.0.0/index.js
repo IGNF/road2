@@ -93,11 +93,11 @@ router.all("/resources", function(req, res) {
 
 // Route
 // Pour effectuer un calcul d'itinéraire
-router.route("/resource/:resource/:profile/:optimization/route/v1/profile/:coordinates")
+router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
 
   .get(async function(req, res, next) {
 
-    LOGGER.debug("requete GET sur /osrm/1.0.0/resource/");
+    LOGGER.debug("requete GET sur /osrm/1.0.0/:resource");
     LOGGER.debug(req.originalUrl);
 
     // On récupère l'instance de Service pour faire les calculs
@@ -137,7 +137,7 @@ router.route("/resource/:resource/:profile/:optimization/route/v1/profile/:coord
 
   .post(async function(req, res, next) {
 
-    LOGGER.debug("requete POST sur /osrm/1.0.0/resource/");
+    LOGGER.debug("requete POST sur /osrm/1.0.0/:resource/");
     LOGGER.debug(req.originalUrl);
     return next(errorManager.createError(" Operation not implemented yet on this service ", 501));
   });
