@@ -372,6 +372,11 @@ module.exports = class osrmSource extends Source {
     let profile;
     let optimization;
     let routes = new Array();
+    let engineExtras = {
+      "code": "",
+      "routes": new Array(),
+      "waypoints": new Array()
+    };
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
     // ---
@@ -383,6 +388,11 @@ module.exports = class osrmSource extends Source {
 
     // optimization
     optimization = routeRequest.optimization;
+    // ---
+
+    // Récupération des paramètres de la réponse OSRM pour une éventuelle réponse avec son API native
+    engineExtras.code = osrmResponse.code;
+
     // ---
 
     // Lecture de la réponse OSRM
@@ -428,6 +438,15 @@ module.exports = class osrmSource extends Source {
       LOGGER.debug("osrm response has 1 or more routes");
     }
 
+    for (let sourceWaypoint in osrmResponse.waypoints) {
+      let nativeWaypoint = {
+        "hint": sourceWaypoint.hint,
+        "distance": sourceWaypoint.distance,
+        "name": sourceWaypoint.name
+      };
+      engineExtras.waypoints.push(nativeWaypoint);
+    }
+
     // routes
     // Il peut y avoir plusieurs itinéraires
     for (let i = 0; i < osrmResponse.routes.length; i++) {
@@ -436,6 +455,8 @@ module.exports = class osrmSource extends Source {
 
       let portions = new Array();
       let currentOsrmRoute = osrmResponse.routes[i];
+      engineExtras.routes[i] = {};
+      nativeLegs = new Array();
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", super.projection) );
@@ -474,13 +495,15 @@ module.exports = class osrmSource extends Source {
 
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], super.projection);
         if (!legEnd.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+          throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         } else {
           LOGGER.debug("portion end in asked projection:");
           LOGGER.debug(legEnd);
         }
 
+
         portions[j] = new Portion(legStart, legEnd);
+        nativeLegs[j] = {};
 
         // On récupère la distance et la durée
         portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"meter");
@@ -488,6 +511,7 @@ module.exports = class osrmSource extends Source {
 
         // Steps
         let steps = new Array();
+        let nativeSteps = new Array();
 
         // On va associer les étapes à la portion concernée
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
@@ -524,17 +548,33 @@ module.exports = class osrmSource extends Source {
           if (currentOsrmRouteStep.maneuver.exit) {
             steps[k].instruction.exit = currentOsrmRouteStep.maneuver.exit;
           }
+
+          nativeSteps[k] = {};
+          nativeSteps[k].mode = currentOsrmRouteStep.mode;
+          nativeIntersections = new Array();
+          for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
+            let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
+            nativeIntersections[intersectionIndex] = JSON.parse(JSON.stringify(currentIntersection));
+            nativeIntersections[intersectionIndex].location = new Point(currentIntersection.location[0], currentIntersection.location[1], super.projection)
+            if (!nativeIntersections[intersectionIndex].location.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of intersection in OSRM response. ");
+            }
+          }
+          nativeSteps[k].intersections = nativeIntersections;
         }
 
         portions[j].steps = steps;
+        nativeLegs[j].steps = nativeSteps;
 
       }
 
       routes[i].portions = portions;
+      engineExtras.routes[i].legs = nativeLegs;
 
     }
 
     routeResponse.routes = routes;
+    routeResponse.engineExtras = engineExtras:
 
     return routeResponse;
 

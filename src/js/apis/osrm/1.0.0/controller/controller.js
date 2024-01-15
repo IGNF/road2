@@ -280,11 +280,11 @@ module.exports = {
   *
   * @function
   * @name writeRouteResponse
-  * @description Ré-écriture de la réponse d'un moteur pour une requête sur /route
-  * @param {object} RouteRequest - Instance de la classe RouteRequest
-  * @param {object} RouteResponse - Instance de la classe RouteResponse
-  * @param {object} service - Instance de la classe Service
-  * @return {object} userResponse - Réponse envoyée à l'utilisateur
+  * @description Rewrite engine's response to respond to a /route request
+  * @param {object} RouteRequest - RouteRequest class instance
+  * @param {object} RouteResponse - RouteResponse class instance
+  * @param {object} service - Service class instance
+  * @return {object} userResponse - Response body to serialize for the user
   *
   */
 
@@ -292,49 +292,44 @@ module.exports = {
 
     LOGGER.debug("writeRouteResponse()");
 
+    // Initialize userResponse
     let userResponse = {
-      "code": "",
-      "routes": [],
-      "waypoints": []
+      "code": routeResponse.engineExtras.code
     };
-    for (let route in routeResponse.routes) {
-      let outputRoute = {
-        "distance": route.distance,
-        "duration": route.duration,
-        "geometry": route.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
+
+    let askedProjection = routeRequest.start.projection;
+
+    // Waypoints
+    let waypointArray = JSON.parse(JSON.stringify(routeResponse.engineExtras.waypoints));
+    let startingPoint = routeResponse.routes[0].portions[0].start;
+    waypointArray[0].location = [startingPoint.x, startingPoint.y];
+    for (let i = 1; i < waypointArray.length; i++) {
+      let point = routeResponse.routes[0].portions[i-1].end;
+      waypointArray[i].location = [point.x, point.y];
+    }
+    userResponse.waypoints = waypointArray;
+
+    let routeArray = new Array();
+    for (let routeIdx = 0; routeIdx < routeResponse.routes.length; routeIdx++) {
+    // for (let route in routeResponse.routes) {
+      let simpleRoute = routeResponse.routes[routeIdx];
+      let extraRoute = routeResponse.engineExtras.routes[routeIdx];
+      routeArray[routeIdx] = {
+        "distance": simpleRoute.distance,
+        "duration": simpleRoute.duration,
+        "geometry": simpleRoute.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
         "legs": []
       };
 
-      for (let i = 0; i < route.portions.length; i++) {
-        let portion = route.portions[i]
-        let leg = {
+      let legArray = new Array();
+      for (let legIdx = 0; legIdx < route.portions.length; legIdx++) {
+        let portion = route.portions[legIdx]
+        legArray = {
           "distance": portion.distance,
           "duration": portion.duration,
           "steps": []
         };
-        if (userResponse.waypoints.length < (route.portions.length + 1)) {
-          let coordsPattern = /^(\-?\d+(?:\.\d+)?),\s*(\-?\d+(?:\.\d+)?)$/;
-          let waypoint = {
-            "hint": "",
-            "distance": NaN,
-            "name": "",
-            "location": portion.start.match(coordsPattern).slice(1, 2)
-          };
-          userResponse.waypoints.push(waypoint);
-
-          if (i == (route.portions.length - 1)) {
-            let finalWaypoint= {
-              "hint": "",
-              "distance": NaN,
-              "name": "",
-              "location": portion.end.match(coordsPattern).slice(1, 2)
-            };
-            userResponse.waypoints.push(finalWaypoint);
-          }
-        }
       }
-
-      userResponse.routes.push(outputRoute)
     }
 
 

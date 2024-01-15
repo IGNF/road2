@@ -126,9 +126,7 @@ router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
       const routeRequest = controller.checkRouteParameters(parameters, service, "GET");
       LOGGER.debug(routeRequest);
 
-    } catch (error) {
-      return next(error);
-    }   
+    }
 
 
     return next(errorManager.createError(" Operation not implemented yet on this service ", 501));
@@ -137,6 +135,8 @@ router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
 
   .post(async function(req, res, next) {
 
+    } catch (error) {
+      return next(error);
     LOGGER.debug("requete POST sur /osrm/1.0.0/:resource/");
     LOGGER.debug(req.originalUrl);
     return next(errorManager.createError(" Operation not implemented yet on this service ", 501));
