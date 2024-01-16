@@ -10,6 +10,7 @@ const Point = require('../geometry/point');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
+const copyManager = require('../../../../utils/copyManager')
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
@@ -554,7 +555,7 @@ module.exports = class osrmSource extends Source {
           nativeIntersections = new Array();
           for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
             let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
-            nativeIntersections[intersectionIndex] = JSON.parse(JSON.stringify(currentIntersection));
+            nativeIntersections[intersectionIndex] = copyManager.deepCopy(currentIntersection);
             nativeIntersections[intersectionIndex].location = new Point(currentIntersection.location[0], currentIntersection.location[1], super.projection)
             if (!nativeIntersections[intersectionIndex].location.transform(askedProjection)) {
               throw errorManager.createError(" Error during reprojection of intersection in OSRM response. ");
@@ -574,7 +575,7 @@ module.exports = class osrmSource extends Source {
     }
 
     routeResponse.routes = routes;
-    routeResponse.engineExtras = engineExtras:
+    routeResponse.engineExtras = engineExtras;
 
     return routeResponse;
 

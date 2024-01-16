@@ -11,79 +11,47 @@ const swaggerUi = require('swagger-ui-express');
 var LOGGER = log4js.getLogger("OSRM");
 var router = express.Router();
 
-// POST
-// ---
-// Pour cette API, on va permettre la lecture des requêtes POST en parsant les contenus du type application/json
-router.use(express.json(
-  // Fonctions utilisées pour vérifier le body d'un POST et ainsi récupérer les erreurs
-  {
-    type: (req) => {
-      // Le seul content-type accepté a toujours été application/json, on rend cela plus explicite
-      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct. 
-      // Sans elle, le traitement continue.
-      if (req.get('Content-Type') !== "application/json") {
-        throw errorManager.createError(" Wrong Content-Type. Must be 'application/json' ", 400);
-      } else {
-        return true;
-      }
-    },
-    verify: (req, res, buf, encoding) => {
-      // Cette fonction permet de vérifier que le JSON envoyé est valide. 
-      // Si ce n'est pas le cas, le traitement de la requête est arrêté. 
-      try {
-        JSON.parse(buf);
-      } catch (error) {
-        throw errorManager.createError("Invalid request body. Error during the parsing of the body: " + error.message, 400);
-      }
-    }
-  }
-)); 
-// ---
-
-// Accueil de l'API
+// API entrypoint
 router.all("/", function(req, res) {
-  LOGGER.debug("requete sur /osrm/1.0.0/");
-  res.send("Road2 via l'API OSRM 1.0.0");
+  LOGGER.debug("request on /osrm/1.0.0/");
+  res.send("Road2 via OSRM API 1.0.0");
 });
 
 
 // swagger-ui
 var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','osrm', '1.0.0', 'api.json');
-LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API OSRM en version 1.0.0");
+LOGGER.info("using file '"+ apiJsonPath + "' to initialize swagger-ui for OSRM API version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
 router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
 router.all("/resources", function(req, res) {
 
-  LOGGER.debug("requete sur /osrm/1.0.0/resources?");
+  LOGGER.debug("request on /osrm/1.0.0/resources?");
 
-  // récupération du service
+  // get service
   let service = req.app.get("service");
 
-  // récupération du uid
+  // get uid
   let uid = service.apisManager.getApi("osrm","1.0.0").uid;
   LOGGER.debug(uid);
 
-  // récupération du getCapabilities précalculé dans init.js
+  // get getCapabilities from init.js
   let getCapabilities = req.app.get(uid + "-getcap");
   LOGGER.debug(getCapabilities);
 
-  // Modification si Host ou X-Forwarded-Host précisè dans l'en-tête de la requête 
-  // il est récupéré par express dans req.host
+  // Change base url in GetCapabilties if "Host" or "X-Forwarded-Host" is specified in request's headers
+  // Host is stored by expres in req.hostname
   if (req.hostname) {
-
-    // TODO : corriger avec quelque chose du genre ^http(s)?:\/\/(.+) puis split au premier /
     let regexpHost = /^http[s]?:\/\/[\w\d:-_\.]*\//;
-
     try {
       getCapabilities.info.url = getCapabilities.info.url.replace(regexpHost, req.protocol + "://" + req.hostname + "/");
     } catch(error) {
-      // on renvoit le getcap par défaut
+      // apply default service url in GetCapabilities
     }
 
   } else {
-    // il y a déjà une valeur par défaut
+    // apply default service url in GetCapabilities
   }
 
   res.set('content-type', 'application/json');
@@ -91,24 +59,23 @@ router.all("/resources", function(req, res) {
 
 });
 
-// Route
-// Pour effectuer un calcul d'itinéraire
+// Route: routing request
 router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
 
   .get(async function(req, res, next) {
 
-    LOGGER.debug("requete GET sur /osrm/1.0.0/:resource");
+    LOGGER.debug("GET request on /osrm/1.0.0/:resource");
     LOGGER.debug(req.originalUrl);
 
-    // On récupère l'instance de Service pour faire les calculs
+    // get service instance
     let service = req.app.get("service");
 
-    // on vérifie que l'on peut faire cette opération sur l'instance du service
+    // check if operation is permitted on this service instance
     if (!service.verifyAvailabilityOperation("route")) {
       return next(errorManager.createError(" Operation not permitted on this service ", 400));
     }
 
-    // on récupère l'ensemble des paramètres de la requête
+    // get request parameters, both from path and query
     let path_parameters = req.params
     let query_parameters = req.query;
     let parameters = {}
@@ -122,33 +89,31 @@ router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
 
     try {
 
-      // Vérification des paramètres de la requête
+      // Check request parameters
       const routeRequest = controller.checkRouteParameters(parameters, service, "GET");
       LOGGER.debug(routeRequest);
+      // Send to service and get response object
+      const routeResponse = await service.computeRequest(routeRequest);
+      LOGGER.debug(routeResponse);
+      // Format response
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service);
+      LOGGER.debug(userResponse);
 
-    }
-
-
-    return next(errorManager.createError(" Operation not implemented yet on this service ", 501));
-
-  })
-
-  .post(async function(req, res, next) {
+      res.set('content-type', 'application/json');
+      res.status(200).json(userResponse);
 
     } catch (error) {
       return next(error);
-    LOGGER.debug("requete POST sur /osrm/1.0.0/:resource/");
-    LOGGER.debug(req.originalUrl);
-    return next(errorManager.createError(" Operation not implemented yet on this service ", 501));
+    }
   });
 
 
-// Gestion des erreurs
-// Cette partie doit être placée après la définition des routes normales
+// Error management
+// This part must be placed after normal routes definitions
 // ---
 router.use(logError);
 router.use(sendError);
-// Celui-ci doit être le dernier pour renvoyer un 404 si toutes les autres routes font appel à next
+// This must be the last item to send an HTTP 404 error if evry route calls next.
 router.use(notFoundError);
 // ---
 
@@ -156,7 +121,7 @@ router.use(notFoundError);
 *
 * @function
 * @name logError
-* @description Callback pour écrire l'erreur dans les logs
+* @description Callback to log error
 *
 */
 
@@ -186,19 +151,19 @@ function logError(err, req, res, next) {
 *
 * @function
 * @name sendError
-* @description Callback pour envoyer l'erreur au client
+* @description Callback to send error to client
 *
 */
 
 function sendError(err, req, res, next) {
-  // On ne veut pas le même comportement en prod et en dev 
+  // Behaviour should differ between production and development environments
   if (process.env.NODE_ENV === "production") {
     if (err.status) {
-      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client 
+      // if error has a status, this error should be sent to the client
       res.status(err.status);
       res.json({ error: {errorType: err.code, message: err.message}});
     } else {
-      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur 
+      // if error has no status, this error's details should not be sent to the client
       res.status(500);
       res.json({ error: {errorType: "internal", message: "Internal Server Error"}});
     }
@@ -207,11 +172,11 @@ function sendError(err, req, res, next) {
       res.json({ error: {errorType: err.code,
         message: err.message,
         stack: err.stack,
-        // utile lorsqu'une erreur sql remonte
+        // useful for SQL errors
         more: err
       }});
   } else {
-    // En dev, on veut faire remonter n'importe quelle erreur 
+    // in the development environment, every error should be sent to clients
     res.status(err.status || 500);
     res.json({ error: {errorType: err.code, message: err.message}});
   }
@@ -222,7 +187,7 @@ function sendError(err, req, res, next) {
 *
 * @function
 * @name sendError
-* @description Callback pour envoyer l'erreur au client
+* @description Callback to send HTTP "Not Found" error to client
 *
 */
 
