@@ -5,6 +5,7 @@ const log4js = require('log4js');
 const polyline = require('@mapbox/polyline');
 const Turf = require('@turf/turf');
 
+const copyManager = require('../../../../utils/copyManager')
 const Distance = require('../../../../geography/distance');
 const Duration = require('../../../../time/duration');
 const errorManager = require('../../../../utils/errorManager');
@@ -296,11 +297,10 @@ module.exports = {
     let userResponse = {
       "code": routeResponse.engineExtras.code
     };
-
     let askedProjection = routeRequest.start.projection;
 
     // Waypoints
-    let waypointArray = JSON.parse(JSON.stringify(routeResponse.engineExtras.waypoints));
+    let waypointArray = copyManager.deepCopy(routeResponse.engineExtras.waypoints);
     let startingPoint = routeResponse.routes[0].portions[0].start;
     waypointArray[0].location = [startingPoint.x, startingPoint.y];
     for (let i = 1; i < waypointArray.length; i++) {
@@ -309,30 +309,65 @@ module.exports = {
     }
     userResponse.waypoints = waypointArray;
 
+    // Routes
     let routeArray = new Array();
     for (let routeIdx = 0; routeIdx < routeResponse.routes.length; routeIdx++) {
-    // for (let route in routeResponse.routes) {
-      let simpleRoute = routeResponse.routes[routeIdx];
-      let extraRoute = routeResponse.engineExtras.routes[routeIdx];
+      let simpleRoute = routeResponse.routes[routeIdx]; // from road2 standard response
+      let extraRoute = routeResponse.engineExtras.routes[routeIdx]; // from engine specific extras
+      // both sources will be fused to craft a response compliant with OSRM's official API definition
+
+      // Legs (Road2's "portions")
+      let legArray = new Array();
+      for (let legIdx = 0; legIdx < simpleRoute.portions.length; legIdx++) {
+        let portion = simpleRoute.portions[legIdx]; // from road2 standard response
+        let leg = extraRoute.legs[legIdx]; // from engine specific extras
+        legArray[legIdx] = {
+          "distance": portion.distance,
+          "duration": portion.duration
+        };
+
+        // Steps (optional)
+        let stepArray = new Array();
+        if (routeRequest.computeSteps && portion.steps.length !== 0) {
+          for (let stepIdx = 0; stepIdx < portion.steps.length; stepIdx++) {
+            let simpleStep = portion.steps[stepIdx]; // from road2 standard response
+            let extraStep = leg.steps[stepIdx]; // from engine specific extras
+            stepArray[stepIdx] = {
+              "distance": simpleStep.distance,
+              "duration": simpleStep.duration,
+              "geometry": simpleStep.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
+              "intersections": copyManager.deepCopy(extraStep.intersections),
+              "maneuver": {
+                "type": extraStep.instruction.type
+              },
+              "mode": extraStep.mode,
+              "name": simpleStep.name
+            };
+            if (simpleStep.instruction.modifier) {
+              stepArray[stepIdx].maneuver.modifier = simpleStep.instruction.modifier;
+            }
+            if (simpleStep.instruction.exit) {
+              stepArray[stepIdx].maneuver.exit = simpleStep.instruction.exit;
+            }
+          }
+          legArray[legIdx].steps = stepArray;
+        } else {
+          LOGGER.debug("no steps asked by user");
+        }
+      }
+
       routeArray[routeIdx] = {
         "distance": simpleRoute.distance,
         "duration": simpleRoute.duration,
         "geometry": simpleRoute.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
-        "legs": []
+        "legs": legArray
       };
-
-      let legArray = new Array();
-      for (let legIdx = 0; legIdx < route.portions.length; legIdx++) {
-        let portion = route.portions[legIdx]
-        legArray = {
-          "distance": portion.distance,
-          "duration": portion.duration,
-          "steps": []
-        };
-      }
     }
 
+    // Finalze userResponse
+    userResponse.routes = routeArray;
 
+    return userResponse;
   }
 
 }
