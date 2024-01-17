@@ -8,8 +8,8 @@ const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
 const swaggerUi = require('swagger-ui-express');
 
-var LOGGER = log4js.getLogger("OSRM");
-var router = express.Router();
+let LOGGER = log4js.getLogger("OSRM");
+let router = express.Router();
 
 // API entrypoint
 router.all("/", function(req, res) {
@@ -19,9 +19,9 @@ router.all("/", function(req, res) {
 
 
 // swagger-ui
-var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','osrm', '1.0.0', 'api.json');
+let apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','osrm', '1.0.0', 'api.json');
 LOGGER.info("using file '"+ apiJsonPath + "' to initialize swagger-ui for OSRM API version 1.0.0");
-var swaggerDocument = require(apiJsonPath);
+let swaggerDocument = require(apiJsonPath);
 router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
@@ -43,7 +43,7 @@ router.all("/resources", function(req, res) {
   // Change base url in GetCapabilties if "Host" or "X-Forwarded-Host" is specified in request's headers
   // Host is stored by expres in req.hostname
   if (req.hostname) {
-    let regexpHost = /^http[s]?:\/\/[\w\d:-_\.]*\//;
+    let regexpHost = /^https?:\/\/[\w\d:-_.]*\//;
     try {
       getCapabilities.info.url = getCapabilities.info.url.replace(regexpHost, req.protocol + "://" + req.hostname + "/");
     } catch(error) {

@@ -2,7 +2,7 @@
 
 const log4js = require('log4js');
 
-var LOGGER = log4js.getLogger("INIT");
+let LOGGER = log4js.getLogger("INIT");
 
 module.exports = {
 
