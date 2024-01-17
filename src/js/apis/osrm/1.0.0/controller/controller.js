@@ -3,17 +3,15 @@
 const log4js = require('log4js');
 
 const polyline = require('@mapbox/polyline');
-const Turf = require('@turf/turf');
 
-const copyManager = require('../../../../utils/copyManager')
+const copyManager = require('../../../../utils/copyManager');
 const Distance = require('../../../../geography/distance');
 const Duration = require('../../../../time/duration');
 const errorManager = require('../../../../utils/errorManager');
-const NearestRequest = require('../../../../requests/nearestRequest');
 const Point = require('../../../../geometry/point');
 const RouteRequest = require('../../../../requests/routeRequest');
 
-var LOGGER = log4js.getLogger("CONTROLLER");
+let LOGGER = log4js.getLogger("CONTROLLER");
 
 module.exports = {
 
@@ -36,9 +34,8 @@ module.exports = {
     let end = {};
     let profile;
     let optimization;
-    let tmpStringCoordinates;
     let coordinatesSequence;
-    let defaultProjection;
+    let askedProjection;
 
     LOGGER.debug("checkRouteParameters()");
 
@@ -68,8 +65,8 @@ module.exports = {
 
     // Get route operation to check some things
     let routeOperation = resource.getOperationById("route");
-    defaultProjection = routeOperation.getParameterById("projection").defaultValueContent;
-    LOGGER.debug("default crs: " + defaultProjection);
+    askedProjection = routeOperation.getParameterById("projection").defaultValueContent;
+    LOGGER.debug("default crs: " + askedProjection);
 
 
     // Profile and Optimization
@@ -113,17 +110,22 @@ module.exports = {
       LOGGER.debug("raw coordinates:");
       LOGGER.debug(parameters.coordinates);
 
-      let rawStringPattern = /^(-?\d+(\.\d+)?,-?\d+(\.\d+)?;){1,}-?\d+(\.\d+)?,-?\d+(\.\d+)?$/;
+      let rawStringPattern = /^-?\d+(\.\d+)?,-?\d+(\.\d+)?(;-?\d+(\.\d+)?,-?\d+(\.\d+)?)+$/;
       let polylinePattern = /^polyline\(\S+\)$/;
 
-      // TODO : extract coordinates in a single format
       if (rawStringPattern.test(parameters.coordinates)) {
-        coordinatesSequence = []
-        const coordinatesMatchList = parameters.coordinates.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)
-        for (const matchItem in coordinatesMatchList) {
+        LOGGER.debug("coordinates are expressed in list format");
+        coordinatesSequence = [];
+        const coordinatesMatchList = parameters.coordinates.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g);
+        LOGGER.debug("coordinates matches list:");
+        LOGGER.debug(coordinatesMatchList);
+        for (const matchItem of coordinatesMatchList) {
+          LOGGER.debug("coordinates match:");
+          LOGGER.debug(matchItem);
           coordinatesSequence.push([parseFloat(matchItem[1]), parseFloat(matchItem[2])]);
         }
       } else if (polylinePattern.test(parameters.coordinates)) {
+        LOGGER.debug("coordinates are expressed in polyline format");
         coordinatesSequence = polyline.decode(parameters.coordinates);
       } else {
         throw errorManager.createError(" Parameter 'coordinates' is invalid: does not match allowed formats", 400);
@@ -136,12 +138,12 @@ module.exports = {
         parameters.start = coordinatesSequence[0].join(",");
         LOGGER.debug("user start:");
         LOGGER.debug(parameters.start);
-        let validity = routeOperation.getParameterById("start").check(parameters.start, defaultProjection);
+        let validity = routeOperation.getParameterById("start").check(parameters.start, askedProjection);
         if (validity.code !== "ok") {
           throw errorManager.createError(" Parameter 'start' is invalid: " + validity.message, 400);
         } else {
           LOGGER.debug("user start valide")
-          start = new Point(coordinatesSequence[0][0], coordinatesSequence[0][1], defaultProjection);
+          start = new Point(coordinatesSequence[0][0], coordinatesSequence[0][1], askedProjection);
           LOGGER.debug("user start in road2' object:");
           LOGGER.debug(start);
         }
@@ -156,7 +158,7 @@ module.exports = {
           throw errorManager.createError(" Parameter 'end' is invalid: " + validity.message, 400);
         } else {
           LOGGER.debug("user end valide")
-          end = new Point(coordinatesSequence[coordinatesSequence.length-1][0], coordinatesSequence[coordinatesSequence.length-1][1], defaultProjection);
+          end = new Point(coordinatesSequence[coordinatesSequence.length-1][0], coordinatesSequence[coordinatesSequence.length-1][1], askedProjection);
           LOGGER.debug("user end in road2' object:");
           LOGGER.debug(end);
         }
@@ -190,14 +192,14 @@ module.exports = {
       finalIntermediates = finalIntermediates.concat(coordinatesSequence[coordinatesSequence.length - 2].join(","));
 
       // Check coordinates validity
-      let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, defaultProjection);
+      let validity = routeOperation.getParameterById("intermediates").check(finalIntermediates, askedProjection);
       if (validity.code !== "ok") {
         throw errorManager.createError(" Parameter 'coordinates' is invalid: " + validity.message, 400);
       } else {
 
         LOGGER.debug("valid intermediates");
 
-        if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, defaultProjection)) {
+        if (!routeOperation.getParameterById("intermediates").convertIntoTable(finalIntermediates, routeRequest.intermediates, askedProjection)) {
           throw errorManager.createError(" Parameter 'intermediates' is invalid. Wrong format or out of the bbox. ", 400);
         } else {
           LOGGER.debug("intermediates in a table:");
@@ -223,7 +225,7 @@ module.exports = {
         } else {
           LOGGER.debug("converted getSteps: " + routeRequest.computeSteps);
         }
-
+      }
     } else if ("defaultValueContent" in routeOperation.getParameterById("getSteps") && typeof(routeOperation.getParameterById("getSteps").defaultValueContent) !== "undefined") {
       // Default value from configuration
       routeRequest.computeSteps = routeOperation.getParameterById("getSteps").defaultValueContent;
@@ -297,7 +299,8 @@ module.exports = {
     let userResponse = {
       "code": routeResponse.engineExtras.code
     };
-    let askedProjection = routeRequest.start.projection;
+    LOGGER.debug("Engine response code :");
+    LOGGER.debug(userResponse.code);
 
     // Waypoints
     let waypointArray = copyManager.deepCopy(routeResponse.engineExtras.waypoints);
@@ -308,23 +311,58 @@ module.exports = {
       waypointArray[i].location = [point.x, point.y];
     }
     userResponse.waypoints = waypointArray;
+    LOGGER.debug("Waypoints :");
+    LOGGER.debug(userResponse.waypoints);
 
     // Routes
     let routeArray = new Array();
     for (let routeIdx = 0; routeIdx < routeResponse.routes.length; routeIdx++) {
       let simpleRoute = routeResponse.routes[routeIdx]; // from road2 standard response
-      let extraRoute = routeResponse.engineExtras.routes[routeIdx]; // from engine specific extras
+      let extraRoute = routeResponse.engineExtras.routes[routeIdx]; // from engine specific extrasz
       // both sources will be fused to craft a response compliant with OSRM's official API definition
+
+      // Geometry
+      routeArray[routeIdx] = {};
+      routeArray[routeIdx].geometry = simpleRoute.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
+      LOGGER.debug("Route " + routeIdx + "'s geometry: " + userResponse.geometry);
+
+      // Distance
+      if (!simpleRoute.distance.convert(routeRequest.distanceUnit)) {
+        throw errorManager.createError(" Error during conversion of route distance in response. ", 400);
+      } else {
+        routeArray[routeIdx].distance = simpleRoute.distance.value;
+      }
+
+      // Duration
+      if (!simpleRoute.duration.convert(routeRequest.timeUnit)) {
+        throw errorManager.createError(" Error during conversion of route duration in response. ", 400);
+      } else {
+        routeArray[routeIdx].duration = simpleRoute.duration.value;
+      }
 
       // Legs (Road2's "portions")
       let legArray = new Array();
       for (let legIdx = 0; legIdx < simpleRoute.portions.length; legIdx++) {
+        LOGGER.debug("Computing leg " + legIdx + " of route " + routeIdx);
         let portion = simpleRoute.portions[legIdx]; // from road2 standard response
         let leg = extraRoute.legs[legIdx]; // from engine specific extras
-        legArray[legIdx] = {
-          "distance": portion.distance,
-          "duration": portion.duration
-        };
+        legArray[legIdx] = {};
+
+        // Distance
+        if (!portion.distance.convert(routeRequest.distanceUnit)) {
+          LOGGER.debug("error during distance conversion: distance " + portion.distance);
+          throw errorManager.createError(" Error during convertion of portion distance in response. ", 400);
+        } else {
+          legArray[legIdx].distance = portion.distance.value;
+        }
+
+        // Duration
+        if (!portion.duration.convert(routeRequest.timeUnit)) {
+          LOGGER.debug("error during duration conversion: duration " + portion.duration);
+          throw errorManager.createError(" Error during convertion of portion duration in response. ", 400);
+        } else {
+          legArray[legIdx].duration = portion.duration.value;
+        }
 
         // Steps (optional)
         let stepArray = new Array();
@@ -332,17 +370,33 @@ module.exports = {
           for (let stepIdx = 0; stepIdx < portion.steps.length; stepIdx++) {
             let simpleStep = portion.steps[stepIdx]; // from road2 standard response
             let extraStep = leg.steps[stepIdx]; // from engine specific extras
+
             stepArray[stepIdx] = {
-              "distance": simpleStep.distance,
-              "duration": simpleStep.duration,
               "geometry": simpleStep.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
               "intersections": copyManager.deepCopy(extraStep.intersections),
               "maneuver": {
-                "type": extraStep.instruction.type
+                "type": simpleStep.instruction.type
               },
               "mode": extraStep.mode,
               "name": simpleStep.name
             };
+
+            // Distance
+            if (!simpleStep.distance.convert(routeRequest.distanceUnit)) {
+              LOGGER.debug("error during distance conversion: distance " + simpleStep.distance);
+              throw errorManager.createError(" Error during convertion of portion distance in response. ", 400);
+            } else {
+              stepArray[stepIdx].distance = simpleStep.distance.value;
+            }
+
+            // Duration
+            if (!simpleStep.duration.convert(routeRequest.timeUnit)) {
+              LOGGER.debug("error during duration conversion: duration " + simpleStep.duration);
+              throw errorManager.createError(" Error during convertion of portion duration in response. ", 400);
+            } else {
+              stepArray[stepIdx].duration = simpleStep.duration.value;
+            }
+
             if (simpleStep.instruction.modifier) {
               stepArray[stepIdx].maneuver.modifier = simpleStep.instruction.modifier;
             }
@@ -356,12 +410,7 @@ module.exports = {
         }
       }
 
-      routeArray[routeIdx] = {
-        "distance": simpleRoute.distance,
-        "duration": simpleRoute.duration,
-        "geometry": simpleRoute.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
-        "legs": legArray
-      };
+      routeArray[routeIdx].legs = legArray;
     }
 
     // Finalze userResponse

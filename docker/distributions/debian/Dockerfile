@@ -28,7 +28,7 @@ RUN apt-get update && \
     libsqlite3-mod-spatialite libzmq3-dev libczmq-dev
 
 ### Installation prime-server
-COPY --from=build /usr/local/lib/libprime_server.so.0.7.0 /usr/lib/libprime_server.so.0.0.0
+COPY --from=build /usr/local/lib/libprime_server.so.0.7.1 /usr/lib/libprime_server.so.0.0.0
 COPY --from=build /usr/local/lib/libprime_server.so.0 /usr/lib/libprime_server.so.0
 COPY --from=build /usr/local/lib/libprime_server.so /usr/lib/libprime_server.so
 

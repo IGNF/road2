@@ -10,7 +10,7 @@ const Point = require('../geometry/point');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
-const copyManager = require('../../../../utils/copyManager')
+const copyManager = require('../utils/copyManager')
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
@@ -457,7 +457,7 @@ module.exports = class osrmSource extends Source {
       let portions = new Array();
       let currentOsrmRoute = osrmResponse.routes[i];
       engineExtras.routes[i] = {};
-      nativeLegs = new Array();
+      let nativeLegs = new Array();
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", super.projection) );
@@ -552,7 +552,7 @@ module.exports = class osrmSource extends Source {
 
           nativeSteps[k] = {};
           nativeSteps[k].mode = currentOsrmRouteStep.mode;
-          nativeIntersections = new Array();
+          let nativeIntersections = new Array();
           for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
             let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
             nativeIntersections[intersectionIndex] = copyManager.deepCopy(currentIntersection);
