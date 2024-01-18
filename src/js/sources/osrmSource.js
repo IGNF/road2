@@ -439,14 +439,15 @@ module.exports = class osrmSource extends Source {
       LOGGER.debug("osrm response has 1 or more routes");
     }
 
-    for (let sourceWaypoint in osrmResponse.waypoints) {
-      let nativeWaypoint = {
-        "hint": sourceWaypoint.hint,
-        "distance": sourceWaypoint.distance,
-        "name": sourceWaypoint.name
+    for (let waypointIdx = 0; waypointIdx < osrmResponse.waypoints.length; waypointIdx++) {
+      engineExtras.waypoints[waypointIdx] = {
+        "hint": osrmResponse.waypoints[waypointIdx].hint,
+        "distance": osrmResponse.waypoints[waypointIdx].distance,
+        "name": osrmResponse.waypoints[waypointIdx].name
       };
-      engineExtras.waypoints.push(nativeWaypoint);
     }
+    LOGGER.debug("OSRM engineExtras waypoints (before adding to routeResponse:");
+    LOGGER.debug(engineExtras.waypoints);
 
     // routes
     // Il peut y avoir plusieurs itinéraires
@@ -556,10 +557,11 @@ module.exports = class osrmSource extends Source {
           for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
             let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
             nativeIntersections[intersectionIndex] = copyManager.deepCopy(currentIntersection);
-            nativeIntersections[intersectionIndex].location = new Point(currentIntersection.location[0], currentIntersection.location[1], super.projection)
-            if (!nativeIntersections[intersectionIndex].location.transform(askedProjection)) {
+            let location = new Point(currentIntersection.location[0], currentIntersection.location[1], super.projection);
+            if (!location.transform(askedProjection)) {
               throw errorManager.createError(" Error during reprojection of intersection in OSRM response. ");
             }
+            nativeIntersections[intersectionIndex].location = [location.x, location.y];
           }
           nativeSteps[k].intersections = nativeIntersections;
         }
