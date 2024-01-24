@@ -50,7 +50,7 @@
         }
       }
     },
-    "/resource/{resourceId}/{profileId}/{optimizationId}/route/v1/profile/{coordinates}": {
+    "/{resourceId}/{profileId}/{optimizationId}/route/v1/_/{coordinates}": {
       "get": {
         "tags": [
           "Route"
@@ -71,7 +71,7 @@
           },
           {
             "name": "coordinates",
-            "in": "query",
+            "in": "path",
             "description": "String of format {longitude},{latitude};{longitude},{latitude}[;{longitude},{latitude} ...] or polyline({polyline}).",
             "required": true,
             "schema": {
