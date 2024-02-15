@@ -25,37 +25,10 @@ let swaggerDocument = require(apiJsonPath);
 router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // GetCapabilities
-router.all("/resources", function(req, res) {
+router.all("/resources", function(req, res, next) {
 
   LOGGER.debug("request on /osrm/1.0.0/resources?");
-
-  // get service
-  let service = req.app.get("service");
-
-  // get uid
-  let uid = service.apisManager.getApi("osrm","1.0.0").uid;
-  LOGGER.debug(uid);
-
-  // get getCapabilities from init.js
-  let getCapabilities = req.app.get(uid + "-getcap");
-  LOGGER.debug(getCapabilities);
-
-  // Change base url in GetCapabilties if "Host" or "X-Forwarded-Host" is specified in request's headers
-  // Host is stored by expres in req.hostname
-  if (req.hostname) {
-    let regexpHost = /^https?:\/\/[\w\d:-_.]*\//;
-    try {
-      getCapabilities.info.url = getCapabilities.info.url.replace(regexpHost, req.protocol + "://" + req.hostname + "/");
-    } catch(error) {
-      // apply default service url in GetCapabilities
-    }
-
-  } else {
-    // apply default service url in GetCapabilities
-  }
-
-  res.set('content-type', 'application/json');
-  res.status(200).json(getCapabilities);
+  return next(errorManager.createError("Not Implemented", 501));
 
 });
 
