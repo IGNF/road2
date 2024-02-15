@@ -1,95 +1,98 @@
 # Road2
 
-## Présentation générale 
+[French](./readme_fr.md)
 
-Road2 est un serveur de calcul d'itinéraires et d'isochrones écrit en Javascript et conçu pour fonctionner avec NodeJS. Ce serveur propose le calcul d'itinéraires et d'isochrones via des moteurs existants comme [OSRM](https://github.com/Project-OSRM/osrm-backend) ou [PGRouting](https://pgrouting.org/). Road2 est donc une interface pour moteurs de calculs. Ces derniers ne sont pas fait dans le code de Road2 mais via des appels à ses moteurs. Cela peut se traduire par l'appel à une librairie, ou à une base de données, ou encore à un autre service web. 
+## General presentation
 
-Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux moteurs et de nouvelles APIs, et cela, de manière totalement transparente les uns pour autres. Autrement dit, ajouter un moteur n'a pas d'impact sur les APIs déjà existantes. L'objectif est de faciliter l'ajout de nouvelles fonctionnalités tout en pérennisant l'accès au service. Pour une plus longue discussion sur les concepts logiciels introduits dans Road2, on pourra se référer à la documentation [suivante](./documentation/developers/concepts.md).
+Road2 is a route and isochrone calculation server written in Javascript and designed to work with NodeJS. This server offers the calculation of routes and isochrones via existing engines like [OSRM](https://github.com/Project-OSRM/osrm-backend) or [PGRouting](https://pgrouting.org/ ). Road2 is therefore an interface for calculation engines. These are not done in Road2's code but via calls to its engines. This can mean calling a library, or a database, or another web service.
 
-Actuellement, Road2 propose trois moteurs, OSRM, PGRouting et Valhalla, via une unique API REST. 
+Road2 was designed with the idea of being able to easily add new engines and new APIs, and this, in a completely transparent way for each other. In other words, adding an engine has no impact on existing APIs. The goal is to facilitate the addition of new features while maintaining access to the service. For a longer discussion on the software concepts introduced in Road2, please refer to the [following documentation](./documentation_en/developers/concepts.md).
 
-## Fonctionnalités disponibles 
+Currently, Road2 offers three engines, OSRM, PGRouting and Valhalla, through a single REST API.
 
-Road2 propose plusieurs grandes familles de fonctionnalités : 
-- Calculer des itinéraires
-- Calculer des isochrones et des isodistances 
-- Administrer le service 
-- etc... 
+## Features available
 
-Ces familles regroupent l'ensemble des fonctionnalités et sont détaillées [ici](./documentation/developers/functionnalities.md).
+Road2 offers several sets of features:
+- Calculate routes
+- Calculate isochrones and isodistances
+- Manage the service
+- etc...
 
-## Licence 
+These sets include all the functionalities and are detailed [here](./documentation_en/developers/functionalities.md).
 
-Road2 est diffusé sous la licence GPL v3. 
+## Licence
 
-## Découverte du service
+Road2 is released under the GPL v3 license.
 
-### Démonstrateur 
+## Service discovery
 
-L'IGN propose un démonstrateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services_betas/itineraires.html) et [l'isochrone](https://geoservices.ign.fr/documentation/services_betas/isochrones.html). Ces démonstrateurs permettent de construire des requêtes via une carte et de visualiser les résultats. 
+### Demonstrator
 
-Autrement, pour une première prise en main du service en local, il est possible d'utiliser l'image [alpine](./docker/demonstration/Dockerfile) de Road2. Cela permettra d'avoir localement une instance du service et une page web permettant de le tester. Les instructions de mise en place sont données [ici](./documentation/docker/demonstration/readme.md). 
+IGN offers a demonstrator for [the route](https://geoservices.ign.fr/documentation/services_betas/itineraires.html) and [the isochrone](https://geoservices.ign.fr/documentation/services_betas/isochrones.html). These demonstrators allow you to build queries via a map and visualize the results.
 
-### Découvrir et tester les APIs du service 
+Otherwise, for a first grip of the service locally, it is possible to use the [alpine](./docker/demonstration/Dockerfile) image of Road2. This will make it possible to have a local instance of the service and a web page allowing it to be tested. Setup instructions are given [here](./documentation_en/docker/demonstration/readme.md).
 
-L'IGN propose une visualisation de l'API utilisateur pour [l'itinéraire](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires/api) et [l'isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api). 
+### Discover and test the service's APIs
 
-L'IGN propose également des pages pour tester une instance du service sur l'ensemble de la France, avec une visualisation cartographique. Il y a une page pour l'[itinéraire](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires) et une page pour l'[isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrones).
+IGN offers a visualization of the user API for [the itinerary](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires/api) and [the isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api).
 
-Autrement, l'ensemble des APIs disponibles sont documentées dans ce [dossier](./documentation/apis/). Pour le moment, il y a une seule API utilisateur qui est documentée via un [fichier](./documentation/apis/simple/1.0.0/api.json) JSON utilisant openapi 3.0.0, et une API d'administration documentée via un autre [fichier](./documentation/apis/administration/1.0.0/api.json) JSON suivant le même formalisme. 
+IGN also offers pages for testing an instance of the service throughout France, with map visualization. There is a page for the [itinerary](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/itineraires) and a page for the [isochrone](https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrones).
 
-Il est possible de visualiser ces documentations d'API localement en suivant les instructions qui sont [ici](./documentation/docker/demonstration/readme.md). 
+Otherwise, all available APIs are documented in this [folder](./documentation_en/apis/). At the moment there is only one user API which is documented via a [file](./documentation_en/apis/simple/1.0.0/api.json) JSON using openapi 3.0.0, and one documented admin API via another [file](./documentation_en/apis/administration/1.0.0/api.json) JSON following the same formating.
 
-## Installation et utilisation de Road2 
+It is possible to view these API documentations locally by following the instructions that are [here](./documentation_en/docker/demonstration/readme.md).
 
-### Pré-requis
+## Installing and using Road2
 
-Pour utiliser ce projet, il est nécessaire d'avoir installé NodeJS sur la machine utilisée. La version de NodeJS utilisée pendant les développements est *12.14.0*. 
+### Prerequisites
 
-### Installation des modules
+To use this project, it is necessary to have NodeJS installed on the machine used. The NodeJS version used during development is *12.14.0*.
 
-L'installation des modules est effectuée via NPM. En se plaçant dans la racine du projet:
+### Installing modules
+
+The installation of the modules is carried out via NPM. Going to the root of the project:
 ```
 npm install
 ```
 
-NB : Il y a des dépendances optionnelles pour gérer celles de chaque moteur. Pour plus d'informations, voir ce [document](./documentation/production/readme.md).
+NB: There are optional dependencies to manage those of each engine. For more information, see this [document](./documentation_en/production/readme.md).
 
-### Génération de données  
+### Data generation
 
-Qu'importe la source des données, il est nécessaire de les fournir dans l'un des formats utilisables par Road2. Étant donné que ce dernier peut utiliser plusieurs moteurs les calculs, il accepte plusieurs formats de données:
-- OSRM 5.26.0 rend possible l'utilisation de données OSRM générées avec cette version. 
-- PGRouting 3.1.3 rend possible l'utilisation d'une base de données utilisant cette version. Il sera nécessaire d'y ajouter les procédures du projet [pgrouting-procedures](https://github.com/IGNF/pgrouting-procedures) afin que Road2 puisse communiquer avec la base. 
+Whatever the data source, it is necessary to provide it in one of the formats used by Road2. Since Road2 can use several calculation engines, it accepts several data formats:
+- OSRM 5.26.0 makes it possible to use OSRM data generated with this version.
+- PGRouting 3.1.3 makes it possible to use a database using this version. It will be necessary to add the project procedures [pgrouting-procedures](https://github.com/IGNF/pgrouting-procedures) so that Road2 can communicate with the database.
 
-Ces données peuvent donc être générées à partir d'une base de données quelconque, ou de fichiers OSM. Le projet [route-graph-generator](https://github.com/IGNF/route-graph-generator) propose des outils pour générer les graphes à partir de n'importe quelle base de données ou fichier osm. Si la base de données ne correspondant pas au format de la base attendue par route-graph-generator, il suffira de la dériver. 
+This data can therefore be generated from any database, or from OSM files. The [route-graph-generator](https://github.com/IGNF/route-graph-generator) project offers tools to generate graphs from any database or OSM files. (If the database does not correspond to the format of the database expected by route-graph-generator, it will suffice to derive it.)#TODO
 
-Pour une discussion détaillée sur les données attendues, on pourra se référer à cette [documentation](./documentation/data/readme.md). 
 
-### Configuration
+For a detailed discussion of the expected data, refer to this [documentation](./documentation_en/data/readme.md).
 
-Afin que le serveur fonctionne, il est nécessaire de le [configurer](./documentation/configuration/readme.md). Il s'agit de créer une arborescence de quelques fichiers JSON permettant l'instanciation du serveur avec des ressources. 
+### Setup
 
-### Lancement 
+In order for the server to work, it is necessary to [configure](./documentation_en/configuration/readme.md). This involves creating a tree structure of a few JSON files allowing instantiation of the server with resources.
 
-Une fois configuré, il est possible de lancer une instance de Road2 avec la commande: 
+### Launch
+
+Once configured, it is possible to launch an instance of Road2 with the command:
 ```
 node ${road2}/src/js/road2.js --ROAD2_CONF_FILE=${configuration}/administration.json
 ```
 
-### Pour plus de détails
+### For more details
 
-On trouvera dans le dossier [docker/distrubutions](./docker/distributions) différents Dockerfiles qui permettent de voir l'installation et de tester le service sur différentes plateformes. Pour le moment, Debian 10 est disponible. 
+In the [docker/distributions](./docker/distributions) folder, you will find different Dockerfiles that allow you to see the installation and test the service on different platforms. At the moment, Debian 10 is available.
 
-## Participer aux développements 
+## Participate in developments
 
-Les participations à ce projet sont encouragées (votre notre [charte](./CODE_OF_CONDUCT.md) à ce sujet). Nous avons mis en place un [guide](./CONTRIBUTING.md) des contributions pour vous accompagner dans cette démarche. 
+Contributing to this project is welcome (see our [code of conduct](./CODE_OF_CONDUCT.md) on this subject). We have set up a [guide](./CONTRIBUTING.md) of contributions to help you in this process.
 
-On trouvera une documentation dédiée aux développeurs [ici](./documentation/developers/readme.md). Elle indique les concepts utiles pour effectuer des développements sur Road2. 
+Developer documentation can be found [here](./documentation_en/developers/readme.md). It indicates the useful concepts to carry out developments on Road2.
 
-Pour en savoir plus sur notre roadmap, vous pouvez regarder le projet [IGNF/Road2 Roadmap](https://github.com/orgs/IGNF/projects/3). 
+To learn more about our roadmap, you can look at the [IGNF/Road2 Roadmap](https://github.com/orgs/IGNF/projects/3) project.
 
-Enfin, il est possible d'utiliser ce [docker-compose](./documentation/docker/dev/readme.md) pour avoir un environnement de développement incluant la construction des binaires, des modules et la génération des données. 
+Finally, it is possible to use this [docker-compose](./documentation_en/docker/dev/readme.md) to have a development environment including building binaries, modules and generating data.
 
-## Utilisation en production
+## Production use
 
-Afin d'utiliser Road2 en production, plusieurs informations sont données dans ce [document](./documentation/production/readme.md). Il s'agit principalement des besoins déjà observés pour une mise en production du service couvrant l'ensemble du territoire français. 
+In order to use Road2 in production, several informations are given in this [document](./documentation_en/production/readme.md). These are mainly the needs already observed for a production launch of the service covering the whole of French territory.
