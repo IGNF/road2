@@ -392,7 +392,8 @@ module.exports = class osrmSource extends Source {
     // ---
 
     // Récupération des paramètres de la réponse OSRM pour une éventuelle réponse avec son API native
-    engineExtras.code = osrmResponse.code;
+    // Si on est ici, pour le moment, c'est que c'est Ok, sinon une erreur aura déjà été renvoyée
+    engineExtras.code = "Ok";
 
     // ---
 

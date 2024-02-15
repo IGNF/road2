@@ -2,25 +2,9 @@
 
 const log4js = require('log4js');
 
-let LOGGER = log4js.getLogger("INIT");
+let LOGGER = log4js.getLogger("UPDATE");
 
 module.exports = {
-
-  /**
-  *
-  * @function
-  * @name updateGetCapabilities
-  * @description Fonction utilisée pour mettre à jour le GetCapabilities
-  * @param {object} app - App ExpressJS
-  * @return {boolean} True si tout s'est bien passé et False sinon
-  *
-  */
-
-  updateGetCapabilities: function(app) {
-
-    return true;
-
-  },
 
   /**
   *
@@ -34,12 +18,6 @@ module.exports = {
   */
 
   run: function(app, uid) {
-
-    // Création du GetCapabilities
-    if (!this.updateGetCapabilities(app)) {
-      LOGGER.error("Erreur lors de la creation du GetCapabilities.");
-      return false;
-    }
 
     return true;
 
