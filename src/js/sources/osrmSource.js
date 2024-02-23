@@ -552,8 +552,11 @@ module.exports = class osrmSource extends Source {
             steps[k].instruction.exit = currentOsrmRouteStep.maneuver.exit;
           }
 
+          // Add OSRM extra in the routeResponse
           nativeSteps[k] = {};
           nativeSteps[k].mode = currentOsrmRouteStep.mode;
+
+          // Add intersections extra
           let nativeIntersections = new Array();
           for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
             let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
@@ -565,10 +568,31 @@ module.exports = class osrmSource extends Source {
             nativeIntersections[intersectionIndex].location = [location.x, location.y];
           }
           nativeSteps[k].intersections = nativeIntersections;
+
+          // Add maneuver extra 
+          let nativeManeuver = {};
+          // Test with hasOwnProperty because it can be 0 inside this property
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("bearing_before")) {
+            nativeManeuver.bearing_before = currentOsrmRouteStep.maneuver.bearing_before;
+          }
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("bearing_after")) {
+            nativeManeuver.bearing_after = currentOsrmRouteStep.maneuver.bearing_after;
+          }
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("location")) {
+            let location = new Point(currentOsrmRouteStep.maneuver.location[0], currentOsrmRouteStep.maneuver.location[1], super.projection);
+            if (!location.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of step location in OSRM response. ");
+            }
+            nativeManeuver.location = [location.x, location.y];
+          }
+          
+          nativeSteps[k].maneuver = nativeManeuver;
+
         }
 
         portions[j].steps = steps;
         nativeLegs[j].steps = nativeSteps;
+        nativeLegs[j].summary = currentOsrmRouteLeg.summary;
 
       }
 

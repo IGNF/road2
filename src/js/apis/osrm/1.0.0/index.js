@@ -134,24 +134,24 @@ function sendError(err, req, res, next) {
     if (err.status) {
       // if error has a status, this error should be sent to the client
       res.status(err.status);
-      res.json({ error: {errorType: err.code, message: err.message}});
+      res.json({code: err.code, message: err.message});
     } else {
       // if error has no status, this error's details should not be sent to the client
       res.status(500);
-      res.json({ error: {errorType: "internal", message: "Internal Server Error"}});
+      res.json({code: "internal", message: "Internal Server Error"});
     }
   } else if ((process.env.NODE_ENV === "debug")) {
       res.status(err.status || 500);
-      res.json({ error: {errorType: err.code,
+      res.json({code: err.code,
         message: err.message,
         stack: err.stack,
         // useful for SQL errors
         more: err
-      }});
+      });
   } else {
     // in the development environment, every error should be sent to clients
     res.status(err.status || 500);
-    res.json({ error: {errorType: err.code, message: err.message}});
+    res.json({code: err.code, message: err.message});
   }
 
 }

@@ -33,7 +33,7 @@ Feature: Road2-osrm-1.0.0-common
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain "Parameter 'resourceId' is invalid: it does not exist on this service"
+    And the response should contain an attribute "message" with value "Parameter 'resourceId' is invalid: it does not exist on this service"
 
   Scenario: [route] Route sur l'API osrm 1.0.0 avec mauvais profile 
     Given an "GET" request on operation "<resource>/<profile>/<optimization>/route/v1/_/<coordinates>" in api "osrm" "1.0.0"
@@ -46,7 +46,7 @@ Feature: Road2-osrm-1.0.0-common
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain "Parameter 'profileId' is invalid"
+    And the response should contain an attribute "message" with value "Parameter 'profileId' is invalid"
 
   Scenario: [route] Route sur l'API osrm 1.0.0 avec mauvaise optimisation 
     Given an "GET" request on operation "<resource>/<profile>/<optimization>/route/v1/_/<coordinates>" in api "osrm" "1.0.0"
@@ -59,7 +59,7 @@ Feature: Road2-osrm-1.0.0-common
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain "Parameter 'optimizationId' is invalid"
+    And the response should contain an attribute "message" with value "Parameter 'optimizationId' is invalid"
 
   Scenario: [route] Route sur l'API osrm 1.0.0 avec mauvaises coordonnées 
     Given an "GET" request on operation "<resource>/<profile>/<optimization>/route/v1/_/<coordinates>" in api "osrm" "1.0.0"
@@ -72,7 +72,7 @@ Feature: Road2-osrm-1.0.0-common
     When I send the request 
     Then the server should send a response with status 400
     And the response should have an header "content-type" with value "application/json"
-    And the response should contain "Parameter 'coordinates' is invalid"
+    And the response should contain an attribute "message" with value "Parameter 'coordinates' is invalid"
 
 
 
