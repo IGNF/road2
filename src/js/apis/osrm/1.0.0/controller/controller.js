@@ -226,13 +226,15 @@ module.exports = {
           LOGGER.debug("converted getSteps: " + routeRequest.computeSteps);
         }
       }
-    } else if ("defaultValueContent" in routeOperation.getParameterById("getSteps") && typeof(routeOperation.getParameterById("getSteps").defaultValueContent) !== "undefined") {
-      // Default value from configuration
-      routeRequest.computeSteps = routeOperation.getParameterById("getSteps").defaultValueContent;
-      LOGGER.debug("configuration default getSteps: " + routeRequest.computeSteps);
     } else {
+
+      // Default value could be taken from configuration 
+      // routeRequest.computeSteps = routeOperation.getParameterById("getSteps").defaultValueContent;
+      // but we take the default of OSRM HTTP API : false 
+      // (see http://project-osrm.org/docs/v5.5.1/api/#route-service)
       routeRequest.computeSteps = false;
       LOGGER.debug("general default getSteps: " + routeRequest.computeSteps);
+
     }
 
     // geometries (OSRM) / geometryFormat (Road2)
@@ -253,8 +255,11 @@ module.exports = {
 
     } else {
 
-      // Default value from configuration
-      routeRequest.geometryFormat = routeOperation.getParameterById("geometryFormat").defaultValueContent;
+      // Default value could be taken from configuration 
+      // routeRequest.geometryFormat = routeOperation.getParameterById("geometryFormat").defaultValueContent;
+      // but we take the default of OSRM HTTP API : polyline 
+      // (see http://project-osrm.org/docs/v5.5.1/api/#route-service)
+      routeRequest.geometryFormat = "polyline";
       LOGGER.debug("default geometryFormat used: " + routeRequest.geometryFormat);
 
     }
@@ -367,9 +372,18 @@ module.exports = {
         // Steps (optional)
         let stepArray = new Array();
         if (routeRequest.computeSteps && portion.steps.length !== 0) {
+
           for (let stepIdx = 0; stepIdx < portion.steps.length; stepIdx++) {
+
             let simpleStep = portion.steps[stepIdx]; // from road2 standard response
             let extraStep = leg.steps[stepIdx]; // from engine specific extras
+
+            let tmpName = "";
+            try {
+              tmpName = JSON.stringify(simpleStep.attributes.name);
+            } catch(error) {
+              LOGGER.debug(error);
+            }
 
             stepArray[stepIdx] = {
               "geometry": simpleStep.geometry.getGeometryWithFormat(routeRequest.geometryFormat),
@@ -378,7 +392,7 @@ module.exports = {
                 "type": simpleStep.instruction.type
               },
               "mode": extraStep.mode,
-              "name": simpleStep.name
+              "name": tmpName
             };
 
             // Distance
@@ -403,10 +417,31 @@ module.exports = {
             if (simpleStep.instruction.exit) {
               stepArray[stepIdx].maneuver.exit = simpleStep.instruction.exit;
             }
+            if (extraStep.maneuver) {
+              // Test with hasOwnProperty because it can be 0 inside this property
+              if (extraStep.maneuver.hasOwnProperty("bearing_before")) {
+                stepArray[stepIdx].maneuver.bearing_before = extraStep.maneuver.bearing_before;
+              }
+              if (extraStep.maneuver.hasOwnProperty("bearing_after")) {
+                stepArray[stepIdx].maneuver.bearing_after = extraStep.maneuver.bearing_after;
+              }
+              if (extraStep.maneuver.hasOwnProperty("location")) {
+                stepArray[stepIdx].maneuver.location = [extraStep.maneuver.location[0],extraStep.maneuver.location[1]];
+              }
+            }
+
           }
+
           legArray[legIdx].steps = stepArray;
+          legArray[legIdx].summary = leg.summary;
+
         } else {
+
+          // We add an empty array (see http://project-osrm.org/docs/v5.5.1/api/#route-object)
+          legArray[legIdx].steps = new Array();
+          legArray[legIdx].summary = "";
           LOGGER.debug("no steps asked by user");
+
         }
       }
 
