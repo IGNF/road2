@@ -10,6 +10,11 @@
                 "nearest": "/simple/1.0.0/nearest",
                 "getcapabilities": "/simple/1.0.0/getcapabilities"
             }
+        },
+        "osrm": {
+            "1.0.0": {
+                "<resource>/<profile>/<optimization>/route/v1/_/<coordinates>": "/osrm/1.0.0/<resource>/<profile>/<optimization>/route/v1/_/<coordinates>"
+            }
         }
     },
     "defaultParameters": [

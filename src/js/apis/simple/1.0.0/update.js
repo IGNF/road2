@@ -2,15 +2,15 @@
 
 const log4js = require('log4js');
 
-var LOGGER = log4js.getLogger("INIT");
+var LOGGER = log4js.getLogger("UPDATE");
 
 module.exports = {
 
   /**
   *
   * @function
-  * @name createGetCapabilities
-  * @description Fonction utilisée pour créer le GetCapabilities
+  * @name updateGetCapabilities
+  * @description Fonction utilisée pour mettre à jour le GetCapabilities
   * @param {object} app - App ExpressJS
   * @return {boolean} True si tout s'est bien passé et False sinon
   *

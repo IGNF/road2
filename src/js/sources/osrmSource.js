@@ -10,6 +10,7 @@ const Point = require('../geometry/point');
 const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
+const copyManager = require('../utils/copyManager')
 const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
@@ -372,6 +373,11 @@ module.exports = class osrmSource extends Source {
     let profile;
     let optimization;
     let routes = new Array();
+    let engineExtras = {
+      "code": "",
+      "routes": new Array(),
+      "waypoints": new Array()
+    };
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
     // ---
@@ -383,6 +389,12 @@ module.exports = class osrmSource extends Source {
 
     // optimization
     optimization = routeRequest.optimization;
+    // ---
+
+    // Récupération des paramètres de la réponse OSRM pour une éventuelle réponse avec son API native
+    // Si on est ici, pour le moment, c'est que c'est Ok, sinon une erreur aura déjà été renvoyée
+    engineExtras.code = "Ok";
+
     // ---
 
     // Lecture de la réponse OSRM
@@ -428,6 +440,16 @@ module.exports = class osrmSource extends Source {
       LOGGER.debug("osrm response has 1 or more routes");
     }
 
+    for (let waypointIdx = 0; waypointIdx < osrmResponse.waypoints.length; waypointIdx++) {
+      engineExtras.waypoints[waypointIdx] = {
+        "hint": osrmResponse.waypoints[waypointIdx].hint,
+        "distance": osrmResponse.waypoints[waypointIdx].distance,
+        "name": osrmResponse.waypoints[waypointIdx].name
+      };
+    }
+    LOGGER.debug("OSRM engineExtras waypoints (before adding to routeResponse:");
+    LOGGER.debug(engineExtras.waypoints);
+
     // routes
     // Il peut y avoir plusieurs itinéraires
     for (let i = 0; i < osrmResponse.routes.length; i++) {
@@ -436,6 +458,8 @@ module.exports = class osrmSource extends Source {
 
       let portions = new Array();
       let currentOsrmRoute = osrmResponse.routes[i];
+      engineExtras.routes[i] = {};
+      let nativeLegs = new Array();
 
       // On commence par créer l'itinéraire avec les attributs obligatoires
       routes[i] = new Route( new Line(currentOsrmRoute.geometry, "geojson", super.projection) );
@@ -474,13 +498,15 @@ module.exports = class osrmSource extends Source {
 
         let legEnd = new Point(osrmResponse.waypoints[j+1].location[0], osrmResponse.waypoints[j+1].location[1], super.projection);
         if (!legEnd.transform(askedProjection)) {
-        throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
+          throw errorManager.createError(" Error during reprojection of leg end in OSRM response. ");
         } else {
           LOGGER.debug("portion end in asked projection:");
           LOGGER.debug(legEnd);
         }
 
+
         portions[j] = new Portion(legStart, legEnd);
+        nativeLegs[j] = {};
 
         // On récupère la distance et la durée
         portions[j].distance = new Distance(currentOsrmRouteLeg.distance,"meter");
@@ -488,6 +514,7 @@ module.exports = class osrmSource extends Source {
 
         // Steps
         let steps = new Array();
+        let nativeSteps = new Array();
 
         // On va associer les étapes à la portion concernée
         for (let k=0; k < currentOsrmRouteLeg.steps.length; k++) {
@@ -524,17 +551,58 @@ module.exports = class osrmSource extends Source {
           if (currentOsrmRouteStep.maneuver.exit) {
             steps[k].instruction.exit = currentOsrmRouteStep.maneuver.exit;
           }
+
+          // Add OSRM extra in the routeResponse
+          nativeSteps[k] = {};
+          nativeSteps[k].mode = currentOsrmRouteStep.mode;
+
+          // Add intersections extra
+          let nativeIntersections = new Array();
+          for (let intersectionIndex = 0; intersectionIndex < currentOsrmRouteStep.intersections.length; intersectionIndex++) {
+            let currentIntersection = currentOsrmRouteStep.intersections[intersectionIndex];
+            nativeIntersections[intersectionIndex] = copyManager.deepCopy(currentIntersection);
+            let location = new Point(currentIntersection.location[0], currentIntersection.location[1], super.projection);
+            if (!location.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of intersection in OSRM response. ");
+            }
+            nativeIntersections[intersectionIndex].location = [location.x, location.y];
+          }
+          nativeSteps[k].intersections = nativeIntersections;
+
+          // Add maneuver extra 
+          let nativeManeuver = {};
+          // Test with hasOwnProperty because it can be 0 inside this property
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("bearing_before")) {
+            nativeManeuver.bearing_before = currentOsrmRouteStep.maneuver.bearing_before;
+          }
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("bearing_after")) {
+            nativeManeuver.bearing_after = currentOsrmRouteStep.maneuver.bearing_after;
+          }
+          if (currentOsrmRouteStep.maneuver.hasOwnProperty("location")) {
+            let location = new Point(currentOsrmRouteStep.maneuver.location[0], currentOsrmRouteStep.maneuver.location[1], super.projection);
+            if (!location.transform(askedProjection)) {
+              throw errorManager.createError(" Error during reprojection of step location in OSRM response. ");
+            }
+            nativeManeuver.location = [location.x, location.y];
+          }
+          
+          nativeSteps[k].maneuver = nativeManeuver;
+
         }
 
         portions[j].steps = steps;
+        nativeLegs[j].steps = nativeSteps;
+        nativeLegs[j].summary = currentOsrmRouteLeg.summary;
 
       }
 
       routes[i].portions = portions;
+      engineExtras.routes[i].legs = nativeLegs;
 
     }
 
     routeResponse.routes = routes;
+    routeResponse.engineExtras = engineExtras;
 
     return routeResponse;
 
