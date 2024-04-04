@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.2.5
+
+FEAT:
+- The native OSRM API v1 was added but some parameters and error responses are still missing
+
 ## 2.2.4
 FIXED:
 - The pg module can emit error event and they were not catched and so it caused some crashs of Road2
