@@ -42,12 +42,15 @@ module.exports = class routeResponse extends Response {
     // profile
     this._profile = profile;
 
-    // optmization
+    // optimization
     this._optimization = optimization;
 
     // Itinéraires
     //Tableau contenant l'ensemble des itinéraires calculés par le moteur
     this._routes = new Array();
+
+    // Informations spécifiques à un moteur et son API native
+    this._engineExtras = {};
 
   }
 
@@ -187,6 +190,29 @@ module.exports = class routeResponse extends Response {
   */
   set routes (st) {
     this._routes = st;
+  }
+
+    /**
+  *
+  * @function
+  * @name get engineExtras
+  * @description Récupérer les propriétés non génériques, spécifiques au moteur et à son API
+  *
+  */
+  get engineExtras () {
+    return this._engineExtras;
+  }
+
+  /**
+  *
+  * @function
+  * @name set engineExtras
+  * @description Attribuer les propriétés non génériques, spécifiques au moteur et à son API
+  * @param {object} ee - Dictionnaire de propriétés spécifiques au moteur et à son API
+  *
+  */
+  set engineExtras (ee) {
+    this._engineExtras = ee;
   }
 
 }
