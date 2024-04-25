@@ -10,7 +10,7 @@ Currently, Road2 offers three engines, OSRM, PGRouting and Valhalla, through mul
 
 ## Features available
 
-Road2 offers several sets of features:
+Road2 offers several sets of features :
 - Calculate routes
 - Calculate isochrones and isodistances
 - Manage the service
