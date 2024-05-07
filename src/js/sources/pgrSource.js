@@ -1032,6 +1032,7 @@ module.exports = class pgrSource extends Source {
                 currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates;
               } catch(e) {
                 LOGGER.warn(e);
+                LOGGER.warn(currentPgrRouteStep);
               }
             }
           }
