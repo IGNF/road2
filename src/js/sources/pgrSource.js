@@ -1028,7 +1028,11 @@ module.exports = class pgrSource extends Source {
 
             // On n'enlève les valeurs dupliquées que si la linestring est plus longue que 2 points
             if (currentPgrRouteStep.geometry.coordinates.length > 2) {
-              currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates
+              try {
+                currentPgrRouteStep.geometry.coordinates = turf.cleanCoords(currentPgrRouteStep.geometry).coordinates;
+              } catch(e) {
+                LOGGER.warn(e);
+              }
             }
           }
 
