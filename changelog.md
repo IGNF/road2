@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.6
+FIXED:
+- Ignore turf errors for steps simplification in pgrSource, and add a warning to analyse which steps trigger the error
+
 ## 2.2.5
 
 FEAT:
