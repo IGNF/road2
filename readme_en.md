@@ -1,5 +1,7 @@
 # Road2
 
+[Français](./readme_fr.md)
+
 ## General presentation
 
 Road2 is a route and isochrone calculation server written in Javascript and designed to work with NodeJS. This server offers the calculation of routes and isochrones via existing engines like [OSRM](https://github.com/Project-OSRM/osrm-backend) or [PGRouting](https://pgrouting.org/ ). Road2 is therefore an interface for calculation engines. These are not done in Road2's code but via calls to its engines. This can mean calling a library, or a database, or another web service.
