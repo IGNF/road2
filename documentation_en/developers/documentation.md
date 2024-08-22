@@ -10,17 +10,17 @@ For the generation:
 # install additional dependencies
 python -m pip install -U -r requirements/documentation.txt
 # build it
-sphinx-build -b html documentation documentation/_build
+sphinx-build -b html documentation_en documentation_en/_build
 # optimized (quiet, multiprocessing, doctrees separated)
-sphinx-build -b html -d documentation/_build/cache -j auto -q documentation documentation/_build/html
+sphinx-build -b html -d documentation_en/_build/cache -j auto -q documentation_en documentation_en/_build/html
 ```
 
-Open `documentation/_build/index.html` in a web browser.
+Open `documentation_en/_build/index.html` in a web browser.
 
 ## Write documentation with live rendering
 
 ```bash
-sphinx-autobuild -b html -d documentation/_build/cache documentation/ documentation/_build
+sphinx-autobuild -b html -d documentation_en/_build/cache documentation_en/ documentation_en/_build
 ```
 
 Open <http://localhost:8000> in a web browser to see updated rendered HTML when a file is saved.

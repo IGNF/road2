@@ -82,7 +82,7 @@ html_title = "Road2 documentation"
 # Sphinx supports the following languages:
 #   'da', 'de', 'en', 'es', 'fi', 'fr', 'hu', 'it', 'ja'
 #   'nl', 'no', 'pt', 'ro', 'ru', 'sv', 'tr'
-html_search_language = "fr"
+html_search_language = "en"
 
 # -- EXTENSIONS --------------------------------------------------------
 # MyST Parser
