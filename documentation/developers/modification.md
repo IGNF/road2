@@ -96,7 +96,7 @@ Une opération est définie par un id et des paramètres. Un paramètre est quan
 Les dossiers `src/js/operations` et `src/js/parameters` contiennent le code nécessaire à la gestion des opérations et des paramètres.
 
 Il y a une distinction à faire entre les opérations de service et les opérations de ressource. Les opérations de services sont les opérations permises sur le service. Elles sont décrites par les JSON de `src/resources/`. Les opérations de ressource sont la déclinaison de ces opérations avec des paramètres spécifiques à chaque ressource. Ils sont décrits dans le fichier ressource.
-Par exemple, on peut déclarer une opération de service que l'on nommera `route`. Pour le service, cette opération existe, est disponible et est décrite via des fichiers JSON. Cette opération peut nécessiter un paramètre `start`. À ce niveau, on sait que l'opération, que le paramètre existe et est obligatoire. Mais on ne sait pas quelles valeurs il peut prendre. Cela dépend de la ressource. Chaque ressource peut avoir une emprise différente.
+Par exemple, on peut déclarer une opération de service que l'on nommera `route`. Pour le service, cette opération existe, est disponible et est décrite via des fichiers JSON. Cette opération peut nécessiter un paramètre `start`. À ce niveau, on sait que l'opération est disponible, que le paramètre existe et est obligatoire. Mais on ne sait pas quelles valeurs il peut prendre. Cela dépend de la ressource. Chaque ressource peut avoir une emprise différente.
 
 #### Ajouter/modifier/supprimer une opération
 

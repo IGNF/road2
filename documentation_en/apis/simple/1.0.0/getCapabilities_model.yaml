@@ -1,0 +1,161 @@
+# Modèle de données d'un GetCapabilities
+
+# un getCapabilities est un objet qui contient toutes les informations utile pour utiliser le service avec les ressources disponibles sur l'instance.
+"getCapabilities":
+	type: object
+	required: true
+	properties:
+		# Informations sur le service
+		"info":
+			type: object
+			required: true
+			properties:
+				# Nom du service
+				"name":
+					type: string
+					required: true
+				# Titre du service
+				"title":
+					type: string
+					required: true
+				# Url d'accès au service
+				"url":
+					type: string
+					required: false
+				# Description du service
+				"description":
+					type: string
+					required: true
+		# un getCapabilities correspond à une API. Elle est ainsi rappelée.
+		"api":
+			type: object
+			required: true
+			properties:
+				# Nom de l'API
+				"name":
+					type: string
+					required: true
+				# Version de l'API
+				"version":
+					type: string
+					required: true
+		# Liste des opérations disponibles pour l'utilisation. Il n'y a pas les opérations d'administrations car ce document aide l'utilisation du service et non son administration.
+		"operations":
+			type: array
+			required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+					# Id de l'opération décrite. Cet id sera repris plus tard pour décrire les valeurs disponibles de chaque paramètre.
+					"id":
+						type: string
+						required: true
+					# Description de l'opération.
+					"description":
+						type: string
+						required: true
+					# Partie de la route qui suit l'url du service.
+					"url":
+						type: string
+						required: true
+					# Méthodes d'accès à l'opération.
+					"methods":
+						type: array
+						required: true
+						uniqueItems: true
+						items:
+							type: string
+							enum: ["GET","POST","PUT","DELETE"]
+					# Paramètres de l'opération.
+					"parameters":
+						type: array
+						required: true
+						items:
+							type: object
+							properties:
+								# Nom du paramètre. Ce nom sera repris plus tard pour décrire les valeurs disponibles de chaque paramètre.
+								"name":
+									type: string
+									required: true
+								# Emplacement du paramètre.
+								"in":
+									type: string
+									required: true
+									enum: ["query","url","body"]
+								# Description du paramètre
+								"description":
+									type: string
+									required: true
+								# Précise si le paramètre est obligatoire ou pas
+								"required":
+									type: "boolean"
+									required: true
+								# Précise s'il existe une valeur par défaut quand le paramètre n'est pas précisé. Cette valeur par défaut est indiquée dans la suite du GetCapabilities.
+								"default":
+									type: "boolean"
+									required: true
+								# format de la donnée
+								"schema":
+									type: "schema"
+									required: true
+								# Exemple pour aider à comprendre l'utilisation du paramètre.
+								"example":
+									type: string
+									required: true
+								# Pour les paramètres qui peuvent être répétés, il indique s'il faut réécrire le nom du paramètre ou pas.
+								"explode":
+									type: "boolean"
+									required: false
+								# Valable uniquement pour explode=false, il indique comment séparer les différentes valeurs du paramètre.
+								"style":
+									type: string
+									required: false
+									enum: ["pipeDelimited","spaceDelimited","commaDelimited"]
+		# Description des ressources disponibles
+		"resources":
+			type: array
+			required: true
+			minItems: 1
+			items:
+				type: object
+				properties:
+					# Id de la ressource. Utilisé dans les requêtes.
+					"id":
+						type: string
+						required: true
+					# Description de la ressource.
+					"description":
+						type: string
+						required: true
+					# Opérations disponibles sur cette ressource.
+					"availableOperations":
+						type: array
+						required: true
+						items:
+							type: object
+							properties:
+								# Id de l'opération. C'est l'id que l'on trouve dans la description des opérations.
+								"id":
+									type: string
+									required: true
+								# Valeurs des paramètres de l'opération
+								"availableParameters":
+									type: array
+									required: true
+									items:
+										type: object
+										properties:
+											# Nom du paramétre concerné
+											"id":
+												type: string
+												required: true
+											# Valeurs disponibles pour ce paramètre
+											"values":
+												type: "schema"
+												required: true
+											# Valeur par défaut s'il y en a une.
+											"default":
+												type: "schema"
+												required: false
+
