@@ -8,7 +8,7 @@ Road2 is a route and isochrone calculation server written in Javascript and desi
 
 Road2 was designed with the idea of being able to easily add new engines and new APIs, and this, in a completely transparent way for each other. In other words, adding an engine has no impact on existing APIs. The goal is to facilitate the addition of new features while maintaining access to the service. For a longer discussion on the software concepts introduced in Road2, please refer to the [following documentation](./documentation_en/developers/concepts.md).
 
-Currently, Road2 offers three engines, OSRM, PGRouting and Valhalla, through multiple REST API.
+Currently, Road2 offers three engines, OSRM, PGRouting and Valhalla, through one REST API. Other API are coming. 
 
 ## Features available
 
