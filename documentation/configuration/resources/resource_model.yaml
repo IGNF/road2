@@ -13,7 +13,7 @@
     "type":
       type: string
       required: true
-      enum: ["osrm","pgr","smartpgr","valhalla"]
+      enum: ["osrm","pgr","valhalla"]
     # Description de la ressource
     "description":
       type: string

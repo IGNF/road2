@@ -1,8 +1,15 @@
 # CHANGELOG
 
-## 2.2.6
+## 3.0.0
+
+BREAKING CHANGES: 
+- All smartpgr resources and smartrouting sources will not work
+
 FIXED:
 - Ignore turf errors for steps simplification in pgrSource, and add a warning to analyse which steps trigger the error
+
+DELETED:
+- All smartrouting related code
 
 ## 2.2.5
 

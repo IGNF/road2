@@ -12,7 +12,7 @@
 "type":
   type: string
   required: true
-  enum: ["osrm","pgr","smartrouting","valhalla"]
+  enum: ["osrm","pgr","valhalla"]
 # Projection des données sources
 "projection":
   type: string

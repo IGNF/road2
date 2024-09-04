@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
-const smartpgrResource = require('../resources/smartpgrResource');
 const valhallaResource = require('../resources/valhallaResource');
 const log4js = require('log4js');
 
@@ -37,7 +36,6 @@ module.exports = class resourceManager {
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "smartpgr": ["route", "isochrone"],
       "valhalla": ["route", "isochrone"]
     };
 
@@ -404,8 +402,6 @@ module.exports = class resourceManager {
       resource = new osrmResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "pgr") {
       resource = new pgrResource(resourceJsonObject, resourceOperationHash);
-    } else if (resourceJsonObject.resource.type === "smartpgr") {
-      resource = new smartpgrResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "valhalla") {
       resource = new valhallaResource(resourceJsonObject, resourceOperationHash);
     } else {
