@@ -521,7 +521,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_1_droite"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_collaboratif_droite"
 
   Scenario Outline: [POST] Route sur l'API simple 1.0.0 avec les waysAttributes par défaut
     Given an "POST" request on operation "route" in api "simple" "1.0.0"
@@ -530,7 +530,7 @@ Scenario: [GET] Route sur l'API simple 1.0.0 avec une contrainte spécifique pgr
     Then the server should send a response with status 200
     And the response should have an header "content-type" with value "application/json"
     And the response should contain a complete and valid road
-    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_1_droite"
+    And the response should contain an attribute "portions.[0].steps.[0].attributes.nom_collaboratif_droite"
 
   Scenario Outline: [GET] Route sur l'API simple 1.0.0 avec mauvais waysAttributes
     Given an "GET" request on operation "route" in api "simple" "1.0.0"

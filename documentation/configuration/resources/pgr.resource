@@ -61,8 +61,8 @@
           {
             "id": "waysAttributes",
             "values": [
-              "nom_1_gauche",
-              "nom_1_droite",
+              "nom_collaboratif_gauche",
+              "nom_collaboratif_droite",
               "cpx_numero",
               "cpx_toponyme_route_nommee",
               "cleabs",

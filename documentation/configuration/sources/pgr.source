@@ -10,13 +10,13 @@
       "schema": "public",
       "attributes": [
         {
-          "key": "nom_1_gauche",
-          "column": "nom_1_gauche",
+          "key": "nom_collaboratif_gauche",
+          "column": "nom_collaboratif_gauche",
           "default": "true"
         },
         {
-          "key": "nom_1_droite",
-          "column": "nom_1_droite",
+          "key": "nom_collaboratif_droite",
+          "column": "nom_collaboratif_droite",
           "default": "true"
         },
         {
