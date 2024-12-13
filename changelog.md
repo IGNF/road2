@@ -2,7 +2,8 @@
 
 ## 2.2.7
 ADDED:
-- Valhalla: Provide the ability to set maxBuffer in exec command options to avoid maxBuffer lenght exceeded error
+- Valhalla: Provide the ability to set maxBuffer in exec command options to avoid maxBuffer lenght exceeded error (#109)
+- Docs: add english documentation (#107)
 
 ## 2.2.6
 FIXED:
