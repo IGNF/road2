@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.7
+ADDED:
+- Valhalla: Provide the ability to set maxBuffer in exec command options to avoid maxBuffer lenght exceeded error
+
 ## 2.2.6
 FIXED:
 - Ignore turf errors for steps simplification in pgrSource, and add a warning to analyse which steps trigger the error

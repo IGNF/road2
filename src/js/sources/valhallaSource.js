@@ -17,6 +17,8 @@ const { exec } = require('child_process');
 // Création du LOGGER
 const log4js = require('log4js');
 const LOGGER = log4js.getLogger("VALHALLASOURCE");
+// Récupération de la valeur du maxBuffer en variable d'environment variable ou valorisation par défaut (1MB)
+const maxBuffer = process.env.EXEC_MAX_BUFFER_SIZE ? parseInt(process.env.EXEC_MAX_BUFFER_SIZE, 10) : 1024 * 1024;
 
 /**
 *
@@ -186,12 +188,13 @@ module.exports = class valhallaSource extends Source {
       // Permet de grandement se simplifier le parsing !!
       const optionsString = `"directions_options":{"format":"osrm"}`;
       const commandString = `valhalla_service ${this._configuration.storage.config} route '{${locationsString},${costingString},${optionsString}}' `;
+      const options = { maxBuffer: maxBuffer };
       LOGGER.info(commandString);
 
       return new Promise( (resolve, reject) => {
 
         try {
-          exec(commandString, (err, stdout, stderr) => {
+          exec(commandString, options, (err, stdout, stderr) => {
 
             // Du moment qu'OSRM a répondu, on considère que la source est joignable
             this.state = "green";
@@ -287,12 +290,13 @@ module.exports = class valhallaSource extends Source {
         const reverseString = `"reverse":${reverse}`;
         const polygonsString = `"polygons":true`;
         const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}}' `;
+        const options = { maxBuffer: maxBuffer };
         LOGGER.info(commandString);
 
         return new Promise( (resolve, reject) => {
 
           try {
-            exec(commandString, (err, stdout, stderr) => {
+            exec(commandString, options, (err, stdout, stderr) => {
 
             // Du moment qu'OSRM a répondu, on considère que la source est joignable
             this.state = "green";
