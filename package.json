@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "2.2.5",
+  "version": "2.2.7",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
