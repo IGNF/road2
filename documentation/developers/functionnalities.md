@@ -160,7 +160,7 @@ Les exclusions sont les contraintes classiques comme l'interdiction d'emprunter 
 
 ### Déterminer le point du graphe le plus proche
 
-Pour un point donnée, OSRM peut renovyer les points les plus proches du graphe. 
+Pour un point donnée, OSRM peut renvoyer les points les plus proches du graphe. 
 
 
 

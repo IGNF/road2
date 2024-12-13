@@ -67,3 +67,8 @@ Par défaut, il y a des options qui sont utilisées mais elles peuvent être rem
 ### Gestion du HTTPS
 
 Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le module `https` de NodeJS. Il est donc possible de lui fournir les [options](https://nodejs.org/docs/latest-v12.x/api/tls.html#tls_tls_createserver_options_secureconnectionlistener) disponibles dans ce module. 
+
+### Gestion du buffer
+
+Il est possible de changer la taille du buffer lors d'une source Valhalla en valorisant la variable d'environnement `EXEC_MAX_BUFFER_SIZE`.
+La valeur par défaut est de 1MB.
