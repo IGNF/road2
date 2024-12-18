@@ -72,3 +72,7 @@ Road2 peut être directement interrogé en HTTPS. Pour cela, il utilise le modul
 
 Il est possible de changer la taille du buffer lors d'une source Valhalla en valorisant la variable d'environnement `EXEC_MAX_BUFFER_SIZE`.
 La valeur par défaut est de 1MB.
+
+### Gestion du timeout valhalla
+Il est possible de changer la valeur du timeout d'execution du process valhalla_service en valorisant la variable d'environnement `EXEC_TIMEOUT` (nombre de millisecondes).
+La valeur par défaut est `0` soit pas de timeout.
