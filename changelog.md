@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.8
+ADDED:
+- Valhalla: allow to configure a timeout on valhalla_service exec
+
 ## 2.2.7
 ADDED:
 - Valhalla: Provide the ability to set maxBuffer in exec command options to avoid maxBuffer lenght exceeded error (#109)
