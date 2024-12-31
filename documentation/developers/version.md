@@ -12,9 +12,9 @@ Route Graph Generator et PGRouting Procedures sont indépendants en tant que pro
 
 ## Les branches
 
-Sur ces trois projets ont une branche `master` et `develop`. La première permet de gérer les versions mises en production. La seconde permet de réaliser les développements. 
+Sur ces trois projets ont une branche principale `main`. La gestion des versions mises en production est faite via des tags transformés en releases.
 
-On veillera à partir de `develop` et à créer une branche du type :
+On veillera à partir de `main` et à créer une branche du type :
 - `doc/*` pour modifier ou ajouter de la documentation uniquement,
 - `feat/*` pour réaliser de nouvelles fonctionnalités,
 - `fix/*` pour effectuer une correction sur le code source,
@@ -22,25 +22,23 @@ On veillera à partir de `develop` et à créer une branche du type :
 - `test/*` pour modifier uniquement les tests, 
 - `ci/*` pour modifier la CI Github
 
-Pour fusionner une branche avec `develop`, on veillera à avoir fait un rebase de develop sur cette branche. Et sur la méthode de merge, on fera un squash. Ainsi, la branche `develop` aura un commit par fonctionnalité, correction, etc...
+Pour fusionner une branche avec `main`, on veillera à avoir fait un rebase de develop sur cette branche. Et sur la méthode de merge, on fera un squash. Ainsi, la branche `main` aura un commit par fonctionnalité, correction, etc...
 
 ## Versions et tags
 
-On part du principe que les versions sont gérés sur les branches `master` et `develop` des différents projets. Et c'est pour ces branches que nous allons expliquer comment maintenir les versions et les tags. 
+On part du principe que les versions sont gérés sur la branche `main` des différents projets. Et c'est pour cette branches que nous allons expliquer comment maintenir les versions et les tags. 
 
 ### Généralités 
 
-Chaque projet aura, sur la branche `develop`, une version supérieure à celle présente sur `master`; ainsi que la mention `-DEVELOP`. 
+Chaque projet aura, sur la branche `main`, une version supérieure à la dernière version ayant fait l'objet d'une release; ainsi que la mention `-BETA`. 
 
 Par exemple, on veillera à toujours avoir, pour chaque projet, un état similaire au suivant: 
-- branche `master`: 1.0.0
-- branche `develop`: 1.0.1-DEVELOP
+- dernière release : 1.0.0
+- branche `main`: 1.0.1-BETA
 
-On veillera à tagger les commits de chaque projet avec les bonnes versions. Et cela sur la branche `master` principalement. Cela est utile pour deux raisons: 
+On veillera à tagger les commits de chaque projet avec les bonnes versions. Cela est utile pour deux raisons: 
 - On doit être capable d'identifier, par les tags, les versions du code utilisées en production. 
-- On doit pouvoir faire fonctionner tous les projets ensemble à partir des tags sur `master` et `develop`. 
-
-Lorsque l'on fusionnera `develop` sur `master`, on veillera à ne pas faire de squash afin de faciliter les futurs fusions (comme cela est préconisé par [github](https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squashing-and-merging-a-long-running-branch)). 
+- On doit pouvoir faire fonctionner tous les projets ensemble à partir des tags sur `main`. 
 
 ### PGRouting Procedures et Route Graph Generator
 
@@ -48,44 +46,43 @@ Il est conseillé de commencer par gérer les versions de ces deux là. *Ce qui 
 
 État initiale pour chaque projet: 
 
-- branche `master`: 1.0.0
-- branche `develop`: 1.0.1-DEVELOP
+- dernière release: 1.0.0
+- branche `main`: 1.0.1-BETA
 
 Démarche à suivre pour chaque projet:
 
-1. Tester `develop` et corriger si nécessaire.
-2. Update de la version sur `develop` à 1.0.1.
-3. Merge de `develop` sur `master`.
-4. Update de la version sur `develop` à 1.0.2-DEVELOP.
-5. Faire des tests sur `master` et corriger si nécessaire.
-6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.
+1. Tester `main` et corriger si nécessaire.
+2. Update de la version sur `main` à 1.0.1.
+3. Création du tag 1.0.1.
+4. Update de la version sur `main` à 1.0.2-BETA.
+5. Faire des tests sur le tag 1.0.1 et corriger si nécessaire.
+6. S'il y a eu des corrections, recommencer à 1. en changeant le numéro de version. Sinon, publier une release avec le tag 1.0.1
 
 ### Road2 
 
 Road2 dépend des deux autres. Cela entraîne des subtilités. 
 
-État initiale pour chaque projet: 
+État initial pour chaque projet: 
 
-- branche `master`: 1.0.0
-- branche `develop`: 1.0.1-DEVELOP
+- dernière release : 1.0.0
+- branche `main`: 1.0.1-BETA
 
 Démarche à suivre pour Road2:
 
 0. Réaliser les montée de version et les merge sur Route Graph Generator et PGRouting Procedures. 
-1. Tester `develop` avec les `develop` des autres projets, et corriger si nécessaire.
-2. Update de la version sur `develop` à 1.0.1.
-3. Merge de `develop` sur `master`.
-4. Update de la version sur `develop` à 1.0.2-DEVELOP.
-5. Faire des tests sur `master` avec les `master` des autres projets, et corriger si nécessaire.
-6. S'il y a eu des corrections sur `master`, alors faire un merge de `master` sur `develop` et recommencer à 1. en changeant le numéro de version.
-7. S'il n'y a pas eu de corrections sur `master`, et qu'on a bien les `master` et les `develop` des trois projets qui fonctionnent ensemble, alors tagger `master` et `develop` avec les versions, sur chaque projet.
+1. Tester `main` avec les `main` des autres projets, et corriger si nécessaire.
+2. Update de la version sur `main` à 1.0.1.
+3. Création du tag 1.0.1.
+4. Update de la version sur `main` à 1.0.2-BETA.
+5. Faire des tests sur le tag 1.0.1 et corriger si nécessaire.
+6. S'il y a eu des corrections, recommencer à 1. en changeant le numéro de version. Sinon, publier une release avec le tag 1.0.1
 
 ### Gestion des sous-modules 
 
-Actuellement, Road2 fait appel à PGRouting Procedures et Route Graph Generator pour construire les différentes images docker qui permettent de tester et développer le service. La version utilisée dans Road2 sur sa branche `master` et `develop` est correspond à *un commit spécifique* de la `master` de chaque sous-module. 
+Actuellement, Road2 fait appel à PGRouting Procedures et Route Graph Generator pour construire les différentes images docker qui permettent de tester et développer le service. La version utilisée dans Road2 sur sa branche `main`  correspond à *un commit spécifique* de la `main` de chaque sous-module. 
 
 Pour pointer sur un commit plus récent, on suivra la procédure suivante : 
-- se placer sur la branche `develop` de Road2
+- créer une branche à partir de la branche `main` de Road2
 - à la racine du projet, lancer la commande `git submodule update --remote`
 - faire le commit de ce changement de référence
-- merger `develop` sur `master`
+- faire une PR de mise à jour des dépendances sur `main`
