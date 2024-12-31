@@ -75,10 +75,10 @@ If you would like for the GitHub UI to link the commit to your account and award
 
 #### Step 2 : Branch
 
-As a best practice to keep your development environment as organized as possible, create local branches to work within. When you create a branch, do it directly off of the upstream **develop** branch.
+As a best practice to keep your development environment as organized as possible, create local branches to work within. When you create a branch, do it directly off of the upstream **main** branch.
 
 ```
-git checkout upstream develop
+git checkout upstream main
 git checkout -b my-branch
 ```
 
@@ -178,13 +178,13 @@ Note that multiple commits often will get squashed when they are landed.
 As a best practice, once you have committed your changes, it is a good idea to use `git rebase` (not `git merge`) to synchronize your work with the main repository.
 
 ```
-git checkout upstream develop
-git pull upstream develop
+git checkout upstream main
+git pull upstream main
 git checkout my-branch
-git rebase develop
+git rebase main
 ```
 
-This ensures that your working branch has the latest changes from the develop branch of the origin repository. Moreover, your Pull Request will be easier to merge. 
+This ensures that your working branch has the latest changes from the main branch of the origin repository. Moreover, your Pull Request will be easier to merge. 
 
 #### Step 6 : Test
 
@@ -230,10 +230,10 @@ git push origin my-branch
 If a git conflict arises, it is necessary to synchronize your branch with other changes that have landed upstream by using git `rebase`:
 
 ```
-git checkout upstream develop
-git pull upstream develop
+git checkout upstream main
+git pull upstream main
 git checkout my-branch
-git rebase develop
+git rebase main
 git push --force origin my-branch
 ```
 
