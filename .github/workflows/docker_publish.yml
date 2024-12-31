@@ -7,11 +7,11 @@ name: Docker GitHub Container Registry
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ '*.*.*' ]
   pull_request:
-    branches: [ "master", "develop" ]
+    branches: [ "main" ]
 
 env:
   # Use docker.io for Docker Hub if empty
