@@ -187,9 +187,14 @@ module.exports = class valhallaSource extends Source {
       locationsString += "]";
 
       const costingString = `"costing":"${this._costs[request.profile][request.optimization].costing}"`;
+      let costingOptionsString = `"costing_options":{"${this._costs[request.profile][request.optimization].costing}":{`;
+      if (this._costs[request.profile][request.optimization].costing === "pedestrian") {
+        costingOptionsString += `"walking_speed": 4`;
+      }
+      costingOptionsString += "}}";
       // Permet de grandement se simplifier le parsing !!
       const optionsString = `"directions_options":{"format":"osrm"}`;
-      const commandString = `valhalla_service ${this._configuration.storage.config} route '{${locationsString},${costingString},${optionsString}}' `;
+      const commandString = `valhalla_service ${this._configuration.storage.config} route '{${locationsString},${costingString},${costingOptionsString},${optionsString}}' `;
       const options = { maxBuffer: maxBuffer, timeout: execTimeout };
       LOGGER.info(commandString);
 
@@ -281,13 +286,19 @@ module.exports = class valhallaSource extends Source {
         const locationsString = `"locations":[{"lat":${tmpPoint[1]},"lon":${tmpPoint[0]}}]`;
         const costingString = `"costing":"${this._costs[request.profile][request.costType].costing}"`;
         let costingOptionsString = `"costing_options":{"${this._costs[request.profile][request.costType].costing}":{`;
-        for (let i = 0; i < constraints.length; i++) {
-          costingOptionsString += `"${constraints[i]}": "1"`
-          if (i != constraints.length - 1) {
-            costingOptionsString += ","
+        if (this._costs[request.profile][request.costType].costing === "pedestrian") {
+          costingOptionsString += `"walking_speed": 4`;
+          if (constraints.length >= 1) {
+            costingOptionsString += ",";
           }
         }
-        costingOptionsString += "}}"
+        for (let i = 0; i < constraints.length; i++) {
+          costingOptionsString += `"${constraints[i]}": "1"`;
+          if (i != constraints.length - 1) {
+            costingOptionsString += ",";
+          }
+        }
+        costingOptionsString += "}}";
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
         const polygonsString = `"polygons":true`;
