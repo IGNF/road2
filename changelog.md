@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.2.9
+
+FIXED:
+- Valhalla: wrong default walking speed: 5.1km/h -> 4km/h
+
 ## 2.2.8
 ADDED:
 - Valhalla: allow to configure a timeout on valhalla_service exec
