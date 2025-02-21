@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.10
+UPDATED:
+- Updated Dockefile for much faster building and much more recent image
+
 ## 2.2.9
 
 FIXED:
