@@ -5,7 +5,7 @@
 
 Pour construire l'image, il suffit de lancer la commande suivante à la racine du projet Road2:
 ```
-docker build -t road2-debian -f docker/debian/Dockerfile .
+docker build -t road2-debian -f docker/distributions/debian/Dockerfile .
 ```
 
 ## Lancer l'application
