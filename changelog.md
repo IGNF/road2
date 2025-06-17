@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.11
+UPDATED:
+- Updated Dockefile: donwgrade node version to 16 for compatibility with OSRM 5.26.0 
+
 ## 2.2.10
 UPDATED:
 - Updated Dockefile for much faster building and much more recent image

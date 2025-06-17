@@ -3,7 +3,7 @@ FROM ghcr.io/valhalla/valhalla@sha256:6fb108a960bdc63c12b1c92ab04517a0c56a019ef4
 
 ### Mise à jour des
 RUN apt-get update && apt-get upgrade -y
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y nodejs
 
 ### Dossier contenant la configuration de Road2
