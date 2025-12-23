@@ -3,7 +3,6 @@
     "name": "Road2",
     "title": "Service de calcul d'itinéraire",
     "description": "Ce service permet de calculer des itinéraires sur les données du Géoportail.",
-    "url": "https://localhost/",
     "provider": {
       "name": "IGN",
       "site": "www.ign.fr",
@@ -50,7 +49,7 @@
       "cors": {
         "configuration": "/home/docker/config/cors.json"
       }
-    }, 
+    },
     "projections": {
       "directory": "/home/docker/config/projections/"
     },

@@ -36,12 +36,25 @@ module.exports = {
     getCapabilities.info.title = globalConfiguration.application.title;
     // info.description
     getCapabilities.info.description = globalConfiguration.application.description;
-    // info.url
-    getCapabilities.info.url = globalConfiguration.application.url;
+    // info.language
+    getCapabilities.info.language = "";
+    if (globalConfiguration.application.language) {
+      getCapabilities.info.language = globalConfiguration.application.language;
+    }
+    // info.keywords
+    getCapabilities.info.keywords = {};
+    if (globalConfiguration.application.keywords) {
+      getCapabilities.info.keywords.keyword = globalConfiguration.application.keywords.keyword;
+    }
+    // info.contact
+    getCapabilities.info.contact = {};
+    if (globalConfiguration.application.contact) {
+      getCapabilities.info.contact.email = globalConfiguration.application.contact.email;
+    }
 
-    // provider 
+    // provider
     getCapabilities.provider = {};
-    
+
     if (globalConfiguration.application.provider) {
 
       // provider.name
@@ -60,6 +73,7 @@ module.exports = {
       getCapabilities.provider.site = "";
       getCapabilities.provider.mail = "";
     }
+
 
     // api
     getCapabilities.api = {};
@@ -575,7 +589,7 @@ module.exports = {
       crsParameterDescription.example = "EPSG:4326";
       nearestDescription.parameters.push(crsParameterDescription);
 
-      
+
 
       // -- end nearest.parameters
 
