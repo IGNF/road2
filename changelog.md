@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.3.0
+ADDED:
+- new fields in capabilities for INSPIRE compliance
+
 ## 2.2.11
 UPDATED:
 - Updated Dockefile: donwgrade node version to 16 for compatibility with OSRM 5.26.0 

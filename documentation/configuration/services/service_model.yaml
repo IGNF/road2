@@ -17,10 +17,26 @@
 		"description":
 			type: string
 			required: true
-    # Url du service qui va apparaître dans le getcap
-    "url":
-      type: string
-      required: true
+		"language":
+			type: string
+			required: false
+    # Informations de contact
+		"contact":
+			type: object
+			required: false
+			properties:
+				# Adresse mail du fournisseur
+				"email":
+					type: string
+					required: true*
+    # Mots clefs associés au service
+    "keywords":
+			type: object
+			required: false
+			properties:
+				"keyword":
+					type: string
+					required: true
 		# Information sur le fournisseur du service
 		"provider":
 			type: object
@@ -90,7 +106,7 @@
 					items:
 						type: object
 						properties:
-							# Id du serveur 
+							# Id du serveur
 							"id":
 								type: string
 								required: true
@@ -104,7 +120,7 @@
 								required: true
 							# Utilisation du HTTPS
 							"https":
-								type: string 
+								type: string
 								enum: ["true", "false"]
 								required: true
 							# Options pour le HTTPS (nécessaire si https="true")
@@ -121,13 +137,13 @@
 										type: string
 										required: true
 				# Configuration des cors
-				"cors":	
-					type: object 
+				"cors":
+					type: object
 					required: false
 					properties:
-						# Fichier de configuration des cors 
-						"configuration": 
-							type: string 
+						# Fichier de configuration des cors
+						"configuration":
+							type: string
 							required: true
     # Configuration des projections disponibles
     "projections":

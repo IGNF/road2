@@ -1353,9 +1353,27 @@
                   "type": "string",
                   "example": "Ce service permet de calculer des itinéraires sur les données du Géoportail."
                 },
-                "url": {
+                "language": {
                   "type": "string",
-                  "example": "https://localhost/"
+                  "example": "Français"
+                },
+                "contact": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "example": "contact.geoservices@ign.fr"
+                    }
+                  }
+                },
+                "keywords": {
+                  "type": "object",
+                  "properties": {
+                    "keyword": {
+                      "type": "string",
+                      "example": "infoMapAccessService"
+                    }
+                  }
                 },
                 "provider": {
                   "type": "object",
