@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "info": {
     "description": "Description of the OSRM API available via Road2. Only route operation in its v1 is available.",
     "version": "1.0.0",

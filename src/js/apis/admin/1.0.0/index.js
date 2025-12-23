@@ -22,10 +22,22 @@ router.all("/", function(req, res) {
 var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','administration', '1.0.0', 'api.json');
 LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API administration en version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
-router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.get('/openapi/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerDocument);
+});
+router.use(
+  '/openapi',
+  swaggerUi.serve,
+  swaggerUi.setup(null, {
+    swaggerOptions: {
+      url: '/admin/1.0.0/openapi/swagger.json'
+    }
+  })
+);
 
 // Version
-// Pour avoir la version de Road2 utilisée 
+// Pour avoir la version de Road2 utilisée
 router.route("/version")
 
   .get(async function(req, res, next) {
@@ -152,7 +164,7 @@ router.route("/services/:service")
 
       // Envoie à l'administrateur et récupération de l'objet réponse
       const serviceResponse = administrator.getServiceConfiguration(serviceRequest.service);
-      
+
       // Formattage de la réponse
       res.set('content-type', 'application/json');
       res.status(200).json(serviceResponse);
@@ -221,22 +233,22 @@ router.route("/services/:service/projections/:projection")
     const parameters = req.params;
     LOGGER.debug(parameters);
 
-    try {     
+    try {
 
       // Vérification des paramètres de la requête
       const projectionRequest = controller.checkProjectionParameters(parameters);
       LOGGER.debug(projectionRequest);
-      
+
       // Envoie à l'administrateur et récupération de l'objet réponse
       const projectionResponse = await administrator.computeRequest(projectionRequest.service, projectionRequest);
       LOGGER.debug(projectionResponse);
-               
+
       // Formattage de la réponse
       const userResponse = controller.writeProjectionResponse(projectionResponse);
       LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
-      res.status(200).json(userResponse);        
+      res.status(200).json(userResponse);
 
     } catch (error) {
       return next(error);
@@ -262,7 +274,7 @@ router.use(notFoundError);
 */
 
 function logError(err, req, res, next) {
-  
+
   let message = {
     request: req.originalUrl,
     query: req.query,
@@ -290,14 +302,14 @@ function logError(err, req, res, next) {
 */
 
 function sendError(err, req, res, next) {
-  // On ne veut pas le même comportement en prod et en dev 
+  // On ne veut pas le même comportement en prod et en dev
   if (process.env.NODE_ENV === "production") {
     if (err.status) {
-      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client 
+      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client
       res.status(err.status);
       res.json({ error: {message: err.message}});
     } else {
-      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur 
+      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur
       res.status(500);
       res.json({ error: {message: "Internal Server Error"}});
     }
@@ -310,7 +322,7 @@ function sendError(err, req, res, next) {
         more: err
       }});
   } else {
-    // En dev, on veut faire remonter n'importe quelle erreur 
+    // En dev, on veut faire remonter n'importe quelle erreur
     res.status(err.status || 500);
     res.json({ error: {message: err.message}});
   }

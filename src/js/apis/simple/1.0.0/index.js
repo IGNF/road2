@@ -19,7 +19,7 @@ router.use(express.json(
   {
     type: (req) => {
       // Le seul content-type accepté a toujours été application/json, on rend cela plus explicite
-      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct. 
+      // Cette fonction permet d'arrêter le traitement de la requête si le content-type n'est pas correct.
       // Sans elle, le traitement continue.
       if (req.get('Content-Type') !== "application/json") {
         throw errorManager.createError(" Wrong Content-Type. Must be 'application/json' ", 400);
@@ -28,8 +28,8 @@ router.use(express.json(
       }
     },
     verify: (req, res, buf, encoding) => {
-      // Cette fonction permet de vérifier que le JSON envoyé est valide. 
-      // Si ce n'est pas le cas, le traitement de la requête est arrêté. 
+      // Cette fonction permet de vérifier que le JSON envoyé est valide.
+      // Si ce n'est pas le cas, le traitement de la requête est arrêté.
       try {
         JSON.parse(buf);
       } catch (error) {
@@ -37,7 +37,7 @@ router.use(express.json(
       }
     }
   }
-)); 
+));
 // ---
 
 // Accueil de l'API
@@ -51,7 +51,19 @@ router.all("/", function(req, res) {
 var apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','simple', '1.0.0', 'api.json');
 LOGGER.info("Utilisation fichier .json '"+ apiJsonPath + "' pour initialisation swagger-ui de l'API simple en version 1.0.0");
 var swaggerDocument = require(apiJsonPath);
-router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.get('/openapi/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerDocument);
+});
+router.use(
+  '/openapi',
+  swaggerUi.serve,
+  swaggerUi.setup(null, {
+    swaggerOptions: {
+      url: '/simple/1.0.0/openapi/swagger.json'
+    }
+  })
+);
 
 // GetCapabilities
 router.all("/getcapabilities", function(req, res) {
@@ -69,7 +81,7 @@ router.all("/getcapabilities", function(req, res) {
   let getCapabilities = req.app.get(uid + "-getcap");
   LOGGER.debug(getCapabilities);
 
-  // Modification si Host ou X-Forwarded-Host précisè dans l'en-tête de la requête 
+  // Modification si Host ou X-Forwarded-Host précisè dans l'en-tête de la requête
   // il est récupéré par express dans req.host
   if (req.hostname) {
 
@@ -171,7 +183,7 @@ router.route("/route")
   });
 
 // Nearest
-// Pour trouver les points du graphe les plus proche d'un autre 
+// Pour trouver les points du graphe les plus proche d'un autre
 router.route("/nearest")
 
   .get(async function(req, res, next) {
@@ -211,9 +223,9 @@ router.route("/nearest")
     }
 
   })
-  
+
   .post(async function(req, res, next) {
-    
+
     LOGGER.debug("requete POST sur /simple/1.0.0/nearest?");
     LOGGER.debug(req.originalUrl);
 
@@ -247,8 +259,8 @@ router.route("/nearest")
     } catch (error) {
       return next(error);
     }
-    
-    
+
+
   });
 
 /* Génération d'isochrone. */
@@ -302,7 +314,7 @@ router.route("/isochrone")
     LOGGER.debug(parameters);
 
     try {
-      
+
       // Vérification des paramètres de la requête
       const isochroneRequest = controller.checkIsochroneParameters(parameters, service, "POST");
       LOGGER.debug(isochroneRequest);
@@ -356,7 +368,7 @@ function logError(err, req, res, next) {
   } else {
     LOGGER.error(message);
   }
-  
+
   next(err);
 }
 
@@ -369,14 +381,14 @@ function logError(err, req, res, next) {
 */
 
 function sendError(err, req, res, next) {
-  // On ne veut pas le même comportement en prod et en dev 
+  // On ne veut pas le même comportement en prod et en dev
   if (process.env.NODE_ENV === "production") {
     if (err.status) {
-      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client 
+      // S'il y a un status dans le code, alors cela veut dire qu'on veut remonter l'erreur au client
       res.status(err.status);
       res.json({ error: {errorType: err.code, message: err.message}});
     } else {
-      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur 
+      // S'il n'y a pas de status dans le code alors on ne veut pas remonter l'erreur
       res.status(500);
       res.json({ error: {errorType: "internal", message: "Internal Server Error"}});
     }
@@ -389,7 +401,7 @@ function sendError(err, req, res, next) {
         more: err
       }});
   } else {
-    // En dev, on veut faire remonter n'importe quelle erreur 
+    // En dev, on veut faire remonter n'importe quelle erreur
     res.status(err.status || 500);
     res.json({ error: {errorType: err.code, message: err.message}});
   }
