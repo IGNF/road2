@@ -22,7 +22,19 @@ router.all("/", function(req, res) {
 let apiJsonPath = path.join(__dirname, '..', '..', '..','..','..', 'documentation','apis','osrm', '1.0.0', 'api.json');
 LOGGER.info("using file '"+ apiJsonPath + "' to initialize swagger-ui for OSRM API version 1.0.0");
 let swaggerDocument = require(apiJsonPath);
-router.use('/openapi', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.get('/openapi/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerDocument);
+});
+router.use(
+  '/openapi',
+  swaggerUi.serve,
+  swaggerUi.setup(null, {
+    swaggerOptions: {
+      url: '/osrm/1.0.0/openapi/swagger.json'
+    }
+  })
+);
 
 // GetCapabilities
 router.all("/resources", function(req, res, next) {
@@ -116,7 +128,7 @@ function logError(err, req, res, next) {
   } else {
     LOGGER.error(message);
   }
-  
+
   next(err);
 }
 

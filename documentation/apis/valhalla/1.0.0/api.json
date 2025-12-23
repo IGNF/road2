@@ -1,5 +1,5 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.1.0",
     "info": {
       "description": "Description of the Valhalla API available via Road2. Only the isochrone API is available for now.",
       "version": "1.0.0",
