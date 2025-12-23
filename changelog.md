@@ -3,10 +3,12 @@
 ## 2.3.0
 ADDED:
 - new fields in capabilities for INSPIRE compliance
+- openapi: link to swagger definition in swagger ui
+- route names are now configurable with env variables: `ROUTE_ROUTE`, `ISOCHRONE_ROUTE` and `NEAREST_ROUTE`
 
 ## 2.2.11
 UPDATED:
-- Updated Dockefile: donwgrade node version to 16 for compatibility with OSRM 5.26.0 
+- Updated Dockefile: donwgrade node version to 16 for compatibility with OSRM 5.26.0
 
 ## 2.2.10
 UPDATED:
@@ -38,7 +40,7 @@ FEAT:
 ## 2.2.4
 FIXED:
 - The pg module can emit error event and they were not catched and so it caused some crashs of Road2
-- Some orange states were deleted from pgrSource and osrmSource 
+- Some orange states were deleted from pgrSource and osrmSource
 
 ## 2.2.3
 FIXED:

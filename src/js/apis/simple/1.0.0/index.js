@@ -11,6 +11,10 @@ const swaggerUi = require('swagger-ui-express');
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
 
+var routeNameRoute = process.env.ROUTE_ROUTE || "route";
+var routeNameIsochrone = process.env.ISOCHRONE_ROUTE || "isochrone";
+var routeNameNearest = process.env.NEAREST_ROUTE || "nearest";
+
 // POST
 // ---
 // Pour cette API, on va permettre la lecture des requêtes POST en parsant les contenus du type application/json
@@ -105,11 +109,11 @@ router.all("/getcapabilities", function(req, res) {
 
 // Route
 // Pour effectuer un calcul d'itinéraire
-router.route("/route")
+router.route("/" + routeNameRoute)
 
   .get(async function(req, res, next) {
 
-    LOGGER.debug("requete GET sur /simple/1.0.0/route?");
+    LOGGER.debug("requete GET sur /simple/1.0.0/" + routeNameRoute);
     LOGGER.debug(req.originalUrl);
 
     // On récupère l'instance de Service pour faire les calculs
@@ -184,11 +188,11 @@ router.route("/route")
 
 // Nearest
 // Pour trouver les points du graphe les plus proche d'un autre
-router.route("/nearest")
+router.route("/" + routeNameNearest)
 
   .get(async function(req, res, next) {
 
-    LOGGER.debug("requete GET sur /simple/1.0.0/nearest?");
+    LOGGER.debug("requete GET sur /simple/1.0.0/" + routeNameNearest);
     LOGGER.debug(req.originalUrl);
 
     // On récupère l'instance de Service pour faire les calculs
@@ -264,11 +268,11 @@ router.route("/nearest")
   });
 
 /* Génération d'isochrone. */
-router.route("/isochrone")
+router.route("/" + routeNameIsochrone)
 
   .get(async function(req, res, next) {
 
-    LOGGER.debug("requete GET sur /simple/1.0.0/isochrone?");
+    LOGGER.debug("requete GET sur /simple/1.0.0/" + routeNameIsochrone);
     LOGGER.debug(req.originalUrl);
 
     let service = req.app.get("service");
