@@ -1157,7 +1157,7 @@ module.exports = class pgrSource extends Source {
       // Potentiellement le cas où il n'y a pas d'isochrone car costValue trop faible
       geometry = new Polygon({type: 'Point',coordinates: [point.x,point.y]}, "geojson", askedProjection);
     } else {
-
+      turf.cleanCoords(rawGeometry, {mutate: true});
       geometry = new Polygon(rawGeometry, "geojson", super.projection);
 
       if (!geometry.transform(askedProjection)) {

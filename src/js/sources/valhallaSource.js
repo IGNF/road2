@@ -13,6 +13,7 @@ const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
 const { exec } = require('child_process');
+const turf = require('@turf/turf');
 
 // Création du LOGGER
 const log4js = require('log4js');
@@ -609,7 +610,7 @@ module.exports = class valhallaSource extends Source {
       // Potentiellement le cas où il n'y a pas d'isochrone car costValue trop faible
       geometry = new Polygon({type: 'Point',coordinates: [point.x,point.y]}, "geojson", askedProjection);
     } else {
-
+      turf.cleanCoords(rawGeometry, {mutate: true});
       geometry = new Polygon(rawGeometry, "geojson", super.projection);
 
       if (!geometry.transform(askedProjection)) {

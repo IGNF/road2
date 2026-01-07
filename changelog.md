@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.3.1
+FIXED:
+- invalid isochrone geometries
+
 ## 2.3.0
 ADDED:
 - new fields in capabilities for INSPIRE compliance
