@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "2.2.8",
+  "version": "3.0.0",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
@@ -16,22 +16,23 @@
     "debug": "env NODE_ENV=debug node --inspect=0.0.0.0:9229 ./src/js/road2.js"
   },
   "dependencies": {
-    "@mapbox/polyline": "1.1.1",
-    "@turf/turf": "6.5.0",
-    "assert": "2.0.0",
+    "@mapbox/polyline": "1.2.1",
+    "@turf/turf": "7.3.0",
+    "assert": "2.1.0",
     "cors": "2.8.5",
-    "express": "4.18.2",
-    "got": "11.8.2",
-    "helmet": "6.0.1",
-    "https-proxy-agent": "5.0.1",
-    "log4js": "6.7.1",
-    "nconf": "0.12.0",
-    "proj4": "2.8.0",
-    "swagger-ui-express": "4.6.3"
+    "express": "5.2.1",
+    "got": "14.6.6",
+    "helmet": "8.1.0",
+    "https-proxy-agent": "7.0.6",
+    "log4js": "6.9.1",
+    "nconf": "0.13.0",
+    "proj4": "2.20.2",
+    "swagger-ui-express": "5.0.1"
   },
   "optionalDependencies": {
-    "osrm": "5.26.0",
-    "pg": "8.9.0"
+    "@project-osrm/osrm": "6.0.0",
+    "pg": "8.16.3",
+    "@valhallajs/valhallajs": "3.6.1"
   },
   "devDependencies": {
     "sinon": "^7.2.7",
@@ -46,7 +47,8 @@
     "express",
     "log4js",
     "nconf",
-    "osrm",
+    "@project-osrm/osrm",
+    "@valhallajs/valhallajs",
     "pg",
     "@mapbox/polyline",
     "@turf/turf",

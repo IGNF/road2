@@ -116,7 +116,7 @@ module.exports = class osrmSource extends Source {
 
       // Chargement du fichier OSRM
       if (OSRM) {
-        this._osrm = new OSRM(osrmFile);
+        this._osrm = new OSRM({path: osrmFile, algorithm: "CH"});
         super.connected = true;
       } else {
         throw errorManager.createError("OSRM is not available");
@@ -311,7 +311,7 @@ module.exports = class osrmSource extends Source {
                 LOGGER.error("osrm error for nearest :");
                 LOGGER.error(err);
                 reject("Internal OSRM error");
-                
+
               } else {
 
                 LOGGER.debug("osrm response for nearest :");
@@ -569,7 +569,7 @@ module.exports = class osrmSource extends Source {
           }
           nativeSteps[k].intersections = nativeIntersections;
 
-          // Add maneuver extra 
+          // Add maneuver extra
           let nativeManeuver = {};
           // Test with hasOwnProperty because it can be 0 inside this property
           if (currentOsrmRouteStep.maneuver.hasOwnProperty("bearing_before")) {
@@ -585,7 +585,7 @@ module.exports = class osrmSource extends Source {
             }
             nativeManeuver.location = [location.x, location.y];
           }
-          
+
           nativeSteps[k].maneuver = nativeManeuver;
 
         }
@@ -616,7 +616,7 @@ module.exports = class osrmSource extends Source {
   * Ce traitement est placé ici car c'est à la source de renvoyer une réponse adaptée au proxy.
   * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
-  * @param {nearestRequest} nearestRequest - Objet nearestRequest 
+  * @param {nearestRequest} nearestRequest - Objet nearestRequest
   * @param {osrmResponse} osrmResponse - Objet osrmResponse, réponse renvoyée par osrm
   *
   */
@@ -633,13 +633,13 @@ module.exports = class osrmSource extends Source {
     // Création de la réponse
     let nearestResponse = new NearestResponse(nearestRequest.resource, nearestRequest.coordinates);
 
-    // Récupération de l'ensemble des points de la réponse d'OSRM 
+    // Récupération de l'ensemble des points de la réponse d'OSRM
     if (osrmResponse.waypoints) {
       LOGGER.debug(osrmResponse);
       if (osrmResponse.waypoints.length < 1) {
         throw errorManager.createError(" OSRM response is invalid: the number of waypoints is lower than 1. ");
       } else {
-        
+
         for (let i=0; i < osrmResponse.waypoints.length; i++) {
 
           if (osrmResponse.waypoints[i].location) {
@@ -668,7 +668,7 @@ module.exports = class osrmSource extends Source {
     } else {
       throw errorManager.createError(" OSRM response is invalid: no waypoints. ");
     }
-    
+
     return nearestResponse;
 
   }
