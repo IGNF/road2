@@ -12,16 +12,12 @@ const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
-const { exec } = require('child_process');
 const turf = require('@turf/turf');
+const { Actor } = require("@valhallajs/valhallajs")
 
 // Création du LOGGER
 const log4js = require('log4js');
 const LOGGER = log4js.getLogger("VALHALLASOURCE");
-// Récupération de la valeur du maxBuffer en variable d'environment variable ou valorisation par défaut (1MB)
-const maxBuffer = process.env.EXEC_MAX_BUFFER_SIZE ? parseInt(process.env.EXEC_MAX_BUFFER_SIZE, 10) : 1024 * 1024;
-// Récupération de la valeur du timeout pour l'execution du valhalla_service en variable d'environnement ou valorisation par défaut (0)
-const execTimeout = process.env.EXEC_TIMEOUT ? parseInt(process.env.EXEC_TIMEOUT, 10) : 0;
 
 /**
 *
@@ -195,39 +191,32 @@ module.exports = class valhallaSource extends Source {
       costingOptionsString += "}}";
       // Permet de grandement se simplifier le parsing !!
       const optionsString = `"directions_options":{"format":"osrm"}`;
-      const commandString = `valhalla_service ${this._configuration.storage.config} route '{${locationsString},${costingString},${costingOptionsString},${optionsString}}' `;
-      const options = { maxBuffer: maxBuffer, timeout: execTimeout };
+      const commandString = `{${locationsString},${costingString},${costingOptionsString},${optionsString}}`;
       LOGGER.info(commandString);
 
       return new Promise( (resolve, reject) => {
 
         try {
-          exec(commandString, options, (err, stdout, stderr) => {
+          Actor.fromConfigFile(this._configuration.storage.config).then((valhallaActor) => {
+            valhallaActor.route(commandString).then((valhallaResponse) => {
+              // Du moment que Valhalla a répondu, on considère que la source est joignable
+              this.state = "green";
 
-            // Du moment qu'OSRM a répondu, on considère que la source est joignable
-            this.state = "green";
+              LOGGER.debug("valhalla response for route :");
+              LOGGER.debug(valhallaResponse);
 
-            if (err) {
+              try {
+                resolve(this.writeRouteResponse(request, valhallaResponse));
+              } catch (error) {
+                reject(error);
+              }
+            }).catch((err) => {
               // mais on ne renvoie pas l'erreur à l'utilisateur
               reject(errorManager.createError(" No path found ", 404));
               LOGGER.error("valhalla error for route :");
               LOGGER.error(err);
-
-            } else {
-
-              LOGGER.debug("valhalla response for route :");
-              LOGGER.debug(stdout);
-
-              try {
-                resolve(this.writeRouteResponse(request, stdout));
-              } catch (error) {
-                reject(error);
-              }
-
-            }
-
+            });
           });
-
         } catch (error) {
           // Pour une raison que l'on ignore, la source n'est plus joignable
           this.state = "red";
@@ -303,39 +292,32 @@ module.exports = class valhallaSource extends Source {
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
         const polygonsString = `"polygons":true`;
-        const commandString = `valhalla_service ${this._configuration.storage.config} isochrone '{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}}' `;
-        const options = { maxBuffer: maxBuffer, timeout: execTimeout };
+        const commandString = `{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}}`;
         LOGGER.info(commandString);
 
         return new Promise( (resolve, reject) => {
 
           try {
-            exec(commandString, options, (err, stdout, stderr) => {
+            Actor.fromConfigFile(this._configuration.storage.config).then((valhallaActor) => {
+              valhallaActor.isochrone(commandString).then((valhallaResponse) => {
+                // Du moment que Valhalla a répondu, on considère que la source est joignable
+                this.state = "green";
 
-            // Du moment qu'OSRM a répondu, on considère que la source est joignable
-            this.state = "green";
+                LOGGER.debug("valhalla response for iso :");
+                LOGGER.debug(valhallaResponse);
 
-            if (err) {
-              // mais on ne renvoie pas l'erreur à l'utilisateur
-              LOGGER.error("valhalla error for route :");
-              LOGGER.error(err);
-              reject(errorManager.createError(" No path found ", 404));
-
-            } else {
-
-              LOGGER.debug("valhalla response for iso :");
-              LOGGER.debug(stdout);
-
-              try {
-                resolve(this.writeIsochroneResponse(request, stdout));
-              } catch (error) {
-                reject(error);
-              }
-
-            }
-
-          });
-
+                try {
+                  resolve(this.writeIsochroneResponse(request, valhallaResponse));
+                } catch (error) {
+                  reject(error);
+                }
+              }).catch((err) => {
+                // mais on ne renvoie pas l'erreur à l'utilisateur
+                reject(errorManager.createError(" No path found ", 404));
+                LOGGER.error("valhalla error for route :");
+                LOGGER.error(err);
+              });
+            });
           } catch (error) {
             // Pour une raison que l'on ignore, la source n'est plus joignable
             this.state = "red";

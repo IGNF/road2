@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 3.0.0
+CHANGED:
+- (breaking) Updated OSRM to 6.0.0
+- Dockerfile now uses Node 24.12 on debian trixie
+- Valhalla source now uses JS binding instead of child process
+
+UPDATED:
+- Updated all package.json dependencies to last versions (08/01/2026)
+
 ## 2.3.1
 FIXED:
 - invalid isochrone geometries
