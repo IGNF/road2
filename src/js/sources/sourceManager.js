@@ -5,7 +5,6 @@ const path = require('path');
 const assert = require('assert').strict;
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
-const smartroutingSource = require('../sources/smartroutingSource');
 const valhallaSource = require('../sources/valhallaSource');
 const log4js = require('log4js');
 
@@ -50,7 +49,6 @@ module.exports = class sourceManager {
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "smartrouting": ["route", "isochrone"],
       "valhalla": ["route", "isochrone"]
     };
 
@@ -352,8 +350,6 @@ module.exports = class sourceManager {
         validation = await this.checkSourcePgr(sourceJsonObject);
       } else if (sourceJsonObject.type === "valhalla") {
         validation = this.checkSourceValhalla(sourceJsonObject);
-      } else if (sourceJsonObject.type === "smartrouting") {
-        validation = this.checkSourceSmartrouting(sourceJsonObject);
       } else {
         LOGGER.error("La source indique un type invalide : " + sourceJsonObject.type);
         return false;
@@ -635,41 +631,6 @@ module.exports = class sourceManager {
 
 }
 
-  /**
-  *
-  * @function
-  * @name checkSourceSmartrouting
-  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source smartrouting.
-  * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean}
-  *
-  */
-
-  checkSourceSmartrouting(sourceJsonObject) {
-
-    LOGGER.info("Verification de la source smartrouting...");
-
-    // Storage
-    if (!sourceJsonObject.storage) {
-      LOGGER.error("Mauvaise configuration : 'source.storage' absent");
-      return false;
-    } else {
-
-      LOGGER.debug("'source.storage' présent");
-
-      if (!sourceJsonObject.storage.url) {
-        LOGGER.error("Mauvaise configuration : 'source.storage.url' absent");
-        return false;
-      } else {
-        LOGGER.debug("'source.storage.url' présent");
-        // TODO: vérifier la forme de l'URL avec une regex
-      }
-    }
-
-    LOGGER.info("Fin de la verification de la source smartrouting.");
-    return true;
-
-  }
 
   /**
   *
@@ -683,7 +644,7 @@ module.exports = class sourceManager {
 
    checkSourceValhalla(sourceJsonObject) {
 
-    LOGGER.info("Verification de la source smartrouting...");
+    LOGGER.info("Verification de la source valhalla...");
 
     // Storage
     if (!sourceJsonObject.storage) {
@@ -774,7 +735,7 @@ module.exports = class sourceManager {
 
     }
 
-    LOGGER.info("Fin de la verification de la source smartrouting.");
+    LOGGER.info("Fin de la verification de la source valhalla.");
     return true;
 
   }
@@ -951,8 +912,6 @@ module.exports = class sourceManager {
       // Création de la source
       source = new pgrSource(sourceJsonObject, base);
 
-    } else if (sourceJsonObject.type === "smartrouting") {
-      source = new smartroutingSource(sourceJsonObject);
     } else if (sourceJsonObject.type === "valhalla") {
       source = new valhallaSource(sourceJsonObject);
     } else {

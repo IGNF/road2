@@ -15,6 +15,9 @@ UPDATED:
 FIXED:
 - Link to openApi in simple api was redirecting to osrm Api
 
+REMOVED:
+- All references to Smartrouting and Smartpgr
+
 ## 2.3.1
 FIXED:
 - invalid isochrone geometries
