@@ -8,6 +8,12 @@ CHANGED:
 
 UPDATED:
 - Updated all package.json dependencies to last versions (08/01/2026)
+- Updated default docker image and the associated doc
+- Updated the sample docker config to have empty dirs
+- Enforced resource files to end with .resource and source files to end with .source
+
+FIXED:
+- Link to openApi in simple api was redirecting to osrm Api
 
 ## 2.3.1
 FIXED:

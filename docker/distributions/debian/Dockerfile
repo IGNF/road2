@@ -16,7 +16,7 @@ COPY documentation/apis ./documentation/apis
 COPY *.json ./
 
 ### Installation des dépendances de l'application NodeJS
-RUN npm install --no-optional && npm install -g mocha eslint jsdoc nyc
+RUN npm install && npm install -g mocha eslint jsdoc nyc
 
 ### Volume partagé pour lire les données
 VOLUME ["/home/docker/data"]

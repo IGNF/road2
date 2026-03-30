@@ -28,12 +28,12 @@ router.get('/openapi/swagger.json', (req, res) => {
 });
 router.use(
   '/openapi',
-  swaggerUi.serve,
-  swaggerUi.setup(null, {
+  swaggerUi.serveFiles(null, {
     swaggerOptions: {
       url: '/osrm/1.0.0/openapi/swagger.json'
     }
-  })
+  }),
+  swaggerUi.setup(swaggerDocument)
 );
 
 // GetCapabilities

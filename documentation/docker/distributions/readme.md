@@ -12,7 +12,7 @@ docker build -t road2-debian -f docker/distributions/debian/Dockerfile .
 
 Pour lancer l'application, il suffit d'utiliser la commande suivante:
 ```
-docker run --name road2-debian-server --rm -d -p 8080:8080 road2-debian
+docker run --name road2-debian-server --rm -d -p 8080:8080 -v ${PWD}/docker/config:/home/docker/config -v ${PWD}/docker/config:/home/docker/data road2-debian
 ```
 
 ### Mode DEBUG

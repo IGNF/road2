@@ -31,7 +31,7 @@ module.exports = class resourceManager {
     // Liste des ressources chargées dans le manager
     this._resource = {};
 
-    // Correspondance entre les ressources et les opérations possibles 
+    // Correspondance entre les ressources et les opérations possibles
     // Le contenu de ce tableau dépend du code écrit dans la ressource correspondante, de ce nous avons choisis de l'implémenter dans Road2
     // Ce tableau peut beaucoup ressembler à son équivalent du sourceManager mais il peut aussi s'en écarter selon les futures ressources qui seront implémentées
     this._operationsByType = {
@@ -53,7 +53,7 @@ module.exports = class resourceManager {
   *
   * @function
   * @name get resource
-  * @description Récupérer les ressources 
+  * @description Récupérer les ressources
   *
   */
    get resource() {
@@ -66,7 +66,7 @@ module.exports = class resourceManager {
   * @name checkResourceDirectory
   * @description Fonction utilisée pour vérifier le contenu d'un dossier de description d'une ressource.
   * @param {string} directory - Dossier qui contient les configurations des ressources
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -94,6 +94,10 @@ module.exports = class resourceManager {
       for (let i = 0; i < fileList.length; i++) {
 
         let resource = fileList[i];
+        if (!resource.endsWith(".resource")) {
+          LOGGER.warn("Le fichier " + resource + " n'est pas un fichier de ressource (extension .resource) et ne sera pas vérifié.");
+          continue;
+        }
         let resourceFile = "";
         try {
           resourceFile = directory + "/" + resource;
@@ -104,7 +108,7 @@ module.exports = class resourceManager {
 
         let resourceConf = {};
         try {
-          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
           resourceConf = JSON.parse(fs.readFileSync(resourceFile));
         } catch (error) {
           LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de ressource: " + resourceFile);
@@ -137,7 +141,7 @@ module.exports = class resourceManager {
   * @name checkResourceConfiguration
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une ressource.
   * @param {object} resourceJsonObject - Configuration de la ressource
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -214,7 +218,7 @@ module.exports = class resourceManager {
         LOGGER.info("Type de la ressource disponible: " + resourceJsonObject.resource.type);
       } else {
         LOGGER.error("La ressource indique un type invalide: " + resourceJsonObject.resource.type);
-        return false;      
+        return false;
       }
 
     }
@@ -296,13 +300,13 @@ module.exports = class resourceManager {
   *
   * @function
   * @name flushCheckedResource
-  * @description Vider la liste des ressources déjà vérifiées 
+  * @description Vider la liste des ressources déjà vérifiées
   *
   */
    flushCheckedResource() {
 
     this._checkedResourceId = new Array();
-  
+
   }
 
   /**
@@ -311,7 +315,7 @@ module.exports = class resourceManager {
   * @name loadResourceDirectory
   * @description Fonction utilisée pour charger le contenu d'un dossier de description d'une ressource.
   * @param {string} directory - Dossier qui contient les configurations des ressources
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -356,7 +360,7 @@ module.exports = class resourceManager {
   * @name loadResourceConfiguration
   * @description Fonction utilisée pour créer une ressource à partir de sa configuration
   * @param {json} resourceJsonObject - Description JSON de la ressource
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -397,7 +401,7 @@ module.exports = class resourceManager {
     if (!this._operationManager.loadResourceOperationConfiguration(resourceOperationHash, resourceJsonObject)) {
       LOGGER.error("Erreur lors de la creation des operations de la ressource");
       return false;
-    } 
+    }
 
     // Création de la ressource
     if (resourceJsonObject.resource.type === "osrm") {
@@ -413,7 +417,7 @@ module.exports = class resourceManager {
       return false;
     }
 
-    // Initialisation de la correspondance entre ressource et sources 
+    // Initialisation de la correspondance entre ressource et sources
     if (!resource.initResource(this._sourceManager)) {
       LOGGER.error("Impossible d'instancier les liens avec les sources");
       return false;
@@ -424,7 +428,7 @@ module.exports = class resourceManager {
     this._resource[resourceJsonObject.resource.id] = resource;
 
     return true;
-    
+
   }
 
 
