@@ -30,9 +30,9 @@
     "swagger-ui-express": "5.0.1"
   },
   "optionalDependencies": {
-    "@project-osrm/osrm": "6.0.0",
+    "@project-osrm/osrm": "26.4.1",
     "pg": "8.16.3",
-    "@valhallajs/valhallajs": "3.6.1"
+    "@valhallajs/valhallajs": "3.7.0"
   },
   "devDependencies": {
     "sinon": "^7.2.7",
