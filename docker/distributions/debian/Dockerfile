@@ -1,10 +1,7 @@
-### TODO : Supprimer la compilation et l'installation de Valhalla dès que l'on aura un binding NodeJS pour lui et donc repasser sur une image node
-FROM ghcr.io/valhalla/valhalla@sha256:6fb108a960bdc63c12b1c92ab04517a0c56a019ef45c9b9c8cf847d8de9db72b
+FROM node:24.12-trixie-slim
 
-### Mise à jour des
+### Mise à jour des paquets
 RUN apt-get update && apt-get upgrade -y
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs
 
 ### Dossier contenant la configuration de Road2
 WORKDIR /home/docker/config

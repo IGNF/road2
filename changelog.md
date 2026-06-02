@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 3.0.0
+CHANGED:
+- (breaking) Updated OSRM to 26.4.1
+- Dockerfile now uses Node 24.12 on debian trixie
+- Valhalla source now uses JS binding instead of child process
+
+UPDATED:
+- Updated all package.json dependencies to last versions (08/01/2026)
+- Updated default docker image and the associated doc
+- Updated the sample docker config to have empty dirs
+- Enforced resource files to end with .resource and source files to end with .source
+
+FIXED:
+- Link to openApi in simple api was redirecting to osrm Api
+
+REMOVED:
+- All references to Smartrouting and Smartpgr
+
 ## 2.3.1
 FIXED:
 - invalid isochrone geometries

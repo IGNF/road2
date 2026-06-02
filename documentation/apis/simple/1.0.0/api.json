@@ -10,16 +10,8 @@
   },
   "servers": [
     {
-      "url": "https://wxs.ign.fr/calcul/geoportail/itineraire/rest/1.0.0/",
-      "description": "Serveur de test IGN pour l'itinéraire"
-    },
-    {
-      "url": "https://wxs.ign.fr/calcul/geoportail/isochrone/rest/1.0.0/",
-      "description": "Serveur de test IGN pour l'isochrone"
-    },
-    {
-      "url": "http://localhost:8080/simple/1.0.0/",
-      "description": "Serveur de test local"
+      "url": "https://data.geopf.fr/navigation",
+      "description": "Géoplateforme"
     }
   ],
   "tags": [

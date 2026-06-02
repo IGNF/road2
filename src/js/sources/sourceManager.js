@@ -5,7 +5,6 @@ const path = require('path');
 const assert = require('assert').strict;
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
-const smartroutingSource = require('../sources/smartroutingSource');
 const valhallaSource = require('../sources/valhallaSource');
 const log4js = require('log4js');
 
@@ -38,19 +37,18 @@ module.exports = class sourceManager {
     // Descriptions des sources vérifiées par le manager
     this._checkedSourceConfiguration = {};
 
-    // Manager des projections 
+    // Manager des projections
     this._projectionManager = projectionManager;
 
     // Manager de bases de données (utiles pour certaines sources)
     this._baseManager = baseManager;
 
-    // Correspondance entre les sources et les opérations possibles 
+    // Correspondance entre les sources et les opérations possibles
     // Le contenu de ce tableau dépend du moteur et du code écrit dans la source correspondante
     // Par exemple, le projet OSRM permet de faire du nearest et nous avons choisis de l'implémenter dans Road2
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "smartrouting": ["route", "isochrone"],
       "valhalla": ["route", "isochrone"]
     };
 
@@ -84,7 +82,7 @@ module.exports = class sourceManager {
   * @name isCheckedSourceAvailable
   * @description Fonction utilisée pour vérifier si une source a été vérifiée
   * @param {string} id - Id de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -129,7 +127,7 @@ module.exports = class sourceManager {
   * @name isLoadedSourceAvailable
   * @description Fonction utilisée pour vérifier si une source a été chargée
   * @param {string} id - Id de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -154,7 +152,7 @@ module.exports = class sourceManager {
   * @name checkSourceDirectory
   * @description Fonction utilisée pour vérifier un dossier contenant des sources.
   * @param {string} directory - Dossier qui contient les configurations des ressources
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -182,6 +180,10 @@ module.exports = class sourceManager {
       for (let i = 0; i < fileList.length; i++) {
 
         let source = fileList[i];
+        if (!source.endsWith(".source")) {
+          LOGGER.warn("Le fichier " + source + " n'est pas un fichier de source (extension .source) et ne sera pas vérifié.");
+          continue;
+        }
         let sourceFile = "";
         try {
           sourceFile = directory + "/" + source;
@@ -192,7 +194,7 @@ module.exports = class sourceManager {
 
         let sourceConf = {};
         try {
-          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+          // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
           sourceConf = JSON.parse(fs.readFileSync(sourceFile));
         } catch (error) {
           LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de source: " + sourceFile);
@@ -225,7 +227,7 @@ module.exports = class sourceManager {
   * @name checkSourceConfiguration
   * @description Fonction utilisée pour vérifier la configuration d'une source.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -299,7 +301,7 @@ module.exports = class sourceManager {
       }
     }
 
-    // Projection 
+    // Projection
     if (!sourceJsonObject.projection) {
       LOGGER.error("Mauvaise configuration: source.projection absent");
       return false;
@@ -311,7 +313,7 @@ module.exports = class sourceManager {
       }
     }
 
-    // Bbox 
+    // Bbox
     if (!sourceJsonObject.bbox) {
       LOGGER.error("Mauvaise configuration: source.bbox absent");
       return false;
@@ -348,8 +350,6 @@ module.exports = class sourceManager {
         validation = await this.checkSourcePgr(sourceJsonObject);
       } else if (sourceJsonObject.type === "valhalla") {
         validation = this.checkSourceValhalla(sourceJsonObject);
-      } else if (sourceJsonObject.type === "smartrouting") {
-        validation = this.checkSourceSmartrouting(sourceJsonObject);
       } else {
         LOGGER.error("La source indique un type invalide : " + sourceJsonObject.type);
         return false;
@@ -375,7 +375,7 @@ module.exports = class sourceManager {
   * @name checkSourceOsrm
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source osrm.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -383,7 +383,7 @@ module.exports = class sourceManager {
 
     LOGGER.info("Verification de la source osrm...");
 
-    // On vérifie que le module osrm est disponible 
+    // On vérifie que le module osrm est disponible
     try {
       let osrmTest = require('osrm');
     } catch(error) {
@@ -446,7 +446,7 @@ module.exports = class sourceManager {
   * @name checkSourcePgr
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source pgr.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -469,7 +469,7 @@ module.exports = class sourceManager {
     return false;
 
   } else {
-    
+
     LOGGER.debug("'source.storage' présent");
 
     if (!sourceJsonObject.storage.base) {
@@ -486,7 +486,7 @@ module.exports = class sourceManager {
         return false;
       } else {
         LOGGER.debug("'source.storage.base.dbConfig' présent");
-        
+
         if (!(await this._baseManager.checkBaseConfiguration(sourceJsonObject.storage.base.dbConfig))) {
           LOGGER.error("Mauvaise configuration : 'source.storage.base.dbConfig' invalide");
           return false;
@@ -537,12 +537,12 @@ module.exports = class sourceManager {
           if (!sourceJsonObject.storage.base.attributes[j].key) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].key' est absent");
             return false;
-          } 
+          }
 
           if (!sourceJsonObject.storage.base.attributes[j].column) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].column' est absent");
             return false;
-          } 
+          }
 
           if (!sourceJsonObject.storage.base.attributes[j].default) {
             LOGGER.error("Mauvaise configuration : 'source.storage.base.attributes["+j+"].default' est absent");
@@ -631,41 +631,6 @@ module.exports = class sourceManager {
 
 }
 
-  /**
-  *
-  * @function
-  * @name checkSourceSmartrouting
-  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source smartrouting.
-  * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
-  *
-  */
-
-  checkSourceSmartrouting(sourceJsonObject) {
-
-    LOGGER.info("Verification de la source smartrouting...");
-
-    // Storage
-    if (!sourceJsonObject.storage) {
-      LOGGER.error("Mauvaise configuration : 'source.storage' absent");
-      return false;
-    } else {
-
-      LOGGER.debug("'source.storage' présent");
-
-      if (!sourceJsonObject.storage.url) {
-        LOGGER.error("Mauvaise configuration : 'source.storage.url' absent");
-        return false;
-      } else {
-        LOGGER.debug("'source.storage.url' présent");
-        // TODO: vérifier la forme de l'URL avec une regex
-      }
-    }
-
-    LOGGER.info("Fin de la verification de la source smartrouting.");
-    return true;
-
-  }
 
   /**
   *
@@ -673,13 +638,13 @@ module.exports = class sourceManager {
   * @name checkSourceValhalla
   * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source valhalla.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
    checkSourceValhalla(sourceJsonObject) {
 
-    LOGGER.info("Verification de la source smartrouting...");
+    LOGGER.info("Verification de la source valhalla...");
 
     // Storage
     if (!sourceJsonObject.storage) {
@@ -770,7 +735,7 @@ module.exports = class sourceManager {
 
     }
 
-    LOGGER.info("Fin de la verification de la source smartrouting.");
+    LOGGER.info("Fin de la verification de la source valhalla.");
     return true;
 
   }
@@ -781,7 +746,7 @@ module.exports = class sourceManager {
   * @name checkDuplicationLoadedSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -812,7 +777,7 @@ module.exports = class sourceManager {
   * @name checkDuplicationCheckedSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
-  * @return {boolean} 
+  * @return {boolean}
   *
   */
 
@@ -856,14 +821,14 @@ module.exports = class sourceManager {
   *
   * @function
   * @name flushCheckedSource
-  * @description Vider la liste des source déjà vérifiées 
+  * @description Vider la liste des source déjà vérifiées
   *
   */
   flushCheckedSource() {
 
     this._checkedSourceId = new Array();
     this._checkedSourceConfiguration = {};
-    
+
   }
 
   /**
@@ -947,8 +912,6 @@ module.exports = class sourceManager {
       // Création de la source
       source = new pgrSource(sourceJsonObject, base);
 
-    } else if (sourceJsonObject.type === "smartrouting") {
-      source = new smartroutingSource(sourceJsonObject);
     } else if (sourceJsonObject.type === "valhalla") {
       source = new valhallaSource(sourceJsonObject);
     } else {
@@ -970,8 +933,8 @@ module.exports = class sourceManager {
   *
   * @function
   * @name connectSource
-  * @description Fonction utilisée pour connecter une source. 
-  * On la sépare volontairement du load de la source car on veut pouvoir gérer ces actions de manière indépendante. 
+  * @description Fonction utilisée pour connecter une source.
+  * On la sépare volontairement du load de la source car on veut pouvoir gérer ces actions de manière indépendante.
   * @param {string} sourceId - Id de la source que l'on veut connecter
   *
   */
@@ -998,7 +961,7 @@ module.exports = class sourceManager {
   *
   * @function
   * @name disconnectSource
-  * @description Fonction utilisée pour déconnecter une source. 
+  * @description Fonction utilisée pour déconnecter une source.
   * @param {string} sourceId - Id de la source que l'on veut déconnecter
   *
   */
@@ -1048,23 +1011,23 @@ module.exports = class sourceManager {
     let nbSourceConnected = 0;
 
     for (let i = 0; i < this._loadedSourceId.length; i++) {
-      
+
       LOGGER.info("Source : " + this._loadedSourceId[i]);
 
       if (!(await this.connectSource(this._loadedSourceId[i]))) {
 
         LOGGER.error("Source " + this._loadedSourceId[i] + " non connectée");
-        // TODO : on continue de connecter les autres sources et on gère après coup la MAJ des ressources, du getcap, etc... 
-        // Pour le moment, s'il y a une source qui ne fonctionne pas, on arrête le serveur 
+        // TODO : on continue de connecter les autres sources et on gère après coup la MAJ des ressources, du getcap, etc...
+        // Pour le moment, s'il y a une source qui ne fonctionne pas, on arrête le serveur
         return false;
 
       } else {
 
         LOGGER.info("Source " + this._loadedSourceId[i] + " connectée");
         nbSourceConnected++;
-        
+
       }
-      
+
     }
 
     LOGGER.info("Les démarrages se sont bien déroulés.");
@@ -1106,7 +1069,7 @@ module.exports = class sourceManager {
     let nbSourceDisconnected = 0;
 
     for (let i = 0; i < this._loadedSourceId.length; i++) {
-      
+
       LOGGER.info("Source : " + this._loadedSourceId[i]);
 
       if (!(await this.disconnectSource(this._loadedSourceId[i]))) {
@@ -1118,9 +1081,9 @@ module.exports = class sourceManager {
 
         LOGGER.info("Source " + this._loadedSourceId[i] + " déconnectée");
         nbSourceDisconnected++;
-        
+
       }
-      
+
     }
 
     LOGGER.info("Les déconnexions se sont bien déroulés.");
