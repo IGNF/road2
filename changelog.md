@@ -2,7 +2,7 @@
 
 ## 3.0.0
 CHANGED:
-- (breaking) Updated OSRM to 6.0.0
+- (breaking) Updated OSRM to 26.4.1
 - Dockerfile now uses Node 24.12 on debian trixie
 - Valhalla source now uses JS binding instead of child process
 
