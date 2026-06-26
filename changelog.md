@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.0.1
+
+FIXED:
+- Bad Valhalla source response handling
+
 ## 3.0.0
 CHANGED:
 - (breaking) Updated OSRM to 26.4.1

@@ -349,10 +349,10 @@ module.exports = class valhallaSource extends Source {
   * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {string} valhallaResponseStr - Réponse de valhalla
+  * @param {Object} valhallaResponse - Réponse de valhalla
   *
   */
-  writeRouteResponse (routeRequest, valhallaResponseStr) {
+  writeRouteResponse (routeRequest, valhallaResponse) {
 
     LOGGER.debug("writeRouteResponse()");
 
@@ -361,7 +361,6 @@ module.exports = class valhallaSource extends Source {
     let end;
     let profile;
     let optimization;
-    let valhallaResponse;
     let routes = new Array();
 
     // Récupération des paramètres de la requête que l'on veut transmettre dans la réponse
@@ -375,16 +374,6 @@ module.exports = class valhallaSource extends Source {
     // optimization
     optimization = routeRequest.optimization;
     // ---
-
-    // Lecture de la réponse Valhalla
-    // ---
-    try {
-      valhallaResponse = JSON.parse(valhallaResponseStr);
-    } catch (error) {
-      LOGGER.error("unable to parse valhalla response")
-      LOGGER.error(valhallaResponseStr)
-      LOGGER.error(error)
-    }
 
     if (valhallaResponse.waypoints.length < 2) {
       // Cela veut dire que l'on n'a pas un start et un end dans la réponse OSRM
@@ -546,25 +535,16 @@ module.exports = class valhallaSource extends Source {
   * C'est cette fonction qui doit vérifier le contenu de la réponse. Une fois la réponse envoyée
   * au proxy, on considère qu'elle est correcte.
   * @param {Request} request - Objet Request ou dérivant de la classe Request
-  * @param {string} valhallaResponseStr - Réponse de valhalla
+  * @param {Object} valhallaResponse - Réponse de valhalla
   *
   */
-  writeIsochroneResponse(isochroneRequest, valhallaResponseStr) {
+  writeIsochroneResponse(isochroneRequest, valhallaResponse) {
 
     let point = {};
     let geometry = {};
-    let valhallaResponse;
 
     // Lecture de la réponse Valhalla
     // ---
-    try {
-      valhallaResponse = JSON.parse(valhallaResponseStr);
-    } catch (error) {
-      LOGGER.error("unable to parse valhalla response")
-      LOGGER.error(valhallaResponseStr)
-      LOGGER.error(error)
-    }
-
     // Si pgrResponse est vide
     if (valhallaResponse.features.length === 0) {
       throw errorManager.createError(" No data found ", 404);
