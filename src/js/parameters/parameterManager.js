@@ -6,6 +6,7 @@ const Parameter = require('../parameters/parameter');
 const BoolParameter = require('../parameters/boolParameter');
 const EnumParameter = require('../parameters/enumParameter');
 const PointParameter = require('../parameters/pointParameter');
+const StringParameter = require('../parameters/stringParameter');
 const FloatParameter = require('../parameters/floatParameter');
 const IntParameter = require('../parameters/intParameter');
 const ConstraintParameter = require('../parameters/constraintParameter');
@@ -113,7 +114,7 @@ module.exports = class parameterManager  {
   *
   * @function
   * @name get checkParameterDirectory
-  * @description Vérifier les configurations de paramètre d'un dossier 
+  * @description Vérifier les configurations de paramètre d'un dossier
   * @param {string} directory - Dossier qui contient les configurations de paramètre à vérifier
   *
   */
@@ -122,7 +123,7 @@ module.exports = class parameterManager  {
     if (!fs.existsSync(directory)) {
       LOGGER.fatal("Mauvaise configuration: Le dossier des parametres n'existe pas : " + directory);
       return false;
-    } 
+    }
 
     // On vérifie que l'application peut lire les fichiers du dossier
     if (!fs.readdirSync(directory).every(parameter => {
@@ -138,7 +139,7 @@ module.exports = class parameterManager  {
 
       let contentFile = {};
       try {
-        // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+        // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
         contentFile = JSON.parse(fs.readFileSync(parameterFile));
       } catch (error) {
         LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de parametres: " + parameterFile);
@@ -263,6 +264,7 @@ module.exports = class parameterManager  {
     } else {
       if (parameterConf.type !== "boolean"
         && parameterConf.type !== "enumeration"
+        && parameterConf.type !== "string"
         && parameterConf.type !== "point"
         && parameterConf.type !== "float"
         && parameterConf.type !== "integer"
@@ -361,14 +363,14 @@ module.exports = class parameterManager  {
   *
   * @function
   * @name flushCheckedParameter
-  * @description Vider la liste des paramètres déjà vérifiés 
+  * @description Vider la liste des paramètres déjà vérifiés
   *
   */
   flushCheckedParameter() {
 
     this._checkedParameterId = new Array();
     this._checkedParametersConfiguration = {};
-  
+
   }
 
   /**
@@ -409,7 +411,7 @@ module.exports = class parameterManager  {
           LOGGER.error(error);
           return false;
         }
-        
+
         if (!this.loadParameterConfiguration(parameterConf)) {
           LOGGER.error("Impossible de charger le parametre");
           return false;
@@ -437,7 +439,7 @@ module.exports = class parameterManager  {
   *
   * @function
   * @name loadParameterConfiguration
-  * @description Créer un paramètre à partir de sa configuration 
+  * @description Créer un paramètre à partir de sa configuration
   * @param {json} configuration - Configuration d'un parametre
   * @return {boolean}
   *
@@ -672,6 +674,25 @@ module.exports = class parameterManager  {
         // il n'y a rien à faire
       }
 
+    } else if (serviceParameterConf.type === "string") {
+
+      // Gestion des valeurs par defaut
+      if (serviceParameterConf.defaultValue === "true") {
+        if (!resourceParameterJsonObject.defaultValueContent) {
+          LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
+          return false;
+        } else if (typeof resourceParameterJsonObject.defaultValueContent !== "string") {
+          LOGGER.error("La valeur par defaut n'est pas une chaine de caracteres");
+          return false;
+        }
+      }
+
+      if (resourceParameterJsonObject.values && resourceParameterJsonObject.values.pattern
+        && typeof resourceParameterJsonObject.values.pattern !== "string") {
+        LOGGER.error("Le pattern du parametre string n'est pas une chaine de caracteres");
+        return false;
+      }
+
     } else if (serviceParameterConf.type === "float" || serviceParameterConf.type === "integer") {
 
       // Gestion des valeurs par défaut
@@ -681,7 +702,7 @@ module.exports = class parameterManager  {
           LOGGER.error("Le parametre ne contient pas de valeur par defaut alors qu'il doit en avoir un");
           return false;
         } else {
-          // on vérifie qu'on a bien un float 
+          // on vérifie qu'on a bien un float
           if (typeof resourceParameterJsonObject.defaultValueContent !== "number") {
             LOGGER.error("La valeur par defaut n'est pas un nombre");
             return false;
@@ -693,7 +714,7 @@ module.exports = class parameterManager  {
         // il n'y a rien à faire
       }
 
-      //on regarde si les min et max précisés sont bien des float 
+      //on regarde si les min et max précisés sont bien des float
       // min et max ne sont pas obligatoires
 
       if (resourceParameterJsonObject.values) {
@@ -716,7 +737,7 @@ module.exports = class parameterManager  {
         }
 
       } else {
-        // il n'y a rien à vérifier 
+        // il n'y a rien à vérifier
       }
 
     } else if (serviceParameterConf.type === "constraint") {
@@ -939,6 +960,8 @@ module.exports = class parameterManager  {
         curResParam = new BoolParameter(curSerParam);
       } else if (curSerParamConf.type === "enumeration") {
         curResParam = new EnumParameter(curSerParam);
+      } else if (curSerParamConf.type === "string") {
+        curResParam = new StringParameter(curSerParam);
       } else if (curSerParamConf.type === "point") {
         curResParam = new PointParameter(curSerParam);
       } else if (curSerParamConf.type === "float") {

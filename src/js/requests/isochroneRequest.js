@@ -59,7 +59,10 @@ module.exports = class isochroneRequest extends Request {
 
     this._distanceUnit = distanceUnit;
 
-    // Gestion des contraintes 
+    // date_time
+    this._date_time = null;
+
+    // Gestion des contraintes
     this._constraints = new Array();
 
   }
@@ -292,6 +295,29 @@ module.exports = class isochroneRequest extends Request {
   */
   set distanceUnit(du) {
     this._distanceUnit = du;
+  }
+
+  /**
+  *
+  * @function
+  * @name get date_time
+  * @description Recuperer la date et heure de depart.
+  *
+  */
+  get date_time() {
+    return this._date_time;
+  }
+
+  /**
+  *
+  * @function
+  * @name set date_time
+  * @description Attribuer la date et heure de depart.
+  * @param {object} dt - Date et heure de depart.
+  *
+  */
+  set date_time(dt) {
+    this._date_time = dt;
   }
 
   /**

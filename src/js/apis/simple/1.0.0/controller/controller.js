@@ -426,6 +426,31 @@ module.exports = {
     }
     // ---
 
+    // date_time
+    if (parameters.date_time) {
+
+      LOGGER.debug("user date_time:");
+      LOGGER.debug(parameters.date_time);
+
+      const routeDateTimeParameter = routeOperation.getParameterById("date_time");
+      if (routeDateTimeParameter.id) {
+        let validity = routeDateTimeParameter.check(parameters.date_time);
+        if (validity.code !== "ok") {
+          throw errorManager.createError(" Parameter 'date_time' is invalid: " + validity.message, 400);
+        }
+      }
+
+      // Valhalla multimodal expects local datetime without timezone seconds.
+      const valhallaDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+      if (!valhallaDateTimeRegex.test(parameters.date_time)) {
+        throw errorManager.createError(" Parameter 'date_time' is invalid: expected format YYYY-MM-DDTHH:mm ", 400);
+      }
+
+      routeRequest.date_time = parameters.date_time;
+      LOGGER.debug("date_time valide");
+    }
+    // ---
+
     // Contraintes
     // ---
     if (parameters.constraints) {
@@ -905,6 +930,30 @@ module.exports = {
       distanceUnit
     );
 
+    // date_time
+    if (parameters.date_time) {
+
+      LOGGER.debug("user date_time:");
+      LOGGER.debug(parameters.date_time);
+
+      const isochroneDateTimeParameter = isochroneOperation.getParameterById("date_time");
+      if (isochroneDateTimeParameter.id) {
+        let validity = isochroneDateTimeParameter.check(parameters.date_time);
+        if (validity.code !== "ok") {
+          throw errorManager.createError(" Parameter 'date_time' is invalid: " + validity.message, 400);
+        }
+      }
+
+      const valhallaDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+      if (!valhallaDateTimeRegex.test(parameters.date_time)) {
+        throw errorManager.createError(" Parameter 'date_time' is invalid: expected format YYYY-MM-DDTHH:mm ", 400);
+      }
+
+      isochroneRequest.date_time = parameters.date_time;
+      LOGGER.debug("date_time valide");
+    }
+    // ---
+
     /* Vérification de la validité du profile et de sa compatibilité avec le costType. */
     if (!resource.checkSourceAvailibilityFromRequest(isochroneRequest)) {
       throw errorManager.createError("Parameters 'profile' and 'costType' are not compatible.", 400);
@@ -1291,7 +1340,7 @@ module.exports = {
     // crs
     userResponse.crs = nearestResponse.coordinates.projection;
 
-    // Liste des points les plus proches 
+    // Liste des points les plus proches
     userResponse.points = new Array();
 
     for (let p=0; p < nearestResponse.points.length; p++) {

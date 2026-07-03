@@ -70,6 +70,9 @@ module.exports = class routeRequest extends Request {
     // distanceUnit
     this._distanceUnit = "meter";
 
+    // date_time
+    this._date_time = null;
+
     // Constraints
     // Tableau contenant des instances de Constraint
     this._constraints = new Array();
@@ -309,7 +312,7 @@ module.exports = class routeRequest extends Request {
   *
   * @function
   * @name get timeUnit
-  * @description Récupérer l'unité des durées 
+  * @description Récupérer l'unité des durées
   *
   */
   get timeUnit () {
@@ -320,7 +323,7 @@ module.exports = class routeRequest extends Request {
   *
   * @function
   * @name set timeUnit
-  * @description Attribuer l'unité des durées 
+  * @description Attribuer l'unité des durées
   *
   */
   set timeUnit (i) {
@@ -331,7 +334,7 @@ module.exports = class routeRequest extends Request {
   *
   * @function
   * @name get distanceUnit
-  * @description Récupérer l'unité des distances 
+  * @description Récupérer l'unité des distances
   *
   */
   get distanceUnit () {
@@ -342,11 +345,33 @@ module.exports = class routeRequest extends Request {
   *
   * @function
   * @name set distanceUnit
-  * @description Attribuer l'unité des distances 
+  * @description Attribuer l'unité des distances
   *
   */
   set distanceUnit (i) {
     this._distanceUnit = i;
+  }
+
+  /**
+  *
+  * @function
+  * @name get date_time
+  * @description Recuperer la date et heure de depart
+  *
+  */
+  get date_time () {
+    return this._date_time;
+  }
+
+  /**
+  *
+  * @function
+  * @name set date_time
+  * @description Attribuer la date et heure de depart
+  *
+  */
+  set date_time (i) {
+    this._date_time = i;
   }
 
   /**

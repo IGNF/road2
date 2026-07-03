@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 3.0.2
+
+ADDED:
+- Valhalla route: optional `date_time` parameter, mapped to Valhalla `date_time` (`type = 1`, `value = <date_time>`)
+- Valhalla isochrone: optional `date_time` parameter, mapped to Valhalla `date_time` (`type = 1`, `value = <date_time>`)
+
+UPDATED:
+- Valhalla multimodal profile is now exposed in sample capabilities/configuration
+
 ## 3.0.1
 
 FIXED:

@@ -1,9 +1,9 @@
 # {{ title }} - Documentation
 
-> **Description:** {{ description }}  
-> **Authors and contributors:** {{ author }}  
-> **Version:** {{ version }}  
-> **Source code:** {{ repo_url }}  
+> **Description:** {{ description }}
+> **Authors and contributors:** {{ author }}
+> **Version:** {{ version }}
+> **Source code:** {{ repo_url }}
 > **last update of the documentation:** {{ date_update }}
 
 ## General presentation
@@ -13,6 +13,8 @@ Road2 is a route and isochrone calculation server written in Javascript and desi
 Road2 was designed with the idea of being able to easily add new engines and new APIs, and to do so in a completely transparent way to each other. In other words, adding an engine does not impact existing APIs. The objective is to facilitate the addition of new functionalities while maintaining access to the service. For a longer discussion on the software concepts introduced in Road2, we can refer to the [following documentation](./developers/concepts.md).
 
 Currently, Road2 offers three engines, OSRM, PGRouting and Valhalla, through a single REST API.
+
+For Valhalla resources configured for multimodal routing, an optional `date_time` parameter is available on `route` and `isochrone` operations (expected format: `YYYY-MM-DDTHH:mm`).
 
 ```{toctree}
 ---
