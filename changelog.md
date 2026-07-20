@@ -1,7 +1,10 @@
 # CHANGELOG
 
-## 3.0.1
+## 3.0.2
+FIXED
+- Bad OSRM module name
 
+## 3.0.1
 FIXED:
 - Bad Valhalla source response handling
 

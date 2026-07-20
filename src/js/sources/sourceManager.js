@@ -385,7 +385,7 @@ module.exports = class sourceManager {
 
     // On vérifie que le module osrm est disponible
     try {
-      let osrmTest = require('osrm');
+      let osrmTest = require('@project-osrm/osrm');
     } catch(error) {
       LOGGER.debug(error);
       LOGGER.error("Le module osrm n'est pas disponible mais une source osrm est proposée dans la configuration.");
