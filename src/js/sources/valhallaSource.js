@@ -191,7 +191,11 @@ module.exports = class valhallaSource extends Source {
       costingOptionsString += "}}";
       // Permet de grandement se simplifier le parsing !!
       const optionsString = `"directions_options":{"format":"osrm"}`;
-      const commandString = `{${locationsString},${costingString},${costingOptionsString},${optionsString}}`;
+      let dateTimeString = "";
+      if (request.date_time) {
+        dateTimeString = `,"date_time":{"type":1,"value":"${request.date_time}"}`;
+      }
+      const commandString = `{${locationsString},${costingString},${costingOptionsString},${optionsString}${dateTimeString}}`;
       LOGGER.info(commandString);
 
       return new Promise( (resolve, reject) => {
@@ -292,7 +296,11 @@ module.exports = class valhallaSource extends Source {
         const contoursString = `"contours":[{"${request.costType}":${costValue}}]`;
         const reverseString = `"reverse":${reverse}`;
         const polygonsString = `"polygons":true`;
-        const commandString = `{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}}`;
+        let dateTimeString = "";
+        if (request.date_time) {
+          dateTimeString = `,"date_time":{"type":1,"value":"${request.date_time}"}`;
+        }
+        const commandString = `{${locationsString},${costingString},${costingOptionsString},${contoursString},${reverseString},${polygonsString}${dateTimeString}}`;
         LOGGER.info(commandString);
 
         return new Promise( (resolve, reject) => {

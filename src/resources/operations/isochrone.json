@@ -9,6 +9,7 @@
     "costValue",
     "profile",
     "direction",
+    "date_time",
     "constraints",
     "projection",
     "geometryFormat",

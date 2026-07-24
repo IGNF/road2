@@ -34,7 +34,8 @@
             "defaultValueContent": "car",
             "values": [
             "car",
-            "pedestrian"
+            "pedestrian",
+            "multimodal"
             ]
         },
         {
@@ -84,6 +85,9 @@
             ]
         },
         {
+            "id": "date_time"
+        },
+        {
             "id": "timeUnit",
             "defaultValueContent": "minute",
             "values": [
@@ -125,7 +129,7 @@
         {
             "id": "resource",
             "values": [
-            "bdtopo-pgr"
+            "bdtopo-valhalla"
             ]
         },
         {
@@ -155,7 +159,8 @@
             "defaultValueContent": "car",
             "values": [
             "car",
-            "pedestrian"
+            "pedestrian",
+            "multimodal"
             ]
         },
         {
@@ -167,20 +172,19 @@
             ]
         },
         {
+            "id": "date_time"
+        },
+        {
             "id": "constraints",
             "values": [
             {
-                "keyType": "name-pgr",
+                "keyType": "name-valhalla",
                 "key": "wayType",
                 "availableConstraintType": ["banned"],
                 "availableValues": [
                 {
                     "value": "autoroute",
-                    "field": "acces_vehicule_leger",
-                    "condition": {
-                    "type": "equal",
-                    "value": "$niv3$A péage$niv3$"
-                    }
+                    "field": "exclude_tolls"
                 }
                 ]
             }

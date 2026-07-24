@@ -193,6 +193,19 @@ module.exports = {
       optimizationParameterDescription.example = "fastest";
       routeDescription.parameters.push(optimizationParameterDescription);
 
+      // route.parameters.date_time
+      let dateTimeServiceParameter = serviceOpRoute.getParameterById("date_time");
+      let dateTimeParameterDescription = {};
+      dateTimeParameterDescription.name = "date_time";
+      dateTimeParameterDescription.in = "query";
+      dateTimeParameterDescription.description = dateTimeServiceParameter.description;
+      dateTimeParameterDescription.required = dateTimeServiceParameter.required;
+      dateTimeParameterDescription.default = dateTimeServiceParameter.defaultValue;
+      dateTimeParameterDescription.schema = {};
+      dateTimeParameterDescription.schema.type = "string";
+      dateTimeParameterDescription.example = "2026-07-03T08:30";
+      routeDescription.parameters.push(dateTimeParameterDescription);
+
       // route.parameters.getSteps
       let getStepsServiceParameter = serviceOpRoute.getParameterById("getSteps");
       let getStepsParameterDescription = {};
@@ -425,6 +438,19 @@ module.exports = {
       directionParameterDescription.schema.type = "string";
       directionParameterDescription.example = "departure";
       isochroneDescription.parameters.push(directionParameterDescription);
+
+      // isochrone.parameters.date_time
+      let dateTimeServiceParameter = serviceOpIsochrone.getParameterById("date_time");
+      let dateTimeParameterDescription = {};
+      dateTimeParameterDescription.name = "date_time";
+      dateTimeParameterDescription.in = "query";
+      dateTimeParameterDescription.description = dateTimeServiceParameter.description;
+      dateTimeParameterDescription.required = dateTimeServiceParameter.required;
+      dateTimeParameterDescription.default = dateTimeServiceParameter.defaultValue;
+      dateTimeParameterDescription.schema = {};
+      dateTimeParameterDescription.schema.type = "string";
+      dateTimeParameterDescription.example = "2026-07-03T08:30";
+      isochroneDescription.parameters.push(dateTimeParameterDescription);
 
       // isochrone.parameters.crs
       let projectionServiceParameter = serviceOpIsochrone.getParameterById("projection");
@@ -694,6 +720,18 @@ module.exports = {
           }
           routeAvailableOperation.availableParameters.push(routeOptimization);
 
+          // route.date_time
+          let dateTimeParameter = resourceOperation.getParameterById("date_time");
+          if (dateTimeParameter.id) {
+            let routeDateTime = {};
+            routeDateTime.id = "date_time";
+            routeDateTime.values = dateTimeParameter.values;
+            if (dateTimeParameter.serviceParameter.defaultValue === "true") {
+              routeDateTime.defaultValue = dateTimeParameter.defaultValueContent;
+            }
+            routeAvailableOperation.availableParameters.push(routeDateTime);
+          }
+
           // route.getSteps
           let getStepsParameter = resourceOperation.getParameterById("getSteps");
           let routeGetSteps = {};
@@ -856,6 +894,18 @@ module.exports = {
             isochroneDirection.defaultValue = directionParameter.defaultValueContent;
           }
           isochroneAvailableOperation.availableParameters.push(isochroneDirection);
+
+          // isochrone.date_time
+          let dateTimeParameter = resourceOperation.getParameterById("date_time");
+          if (dateTimeParameter.id) {
+            let isochroneDateTime = {};
+            isochroneDateTime.id = "date_time";
+            isochroneDateTime.values = dateTimeParameter.values;
+            if (dateTimeParameter.serviceParameter.defaultValue === "true") {
+              isochroneDateTime.defaultValue = dateTimeParameter.defaultValueContent;
+            }
+            isochroneAvailableOperation.availableParameters.push(isochroneDateTime);
+          }
 
           // isochrone.crs
           let projectionParameter = resourceOperation.getParameterById("projection");

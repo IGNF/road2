@@ -130,6 +130,17 @@
             "example": "fastest"
           },
           {
+            "name": "date_time",
+            "in": "query",
+            "description": "Departure date and time for Valhalla multimodal computation. This parameter is optional and only used on Valhalla resources configured for multimodal routing.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$"
+            },
+            "example": "2026-07-03T08:30"
+          },
+          {
             "name": "geometryFormat",
             "in": "query",
             "description": "Format des géométries dans la réponse. Peuvent être au format GeoJSON ou Encoded Polyline.",
@@ -559,6 +570,17 @@
             "example": "départ"
           },
           {
+            "name": "date_time",
+            "in": "query",
+            "description": "Departure date and time for Valhalla multimodal computation. This parameter is optional and only used on Valhalla resources configured for multimodal routing.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$"
+            },
+            "example": "2026-07-03T08:30"
+          },
+          {
             "name": "constraints",
             "in": "query",
             "description": "Contraintes utilisées pour le calcul. Il s'agit d'un objet JSON (voir la version POST de cette opération). Les paramètres disponibles sont présents dans le GetCapabilities.",
@@ -812,6 +834,10 @@
           "optimization": {
             "type": "string"
           },
+          "date_time": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$"
+          },
           "constraints": {
             "type": "array",
             "items": {
@@ -895,6 +921,10 @@
               "départ",
               "arrivé"
             ]
+          },
+          "date_time": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$"
           },
           "constraints": {
             "type": "array",
