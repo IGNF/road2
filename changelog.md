@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 3.0.2
+## 3.1.0
 
 ADDED:
 - Valhalla route: optional `date_time` parameter, mapped to Valhalla `date_time` (`type = 1`, `value = <date_time>`)
@@ -9,8 +9,11 @@ ADDED:
 UPDATED:
 - Valhalla multimodal profile is now exposed in sample capabilities/configuration
 
-## 3.0.1
+## 3.0.2
+FIXED
+- Bad OSRM module name
 
+## 3.0.1
 FIXED:
 - Bad Valhalla source response handling
 

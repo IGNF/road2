@@ -15,7 +15,7 @@ const errorManager = require('../utils/errorManager');
 const log4js = require('log4js');
 
 try {
-  var OSRM = require("osrm");
+  var OSRM = require("@project-osrm/osrm");
 } catch(error) {
   OSRM = null;
 }
