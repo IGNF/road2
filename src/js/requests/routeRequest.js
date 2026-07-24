@@ -367,7 +367,7 @@ module.exports = class routeRequest extends Request {
   *
   * @function
   * @name set date_time
-  * @description Attribuer la date et heure de depart
+  * @description Attribuer la date et heure de départ
   *
   */
   set date_time (i) {

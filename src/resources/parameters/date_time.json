@@ -4,7 +4,7 @@
   "description": "Date et heure de départ pour le calcul multimodal Valhalla (format ISO local: YYYY-MM-DDTHH:mm)",
   "required": "false",
   "defaultValue": "false",
-  "example": "2026-07-03T08:30"
+  "example": "2026-07-03T08:30",
   "type": "string",
   "min": 0,
   "max": 1

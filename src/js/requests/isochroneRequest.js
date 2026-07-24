@@ -312,8 +312,8 @@ module.exports = class isochroneRequest extends Request {
   *
   * @function
   * @name set date_time
-  * @description Attribuer la date et heure de depart.
-  * @param {object} dt - Date et heure de depart.
+  * @description Attribuer la date et heure de départ.
+  * @param {string} dt - Date et heure de départ.
   *
   */
   set date_time(dt) {
