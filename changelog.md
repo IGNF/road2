@@ -8,7 +8,6 @@ ADDED:
 UPDATED:
 - Valhalla multimodal profile is now exposed in sample capabilities/configuration
 
-## 3.0.3
 CHANGED
 - No more optional dependencies
 
