@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.3
+CHANGED
+- No more optional dependencies
+
 ## 3.0.2
 FIXED
 - Bad OSRM module name
