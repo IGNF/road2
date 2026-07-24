@@ -14,7 +14,7 @@ Road2 a été conçu dans l'idée de pouvoir facilement ajouter des nouveaux mot
 
 Actuellement, Road2 propose trois moteurs, OSRM, PGRouting et Valhalla, via une unique API REST.
 
-Pour les ressources Valhalla configurees en multimodal, un parametre optionnel `date_time` est disponible sur les operations `route` et `isochrone` (format attendu: `YYYY-MM-DDTHH:mm`).
+Pour les ressources Valhalla configurées en multimodal, un paramètre optionnel `date_time` est disponible sur les opérations `route` et `isochrone` (format attendu: `YYYY-MM-DDTHH:mm`).
 
 
 ```{toctree}

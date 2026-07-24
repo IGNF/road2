@@ -301,7 +301,7 @@ module.exports = class isochroneRequest extends Request {
   *
   * @function
   * @name get date_time
-  * @description Recuperer la date et heure de depart.
+  * @description Récupérer la date et heure de départ.
   *
   */
   get date_time() {

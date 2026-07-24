@@ -1,9 +1,9 @@
 {
   "id": "date_time",
-  "name": "Date et heure de depart",
-  "description": "Date et heure de depart pour le calcul multimodal Valhalla (format ISO local: YYYY-MM-DDTHH:mm)",
+  "name": "Date et heure de départ",
+  "description": "Date et heure de départ pour le calcul multimodal Valhalla (format ISO local: YYYY-MM-DDTHH:mm)",
   "required": "false",
-  "defaultValue": "false",
+  "defaultValue": "",
   "example": "2026-07-03T08:30",
   "type": "string",
   "min": 0,
