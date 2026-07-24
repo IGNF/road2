@@ -1,6 +1,6 @@
 {
   "name": "road2",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Calcul d'itinéraire",
   "author": "RDEV - IGN",
   "main": "src/js/road2.js",
@@ -27,9 +27,7 @@
     "log4js": "6.9.1",
     "nconf": "0.13.0",
     "proj4": "2.20.2",
-    "swagger-ui-express": "5.0.1"
-  },
-  "optionalDependencies": {
+    "swagger-ui-express": "5.0.1",
     "@project-osrm/osrm": "26.4.1",
     "pg": "8.16.3",
     "@valhallajs/valhallajs": "3.7.0"
