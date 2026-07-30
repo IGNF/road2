@@ -49,7 +49,7 @@ module.exports = class serviceManager {
 
         LOGGER.info("Vérification du contenu de la configuration du service...");
 
-        // Création d'un service pour vérifier la configuration 
+        // Création d'un service pour vérifier la configuration
         // On procède ainsi pour ne pas dupliquer du code déjà présent dans la classe Service
         // De plus, on souhaite que la classe Service soit indépendante, donc ait le code de vérification de sa conf
         let service = new Service();
@@ -69,17 +69,17 @@ module.exports = class serviceManager {
      * @function
      * @name loadService
      * @description Création et lancement d'un service à partir de sa configuration
-     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
+     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie.
      * @param {string} id - Id du service pour l'administrateur
      * @param {string} configurationLocation - Emplacement de la configuration du service à charger
      * @param {object} options - Contenu optionnel pour le chargement de certains types de services
-     * 
+     *
      */
     async loadService(creationType, id, configurationLocation, options) {
 
         LOGGER.info("Création et lancement du service " + id);
 
-        // TODO : voir s'il n'existe pas déjà ? 
+        // TODO : voir s'il n'existe pas déjà ?
 
         let serviceAdministered = {};
 
@@ -105,7 +105,7 @@ module.exports = class serviceManager {
 
         } else {
 
-            // Cela ne devrait pas arriver 
+            // Cela ne devrait pas arriver
             LOGGER.error("Le type de creation du service n'est pas valide. Impossible de créer un service");
             return false;
 
@@ -135,12 +135,12 @@ module.exports = class serviceManager {
      * @function
      * @name stopService
      * @description Arrêt d'un service
-     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
+     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie.
      * @param {string} id - Id du service pour l'administrateur
      * @param {string} configurationLocation - Emplacement de la configuration du service à charger
      * @param {object} options - Contenu optionnel pour le chargement de certains types de services
      * @return {boolean} response - Retourne si le service a bien été arrêté
-     * 
+     *
      */
     async stopService(id) {
 
@@ -149,7 +149,7 @@ module.exports = class serviceManager {
         // On récupère le service administré
         const administeredService = this._loadedServiceAdministeredCatalog[id];
         if (!administeredService) {
-            LOGGER.error("Aucun service associé à cet ID: " + serviceId);
+            LOGGER.error("Aucun service associé à cet ID: " + id);
             return false;
         }
 
@@ -167,11 +167,11 @@ module.exports = class serviceManager {
      * @function
      * @name restartService
      * @description Redémarrage d'un service
-     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie. 
+     * @param {string} creationType - Type de création pour le service. Permet d'indiquer si on est dans le même process ou pas, voir sur une autre machine en théorie.
      * @param {string} id - Id du service pour l'administrateur
      * @param {string} configurationLocation - Emplacement de la configuration du service à charger
      * @param {object} options - Contenu optionnel pour le chargement de certains types de services
-     * 
+     *
      */
     async restartService(creationType, id, configurationLocation, options) {
 
@@ -201,11 +201,11 @@ module.exports = class serviceManager {
      *
      * @function
      * @name computeRequest
-     * @description Gestion d'une requête pour un service 
+     * @description Gestion d'une requête pour un service
      * La requête est envoyé au service puis la réponse du service est retournée
      * @param {string} serviceId - Id du service selon l'administrateur
-     * @param {object} request - Instance fille de la classe Request 
-     * 
+     * @param {object} request - Instance fille de la classe Request
+     *
      */
     async computeRequest(serviceId, request) {
 
@@ -214,7 +214,7 @@ module.exports = class serviceManager {
         // Quelques vérifications
         if (!serviceId) {
             throw errorManager.createError("Aucun id de service");
-        } 
+        }
         if (typeof(serviceId) !== "string") {
             throw errorManager.createError("L'id de service n'est pas une string");
         } else {
@@ -222,7 +222,7 @@ module.exports = class serviceManager {
         }
         if (!request) {
             throw errorManager.createError("Aucune requête");
-        } 
+        }
         if (typeof(request) !== "object") {
             throw errorManager.createError("La requête n'est pas un objet");
         } else {
@@ -237,7 +237,7 @@ module.exports = class serviceManager {
             throw errorManager.createError("Unknown service : " + serviceId, 404);
         }
 
-        // On envoit la requête et renvoit la réponse 
+        // On envoit la requête et renvoit la réponse
         let response = await administeredService.computeRequest(request);
 
         return response;

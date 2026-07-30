@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.1
+FIXED:
+- Various OSRM import issues
+
 ## 3.1.0
 ADDED:
 - Valhalla route: optional `date_time` parameter, mapped to Valhalla `date_time` (`type = 1`, `value = <date_time>`)
