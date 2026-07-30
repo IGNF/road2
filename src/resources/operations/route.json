@@ -18,5 +18,8 @@
     "timeUnit",
     "distanceUnit",
     "constraints"
+  ],
+  "optional_parameters": [
+    "date_time"
   ]
 }

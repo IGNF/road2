@@ -1,7 +1,7 @@
 FROM node:24.12-trixie-slim
 
 ### Mise à jour des paquets
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y && apt-get install -y libtbb12 && rm -rf /var/lib/apt/lists/*
 
 ### Dossier contenant la configuration de Road2
 WORKDIR /home/docker/config

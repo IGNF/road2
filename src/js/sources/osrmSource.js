@@ -16,6 +16,9 @@ const log4js = require('log4js');
 
 try {
   var OSRM = require("@project-osrm/osrm");
+  if (OSRM && OSRM.__esModule && OSRM.default) {
+    OSRM = OSRM.default;
+  }
 } catch(error) {
   OSRM = null;
 }
@@ -123,6 +126,8 @@ module.exports = class osrmSource extends Source {
       }
 
     } catch (err) {
+      LOGGER.debug(err);
+      LOGGER.debug(OSRM);
       throw errorManager.createError("Cannot connect source");
     }
 
