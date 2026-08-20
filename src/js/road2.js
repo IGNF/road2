@@ -39,7 +39,7 @@ async function start() {
 
   if (!nconf.argv().get('configCheck')) {
 
-    // Cas général de l'utilisation de Road2 
+    // Cas général de l'utilisation de Road2
     LOGGER.info("Lancement classique de Road2");
 
     // Récupération de la configuration de l'administrateur
@@ -58,7 +58,7 @@ async function start() {
         LOGGER.fatal("Le serveur de l'administrateur ne peut être créé");
         pm.shutdown(12);
       } else {
-        
+
         LOGGER.debug("Serveur administrateur créé");
 
         // Création des services au démarrage si demandé
@@ -77,10 +77,10 @@ async function start() {
 
   } else {
 
-    // Cas particulier 
+    // Cas particulier
     LOGGER.info("Lancement de Road2 pour vérification des configurations");
 
-    // On commence par vérifier la configuration du service 
+    // On commence par vérifier la configuration du service
     if (!administrator.checkAdminConfiguration(configuration, configurationPath)) {
 
       // La configuration de l'administrateur n'est pas validée
@@ -90,11 +90,11 @@ async function start() {
     } else {
 
       LOGGER.info("La configuration de l'administrateur a été vérifiée et validée");
-      
+
       // On la sauvegarde pour la suite
       administrator.saveAdminConfiguration(configuration, configurationPath, logConfiguration);
-      
-      // On vérifie la configuration du service 
+
+      // On vérifie la configuration du service
       if (!(await administrator.checkServicesConfiguration())) {
 
         // La configuration du service n'est pas validée
@@ -106,7 +106,7 @@ async function start() {
       }
 
     }
-    
+
     LOGGER.info("La vérification des différentes configurations est terminée");
     pm.shutdown(0);
 
@@ -149,7 +149,7 @@ function loadGlobalConfiguration() {
 
     // vérification de l'exitence du fichier
     if (fs.existsSync(configurationPath)) {
-      
+
       // chargement dans une variable pour la classe Administrateur
       try {
         globalConfiguration = JSON.parse(fs.readFileSync(configurationPath));
@@ -173,7 +173,7 @@ function loadGlobalConfiguration() {
 
   console.log("Configuration chargee.")
 
-  return [globalConfiguration,configurationPath];
+  return [globalConfiguration, configurationPath];
 
 }
 
@@ -277,11 +277,11 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
 
           // chemin absolu du fichier
           let file = "";
-          
+
           try {
 
             file = path.resolve(path.dirname(userConfigurationPath), userLogConfigurationFile);
-  
+
           } catch (error) {
 
             console.log("Impossible de recuperer le chemin absolu du fichier de log:");
@@ -289,7 +289,7 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
             process.exit(11);
 
           }
-                    
+
           // vérification de l'exitence du fichier
           if (fs.existsSync(file)) {
             //Lecture du fichier de configuration des logs

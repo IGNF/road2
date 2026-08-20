@@ -56,7 +56,7 @@ module.exports = class Server {
     this._options = options;
 
     // serveur
-    //TODO: enlever cette partie du constructeur, qu'il ne puisse pas y avoir d'erreurs possibles 
+    //TODO: enlever cette partie du constructeur, qu'il ne puisse pas y avoir d'erreurs possibles
     if (this._enableHttps === "true") {
 
       let optionsContent = {};
@@ -128,18 +128,16 @@ module.exports = class Server {
     // on lance l'écoute du serveur
     return new Promise((resolve, reject) => {
 
-      this._server.listen(this._port, this._host, (error) => {
-
-        if (error) {
-          LOGGER.error("Erreur lors du démarage du serveur : " + error);
-          reject(false);
-        } else {
-          LOGGER.info(this._host + ":" + this._port);
-          resolve(true);
-        }
-
+      this._server.once('error', (error) => {
+        LOGGER.error("Erreur lors du démarage du serveur : " + error);
+        reject(false);
       });
-      
+
+      this._server.listen(this._port, this._host, () => {
+        LOGGER.info(this._host + ":" + this._port);
+        resolve(true);
+      });
+
     });
 
 

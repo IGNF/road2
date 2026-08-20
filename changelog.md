@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.2
+FIXED:
+- Server error not caught
+
 ## 3.1.1
 FIXED:
 - Various OSRM import issues
