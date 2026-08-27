@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.1.3
+FIXED:
+- Valhalla source reloaded the routing graph on every request (a new actor was created per request), causing excessive memory usage (OOM) and poor performance. The Valhalla actor is now created once and reused across requests.
+- Unhandled promise rejection when the Valhalla actor failed to load.
+
+ADDED:
+- Service child process `exit`/`error` handling: unexpected termination (crash, OOM/SIGKILL) is now logged with its exit code/signal, controlled stops are logged at info level, and the startup health check fails fast instead of waiting for the timeout.
+
 ## 3.1.2
 FIXED:
 - Server error not caught
@@ -31,7 +39,7 @@ FIXED:
 CHANGED:
 - (breaking) Updated OSRM to 26.4.1
 - Dockerfile now uses Node 24.12 on debian trixie
-- Valhalla source now uses JS binding instead of child process
+- Valhalla source now uses JS bfinding instead of child process
 
 UPDATED:
 - Updated all package.json dependencies to last versions (08/01/2026)

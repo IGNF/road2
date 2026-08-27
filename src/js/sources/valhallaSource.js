@@ -43,6 +43,9 @@ module.exports = class valhallaSource extends Source {
     // Stockage de la configuration
     this._configuration = sourceJsonObject;
 
+    // Acteur Valhalla, chargé une seule fois puis réutilisé (évite de recharger le graphe à chaque requête)
+    this._actor = null;
+
     // Gestions des coûts disponibles
     this._costs = {};
 
@@ -101,7 +104,26 @@ module.exports = class valhallaSource extends Source {
   *
   */
   async disconnect() {
+    this._actor = null;
     this._connected = false;
+  }
+
+  /**
+  *
+  * @function
+  * @name getActor
+  * @description Récupère l'acteur Valhalla en le créant une seule fois puis en le réutilisant.
+  * Recharger le graphe à chaque requête provoque une forte consommation mémoire (OOM) et une perte de performance.
+  *
+  */
+  getActor() {
+    if (!this._actor) {
+      this._actor = Actor.fromConfigFile(this._configuration.storage.config).catch((error) => {
+        this._actor = null;
+        throw error;
+      });
+    }
+    return this._actor;
   }
 
   /**
@@ -200,33 +222,31 @@ module.exports = class valhallaSource extends Source {
 
       return new Promise( (resolve, reject) => {
 
-        try {
-          Actor.fromConfigFile(this._configuration.storage.config).then((valhallaActor) => {
-            valhallaActor.route(commandString).then((valhallaResponse) => {
-              // Du moment que Valhalla a répondu, on considère que la source est joignable
-              this.state = "green";
+        this.getActor().then((valhallaActor) => {
+          valhallaActor.route(commandString).then((valhallaResponse) => {
+            // Du moment que Valhalla a répondu, on considère que la source est joignable
+            this.state = "green";
 
-              LOGGER.debug("valhalla response for route :");
-              LOGGER.debug(valhallaResponse);
+            LOGGER.debug("valhalla response for route :");
+            LOGGER.debug(valhallaResponse);
 
-              try {
-                resolve(this.writeRouteResponse(request, valhallaResponse));
-              } catch (error) {
-                reject(error);
-              }
-            }).catch((err) => {
-              // mais on ne renvoie pas l'erreur à l'utilisateur
-              reject(errorManager.createError(" No path found ", 404));
-              LOGGER.error("valhalla error for route :");
-              LOGGER.error(err);
-            });
+            try {
+              resolve(this.writeRouteResponse(request, valhallaResponse));
+            } catch (error) {
+              reject(error);
+            }
+          }).catch((err) => {
+            // mais on ne renvoie pas l'erreur à l'utilisateur
+            reject(errorManager.createError(" No path found ", 404));
+            LOGGER.error("valhalla error for route :");
+            LOGGER.error(err);
           });
-        } catch (error) {
+        }).catch((error) => {
           // Pour une raison que l'on ignore, la source n'est plus joignable
           this.state = "red";
           LOGGER.error(error);
           reject("Internal VALHALLA error");
-        }
+        });
       });
 
     } else if (request.operation === "isochrone") {
@@ -305,33 +325,31 @@ module.exports = class valhallaSource extends Source {
 
         return new Promise( (resolve, reject) => {
 
-          try {
-            Actor.fromConfigFile(this._configuration.storage.config).then((valhallaActor) => {
-              valhallaActor.isochrone(commandString).then((valhallaResponse) => {
-                // Du moment que Valhalla a répondu, on considère que la source est joignable
-                this.state = "green";
+          this.getActor().then((valhallaActor) => {
+            valhallaActor.isochrone(commandString).then((valhallaResponse) => {
+              // Du moment que Valhalla a répondu, on considère que la source est joignable
+              this.state = "green";
 
-                LOGGER.debug("valhalla response for iso :");
-                LOGGER.debug(valhallaResponse);
+              LOGGER.debug("valhalla response for iso :");
+              LOGGER.debug(valhallaResponse);
 
-                try {
-                  resolve(this.writeIsochroneResponse(request, valhallaResponse));
-                } catch (error) {
-                  reject(error);
-                }
-              }).catch((err) => {
-                // mais on ne renvoie pas l'erreur à l'utilisateur
-                reject(errorManager.createError(" No path found ", 404));
-                LOGGER.error("valhalla error for route :");
-                LOGGER.error(err);
-              });
+              try {
+                resolve(this.writeIsochroneResponse(request, valhallaResponse));
+              } catch (error) {
+                reject(error);
+              }
+            }).catch((err) => {
+              // mais on ne renvoie pas l'erreur à l'utilisateur
+              reject(errorManager.createError(" No path found ", 404));
+              LOGGER.error("valhalla error for route :");
+              LOGGER.error(err);
             });
-          } catch (error) {
+          }).catch((error) => {
             // Pour une raison que l'on ignore, la source n'est plus joignable
             this.state = "red";
             LOGGER.error(error);
             reject("Internal VALHALLA error");
-          }
+          });
         });
 
       } else {

@@ -29,7 +29,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      * @description Constructeur de la classe ServiceProcess
      * @param {string} id - Identifiant du service pour l'administrateur
      * @param {string} location - Localisation de la configuration du service
-     * 
+     *
      */
     constructor(id, location) {
 
@@ -41,6 +41,12 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
         // Instance de childProcess quand le processus est lancé
         this._serviceInstance = {};
+
+        // Renseigné si le processus enfant s'est arrêté de façon inattendue (code ou signal, ex: SIGKILL pour un OOM)
+        this._exitInfo = null;
+
+        // Indique qu'un arrêt du processus a été explicitement demandé (stopService)
+        this._stopRequested = false;
 
         // Compteur des requêtes envoyées effectivement au service
         this._requestCount = 0;
@@ -61,7 +67,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
 
         LOGGER.info("Création et lancement d'un service dans un autre processus");
 
-        // Un minimum de vérifications au cas où 
+        // Un minimum de vérifications au cas où
         if (typeof(this._configurationLocation) !== "string") {
             LOGGER.error("Le chemin fourni n'est pas une string");
             return false;
@@ -76,7 +82,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             LOGGER.debug("Le chemin est renseigné : " + this._configurationLocation);
         }
 
-        // On prépare les options 
+        // On prépare les options
         let serviceOptions = {};
 
         if (process.env.NODE_ENV === "debug") {
@@ -107,13 +113,27 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             LOGGER.debug("Parent got message:");
             LOGGER.debug(response);
 
-            // On stocke la réponse 
+            // On stocke la réponse
             if (response._uuid) {
                 this._unReadResponses[response._uuid] = response;
             } else {
                 // TODO voir ce qu'on fait
             }
 
+        });
+
+        // Détection d'un arrêt inattendu du child (crash, OOM/SIGKILL) pour ne pas rester bloqué en attente
+        this._serviceInstance.on("exit", (code, signal) => {
+            this._exitInfo = { code, signal };
+            if (this._stopRequested) {
+                LOGGER.info(`Le processus du service ${this._id} s'est arrêté suite à une demande d'arrêt (code: ${code}, signal: ${signal})`);
+            } else {
+                LOGGER.error(`Le processus du service ${this._id} s'est arrêté de façon inattendue (code: ${code}, signal: ${signal})`);
+            }
+        });
+
+        this._serviceInstance.on("error", (error) => {
+            LOGGER.error(`Erreur sur le processus du service ${this._id} : ${error}`);
         });
 
         // On demande au service (child) son état
@@ -126,7 +146,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             LOGGER.error("Erreur lors de l'attente de l'état du service : " + error);
             return false;
         }
-        
+
         return true;
 
     }
@@ -142,6 +162,9 @@ module.exports = class ServiceProcess extends ServiceAdministered {
     async stopService() {
 
         LOGGER.debug("Arrêt d'un service dans un autre processus");
+
+        // Arrêt explicitement demandé : l'exit qui suit n'est pas une erreur
+        this._stopRequested = true;
 
         // Envoi du signal SIGTERM
         this._serviceInstance.kill();
@@ -167,7 +190,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
             }
 
         }
-    
+
     }
 
     /**
@@ -175,9 +198,9 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      * @function
      * @name computeRequest
      * @description Fonction pour utiliser pour envoyer une requête à un service selon le mode adaptée à la classe fille. Elle doit être ré-écrite dans chaque classe fille.
-     * @param {object} request - Instance fille de la classe Request 
+     * @param {object} request - Instance fille de la classe Request
      * @returns {object} response - Instance fille de la classe Response
-     * 
+     *
      */
     async computeRequest(request) {
 
@@ -209,7 +232,7 @@ module.exports = class ServiceProcess extends ServiceAdministered {
                 // TODO : voir ce qu'on fait de la stack dispo dans response._stack
                 throw errorManager.createError(response._message, response.status);
             }
-            
+
             return response;
 
         }
@@ -221,8 +244,8 @@ module.exports = class ServiceProcess extends ServiceAdministered {
      * @function
      * @name waitResponse
      * @description Fonction pour utiliser pour récupérer la réponse d'une requête une fois qu'elle est arrivée
-     * @param {string} uuid - UUID de la requête 
-     * 
+     * @param {string} uuid - UUID de la requête
+     *
      */
     async waitResponse(uuid) {
 
@@ -243,6 +266,13 @@ module.exports = class ServiceProcess extends ServiceAdministered {
                 // On supprime la réponse de l'objet pour libérer la mémoire
                 delete this._unReadResponses[uuid];
                 LOGGER.debug(this._unReadResponses);
+                break;
+            }
+
+            // Le child s'est arrêté avant de répondre : inutile d'attendre le timeout
+            if (this._exitInfo) {
+                LOGGER.error(`Le service s'est arrêté avant de répondre (code: ${this._exitInfo.code}, signal: ${this._exitInfo.signal})`);
+                response = errorManager.createError(`Le processus du service s'est arrêté (code: ${this._exitInfo.code}, signal: ${this._exitInfo.signal})`);
                 break;
             }
 
