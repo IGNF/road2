@@ -53,24 +53,21 @@ async function start() {
       // On aura besoin de cette configuration plus tard
       administrator.saveAdminConfiguration(configuration, configurationPath, logConfiguration);
 
-      // Création du serveur d'administration
-      if (!administrator.createServer()) {
+      LOGGER.info("Création des services...");
+      const startupResult = await startServicesThenAdmin(administrator);
+
+      if (!startupResult.servicesStarted) {
+        LOGGER.error("Problèmes lors du démarrage des services. Reconfigurez les et relancez leur démarrage.");
+        // On démarre tout de même l'administration pour permettre de réparer les services.
+      } else {
+        LOGGER.info("S'il y en a, les services ont été démarré");
+      }
+
+      if (!startupResult.adminServerStarted) {
         LOGGER.fatal("Le serveur de l'administrateur ne peut être créé");
         pm.shutdown(12);
       } else {
-
         LOGGER.debug("Serveur administrateur créé");
-
-        // Création des services au démarrage si demandé
-        LOGGER.info("Création des services...");
-
-        if (!(await administrator.createServices())) {
-          LOGGER.error("Problèmes lors du démarrage des services. Reconfigurez les et relancez leur démarrage.");
-          // On n'éteint pas le serveur d'administration car les services pourront être reconfiguré et démarrés par l'API
-        } else {
-          LOGGER.info("S'il y en a, les services ont été démarré");
-        }
-
       }
 
     }
@@ -112,6 +109,14 @@ async function start() {
 
   }
 
+}
+
+async function startServicesThenAdmin(administrator) {
+  // Start services before exposing restart endpoints, so startup requests cannot
+  // race registration in the ServiceManager's runtime catalog.
+  const servicesStarted = await administrator.createServices();
+  const adminServerStarted = administrator.createServer();
+  return { servicesStarted, adminServerStarted };
 }
 
 /**
@@ -332,4 +337,8 @@ function getLoggerConfiguration(userConfiguration, userConfigurationPath) {
 }
 
 // Lancement de l'application
-start();
+if (require.main === module) {
+  start();
+}
+
+module.exports = { startServicesThenAdmin };

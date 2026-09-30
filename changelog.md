@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.4
+FIXED:
+- Start the administration API after the initial managed-service startup attempt, preventing publication agents from requesting a restart before the service is registered in the runtime catalog. The administration API still starts if service startup fails so operators can recover the service.
+
 ## 3.1.3
 FIXED:
 - Valhalla source reloaded the routing graph on every request (a new actor was created per request), causing excessive memory usage (OOM) and poor performance. The Valhalla actor is now created once and reused across requests.
