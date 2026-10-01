@@ -112,10 +112,9 @@ async function start() {
 }
 
 async function startServicesThenAdmin(administrator) {
-  // Start services before exposing restart endpoints, so startup requests cannot
-  // race registration in the ServiceManager's runtime catalog.
+  // Expose the admin API first so dependent agents can observe startup progress.
+  const adminServerStarted = await administrator.createServer();
   const servicesStarted = await administrator.createServices();
-  const adminServerStarted = administrator.createServer();
   return { servicesStarted, adminServerStarted };
 }
 

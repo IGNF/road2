@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## 3.1.5
+FIXED:
+- Wait for the administration server to bind successfully before continuing Road2 startup, so startup failures are reported correctly and dependent publication agents do not race an unready admin API.
+
 ## 3.1.4
 FIXED:
-- Start the administration API after the initial managed-service startup attempt, preventing publication agents from requesting a restart before the service is registered in the runtime catalog. The administration API still starts if service startup fails so operators can recover the service.
+- Start the administration API before waiting for the managed service startup, preventing publication agents from receiving connection refused while Road2 initializes. The health endpoint remains unsuccessful until the managed service is registered and ready.
 
 ## 3.1.3
 FIXED:

@@ -19,7 +19,7 @@ const LOGGER = log4js.getLogger("ADMINISTRATOR");
 *
 * @class
 * @name Administrator
-* @description Pour chaque démarrage de Road2, il y a un Administrateur qui gère les services rendus. C'est un serveur qui écoute sur un port différent des serveurs des services. 
+* @description Pour chaque démarrage de Road2, il y a un Administrateur qui gère les services rendus. C'est un serveur qui écoute sur un port différent des serveurs des services.
 *
 */
 
@@ -88,7 +88,7 @@ module.exports = class Administrator {
             LOGGER.debug("Configuration présente");
         }
 
-        // Partie administration 
+        // Partie administration
         if (!configuration.administration) {
             LOGGER.error("Mauvaise configuration: 'administration' absent.");
             return false;
@@ -143,7 +143,7 @@ module.exports = class Administrator {
 
                             LOGGER.debug("Id présent : " + curServiceConf.id);
 
-                            // On vérifie que l'id n'est pas déjà pris 
+                            // On vérifie que l'id n'est pas déjà pris
                             if (checkedServiceId.length === 0) {
                                 // On continue la suite de la vérification
                             } else {
@@ -152,7 +152,7 @@ module.exports = class Administrator {
                                     if (curServiceConf.id === checkedServiceId[j]) {
                                         LOGGER.error("Id de service déjà pris : " + curServiceConf.id);
                                         return false;
-                                    } 
+                                    }
                                 }
 
                             }
@@ -163,9 +163,9 @@ module.exports = class Administrator {
                             LOGGER.error("Mauvaise configuration: 'configuration' absent.");
                             return false;
                         } else {
-                
+
                             LOGGER.debug("configuration présent");
-                                            
+
                             try {
                                 configurationLocation =  path.resolve(path.dirname(this._configurationPath), curServiceConf.configuration);
                                 LOGGER.debug("Chemin absolu du fichier de configuration du service : " + configurationLocation);
@@ -175,7 +175,7 @@ module.exports = class Administrator {
                                 return false;
                             }
 
-                            // On vérifie que ce chemin n'est pas déjà utilisé 
+                            // On vérifie que ce chemin n'est pas déjà utilisé
                             if (checkedServiceConfLocation.length !== 0) {
                                 for (let cs = 0; cs < checkedServiceConfLocation.length; cs++) {
                                     if (configurationLocation === checkedServiceConfLocation[cs]) {
@@ -186,7 +186,7 @@ module.exports = class Administrator {
                             }
 
                             try {
-                                // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+                                // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
                                 configurationContent = JSON.parse(fs.readFileSync(configurationLocation));
                                 LOGGER.debug("Le contenu du fichier est accessible par Road2");
                             } catch (error) {
@@ -208,26 +208,26 @@ module.exports = class Administrator {
                                 }
                             }
 
-                            
-                
+
+
                         }
-                
+
                         if (!curServiceConf.creationType) {
                             LOGGER.error("Mauvaise configuration: 'creationType' absent.");
                             return false;
                         } else {
-                
+
                             LOGGER.debug("configuration.creationType présent");
-                
+
                             if (!["sameProcess","newProcess","findByURI"].includes(curServiceConf.creationType)) {
                                 LOGGER.error("Mauvaise configuration: 'creationType' doit être parmi 'sameProcess', 'newProcess', 'findByURI'.");
                                 return false;
                             } else {
                                 LOGGER.debug("configuration.creationType bien configuré");
                             }
-                
+
                         }
-                
+
                         LOGGER.debug("Vérification du service en cours terminée");
                         checkedServiceId.push(curServiceConf.id);
                         checkedServiceConf.push(configurationContent);
@@ -257,7 +257,7 @@ module.exports = class Administrator {
         } else {
             LOGGER.debug("configuration.administration.api bien configuré");
         }
-        
+
         // Partie network de l'administrateur
         if (!configuration.administration.network) {
             LOGGER.fatal("Mauvaise configuration: 'administration.network' absent.");
@@ -314,7 +314,7 @@ module.exports = class Administrator {
      *
      */
 
-    createServer() {
+    async createServer() {
 
         LOGGER.info("Creation de l'application web Express...");
 
@@ -352,11 +352,11 @@ module.exports = class Administrator {
         } else {
             LOGGER.debug("API chargée");
         }
-    
+
         administrator.all('/', (req, res) => {
             res.send('Road2 Administrator');
         });
-    
+
         // Création du serveur
         LOGGER.info("Création du serveur d'administration...");
         if (!this._serverManager.loadServerConfiguration(administrator, this._configuration.administration.network.server)) {
@@ -365,10 +365,10 @@ module.exports = class Administrator {
         } else {
             LOGGER.debug("Serveur d'administration créé");
         }
-    
+
         // Démarrage du serveur
         LOGGER.info("Démarrage du serveur d'administration...");
-        if (!this._serverManager.startAllServers()) {
+        if (!(await this._serverManager.startAllServers())) {
             LOGGER.fatal("Impossible de démarrer le serveur d'administration.");
             return false;
         } else {
@@ -424,7 +424,7 @@ module.exports = class Administrator {
      *
      * @function
      * @name createServices
-     * @description Création des services gérés par cet administrateur 
+     * @description Création des services gérés par cet administrateur
      *
      */
 
@@ -437,7 +437,7 @@ module.exports = class Administrator {
             return true;
         }
 
-        // Pour chaque service, on vérifie sa configuration puis on le démarre 
+        // Pour chaque service, on vérifie sa configuration puis on le démarre
 
         for (let i = 0; i < this._configuration.administration.services.length; i++) {
 
@@ -449,7 +449,7 @@ module.exports = class Administrator {
             let serviceConfLocation = path.resolve(path.dirname(this._configurationPath), curIASConf.configuration);
             let serviceConfiguration = JSON.parse(fs.readFileSync(serviceConfLocation));
 
-            // Vérification de la configuration 
+            // Vérification de la configuration
             LOGGER.info("Vérification de la configuration...");
             if (!(await this._serviceManager.checkServiceConfiguration(serviceConfiguration, serviceConfLocation))) {
                 LOGGER.error("La configuration du service "+ curIASConf.id +" est incorrecte");
@@ -479,9 +479,9 @@ module.exports = class Administrator {
      *
      * @function
      * @name computeRequest
-     * @description Gestion de la requête pour une route d'administration sur un serveur 
+     * @description Gestion de la requête pour une route d'administration sur un serveur
      * @param {string} serviceId - Id du service selon l'administrateur
-     * @param {object} request - Instance fille de la classe Request 
+     * @param {object} request - Instance fille de la classe Request
      * @return {object} responses - Json contenant la réponse du service à la requête
      *
      */
@@ -498,8 +498,8 @@ module.exports = class Administrator {
      *
      * @function
      * @name computeHealthRequest
-     * @description Gestion de la requête d'état du serveur 
-     * Cette fonction ne suit pas le m$eme chemin que les autres car elle est globale 
+     * @description Gestion de la requête d'état du serveur
+     * Cette fonction ne suit pas le m$eme chemin que les autres car elle est globale
      * et ne concerne pas un service particulier
      * Elle renvoit une healthResponse complète et c'est au niveau de l'API qu'on peut la modifier
      * @param {HealthRequest} healthRequest - Instance de la classe HealthRequest
@@ -515,7 +515,7 @@ module.exports = class Administrator {
 
         let healthResponse = new HealthResponse();
 
-        // Étant donné que l'administrateur est en train de répondre, on le met au vert 
+        // Étant donné que l'administrateur est en train de répondre, on le met au vert
         // À voir s'il y a des fonctionnalités qui pourraient le mettre à l'orange ou au rouge
         // Dans ce cas là, il faudra que l'administrator ait un attribut d'état et que celui-ci soit lu dans cette fonction
         healthResponse.adminState = "green";
@@ -579,7 +579,7 @@ module.exports = class Administrator {
                     continue;
                 }
 
-                // On stocke le retour de ce service 
+                // On stocke le retour de ce service
                 curHealthResponse._serviceStates[0].id = curServiceId;
                 healthResponse.serviceStates.push(curHealthResponse._serviceStates[0]);
 
@@ -587,8 +587,8 @@ module.exports = class Administrator {
 
         }
 
-        // En fonction des états définis précédemment, on va définir l'état global 
-        // Pour faire simple : 
+        // En fonction des états définis précédemment, on va définir l'état global
+        // Pour faire simple :
         // - global est orange si un des services est orange
         // - global est rouge si un des services est rouge
         if (gotRed) {
@@ -624,10 +624,10 @@ module.exports = class Administrator {
         LOGGER.debug("Récupération des configurations de chaque service");
 
         // Pour chaque service, on récupère la configuration depuis le fichier de configuration
-        for (let i = 0; i < this._configuration.administration.services.length; i++) { 
+        for (let i = 0; i < this._configuration.administration.services.length; i++) {
 
             let curServiceAdminConf = this._configuration.administration.services[i];
-            
+
             LOGGER.debug("Récupération de la configuration du service : " + curServiceAdminConf.id);
 
             let configuration = this.readServiceConfiguration(curServiceAdminConf);
@@ -695,7 +695,7 @@ module.exports = class Administrator {
             const configurationLocation =  path.resolve(path.dirname(this._configurationPath), serviceAdminConf.configuration);
             LOGGER.debug("Location à lire : " + configurationLocation);
 
-            const configuration = JSON.parse(fs.readFileSync(configurationLocation));  
+            const configuration = JSON.parse(fs.readFileSync(configurationLocation));
             LOGGER.debug(configuration);
 
             return configuration;
@@ -740,7 +740,7 @@ module.exports = class Administrator {
                 LOGGER.error("Impossible de récupérer la configuration du service : " + error);
                 return false;
             }
-            
+
 
             // On vérifie la configuration avant de redémarrer afin d'éviter au maximum les mauvaises surprises
             LOGGER.info("Vérification de la configuration avant de demander un redémarrage");
