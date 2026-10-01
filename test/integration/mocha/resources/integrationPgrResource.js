@@ -1,6 +1,5 @@
 const assert = require('assert');
 const PgrResource = require('../../../../src/js/resources/pgrResource');
-const RouteRequest = require('../../../../src/js/requests/routeRequest');
 const logManager = require('../logManager');
 
 const sinon = require('sinon');
@@ -12,45 +11,44 @@ describe('Test de la classe PgrResource', function() {
     logManager.manageLogs();
   });
 
+  let sourceConfiguration = {
+    "id": "test-car-fastest",
+    "type": "pgr",
+    "description": "Source pgr de test",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",
+    "storage": {
+      "base": {
+        "dbConfig": "./dbs/db_config_test.json"
+      },
+      "costColumn": "cost_s_car",
+      "rcostColumn": "reverse_cost_s_car"
+    },
+    "costs": [
+      {
+        "profile": "car",
+        "optimization": "fastest",
+        "costType": "time"
+      }
+    ]
+  };
+
+  // la ressource délègue la récupération des sources au sourceManager
+  let sourceManager = {
+    isLoadedSourceAvailable: sinon.stub().returns(true),
+    getSourceById: sinon.stub().returns({ type: "pgr", configuration: sourceConfiguration })
+  };
+
   let resourceConfiguration = {
     "resource": {
-    "id": "test-pgr",
-    "type": "pgr",
-    "description": "Exemple d'une ressource PGR.",
-    "topology": {
-      "description": "Données pgr",
-      "storage": {
-        "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json"
-      },
-      "projection": "EPSG:4326"
-    },
-    "sources": [
-      {
-        "id": "test-car-fastest",
-        "type": "pgr",
-        "storage": {
-          "dbConfig": "/home/docker/app/src/config/dbs/db_config_test.json",
-          "costColumn": "cost_s_car",
-          "rcostColumn": "reverse_cost_s_car"
-        },
-        "cost": {
-          "profile": "car",
-          "optimization": "fastest",
-          "compute": {
-            "storage": {
-              "file": "/home/docker/route-graph-generator/configuration/costs_calculation_sample.json"
-            }
-          }
-        }
-      }
-    ],
-    "availableOperations":[
-
-    ],
-    "defaultSourceId": "test-car-fastest",
-    "boundingBox": "-180,-90,180,90",
-    "defaultProjection": "EPSG:4326",
-    "availableProjections": ["EPSG:4326","EPSG:2154"]
+      "id": "test-pgr",
+      "resourceVersion": "1.0.0",
+      "type": "pgr",
+      "description": "Exemple d'une ressource PGR.",
+      "sources": [
+        "test-car-fastest"
+      ],
+      "availableOperations": []
     }
   };
 
@@ -72,23 +70,30 @@ describe('Test de la classe PgrResource', function() {
       assert.deepEqual(resource.configuration, resourceConfiguration.resource);
     });
 
-    it('Get LinkedSource', function() {
+  });
+
+  describe('Test de initResource()', function() {
+
+    it('initResource()', function() {
+      assert.equal(resource.initResource(sourceManager), true);
       let reference = {};
       reference["carfastest"] = "test-car-fastest";
-      assert.deepEqual(resource.linkedSource, reference);
+      reference["cartime"] = "test-car-fastest";
+      assert.deepEqual(resource._linkedSource, reference);
     });
 
   });
 
-  describe('Test du constructeur et des getters', function() {
+  describe('Test de getSourceIdFromRequest()', function() {
 
-    // Pour ne pas dépendre de la classe RouteRequest
-    let request = sinon.mock(RouteRequest);
-    request.profile = "car";
-    request.optimization = "fastest";
-
-    it('getSourceIdFromRequest()', function() {
+    it('getSourceIdFromRequest() avec une requete route', function() {
+      let request = { operation: "route", profile: "car", optimization: "fastest" };
       assert.equal(resource.getSourceIdFromRequest(request), "test-car-fastest");
+    });
+
+    it('getSourceIdFromRequest() avec une operation inconnue', function() {
+      let request = { operation: "inconnue", profile: "car", optimization: "fastest" };
+      assert.equal(resource.getSourceIdFromRequest(request), null);
     });
 
   });

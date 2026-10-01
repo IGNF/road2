@@ -1,8 +1,16 @@
 const log4js = require('log4js');
-const got = require('got');
-const HttpsProxyAgent = require('https-proxy-agent');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
 var LOGGER = log4js.getLogger("HTTPQUERY");
+
+// got est distribué uniquement en ESM, il doit donc être chargé dynamiquement depuis ce module CommonJS
+let gotPromise = null;
+function loadGot() {
+    if (!gotPromise) {
+        gotPromise = import('got').then((module) => module.default);
+    }
+    return gotPromise;
+}
 
 module.exports = class httpQuery {
 
@@ -49,7 +57,7 @@ module.exports = class httpQuery {
         const _options = {...this._options, ...options};
         LOGGER.debug("with options :");
         LOGGER.debug(_options);
-        return got(query, _options);
+        return loadGot().then((got) => got(query, _options));
     }
 
     /**
@@ -65,7 +73,7 @@ module.exports = class httpQuery {
      post(url, options) {
         //WARNING: fonction non testée
         const _options = {...this._options, ...options};
-        return got.post(url, _options);
+        return loadGot().then((got) => got.post(url, _options));
     }
 
     /**
@@ -86,6 +94,6 @@ module.exports = class httpQuery {
             resolveBodyOnly: true
         };
         const _options = {...this._options, ...options};
-        return got.post(url, _options);
+        return loadGot().then((got) => got.post(url, _options));
     }
 }

@@ -26,7 +26,7 @@ describe('Test de la classe Resource', function() {
   describe('Test de la fonction getSourceIdFromRequest()', function() {
 
     it('getSourceIdFromRequest()', function() {
-      assert.equal(resource.getSourceIdFromRequest(), "");
+      assert.equal(resource.getSourceIdFromRequest({ toString() { return "request"; } }), "");
     });
 
   });

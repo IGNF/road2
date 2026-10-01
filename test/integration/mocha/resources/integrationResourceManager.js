@@ -1,215 +1,131 @@
 const assert = require('assert');
 const ResourceManager = require('../../../../src/js/resources/resourceManager');
-const SourceManager = require('../../../../src/js/sources/sourceManager');
-const OperationManager = require('../../../../src/js/operations/operationManager');
 const logManager = require('../logManager');
 
 const sinon = require('sinon');
-const mockfs = require('mock-fs');
 
 describe('Test de la classe ResourceManager', function() {
 
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();
-
-    mockfs({
-      "/home/docker/data": {
-        "corse-latest.osrm": "",
-        "corse-latest.osm.pbf": "",
-      },
-      "/usr/local/share/osrm/profiles": {
-        "car.lua": "",
-      },
-    });
   });
 
-  after(() => {
-    mockfs.restore();
-  });
+  let sourceConfiguration = {
+    "id": "corse-car-fastest",
+    "description": "Source osrm de la Corse",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",
+    "type": "osrm",
+    "storage": {
+      "file": "/home/docker/data/corse-latest.osrm"
+    },
+    "cost": {
+      "profile": "car",
+      "optimization": "fastest"
+    }
+  };
+
+  // le resourceManager délègue la gestion des sources et des opérations aux managers associés
+  let sourceManager = {
+    isCheckedSourceAvailable: sinon.stub().returns(true),
+    isLoadedSourceAvailable: sinon.stub().returns(true),
+    getSourceById: sinon.stub().returns({ type: "osrm", configuration: sourceConfiguration })
+  };
+
+  let operationManager = {
+    checkResourceOperationConfiguration: sinon.stub().returns(true),
+    loadResourceOperationConfiguration: sinon.stub().returns(true)
+  };
 
   let resourceConfiguration = {
     "resource": {
-    "id": "corse-osm",
-    "type": "osrm",
-    "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
-    "topology": {
       "id": "corse-osm",
-      "type": "osm",
-      "description": "Données OSM sur la Corse.",
-      "storage": {
-        "file": "/home/docker/internal/corse-latest.osm.pbf"
-      },
-      "projection": "EPSG:4326",
-      "bbox": "-180,-90,180,90"
-    },
-    "sources": [
-      {
-        "id": "corse-car-fastest",
-        "type": "osrm",
-        "storage": {
-          "file": "/home/docker/internal/corse-latest.osrm"
-        },
-        "cost": {
-          "profile": "car",
-          "optimization": "fastest",
-          "compute": {
-            "storage": {
-              "file": "/usr/local/share/osrm/profiles/car.lua"
+      "resourceVersion": "1.0.0",
+      "type": "osrm",
+      "description": "Exemple d'une ressource sur la Corse avec les données OSM.",
+      "sources": [
+        "corse-car-fastest"
+      ],
+      "availableOperations": [
+        {
+          "id": "route",
+          "parameters": [
+            {
+              "id": "resource",
+              "values": ["corse-osm"]
             }
-          }
+          ]
         }
-      }
-    ],
-    "availableOperations":[
-      {
-        "id": "route",
-        "parameters": [
-          {
-            "id": "resource",
-            "values": [
-              "corse-osm"
-            ]
-          },
-          {
-            "id": "start",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "end",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "profile",
-            "defaultValueContent": "car",
-            "values": [
-              "car"
-            ]
-          },
-          {
-            "id": "optimization",
-            "defaultValueContent": "fastest",
-            "values": [
-              "fastest"
-            ]
-          },
-          {
-            "id": "intermediates",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "getSteps",
-            "defaultValueContent": "true"
-          },
-          {
-            "id": "waysAttributes",
-            "values": [
-              "name"
-            ]
-          },
-          {
-            "id": "geometryFormat",
-            "defaultValueContent": "geojson",
-            "values": [
-              "geojson",
-              "polyline"
-            ]
-          },
-          {
-            "id": "bbox",
-            "defaultValueContent": "true"
-          },
-          {
-            "id": "projection",
-            "defaultValueContent": "EPSG:4326",
-            "values": [
-              "EPSG:4326",
-              "EPSG:2154"
-            ]
-          },
-          {
-            "id": "timeUnit",
-            "defaultValueContent": "minute",
-            "values": [
-              "hour",
-              "minute",
-              "second"
-            ]
-          },
-          {
-            "id": "distanceUnit",
-            "defaultValueContent": "meter",
-            "values": [
-              "meter",
-              "kilometer"
-            ]
-          }
-        ]
-      }
-    ]
+      ]
     }
-  }
-  ;
+  };
 
-  let resourceManager = new ResourceManager();
-  let sourceManager = sinon.mock(SourceManager);
-  let operationManager = sinon.mock(OperationManager);
-
-  // Comportements attendus
-  sourceManager.checkSource = sinon.stub().withArgs(resourceConfiguration).returns(true);
-  sourceManager.sourceTopology = new Array();
-  operationManager.checkResourceOperationConf = sinon.stub().returns(true);
-  operationManager.getResourceOperationConf = sinon.stub().returns(true);
-  operationManager.createResourceOperation = sinon.stub().returns(true);
+  let resourceManager = new ResourceManager(sourceManager, operationManager);
 
   describe('Test du constructeur et des getters', function() {
 
-    it('Get listOfResourceIds', function() {
-      assert.deepEqual(resourceManager.listOfResourceIds, new Array());
+    it('Get resource', function() {
+      assert.deepEqual(resourceManager.resource, {});
     });
 
   });
 
-  describe('Test de checkResource() et checkResourceOsrm()', function() {
+  describe('Test de checkResourceConfiguration()', function() {
 
     it('Avec les bons parametres', function() {
-      assert.equal(resourceManager.checkResource(resourceConfiguration, sourceManager, operationManager), true);
+      assert.equal(resourceManager.checkResourceConfiguration(resourceConfiguration), true);
     });
 
-    it('checkResource() avec un mauvais id', function() {
+    it('checkResourceConfiguration() sans objet resource', function() {
+      assert.equal(resourceManager.checkResourceConfiguration({}), false);
+    });
+
+    it('checkResourceConfiguration() avec un mauvais id', function() {
       let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       wrongDescription.resource.id = "";
-      assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
+      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
     });
 
-    it('checkResource() avec un mauvais type', function() {
+    it('checkResourceConfiguration() sans version', function() {
+      let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
+      wrongDescription.resource.id = "test-version";
+      delete wrongDescription.resource.resourceVersion;
+      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
+    });
+
+    it('checkResourceConfiguration() avec un mauvais type', function() {
       let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       wrongDescription.resource.id = "test-2";
       wrongDescription.resource.type = "test";
-      assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
+      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
     });
 
-    it('checkResource() avec un mauvais id deja pris', function() {
+    it('checkResourceConfiguration() avec des sources vides', function() {
       let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
-      assert.equal(resourceManager.checkResource(wrongDescription, sourceManager), false);
+      wrongDescription.resource.id = "test-3";
+      wrongDescription.resource.sources = [];
+      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
+    });
+
+    it('checkResourceConfiguration() avec une operation indisponible pour le type', function() {
+      let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
+      wrongDescription.resource.id = "test-4";
+      wrongDescription.resource.availableOperations[0].id = "isochrone";
+      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
     });
 
   });
 
-  describe('Test de createResource()', function() {
+  describe('Test de loadResourceConfiguration()', function() {
 
-    it('createResource()', function() {
-      let newResource = resourceManager.createResource(resourceConfiguration, operationManager);
-      assert.equal(newResource.id, resourceConfiguration.resource.id);
+    it('loadResourceConfiguration() avec une description correcte', function() {
+      assert.equal(resourceManager.loadResourceConfiguration(resourceConfiguration), true);
+      assert.equal(resourceManager.resource[resourceConfiguration.resource.id].id, resourceConfiguration.resource.id);
+    });
+
+    it('checkResourceConfiguration() avec un id deja charge', function() {
+      assert.equal(resourceManager.checkResourceConfiguration(resourceConfiguration), false);
     });
 
   });

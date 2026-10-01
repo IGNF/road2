@@ -1,13 +1,17 @@
 const assert = require('assert');
 const SourceManager = require('../../../../src/js/sources/sourceManager');
-const OperationManager = require('../../../../src/js/operations/operationManager');
 const logManager = require('../logManager');
-const Source = require('../../../../src/js/sources/source');
 
 const sinon = require('sinon');
 const mockfs = require('mock-fs');
 
 describe('Test de la classe SourceManager', function() {
+
+  // le sourceManager délègue la validation des projections et des bbox au projectionManager
+  let projectionManager = {
+    isProjectionChecked: sinon.stub().returns(true),
+    checkBboxConfiguration: sinon.stub().returns(true)
+  };
 
   before(function() {
     // runs before all tests in this block
@@ -28,12 +32,13 @@ describe('Test de la classe SourceManager', function() {
     mockfs.restore();
   });
 
-  let sourceManager = new SourceManager();
-  let sourcesIds = new Array();
-  let sourcesDescriptions = {};
+  let sourceManager = new SourceManager(projectionManager, {});
 
   let description = {
     "id": "corse-car-fastest",
+    "description": "Source osrm de la Corse",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",
     "type": "osrm",
     "storage": {
       "file": "/home/docker/data/corse-latest.osrm"
@@ -49,236 +54,120 @@ describe('Test de la classe SourceManager', function() {
     }
   };
 
-  let resourceOperationTable =
-    [
-      {
-        "id": "route",
-        "parameters": [
-          {
-            "id": "resource",
-            "values": [
-              "corse-osm"
-            ]
-          },
-          {
-            "id": "start",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "end",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "profile",
-            "defaultValueContent": "car",
-            "values": [
-              "car"
-            ]
-          },
-          {
-            "id": "optimization",
-            "defaultValueContent": "fastest",
-            "values": [
-              "fastest"
-            ]
-          },
-          {
-            "id": "intermediates",
-            "values": {
-              "bbox": "-180,-90,180,90",
-              "projection": "EPSG:4326"
-            }
-          },
-          {
-            "id": "getSteps",
-            "defaultValueContent": "true"
-          },
-          {
-            "id": "waysAttributes",
-            "values": [
-              "name"
-            ]
-          },
-          {
-            "id": "geometryFormat",
-            "defaultValueContent": "geojson",
-            "values": [
-              "geojson",
-              "polyline"
-            ]
-          },
-          {
-            "id": "bbox",
-            "defaultValueContent": "true"
-          },
-          {
-            "id": "projection",
-            "defaultValueContent": "EPSG:4326",
-            "values": [
-              "EPSG:4326",
-              "EPSG:2154"
-            ]
-          },
-          {
-            "id": "timeUnit",
-            "defaultValueContent": "minute",
-            "values": [
-              "hour",
-              "minute",
-              "second"
-            ]
-          },
-          {
-            "id": "distanceUnit",
-            "defaultValueContent": "meter",
-            "values": [
-              "meter",
-              "kilometer"
-            ]
-          }
-        ]
-      }
-    ];
+  let wrongDuplicateDescription = JSON.parse(JSON.stringify(description));
+  wrongDuplicateDescription.storage.file = "/home/docker/data/corse-latest-2.osrm";
 
+  describe('Test du constructeur et des getters', function() {
 
-  let wrongDuplicateDescription = {
-    "id": "corse-car-fastest",
-    "type": "osrm",
-    "storage": {
-      "file": "/home/docker/data/corse-latest-2.osrm"
-    },
-    "cost": {
-      "profile": "car",
-      "optimization": "fastest",
-      "compute": {
-        "storage": {
-          "file": "/usr/local/share/osrm/profiles/car.lua"
-        }
-      }
-    }
-  };
-
-  sourcesIds.push(description.id);
-  sourcesDescriptions[description.id] = description;
-
-  describe('Test du constructeur et des getters/setters', function() {
-
-    it('Get SourceManager listOfSourceIds', function() {
-      assert.deepEqual(sourceManager.listOfSourceIds, new Array());
+    it('Get SourceManager loadedSourceId', function() {
+      assert.deepEqual(sourceManager.loadedSourceId, new Array());
     });
 
-    it('Get SourceManager sourceDescriptions', function() {
-      assert.deepEqual(sourceManager.sourceDescriptions, {});
-    });
-
-    it('Set SourceManager listOfSourceIds', function() {
-      sourceManager.listOfSourceIds = sourcesIds;
-      assert.deepEqual(sourceManager.listOfSourceIds, sourcesIds);
-    });
-
-    it('Set SourceManager sourceDescriptions', function() {
-      sourceManager.sourceDescriptions = sourcesDescriptions;
-      assert.deepEqual(sourceManager.sourceDescriptions, sourcesDescriptions);
+    it('Get SourceManager sources', function() {
+      assert.deepEqual(sourceManager.sources, {});
     });
 
   });
 
-  describe('Test de la fonction checkSource()', function() {
-    let opMgr = sinon.mock(OperationManager);
-    opMgr.isOperationAvailable = sinon.stub().returns(true);
-    opMgr.isAvailableInTable = sinon.stub().returns(true);
-    it('checkSource() avec une bonne description', function() {
+  describe('Test de la fonction checkSourceConfiguration()', function() {
 
-      assert.equal(sourceManager.checkSource(description, opMgr, resourceOperationTable), true);
+    it('checkSourceConfiguration() avec une bonne description', async function() {
+      assert.equal(await sourceManager.checkSourceConfiguration(description), true);
     });
 
-    it('checkSource() avec un mauvais id', function() {
+    it('checkSourceConfiguration() avec un mauvais id', async function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      assert.equal(await sourceManager.checkSourceConfiguration(wrongDescription), false);
     });
 
-    it('checkSource() avec un mauvais type', function() {
+    it('checkSourceConfiguration() avec un mauvais type', async function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
       wrongDescription.id = "test-2";
       wrongDescription.type = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      assert.equal(await sourceManager.checkSourceConfiguration(wrongDescription), false);
+    });
+
+    it('checkSourceConfiguration() sans description', async function() {
+      let wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.id = "test-7";
+      delete wrongDescription.description;
+      assert.equal(await sourceManager.checkSourceConfiguration(wrongDescription), false);
     });
 
   });
 
   describe('Test de la fonction checkSourceOsrm()', function() {
-    let opMgr = sinon.mock(OperationManager);
-    opMgr.isOperationAvailable = sinon.stub().returns(true);
-    opMgr.isAvailableInTable = sinon.stub().returns(true);
 
     it('checkSourceOsrm() avec une bonne description', function() {
-      assert.equal(sourceManager.checkSourceOsrm(description, opMgr, resourceOperationTable), true);
+      assert.equal(sourceManager.checkSourceOsrm(description), true);
+    });
+
+    it('checkSourceOsrm() avec un mauvais storage', function() {
+      let wrongDescription = JSON.parse(JSON.stringify(description));
+      wrongDescription.storage = "";
+      assert.equal(sourceManager.checkSourceOsrm(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
-      wrongDescription.id = "test-3";
       wrongDescription.cost = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      assert.equal(sourceManager.checkSourceOsrm(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.profile', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
-      wrongDescription.id = "test-4";
       wrongDescription.cost.profile = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      assert.equal(sourceManager.checkSourceOsrm(wrongDescription), false);
     });
 
     it('checkSourceOsrm() avec un mauvais cost.optimization', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
-      wrongDescription.id = "test-5";
       wrongDescription.cost.optimization = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      assert.equal(sourceManager.checkSourceOsrm(wrongDescription), false);
     });
 
-    it('checkSourceOsrm() avec un mauvais cost.compute', function() {
+  });
+
+  describe('Test de la fonction loadSourceConfiguration()', function() {
+
+    it('loadSourceConfiguration() avec une description correcte', function() {
+      assert.equal(sourceManager.loadSourceConfiguration(description), true);
+      assert.equal(sourceManager.isLoadedSourceAvailable(description.id), true);
+      assert.equal(sourceManager.getSourceById(description.id).type, "osrm");
+    });
+
+    it('loadSourceConfiguration() avec un type inconnu', function() {
       let wrongDescription = JSON.parse(JSON.stringify(description));
-      wrongDescription.id = "test-6";
-      wrongDescription.cost.compute = "";
-      assert.equal(sourceManager.checkSource(wrongDescription, opMgr, resourceOperationTable), false);
+      wrongDescription.id = "test-unknown-type";
+      wrongDescription.type = "unknown";
+      assert.equal(sourceManager.loadSourceConfiguration(wrongDescription), false);
     });
 
   });
 
-  describe('Test de la fonction checkDuplicationSource()', function() {
+  describe('Test de la fonction checkDuplicationLoadedSource()', function() {
 
-    it('checkDuplicationSource() avec une description identique', function() {
-      assert.equal(sourceManager.checkDuplicationSource(description), true);
+    it('checkDuplicationLoadedSource() avec une description identique', function() {
+      assert.equal(sourceManager.checkDuplicationLoadedSource(description), true);
     });
 
-    it('checkDuplicationSource() avec une description ayant le même id mais différente', function() {
-      assert.equal(sourceManager.checkDuplicationSource(wrongDuplicateDescription), false);
-    });
-
-  });
-
-  describe('Test de la fonction createSource()', function() {
-
-    it('createSource() avec une description correcte', function() {
-      let source = sourceManager.createSource(description);
-      assert.equal(source.type, "osrm");
+    it('checkDuplicationLoadedSource() avec une description ayant le même id mais différente', function() {
+      assert.equal(sourceManager.checkDuplicationLoadedSource(wrongDuplicateDescription), false);
     });
 
   });
 
-  describe('Test de la fonction connectSource()', function() {
+  describe('Test des fonctions connectSource() et disconnectSource()', function() {
 
-    it('connectSource() avec une description correcte', async function() {
-      const source = sinon.mock(Source);
-      source.connect = sinon.stub().returns(true);
-      await sourceManager.connectSource(source);
+    it('connectSource() avec une source chargée', async function() {
+      sourceManager.sources[description.id].connect = sinon.stub().resolves(true);
+      assert.equal(await sourceManager.connectSource(description.id), true);
+    });
+
+    it('disconnectSource() avec une source chargée', async function() {
+      sourceManager.sources[description.id].disconnect = sinon.stub().resolves(true);
+      assert.equal(await sourceManager.disconnectSource(description.id), true);
     });
 
   });

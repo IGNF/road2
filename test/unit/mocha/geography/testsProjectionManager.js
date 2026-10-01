@@ -1,6 +1,10 @@
 const assert = require('assert');
+const path = require('path');
 const ProjectionManager = require('../../../../src/js/geography/projectionManager');
 const logManager = require('../logManager');
+
+const projectionsDirectory = path.resolve(__dirname, '../config/projections/');
+const projectionsFile = path.join(projectionsDirectory, 'france.json');
 
 describe('Test de la classe ProjectionManager', function() {
 
@@ -36,7 +40,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Test de isProjectionChecked', function() {
 
     let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+    let directory = projectionsDirectory;
 
     it('isProjectionChecked()', function() {
       projManager.checkProjectionDirectory(directory);
@@ -50,7 +54,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Vérification d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let file = "/home/docker/app/test/unit/mocha/config/projections/france.json";
+    let file = projectionsFile;
 
     it('checkProjectionFile()', function() {
       assert.equal(projManager.checkProjectionFile(file), true);
@@ -64,7 +68,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Vérification d\'un dossier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+    let directory = projectionsDirectory;
 
     it('checkProjectionDirectory()', function() {
       assert.equal(projManager.checkProjectionDirectory(directory), true);
@@ -93,7 +97,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Test de isProjectionLoaded', function() {
 
     let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+    let directory = projectionsDirectory;
 
     it('isProjectionLoaded()', function() {
       projManager.loadProjectionDirectory(directory);
@@ -107,7 +111,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Chargement d\'un fichier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let file = "/home/docker/app/test/unit/mocha/config/projections/france.json";
+    let file = projectionsFile;
 
     it('loadProjectionFile()', function() {
       assert.equal(projManager.loadProjectionFile(file), true);
@@ -121,7 +125,7 @@ describe('Test de la classe ProjectionManager', function() {
   describe('Chargement d\'un dossier de projections', function() {
 
     let projManager = new ProjectionManager();
-    let directory = "/home/docker/app/test/unit/mocha/config/projections/";
+    let directory = projectionsDirectory;
 
     it('loadProjectionDirectory()', function() {
       assert.equal(projManager.loadProjectionDirectory(directory), true);

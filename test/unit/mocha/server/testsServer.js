@@ -1,13 +1,31 @@
 const assert = require('assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { execFileSync } = require('child_process');
 const Server = require('../../../../src/js/server/server');
 const logManager = require('../logManager');
 const express = require('express');
+
+// Les certificats sont générés à la volée pour que le test soit indépendant de l'environnement (docker secrets)
+const certDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'road2-server-test-'));
+const keyPath = path.join(certDirectory, 'server.key');
+const certPath = path.join(certDirectory, 'server.cert');
+execFileSync('openssl', [
+  'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+  '-keyout', keyPath, '-out', certPath,
+  '-days', '1', '-subj', '/CN=localhost'
+], { stdio: 'ignore' });
 
 describe('Test de la classe Server', function() {
 
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();
+  });
+
+  after(function() {
+    fs.rmSync(certDirectory, { recursive: true, force: true });
   });
 
   let httpServer = {
@@ -21,10 +39,10 @@ describe('Test de la classe Server', function() {
       "id": "externalServer",
       "https": "true",
       "host": "0.0.0.0",
-      "port": "444",
+      "port": "8444",
       "options": {
-        "key": "/run/secrets/key",
-        "cert": "/run/secrets/cert"
+        "key": keyPath,
+        "cert": certPath
       }
     };
 

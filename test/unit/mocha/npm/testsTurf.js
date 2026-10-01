@@ -87,7 +87,7 @@ describe('Test de la dépendance NPM TurfJS', function() {
 
     let line = {"geometry":{"coordinates":[[2.322075785,48.882563257],[2.320957896,48.8823445245],[2.32092,48.88233],[2.32242,48.88402],[2.32451,48.8846],[2.32451,48.8846]],"type":"LineString"},"properties":{},"type":"Feature"};
     let point = turf.point([2.32207,48.88256]);
-    let refPoint = {geometry: {coordinates: [2.3220691120694474,48.88256195133658],type: 'Point'},properties: {dist: 0.00022648508237084762,index: 0,location: 0.0005090817926782273},type: 'Feature'};
+    let refPoint = {geometry: {coordinates: [2.322069116684443,48.88256195228571],type: 'Point'},properties: {dist: 0.00022648972665292446,index: 0,location: 0.0005087282488270849,multiFeatureIndex: 0},type: 'Feature'};
 
     it('Calcul du point le plus proche d\'un autre sur une ligne ', function() {
         let nearest = turf.nearestPointOnLine(line, point,{precision: 6});

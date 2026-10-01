@@ -4,6 +4,9 @@ const logManager = require('../logManager');
 
 describe('Test de httpQuery', function() {
 
+  // ces tests interrogent un service externe (httpbin.org)
+  this.timeout(20000);
+
   before(function() {
     // runs before all tests in this block
     logManager.manageLogs();

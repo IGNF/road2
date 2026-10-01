@@ -2,7 +2,7 @@ const assert = require('assert');
 const osrmSource = require('../../../../src/js/sources/osrmSource');
 const RouteRequest = require('../../../../src/js/requests/routeRequest');
 const logManager = require('../logManager');
-const OSRM = require("osrm");
+const OSRM = require("@project-osrm/osrm");
 
 const sinon = require('sinon');
 const mockfs = require('mock-fs');
