@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 3.1.6
+FIXED:
+- `httpQuery` could not be used at all: `https-proxy-agent` v7 exports a named binding (`HttpsProxyAgent is not a constructor` when `HTTP_PROXY` is set), and `got` v14 is ESM-only so it is now loaded through a dynamic `import()`.
+- pgr route response: the last row of a route has no geometry, which made `writeRouteResponse` throw when building the link between two legs.
+
+CHANGED:
+- Unit and integration tests no longer depend on the Docker environment: the server test generates its own self-signed certificate instead of reading the Docker secrets, and the projection/API tests resolve their fixtures relative to the test files instead of `/home/docker/app`.
+- Integration tests updated to the API introduced in 3.0.0 (`checkSourceConfiguration`, `loadSourceConfiguration`, `checkDuplicationLoadedSource`, `checkResourceConfiguration`, `loadResourceConfiguration`, `checkServiceConfiguration`, `stopServers`, resource `initResource`) and to the current source/resource configuration format.
+- Valhalla and pgr test fixtures corrected (OSRM assertions copy-pasted into the Valhalla tests, obsolete `topology` constructor argument, outdated TurfJS reference values).
+
 ## 3.1.5
 FIXED:
 - Wait for the administration server to bind successfully before continuing Road2 startup, so startup failures are reported correctly and dependent publication agents do not race an unready admin API.

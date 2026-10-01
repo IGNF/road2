@@ -689,7 +689,9 @@ module.exports = class pgrSource extends Source {
         // La géométrie précédente aura été parcourue en partie par la leg précédente, il faut la rajouter pour parcourir le reste.
         if (response.routes[0].legs.length > 1 && currentGeom) {
           // Si le tronçon doit être repris dans l'autre sens, il faut reverse l'ordre des coordonnées: voir #36883
-          if (!gisManager.arraysEquals(currentGeom.coordinates[currentGeom.coordinates.length - 1 ], JSON.parse(row.geom_json).coordinates[0])) {
+          // Le dernier tronçon d'un itinéraire n'a pas de géométrie, il n'y a alors rien à raccorder.
+          let nextGeom = row.geom_json ? JSON.parse(row.geom_json) : null;
+          if (nextGeom && !gisManager.arraysEquals(currentGeom.coordinates[currentGeom.coordinates.length - 1 ], nextGeom.coordinates[0])) {
             currentGeom.coordinates = currentGeom.coordinates.reverse();
           }
           response.routes[0].legs.slice(-1)[0].geometry.coordinates.push( [...currentGeom.coordinates] );

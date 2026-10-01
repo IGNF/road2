@@ -60,7 +60,7 @@ describe('Test de la classe OsrmResource', function() {
     it('Get Configuration', function() {
       assert.deepEqual(resource.configuration, resourceConfiguration.resource);
     });
-    
+
     it('Get waysAttributes', function() {
       assert.deepEqual(resource.waysAttributes, ["name"]);
     });
