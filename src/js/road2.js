@@ -112,9 +112,12 @@ async function start() {
 }
 
 async function startServicesThenAdmin(administrator) {
-  // Expose the admin API first so dependent agents can observe startup progress.
-  const adminServerStarted = await administrator.createServer();
-  const servicesStarted = await administrator.createServices();
+  // Start service initialization while the admin listener binds; restart calls
+  // wait for the initial service-start attempt to finish.
+  const [adminServerStarted, servicesStarted] = await Promise.all([
+    administrator.createServer(),
+    administrator.createServices()
+  ]);
   return { servicesStarted, adminServerStarted };
 }
 

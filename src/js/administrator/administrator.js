@@ -53,6 +53,9 @@ module.exports = class Administrator {
         // Configuration des logs
         this._logConfiguration = {};
 
+        this._servicesStartupPromise = null;
+        this._restartPromises = new Map();
+
 
     }
 
@@ -428,7 +431,16 @@ module.exports = class Administrator {
      *
      */
 
-    async createServices() {
+    createServices() {
+        const startupPromise = this._createServices();
+        this._servicesStartupPromise = startupPromise.then(
+            () => undefined,
+            () => undefined
+        );
+        return startupPromise;
+    }
+
+    async _createServices() {
 
         LOGGER.info("Vérification et création des services...");
 
@@ -717,8 +729,27 @@ module.exports = class Administrator {
      */
 
     async restartService(serviceId) {
+        let restartPromise = this._restartPromises.get(serviceId);
+        if (!restartPromise) {
+            restartPromise = this._restartService(serviceId);
+            this._restartPromises.set(serviceId, restartPromise);
+            try {
+                return await restartPromise;
+            } finally {
+                this._restartPromises.delete(serviceId);
+            }
+        }
+        return restartPromise;
+    }
+
+    async _restartService(serviceId) {
 
         LOGGER.info("restartService...");
+
+        if (this._servicesStartupPromise) {
+            LOGGER.info("Attente de la fin du démarrage initial des services...");
+            await this._servicesStartupPromise;
+        }
 
         // On récupère la configuration admin de ce service, s'il existe
         const serviceAdminConf = this._configuration.administration.services.find(service => service.id == serviceId);

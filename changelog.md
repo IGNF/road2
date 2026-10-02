@@ -2,6 +2,7 @@
 
 ## 3.1.6
 FIXED:
+- Keep the administration API reachable while services initialize, and queue/coalesce restart requests until the initial service-start attempt completes.
 - `httpQuery` could not be used at all: `https-proxy-agent` v7 exports a named binding (`HttpsProxyAgent is not a constructor` when `HTTP_PROXY` is set), and `got` v14 is ESM-only so it is now loaded through a dynamic `import()`.
 - pgr route response: the last row of a route has no geometry, which made `writeRouteResponse` throw when building the link between two legs.
 
