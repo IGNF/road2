@@ -77,6 +77,30 @@ describe('Test de la classe ResourceManager', function() {
       assert.equal(resourceManager.checkResourceConfiguration(resourceConfiguration), true);
     });
 
+    it('ignore les sources indisponibles si une source reste disponible', function() {
+      const partialResourceConfiguration = JSON.parse(JSON.stringify(resourceConfiguration));
+      partialResourceConfiguration.resource.id = "partial-source-resource";
+      partialResourceConfiguration.resource.sources.push("missing-source");
+      sourceManager.isCheckedSourceAvailable.withArgs("missing-source").returns(false);
+
+      assert.equal(resourceManager.checkResourceConfiguration(partialResourceConfiguration), true);
+      assert.deepEqual(partialResourceConfiguration.resource.sources, ["corse-car-fastest"]);
+    });
+
+    it('validates a resource with no available source but does not register it', function() {
+      const unavailableResourceConfiguration = JSON.parse(JSON.stringify(resourceConfiguration));
+      unavailableResourceConfiguration.resource.id = "unavailable-source-resource";
+      unavailableResourceConfiguration.resource.sources = ["missing-source"];
+      sourceManager.isCheckedSourceAvailable.withArgs("missing-source").returns(false);
+      sourceManager.isLoadedSourceAvailable.withArgs("missing-source").returns(false);
+      const isolatedResourceManager = new ResourceManager(sourceManager, operationManager);
+
+      assert.equal(isolatedResourceManager.checkResourceConfiguration(unavailableResourceConfiguration), true);
+      assert.deepEqual(unavailableResourceConfiguration.resource.sources, []);
+      assert.equal(isolatedResourceManager.loadResourceConfiguration(unavailableResourceConfiguration), false);
+      assert.deepEqual(isolatedResourceManager.resource, {});
+    });
+
     it('checkResourceConfiguration() sans objet resource', function() {
       assert.equal(resourceManager.checkResourceConfiguration({}), false);
     });
@@ -101,11 +125,15 @@ describe('Test de la classe ResourceManager', function() {
       assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
     });
 
-    it('checkResourceConfiguration() avec des sources vides', function() {
+    it('validates but skips a resource with an empty source list', function() {
       let wrongDescription = JSON.parse(JSON.stringify(resourceConfiguration));
       wrongDescription.resource.id = "test-3";
       wrongDescription.resource.sources = [];
-      assert.equal(resourceManager.checkResourceConfiguration(wrongDescription), false);
+      const isolatedResourceManager = new ResourceManager(sourceManager, operationManager);
+
+      assert.equal(isolatedResourceManager.checkResourceConfiguration(wrongDescription), true);
+      assert.equal(isolatedResourceManager.loadResourceConfiguration(wrongDescription), false);
+      assert.deepEqual(isolatedResourceManager.resource, {});
     });
 
     it('checkResourceConfiguration() avec une operation indisponible pour le type', function() {
@@ -122,6 +150,19 @@ describe('Test de la classe ResourceManager', function() {
     it('loadResourceConfiguration() avec une description correcte', function() {
       assert.equal(resourceManager.loadResourceConfiguration(resourceConfiguration), true);
       assert.equal(resourceManager.resource[resourceConfiguration.resource.id].id, resourceConfiguration.resource.id);
+    });
+
+    it('charge une ressource en ignorant ses sources non chargées', function() {
+      const partialResourceConfiguration = JSON.parse(JSON.stringify(resourceConfiguration));
+      partialResourceConfiguration.resource.id = "partial-loaded-source-resource";
+      partialResourceConfiguration.resource.sources.push("missing-loaded-source");
+      sourceManager.isLoadedSourceAvailable.withArgs("missing-loaded-source").returns(false);
+
+      assert.equal(resourceManager.loadResourceConfiguration(partialResourceConfiguration), true);
+      assert.deepEqual(
+        resourceManager.resource[partialResourceConfiguration.resource.id].configuration.sources,
+        ["corse-car-fastest"]
+      );
     });
 
     it('checkResourceConfiguration() avec un id deja charge', function() {

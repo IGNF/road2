@@ -66,7 +66,7 @@ module.exports = class Service {
     // Stockage de la configuration
     this._configuration = {};
 
-    // Stockage du chemin de la configuration 
+    // Stockage du chemin de la configuration
     this._configurationPath = "";
 
     // Stockage de la configuration des logs
@@ -256,7 +256,7 @@ module.exports = class Service {
     }
 
     // Information sur le logger
-    
+
     // On le test ici aussi pour avoir un check le plus complet quand il est lancé en dehors d'un démarrage de Road2
     LOGGER.debug("Vérification des informations sur les logs");
 
@@ -269,9 +269,9 @@ module.exports = class Service {
         LOGGER.error("Mauvaise configuration: Objet 'application.logs.configuration' manquant !");
         return false;
       } else {
-        
+
         let logConfPath = "";
-          
+
         try {
           logConfPath = path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.logs.configuration);
         } catch (error) {
@@ -285,7 +285,7 @@ module.exports = class Service {
           let logConf = {};
 
           try {
-            // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+            // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
             logConf = JSON.parse(fs.readFileSync(logConfPath));
           } catch (error) {
             LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de conf des logs du service de Road2: " + logConfPath);
@@ -296,12 +296,12 @@ module.exports = class Service {
           if (!LogManager.checkLogConfiguration(logConf)) {
             LOGGER.error("Le logger est mal configuré");
             return false;
-          } 
+          }
 
         } else {
           LOGGER.fatal("Mauvaise configuration: Fichier de conf des logs inexistant : " + logConfPath);
-          return false; 
-        } 
+          return false;
+        }
 
       }
     }
@@ -332,7 +332,7 @@ module.exports = class Service {
             return false;
           } else {
 
-            // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres              
+            // On vérifie que le dossier existe et qu'il contient des fichiers de description des paramètres
             let parameterDirectory = "";
 
             try {
@@ -383,7 +383,7 @@ module.exports = class Service {
 
       if (!userConfiguration.application.projections.directory) {
         LOGGER.fatal("Mauvaise configuration: Champ 'application:projections:directory' manquant !");
-        return false; 
+        return false;
       } else {
 
 
@@ -392,13 +392,13 @@ module.exports = class Service {
         if (!this._projectionManager.checkProjectionDirectory(directory)) {
           LOGGER.fatal("La configuration des projections du dossier est incorrecte");
           return false;
-        } 
+        }
 
       }
 
     }
 
-    // Information sur les sources 
+    // Information sur les sources
     LOGGER.debug("Vérification des informations sur les sources");
 
     if (!userConfiguration.application.sources) {
@@ -433,7 +433,7 @@ module.exports = class Service {
           } else {
 
             let directory =  path.resolve(path.dirname(userConfigurationPath), sourcesDirectories[i]);
-            
+
             if (!(await this._sourceManager.checkSourceDirectory(directory))) {
               LOGGER.error("Le dossier " + directory + " contient des sources dont la vérification a échoué");
               return false;
@@ -443,7 +443,7 @@ module.exports = class Service {
             }
 
           }
-          
+
         }
 
         if (!oneValidDir) {
@@ -452,8 +452,8 @@ module.exports = class Service {
         }
 
       }
-      
-    } 
+
+    }
 
     // Information sur les ressources
 
@@ -491,7 +491,7 @@ module.exports = class Service {
           } else {
 
             let directory =  path.resolve(path.dirname(userConfigurationPath), resourcesDirectories[i]);
-            
+
             if (!this._resourceManager.checkResourceDirectory(directory)) {
               LOGGER.error("Le dossier " + directory + " contient des ressources dont la vérification a échoué");
               return false;
@@ -501,7 +501,7 @@ module.exports = class Service {
             }
 
           }
-          
+
         }
 
         if (!oneValidDir) {
@@ -510,8 +510,8 @@ module.exports = class Service {
         }
 
       }
-      
-    } 
+
+    }
 
     // Information sur le reseau
 
@@ -552,11 +552,11 @@ module.exports = class Service {
 
         if (!userConfiguration.application.network.cors.configuration) {
           LOGGER.fatal("Mauvaise configuration: Champ 'application:network:cors:configuration' manquant !");
-          return false; 
+          return false;
         } else {
 
           let corsFile = "";
-          
+
           try {
             corsFile = path.resolve(path.dirname(userConfigurationPath), userConfiguration.application.network.cors.configuration);
           } catch (error) {
@@ -568,7 +568,7 @@ module.exports = class Service {
           if (fs.existsSync(corsFile)) {
 
             try {
-              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard 
+              // Il s'agit juste de savoir si le fichier est lisible par Road2, il sera exploité plus tard
               JSON.parse(fs.readFileSync(corsFile));
             } catch (error) {
               LOGGER.error("Mauvaise configuration: impossible de lire ou de parser le fichier de cors de Road2: " + corsFile);
@@ -578,7 +578,7 @@ module.exports = class Service {
 
           } else {
             LOGGER.fatal("Mauvaise configuration: Fichier de cors inexistant : " + corsFile);
-            return false; 
+            return false;
           }
 
         }
@@ -665,7 +665,7 @@ module.exports = class Service {
 
     // Chargement des opérations
     LOGGER.info("Chargement des operations...");
-    
+
     let parametersDirectory = "";
     try {
       parametersDirectory = path.resolve(path.dirname(this._configurationPath), this._configuration.application.operations.parameters.directory);
@@ -705,13 +705,13 @@ module.exports = class Service {
       LOGGER.error(error);
       return false;
     }
-    
+
     if (!this._projectionManager.loadProjectionDirectory(projectionsDirectory)) {
       LOGGER.error("Erreur lors du chargement des projections.");
       return false;
     }
 
-    // Chargement des sources 
+    // Chargement des sources
     LOGGER.info("Chargement des sources...");
 
     for (let i = 0; i < this._configuration.application.sources.directories.length; i++) {
@@ -726,19 +726,18 @@ module.exports = class Service {
         LOGGER.error(error);
         continue;
       }
-      
+
       if (!this._sourceManager.loadSourceDirectory(sourceDirectory)) {
         LOGGER.error("Impossible de charger correctement le dossier de sources " + sourceDirectory);
       } else {
-        // On va continuer 
+        // On va continuer
         LOGGER.info("Les sources du dossier " + sourceDirectory + " sont chargées dans la mesure du possible")
       }
 
     }
 
-    if (this._sourceManager.sources.length === 0) {
-      LOGGER.fatal("Aucune ressource n'a pu etre chargee");
-      return false;
+    if (Object.keys(this._sourceManager.sources).length === 0) {
+      LOGGER.warn("Aucune source disponible au démarrage; le service continuera sans source");
     }
 
     // Chargement des ressources
@@ -756,19 +755,18 @@ module.exports = class Service {
         LOGGER.error(error);
         continue;
       }
-      
+
       if (!this._resourceManager.loadResourceDirectory(resourceDirectory)) {
         LOGGER.error("Impossible de charger correctement le dossier de ressources " + resourceDirectory);
       } else {
-        // On va continuer 
+        // On va continuer
         LOGGER.info("Les ressources du dossier " + resourceDirectory + " sont chargées dans la mesure du possible")
       }
 
     }
 
-    if (this._resourceManager.resource.length === 0) {
-      LOGGER.fatal("Aucune ressource n'a pu etre chargee");
-      return false;
+    if (Object.keys(this._resourceManager.resource).length === 0) {
+      LOGGER.warn("Aucune ressource disponible au démarrage; le service attendra les publications de l'agent");
     }
 
     // Chargement des serveurs
@@ -780,7 +778,7 @@ module.exports = class Service {
     // Stockage de l'instance Service dans l'app expressJS afin que les informations soient accessibles par les requêtes
     road2.set("service", this);
 
-    // Initialisation des CORS 
+    // Initialisation des CORS
     LOGGER.info("Initialisation des cors...");
 
     let corsConfiguration = {};
@@ -804,7 +802,7 @@ module.exports = class Service {
       LOGGER.error(error);
       return false;
     }
-    
+
     // Gestion des en-têtes avec helmet selon les préconisations d'ExpressJS
     road2.use(helmet());
 
@@ -824,8 +822,8 @@ module.exports = class Service {
       LOGGER.error(error);
       return false;
     }
-    
-    // Chargement des APIs indiquées dans la conf 
+
+    // Chargement des APIs indiquées dans la conf
     LOGGER.info("Chargement des APIs indiquées dans la configuration...");
 
     for (let i = 0; i < this._configuration.application.apis.length; i++) {
@@ -844,7 +842,7 @@ module.exports = class Service {
     LOGGER.info("Chargement des serveurs...");
 
     for (let i = 0; i < this._configuration.application.network.servers.length; i++) {
-      
+
       let serverConf = this._configuration.application.network.servers[i];
       LOGGER.info("Chargement du serveur : " + serverConf.id);
 
@@ -1007,16 +1005,16 @@ module.exports = class Service {
       LOGGER.debug("Service child received request: ");
       LOGGER.debug(request);
 
-      // TODO : vérifier que le message vient bien du parent ? 
+      // TODO : vérifier que le message vient bien du parent ?
 
       let response;
       try {
         response = this.computeAdminRequest(request);
       } catch(error) {
-        // C'est un cas particulier : on veut retrouver l'usage des controller d'APIs 
+        // C'est un cas particulier : on veut retrouver l'usage des controller d'APIs
         // => comme c'est une requête, on fait du throw en cas d'erreur et c'est normal
         // ce n'est pas une vraie erreur. Cependant, on veut renvoyer l'erreur au parent
-        // donc on copie le message  
+        // donc on copie le message
         LOGGER.info("Erreur lors de l'exécution de la requête: " + error.message);
         error._uuid = request._uuid;
         error._errorFlag = true;
@@ -1064,7 +1062,7 @@ module.exports = class Service {
       }
 
     });
-    
+
   }
 
   /**
@@ -1072,7 +1070,7 @@ module.exports = class Service {
   * @function
   * @name computeAdminRequest
   * @description Fonction utilisée pour traiter une requête venant de l'administrateur
-  * @param {object} request - Instance fille de la classe Request 
+  * @param {object} request - Instance fille de la classe Request
   *
   */
 
@@ -1081,12 +1079,12 @@ module.exports = class Service {
     LOGGER.info("computeAdminRequest...");
 
     // On part du principe qu'un maximum de vérifications ont été faites avant par l'administrateur
-    // On essaye de réduire l'exécution par le service 
+    // On essaye de réduire l'exécution par le service
 
     // Le passage potentiel par IPC fait perdre les méthodes donc dans la suite, on est obligé de prendre les attributs avec _
 
-    // En fonction du type de la requête, on va appeler différentes fonctions 
-    // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper. 
+    // En fonction du type de la requête, on va appeler différentes fonctions
+    // Le if est un choix modifiable. Pour le moment c'est ainsi car dans le cas du serviceProcess, on ne peut pas y échapper.
     if (request._type === "healthRequest") {
       return this.computeHealthRequest(request);
     }else if (request._type === "projectionRequest") {
@@ -1102,7 +1100,7 @@ module.exports = class Service {
   * @function
   * @name computeHealthRequest
   * @description Fonction utilisée pour connaître l'état du service
-  * @param {HealthRequest} healthRequest - Instance de la classe HealthRequest 
+  * @param {HealthRequest} healthRequest - Instance de la classe HealthRequest
   *
   */
 
@@ -1120,11 +1118,11 @@ module.exports = class Service {
     for (let sourceId in this._sourceManager.sources) {
 
       let sourceState = this._sourceManager.sources[sourceId].state;
-      
+
       if (sourceState === "red") {
         nbRed++;
       } else if (sourceState === "green" || sourceState === "init") {
-        // Les cas "green" et "init" sont considérés comme équivalent 
+        // Les cas "green" et "init" sont considérés comme équivalent
       } else {
         // État inconnu donc on lève une alerte et on le met manuellement à "unknown" pour ne pas renvoyer n'importe quoi à l'administrateur
         sourceState = "unknown";
@@ -1135,9 +1133,9 @@ module.exports = class Service {
 
     }
 
-    // Pour faire simple : 
-    //  - un service est orange si une des sources est indisponible 
-    //  - service est rouge si la moitié, ou plus, de ses sources sont indisponibles 
+    // Pour faire simple :
+    //  - un service est orange si une des sources est indisponible
+    //  - service est rouge si la moitié, ou plus, de ses sources sont indisponibles
     if (nbRed > 0) {
 
       if (nbRed >= nbSources / 2) {
@@ -1145,7 +1143,7 @@ module.exports = class Service {
       } else {
         serviceState.state = "orange";
       }
-      
+
     } else {
       serviceState.state = "green";
     }
@@ -1160,7 +1158,7 @@ module.exports = class Service {
   * @function
   * @name computeProjectionRequest
   * @description Fonction utilisée pour connaitre une projection utilisée par un service
-  * @param {projectionRequest} projectionRequest - Instance de la classe projectionRequest 
+  * @param {projectionRequest} projectionRequest - Instance de la classe projectionRequest
   * @returns {projectionResponse} response - Instance de la classe projectionResponse
   *
   */
@@ -1172,14 +1170,14 @@ module.exports = class Service {
     // On doit utiliser les attributs avec _ car les méthodes ne sont pas disponible dans le cadre d'une communication IPC
     let projectionIdAsked = projectionRequest._projection;
 
-    if (!this._projectionManager.isProjectionLoaded(projectionIdAsked)) {      
+    if (!this._projectionManager.isProjectionLoaded(projectionIdAsked)) {
       throw errorManager.createError(`Can't find projection ${projectionIdAsked}`, 404);
     } else {
 
       LOGGER.debug("La projection " + projectionIdAsked + " existe");
       let param = this._projectionManager.getProjectionParameters(projectionIdAsked);
       LOGGER.debug("Paramétres de la projection : " + param);
-      
+
       return new ProjectionResponse(projectionIdAsked, param);
 
     }

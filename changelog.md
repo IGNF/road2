@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.1.7
+FIXED:
+- Return HTTP 503 from the admin health endpoint unless the global service state is green; ignore unavailable source IDs when building each resource's runtime source registry.
+- Allow Road2 to start with no sources or resources so the publication agent can populate them after startup; resources with no available sources are skipped.
+
 ## 3.1.6
 FIXED:
 - Keep the administration API reachable while services initialize, and queue/coalesce restart requests until the initial service-start attempt completes.

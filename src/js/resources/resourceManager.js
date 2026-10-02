@@ -242,21 +242,16 @@ module.exports = class resourceManager {
         return false;
       }
 
-      if (resourceJsonObject.resource.sources.length === 0) {
-        LOGGER.error("Mauvaise configuration: 'resource.sources' est un tableau vide");
-        return false;
-      }
-
-      for (let i = 0; i < resourceJsonObject.resource.sources.length; i++ ) {
-
-        let sourceId = resourceJsonObject.resource.sources[i];
-        if (!this._sourceManager.isCheckedSourceAvailable(sourceId)) {
-          LOGGER.error("La ressource contient une source non disponible : " + sourceId);
-          return false;
-        } else {
-          // TODO : on stocke l'id de la ressource pour cette source donnée
+      resourceJsonObject.resource.sources = resourceJsonObject.resource.sources.filter(sourceId => {
+        if (this._sourceManager.isCheckedSourceAvailable(sourceId)) {
+          return true;
         }
+        LOGGER.warn(`La source ${sourceId} n'est pas disponible et sera ignorée pour cette ressource`);
+        return false;
+      });
 
+      if (resourceJsonObject.resource.sources.length === 0) {
+        LOGGER.warn(`Aucune source disponible pour la ressource ${resourceJsonObject.resource.id}; elle ne sera pas chargée`);
       }
 
       LOGGER.debug("Vérification des sources terminée");
@@ -385,13 +380,24 @@ module.exports = class resourceManager {
       // C'est la première ressource créée
     }
 
-    // Vérification des sources associées
+    if (!Array.isArray(resourceJsonObject.resource.sources)) {
+      LOGGER.error("Mauvaise configuration: 'resource.sources' n'est pas un tableau");
+      return false;
+    }
+
+    // Keep unavailable sources out of this resource's runtime source registry.
     LOGGER.info("Vérification du chargement des sources associées...");
-    for (let i = 0; i < resourceJsonObject.resource.sources.length; i++) {
-      if (!this._sourceManager.isLoadedSourceAvailable(resourceJsonObject.resource.sources[i])) {
-        LOGGER.error("La source associée à la ressource n'est pas chargée : " + resourceJsonObject.resource.sources[i].id);
-        return false;
+    resourceJsonObject.resource.sources = resourceJsonObject.resource.sources.filter(sourceId => {
+      if (this._sourceManager.isLoadedSourceAvailable(sourceId)) {
+        return true;
       }
+      LOGGER.warn(`La source ${sourceId} n'est pas chargée et sera ignorée pour cette ressource`);
+      return false;
+    });
+
+    if (resourceJsonObject.resource.sources.length === 0) {
+      LOGGER.warn(`Aucune source chargée pour la ressource ${resourceJsonObject.resource.id}; elle ne sera pas chargée`);
+      return false;
     }
 
     // Création des opérations

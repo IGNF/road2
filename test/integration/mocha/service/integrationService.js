@@ -53,6 +53,37 @@ describe('Test de la classe Service', function() {
 
   });
 
+  describe('Test du démarrage sans sources ni ressources', function() {
+
+    it('continue le chargement de la configuration sans source ou ressource', function() {
+      const emptyService = new Service();
+      emptyService.saveServiceConfiguration({
+        application: {
+          operations: {
+            parameters: {directory: "parameters"},
+            directory: "operations"
+          },
+          projections: {directory: "projections"},
+          sources: {directories: ["sources"]},
+          resources: {directories: ["resources"]},
+          network: {servers: [{id: "internalServer"}]},
+          apis: []
+        }
+      }, __filename, logManager.getLogsConf());
+
+      emptyService._operationManager.loadParameterDirectory = sinon.stub().returns(true);
+      emptyService._operationManager.loadOperationDirectory = sinon.stub().returns(true);
+      emptyService._projectionManager.loadProjectionDirectory = sinon.stub().returns(true);
+      emptyService._sourceManager.loadSourceDirectory = sinon.stub().returns(true);
+      emptyService._resourceManager.loadResourceDirectory = sinon.stub().returns(true);
+      emptyService._serverManager.loadServerConfiguration = sinon.stub().returns(true);
+
+      assert.strictEqual(emptyService.loadServiceConfiguration(), true);
+      assert.strictEqual(emptyService._serverManager.loadServerConfiguration.calledOnce, true);
+    });
+
+  });
+
   describe('Test de la gestion des ressources', function() {
 
     let resource = { id: "corse-osm" };

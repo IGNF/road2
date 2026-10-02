@@ -81,7 +81,7 @@ router.route("/health")
       LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
-      res.status(200).json(userResponse);
+      res.status(healthResponse.globalState === 'green' ? 200 : 503).json(userResponse);
 
     } catch (error) {
       return next(error);
