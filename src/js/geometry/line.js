@@ -5,7 +5,6 @@ const polyline = require('@mapbox/polyline');
 const wkt = require('./formats/wkt');
 const Geometry = require('./geometry');
 const proj4 = require('proj4');
-const assert = require('assert');
 
 /**
 *
@@ -113,19 +112,14 @@ module.exports = class Line extends Geometry {
 
       let tmpGeom = this.getLineIn(projection, this._format);
 
-      try {
-
-        assert.deepStrictEqual(tmpGeom, {});
+      if (typeof tmpGeom === "object" && tmpGeom !== null && Object.keys(tmpGeom).length === 0) {
         return false;
-
-      } catch (err) {
-
-        this._geom = tmpGeom;
-        super.projection = projection;
-
-        return true;
-
       }
+
+      this._geom = tmpGeom;
+      super.projection = projection;
+
+      return true;
 
     } else {
       // il n'y a rien à faire

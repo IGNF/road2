@@ -1000,12 +1000,9 @@ module.exports = class sourceManager {
       return true;
     }
 
-    try {
-      assert.deepStrictEqual(this._loadedSourceConfiguration, {});
+    if (Object.keys(this._loadedSourceConfiguration).length === 0) {
       LOGGER.error("Aucune source n'a été préalablement chargée");
       return false;
-    } catch (err) {
-      // tout va bien
     }
 
     let nbSourceConnected = 0;
@@ -1058,12 +1055,9 @@ module.exports = class sourceManager {
       return true;
     }
 
-    try {
-      assert.deepStrictEqual(this._loadedSourceConfiguration, {});
+    if (Object.keys(this._loadedSourceConfiguration).length === 0) {
       LOGGER.error("Aucune source n'a été préalablement chargée");
       return false;
-    } catch (err) {
-      // tout va bien
     }
 
     let nbSourceDisconnected = 0;

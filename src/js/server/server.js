@@ -4,7 +4,6 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const errorManager = require('../utils/errorManager');
-const assert = require('assert');
 
 const log4js = require('log4js');
 
@@ -102,8 +101,7 @@ module.exports = class Server {
     LOGGER.info("Démarage du serveur...");
 
     // si le serveur n'existe pas, on le crée
-    try {
-      assert.deepStrictEqual(this._server, {});
+    if (Object.keys(this._server).length === 0) {
 
       // serveur
       if (this._enableHttps === "true") {
@@ -121,8 +119,6 @@ module.exports = class Server {
 
       }
 
-    } catch (err) {
-      // tout va bien
     }
 
     // on lance l'écoute du serveur

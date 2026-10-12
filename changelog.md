@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.8
+FIXED:
+- Service process crashed with OOM at startup: `assert.deepStrictEqual(x, {})` used as an emptiness check always failed on non-empty catalogs, and building the assertion message serialized the whole object graph (servers, resources, sources). Replaced with `Object.keys(x).length === 0` checks.
+
 ## 3.1.7
 FIXED:
 - Return HTTP 503 from the admin health endpoint unless the global service state is green; ignore unavailable source IDs when building each resource's runtime source registry.

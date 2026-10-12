@@ -3,7 +3,6 @@
 const Server = require('./server');
 const log4js = require('log4js');
 const fs = require('fs');
-const assert = require('assert');
 
 // Création du LOGGER
 const LOGGER = log4js.getLogger("SERVERMANAGER");
@@ -283,12 +282,9 @@ module.exports = class serverManager {
       return false;
     }
 
-    try {
-      assert.deepStrictEqual(this._serverCatalog, {});
+    if (Object.keys(this._serverCatalog).length === 0) {
       LOGGER.error("Aucun serveur n'a ete cree.");
       return false;
-    } catch (err) {
-      // tout va bien
     }
 
     let allServersStatus = true;
@@ -338,12 +334,9 @@ module.exports = class serverManager {
       return true;
     }
 
-    try {
-      assert.deepStrictEqual(this._serverCatalog, {});
+    if (Object.keys(this._serverCatalog).length === 0) {
       LOGGER.warn("Aucun serveur n'est disponible (catalog).");
       return true;
-    } catch (err) {
-      // On continue
     }
 
     let allServersStatus = true;
