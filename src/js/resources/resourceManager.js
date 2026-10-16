@@ -5,6 +5,7 @@ const path = require('path');
 const osrmResource = require('../resources/osrmResource');
 const pgrResource = require('../resources/pgrResource');
 const valhallaResource = require('../resources/valhallaResource');
+const proxyResource = require('../resources/proxyResource');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -36,7 +37,8 @@ module.exports = class resourceManager {
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "valhalla": ["route", "isochrone"]
+      "valhalla": ["route", "isochrone"],
+      "proxy": ["route", "isochrone"]
     };
 
     // Manager de source
@@ -414,6 +416,8 @@ module.exports = class resourceManager {
       resource = new pgrResource(resourceJsonObject, resourceOperationHash);
     } else if (resourceJsonObject.resource.type === "valhalla") {
       resource = new valhallaResource(resourceJsonObject, resourceOperationHash);
+    } else if (resourceJsonObject.resource.type === "proxy") {
+      resource = new proxyResource(resourceJsonObject, resourceOperationHash);
     } else {
       LOGGER.error("Type de la ressource inconnue");
       return false;

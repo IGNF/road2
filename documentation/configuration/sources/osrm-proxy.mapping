@@ -1,0 +1,22 @@
+{
+    "route": {
+        "method": "GET",
+        "path": {
+            "$concat": [
+                "/route/v1/",
+                "${cost.profile}",
+                "/",
+                { "$join": { "from": "coordinates", "separator": ";", "as": "${item.0},${item.1}" } }
+            ]
+        },
+        "query": {
+            "overview": "full",
+            "geometries": "polyline6",
+            "steps": "true"
+        },
+        "response": {
+            "format": "osrm",
+            "polylinePrecision": 6
+        }
+    }
+}
