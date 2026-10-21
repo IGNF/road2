@@ -6,6 +6,8 @@ const assert = require('assert').strict;
 const osrmSource = require('../sources/osrmSource');
 const pgrSource = require('../sources/pgrSource');
 const valhallaSource = require('../sources/valhallaSource');
+const proxySource = require('../sources/proxySource');
+const proxyMapper = require('../sources/proxyMapper');
 const log4js = require('log4js');
 
 // Création du LOGGER
@@ -49,7 +51,8 @@ module.exports = class sourceManager {
     this._operationsByType = {
       "osrm": ["nearest", "route"],
       "pgr": ["route", "isochrone"],
-      "valhalla": ["route", "isochrone"]
+      "valhalla": ["route", "isochrone"],
+      "proxy": ["route", "isochrone"]
     };
 
   }
@@ -350,6 +353,8 @@ module.exports = class sourceManager {
         validation = await this.checkSourcePgr(sourceJsonObject);
       } else if (sourceJsonObject.type === "valhalla") {
         validation = this.checkSourceValhalla(sourceJsonObject);
+      } else if (sourceJsonObject.type === "proxy") {
+        validation = this.checkSourceProxy(sourceJsonObject);
       } else {
         LOGGER.error("La source indique un type invalide : " + sourceJsonObject.type);
         return false;
@@ -743,6 +748,79 @@ module.exports = class sourceManager {
   /**
   *
   * @function
+  * @name checkSourceProxy
+  * @description Fonction utilisée pour vérifier le contenu d'un fichier de description d'une source proxy.
+  * @param {json} sourceJsonObject - Description JSON de la source
+  * @return {boolean}
+  *
+  */
+  checkSourceProxy(sourceJsonObject) {
+
+    LOGGER.info("Verification de la source proxy...");
+
+    const proxy = sourceJsonObject.proxy;
+
+    if (!proxy) {
+      LOGGER.error("Mauvaise configuration : 'source.proxy' absent");
+      return false;
+    }
+
+    if (typeof proxy.url !== "string" || !/^https?:\/\/.+/.test(proxy.url)) {
+      LOGGER.error("Mauvaise configuration : 'source.proxy.url' absent ou n'est pas une url http(s)");
+      return false;
+    }
+
+    if (proxy.timeout !== undefined && (!Number.isInteger(proxy.timeout) || proxy.timeout <= 0)) {
+      LOGGER.error("Mauvaise configuration : 'source.proxy.timeout' doit être un entier positif (ms)");
+      return false;
+    }
+
+    if (!proxy.mapping) {
+      LOGGER.error("Mauvaise configuration : 'source.proxy.mapping' absent");
+      return false;
+    }
+
+    let mapping = proxy.mapping;
+    if (typeof mapping === "string") {
+      try {
+        mapping = proxyMapper.loadMappingFile(mapping);
+      } catch (error) {
+        LOGGER.error("Impossible de lire le mapping " + proxy.mapping + " : " + error);
+        return false;
+      }
+    }
+
+    const mappingError = proxyMapper.checkMapping(mapping);
+    if (mappingError) {
+      LOGGER.error("Mauvaise configuration du mapping : " + mappingError);
+      return false;
+    }
+
+    if (!Array.isArray(sourceJsonObject.costs) || sourceJsonObject.costs.length === 0) {
+      LOGGER.error("Mauvaise configuration : 'source.costs' absent, n'est pas un tableau ou est vide");
+      return false;
+    }
+
+    for (let i = 0; i < sourceJsonObject.costs.length; i++) {
+      const cost = sourceJsonObject.costs[i];
+      if (!cost.profile || !cost.optimization || !cost.costType) {
+        LOGGER.error("Mauvaise configuration : 'source.costs[" + i + "]' doit contenir profile, optimization et costType");
+        return false;
+      }
+      if (cost.parameters !== undefined && (cost.parameters === null || typeof cost.parameters !== "object")) {
+        LOGGER.error("Mauvaise configuration : 'source.costs[" + i + "].parameters' doit être un objet");
+        return false;
+      }
+    }
+
+    LOGGER.info("Fin de la verification de la source proxy.");
+    return true;
+
+  }
+
+  /**
+  *
+  * @function
   * @name checkDuplicationLoadedSource
   * @description Fonction utilisée pour vérifier que le contenu d'un fichier de description d'une source est bien le même qu'un autre.
   * @param {json} sourceJsonObject - Description JSON de la source
@@ -914,6 +992,8 @@ module.exports = class sourceManager {
 
     } else if (sourceJsonObject.type === "valhalla") {
       source = new valhallaSource(sourceJsonObject);
+    } else if (sourceJsonObject.type === "proxy") {
+      source = new proxySource(sourceJsonObject);
     } else {
       LOGGER.error("Le type de la source est inconnu");
       return false;
