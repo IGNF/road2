@@ -1,4 +1,4 @@
-FROM node:24.12-trixie-slim
+FROM node:24.22-trixie-slim
 
 ### Mise à jour des paquets
 RUN apt-get update && apt-get upgrade -y && apt-get install -y libtbb12 && rm -rf /var/lib/apt/lists/*
