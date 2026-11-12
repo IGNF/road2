@@ -1957,7 +1957,13 @@ goog.removeUid = function(obj) {
  * @type {string}
  * @private
  */
-goog.UID_PROPERTY_ = 'closure_uid_' + ((Math.random() * 1e9) >>> 0);
+var uid = new Uint32Array(1);
+if (goog.global.crypto && goog.global.crypto.getRandomValues) {
+  goog.global.crypto.getRandomValues(uid);
+  goog.UID_PROPERTY_ = 'closure_uid_' + uid[0];
+} else {
+  goog.UID_PROPERTY_ = 'closure_uid_' + new Date().getTime();
+}
 
 
 /**

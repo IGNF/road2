@@ -98,6 +98,12 @@
 			type: object
 			required: true
 			properties:
+				# Adresses IP/CIDR des reverse proxies de confiance, seuls autorisés à fournir X-Forwarded-For
+				"trustedProxies":
+					type: array
+					required: false
+					items:
+						type: string
 				# Liste des serveurs que l'on veut instancier
 				"servers":
 					type: array
