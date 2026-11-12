@@ -76,10 +76,19 @@ describe('Test de la classe Service', function() {
       emptyService._projectionManager.loadProjectionDirectory = sinon.stub().returns(true);
       emptyService._sourceManager.loadSourceDirectory = sinon.stub().returns(true);
       emptyService._resourceManager.loadResourceDirectory = sinon.stub().returns(true);
-      emptyService._serverManager.loadServerConfiguration = sinon.stub().returns(true);
+      let trustProxy;
+      emptyService._serverManager.loadServerConfiguration = sinon.stub().callsFake(app => {
+        trustProxy = app.get("trust proxy");
+        return true;
+      });
 
       assert.strictEqual(emptyService.loadServiceConfiguration(), true);
       assert.strictEqual(emptyService._serverManager.loadServerConfiguration.calledOnce, true);
+      assert.strictEqual(trustProxy, false);
+
+      emptyService.configuration.application.network.trustedProxies = ["192.0.2.10"];
+      assert.strictEqual(emptyService.loadServiceConfiguration(), true);
+      assert.deepStrictEqual(trustProxy, ["192.0.2.10"]);
     });
 
   });

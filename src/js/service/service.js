@@ -537,6 +537,13 @@ module.exports = class Service {
         return false;
       }
 
+      if (userConfiguration.application.network.trustedProxies !== undefined &&
+          (!Array.isArray(userConfiguration.application.network.trustedProxies) ||
+           !userConfiguration.application.network.trustedProxies.every(proxy => typeof proxy === "string" && proxy.trim()))) {
+        LOGGER.fatal("Mauvaise configuration: Champ 'application:network:trustedProxies' doit être un tableau de chaînes non vides !");
+        return false;
+      }
+
       for (let i = 0; i < userConfiguration.application.network.servers.length; i++) {
         if (!this._serverManager.checkServerConfiguration(userConfiguration.application.network.servers[i])) {
           LOGGER.fatal("Mauvaise configuration d'un serveur !");
@@ -774,6 +781,13 @@ module.exports = class Service {
 
     // Application Express
     let road2 = express();
+    try {
+      road2.set("trust proxy", this._configuration.application.network.trustedProxies || false);
+    } catch (error) {
+      LOGGER.fatal("Impossible de configurer les proxies de confiance !");
+      LOGGER.error(error);
+      return false;
+    }
 
     // Stockage de l'instance Service dans l'app expressJS afin que les informations soient accessibles par les requêtes
     road2.set("service", this);
