@@ -1377,6 +1377,13 @@ module.exports = {
     let finalParameter = "";
     let separator = "";
 
+    if (!Array.isArray(userParameter)) {
+      throw errorManager.createError(" The parameter " + parameterName + " is not an array. ", 400);
+    }
+    if (userParameter.length === 0) {
+      throw errorManager.createError(" The parameter " + parameterName + " is an empty array. ", 400);
+    }
+
     if (serviceParameter.explode === "false") {
       if (serviceParameter.style === "pipeDelimited") {
         separator = "|";
@@ -1391,38 +1398,12 @@ module.exports = {
       return userParameter;
     }
 
-    if (!Array.isArray(userParameter)) {
-      throw errorManager.createError(" The parameter " + parameterName + " is not an array. ", 400);
-    } else {
-      LOGGER.debug("Le parametre est un tableau");
-    }
-    if (userParameter.length === 0) {
-      throw errorManager.createError(" The parameter " + parameterName + " is an empty array. ", 400);
-    } else {
-      LOGGER.debug("Le parametre est un tableau non vide");
-    }
-
     try {
-      if (typeof userParameter[0] !== "object") {
-        finalParameter = userParameter[0];
-      } else {
-        finalParameter = JSON.stringify(userParameter[0]);
-      }
+      finalParameter = userParameter.map((value) => {
+        return value !== null && typeof value === "object" ? JSON.stringify(value) : String(value);
+      }).join(separator);
     } catch(err) {
       throw errorManager.createError(" The parameter " + parameterName + " can't be converted to a string. ", 400);
-    }
-
-    for (let i = 1; i < userParameter.length; i++) {
-      try {
-        //TODO: vérifier que l'on peut mettre i à la place de 0
-        if (typeof userParameter[0] !== "object") {
-          finalParameter = finalParameter + separator + userParameter[i];
-        } else {
-          finalParameter = finalParameter + separator + JSON.stringify(userParameter[i]);
-        }
-      } catch(err) {
-        throw errorManager.createError(" The parameter " + parameterName + " can't be converted to a string. ", 400);
-      }
     }
 
     return finalParameter;

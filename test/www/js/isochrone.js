@@ -15,6 +15,35 @@ var defaultMethod = "time";
 var defaultReverse = "false"
 // --
 
+function displayRequest(container, request) {
+  var card = document.createElement("div");
+  card.className = "card card-body";
+
+  var link = document.createElement("a");
+  link.textContent = request;
+
+  var requestUrl = new URL(request, document.baseURI);
+  if (requestUrl.protocol === "http:" || requestUrl.protocol === "https:") {
+    link.href = requestUrl.href;
+  }
+
+  card.appendChild(link);
+  container.textContent = "";
+  container.appendChild(card);
+}
+
+function displayResponse(container, response) {
+  var card = document.createElement("div");
+  card.className = "card card-body";
+
+  var pre = document.createElement("pre");
+  pre.textContent = JSON.stringify(response, undefined, 2);
+
+  card.appendChild(pre);
+  container.textContent = "";
+  container.appendChild(card);
+}
+
 // -- Variables pour la carte
 
 // Vecteurs qui vont contenir les éléments de l'itineraire sur la carte
@@ -232,7 +261,7 @@ function computeIso() {
 
   // On affiche la requete sur la page
   let requestDiv = document.getElementById('request');
-  requestDiv.innerHTML = "<div class='card card-body'><a href='"+ requestStr + "'>"+requestStr+"</a></div>";
+  displayRequest(requestDiv, requestStr);
 
   // on calcule l'itinéraire
   fetch(requestStr)
@@ -245,7 +274,7 @@ function computeIso() {
 
     // On affiche la réponse sur la page
     let responseDiv = document.getElementById('response');
-    responseDiv.innerHTML = "<div class='card card-body'><pre>"+ JSON.stringify(responseJSON, undefined, 2) +"</pre></div>";
+    displayResponse(responseDiv, responseJSON);
 
   });
   // ----
@@ -294,7 +323,7 @@ function computeOtherRoad(request) {
 
   // On affiche la requete sur la page
   let requestDiv = document.getElementById('request-other');
-  requestDiv.innerHTML = "<div class='card card-body'><a href='" + requestStr + "'>" + requestStr + "</a></div>";
+  displayRequest(requestDiv, requestStr);
 
   // on calcule l'itinéraire
   fetch(requestStr)
@@ -308,7 +337,7 @@ function computeOtherRoad(request) {
 
     // On affiche la réponse sur la page
     let responseDiv = document.getElementById('response-other');
-    responseDiv.innerHTML = "<div class='card card-body'><pre>"+ JSON.stringify(responseJSON, undefined, 2) +"</pre></div>";
+    displayResponse(responseDiv, responseJSON);
 
     // On affiche l'itinéraire sur la carte
     utils.createIso(responseJSON.wktGeometry, "wkt", vectorRoadOther);

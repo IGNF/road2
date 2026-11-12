@@ -7,6 +7,7 @@ const log4js = require('log4js');
 const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
 const swaggerUi = require('swagger-ui-express');
+const { rateLimit } = require('express-rate-limit');
 
 var LOGGER = log4js.getLogger("SIMPLE");
 var router = express.Router();
@@ -90,7 +91,7 @@ router.all("/getcapabilities", function(req, res) {
   if (req.hostname) {
 
     // TODO : corriger avec quelque chose du genre ^http(s)?:\/\/(.+) puis split au premier /
-    let regexpHost = /^http[s]?:\/\/[\w\d:-_\.]*\//;
+    let regexpHost = /^https?:\/\/[\w.:-]*\//;
 
     try {
       getCapabilities.info.url = getCapabilities.info.url.replace(regexpHost, req.protocol + "://" + req.hostname + "/");
@@ -106,6 +107,13 @@ router.all("/getcapabilities", function(req, res) {
   res.status(200).json(getCapabilities);
 
 });
+
+router.use(rateLimit({
+  windowMs: 1000,
+  limit: 500,
+  standardHeaders: true,
+  legacyHeaders: false
+}));
 
 // Route
 // Pour effectuer un calcul d'itinéraire

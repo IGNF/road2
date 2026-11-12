@@ -360,6 +360,10 @@ class road2World {
         // Pour chaque attribut, on va voir s'il existe et le rajouter sinon 
         for (let i = 0; i < attributesTable.length; i++) {
 
+            if (["__proto__", "prototype", "constructor"].includes(attributesTable[i])) {
+                throw "AttributeSchema contains an unsafe property";
+            }
+
             // Analyse de l'attribut courant pour son nom ou son indice
             let attributeName;
 
