@@ -7,6 +7,7 @@ const log4js = require('log4js');
 const controller = require('./controller/controller');
 const errorManager = require('../../../utils/errorManager');
 const swaggerUi = require('swagger-ui-express');
+const { rateLimit } = require('express-rate-limit');
 
 let LOGGER = log4js.getLogger("OSRM");
 let router = express.Router();
@@ -43,6 +44,13 @@ router.all("/resources", function(req, res, next) {
   return next(errorManager.createError("Not Implemented", 501));
 
 });
+
+router.use(rateLimit({
+  windowMs: 1000,
+  limit: 500,
+  standardHeaders: true,
+  legacyHeaders: false
+}));
 
 // Route: routing request
 router.route("/:resource/:profile/:optimization/route/v1/_/:coordinates")
