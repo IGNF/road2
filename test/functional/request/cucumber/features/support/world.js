@@ -4,7 +4,6 @@ const fs = require('fs');
 const turf = require('@turf/turf');
 const axios = require('axios');
 const tunnel = require('tunnel');
-const https = require('https');
 const polyline = require('@mapbox/polyline');
 
 
@@ -248,14 +247,6 @@ class road2World {
         if (process.env.HTTP_PROXY === "") {
 
             finalRequest.proxy = false;
-
-            if (currentProtocol === "https") {
-                finalRequest.httpsAgent = new https.Agent({
-                    rejectUnauthorized: false
-                });
-            } else {
-                // rien à ajouter 
-            }
 
         } else {
             // on a un proxy http 
