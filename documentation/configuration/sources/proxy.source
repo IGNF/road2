@@ -1,0 +1,32 @@
+{
+    "id": "valhalla-proxy",
+    "description": "Service Valhalla distant",
+    "type": "proxy",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",
+    "proxy": {
+        "url": "http://valhalla:8002",
+        "timeout": 10000,
+        "mapping": "/home/docker/config/valhalla-proxy.mapping"
+    },
+    "costs": [
+        {
+            "profile": "car",
+            "optimization": "fastest",
+            "costType": "time",
+            "parameters": { "costing": "auto", "contourDivisor": 60 }
+        },
+        {
+            "profile": "car",
+            "optimization": "shortest",
+            "costType": "distance",
+            "parameters": { "costing": "auto_shorter", "contourDivisor": 1000 }
+        },
+        {
+            "profile": "pedestrian",
+            "optimization": "shortest",
+            "costType": "distance",
+            "parameters": { "costing": "pedestrian", "contourDivisor": 1000, "options": { "walking_speed": 4 } }
+        }
+    ]
+}

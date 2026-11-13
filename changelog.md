@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+ADDED:
+- `proxy` source and resource type: Road2 translates `route` and `isochrone` requests to a remote HTTP service (e.g. a Valhalla container) using a declarative mapping file (`source.proxy.url`, `source.proxy.mapping`). See `documentation/configuration/sources/proxy.source` and `valhalla-proxy.mapping`.
+
 ## 3.1.8
 FIXED:
 - Service process crashed with OOM at startup: `assert.deepStrictEqual(x, {})` used as an emptiness check always failed on non-empty catalogs, and building the assertion message serialized the whole object graph (servers, resources, sources). Replaced with `Object.keys(x).length === 0` checks.

@@ -1,0 +1,20 @@
+{
+    "id": "osrm-proxy-car",
+    "description": "Service osrm-routed distant (profil voiture)",
+    "type": "proxy",
+    "projection": "EPSG:4326",
+    "bbox": "-180,-90,180,90",
+    "proxy": {
+        "url": "http://osrm:5000",
+        "timeout": 10000,
+        "mapping": "/home/docker/config/osrm-proxy.mapping"
+    },
+    "costs": [
+        {
+            "profile": "car",
+            "optimization": "fastest",
+            "costType": "time",
+            "parameters": { "profile": "driving" }
+        }
+    ]
+}
