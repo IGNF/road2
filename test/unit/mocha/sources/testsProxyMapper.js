@@ -54,9 +54,19 @@ describe('Test de proxyMapper', function() {
       assert.strictEqual(proxyMapper.render(node, context), "/route/car/2.1,48.1;2.2,48.2");
     });
 
+    it('$join avec un séparateur vide', function() {
+      const node = { $join: { from: "values", separator: "", as: "${item}" } };
+      assert.strictEqual(proxyMapper.render(node, { values: ["first", "last"] }), "firstlast");
+    });
+
     it('$fromEntries', function() {
       const result = proxyMapper.render({ $fromEntries: { from: "constraints", key: "${item}", value: "1" } }, context);
       assert.deepStrictEqual(result, { toll: "1" });
+    });
+
+    it('$merge', function() {
+      const result = proxyMapper.render({ $merge: [{ walking_speed: 4 }, { $fromEntries: { from: "constraints", key: "${item}", value: true } }] }, context);
+      assert.deepStrictEqual(result, { walking_speed: 4, toll: true });
     });
 
   });

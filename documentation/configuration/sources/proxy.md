@@ -35,6 +35,8 @@ Un objet par opération (`route`, `isochrone`) :
 
 ### Templates
 
+`$merge` fusionne les objets rendus et donne priorité aux clés des objets suivants.
+
 - `"${variable.chemin}"` : valeur typée si c'est toute la chaîne, sinon interpolation. Fonctionne aussi dans les clés.
 - Les valeurs indéfinies sont omises.
 - `{"$for": "liste", "$as": template}` : itération (`item`, `index`)

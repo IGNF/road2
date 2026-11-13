@@ -42,7 +42,7 @@ module.exports = class proxySource extends Source {
     const mapping = sourceJsonObject.proxy.mapping;
     this._mapping = typeof mapping === "string" ? proxyMapper.loadMappingFile(mapping) : mapping;
 
-    this._httpQuery = new httpQuery();
+    this._httpQuery = new httpQuery({ https: { rejectUnauthorized: true } });
 
     // Correspondance profile/optimization et profile/costType vers la configuration du coût
     this._costs = {};
@@ -123,7 +123,10 @@ module.exports = class proxySource extends Source {
       options.headers = proxyMapper.render(operationMapping.headers, context);
     }
     if (operationMapping.query) {
-      options.searchParams = this.toSearchParams(proxyMapper.render(operationMapping.query, context));
+      const query = proxyMapper.render(operationMapping.query, context);
+      if (query !== undefined) {
+        options.searchParams = this.toSearchParams(query);
+      }
     }
 
     let call;
@@ -161,7 +164,7 @@ module.exports = class proxySource extends Source {
       if (error && error.response) {
         // Le service a répondu : il est joignable mais n'a pas pu traiter la requête
         this.state = "green";
-        return Promise.reject(errorManager.createError(" No path found ", 404));
+        return Promise.reject(errorManager.createError(" Upstream proxy service error ", 502));
       }
 
       this.state = "red";

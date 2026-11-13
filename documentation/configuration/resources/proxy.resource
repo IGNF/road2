@@ -3,6 +3,7 @@
         "id": "valhalla-proxy",
         "type": "proxy",
         "description": "Ressource proxy vers un service Valhalla.",
+        "resourceVersion": "2026-11-13",
         "sources": ["valhalla-proxy"],
         "availableOperations": [
             {
@@ -20,6 +21,7 @@
                     { "id": "bbox", "defaultValueContent": "true" },
                     { "id": "projection", "defaultValueContent": "EPSG:4326", "values": ["EPSG:4326", "EPSG:2154"] },
                     { "id": "date_time" },
+                    { "id": "constraints", "values": [{ "keyType": "name-valhalla", "key": "wayType", "availableConstraintType": ["banned"], "availableValues": [{ "value": "autoroute", "field": "exclude_tolls" }] }] },
                     { "id": "timeUnit", "defaultValueContent": "minute", "values": ["hour", "minute", "second", "standard"] },
                     { "id": "distanceUnit", "defaultValueContent": "meter", "values": ["meter", "kilometer"] }
                 ]
@@ -34,6 +36,7 @@
                     { "id": "profile", "defaultValueContent": "car", "values": ["car", "pedestrian"] },
                     { "id": "direction", "defaultValueContent": "departure", "values": ["departure", "arrival"] },
                     { "id": "date_time" },
+                    { "id": "constraints", "values": [{ "keyType": "name-valhalla", "key": "wayType", "availableConstraintType": ["banned"], "availableValues": [{ "value": "autoroute", "field": "exclude_tolls" }] }] },
                     { "id": "projection", "defaultValueContent": "EPSG:4326", "values": ["EPSG:4326", "EPSG:2154"] },
                     { "id": "geometryFormat", "defaultValueContent": "geojson", "values": ["geojson", "polyline", "wkt"] },
                     { "id": "timeUnit", "defaultValueContent": "second", "values": ["hour", "minute", "second"] },

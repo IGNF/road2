@@ -8,7 +8,7 @@ const SUPPORTED_RESPONSE_FORMATS = {
   "route": ["osrm"],
   "isochrone": ["geojson"]
 };
-const DIRECTIVES = ["$for", "$if", "$divide", "$multiply", "$lookup", "$fromEntries", "$concat", "$join"];
+const DIRECTIVES = ["$for", "$if", "$divide", "$multiply", "$lookup", "$fromEntries", "$concat", "$join", "$merge"];
 
 /**
 *
@@ -130,7 +130,18 @@ function render(node, context) {
     if (!Array.isArray(list)) {
       return undefined;
     }
-    return list.map((item, index) => render(node.$join.as, {...context, item, index})).join(node.$join.separator || ",");
+    const separator = node.$join.separator === undefined ? "," : node.$join.separator;
+    return list.map((item, index) => render(node.$join.as, {...context, item, index})).join(separator);
+  }
+
+  if (node.$merge !== undefined) {
+    if (!Array.isArray(node.$merge)) {
+      return undefined;
+    }
+    return node.$merge
+      .map((value) => render(value, context))
+      .filter((value) => value !== null && typeof value === "object" && !Array.isArray(value))
+      .reduce((result, value) => ({...result, ...value}), {});
   }
 
   const result = {};
