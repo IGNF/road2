@@ -103,9 +103,9 @@ function render(node, context) {
   if (node.$lookup !== undefined) {
     const key = render(node.$lookup.value, context);
     if (key !== undefined && Object.prototype.hasOwnProperty.call(node.$lookup.table, key)) {
-      return node.$lookup.table[key];
+      return render(node.$lookup.table[key], context);
     }
-    return node.$lookup.default;
+    return render(node.$lookup.default, context);
   }
 
   if (node.$fromEntries !== undefined) {
@@ -116,7 +116,11 @@ function render(node, context) {
     const result = {};
     list.forEach((item, index) => {
       const itemContext = {...context, item, index};
-      result[render(node.$fromEntries.key, itemContext)] = render(node.$fromEntries.value, itemContext);
+      const key = render(node.$fromEntries.key, itemContext);
+      const value = render(node.$fromEntries.value, itemContext);
+      if (key !== undefined && value !== undefined) {
+        result[key] = value;
+      }
     });
     return result;
   }
@@ -156,24 +160,85 @@ function render(node, context) {
 
 }
 
-function findUnknownDirective(node) {
+function isObject(node) {
+  return node !== null && typeof node === "object" && !Array.isArray(node);
+}
+
+function isPath(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function checkTemplate(node) {
   if (Array.isArray(node)) {
     for (const n of node) {
-      const found = findUnknownDirective(n);
-      if (found) {
-        return found;
+      const error = checkTemplate(n);
+      if (error) {
+        return error;
       }
     }
-  } else if (node !== null && typeof node === "object") {
-    for (const key of Object.keys(node)) {
-      if (key.startsWith("$") && !key.startsWith("${") && !DIRECTIVES.includes(key) && !["$as", "$then", "$else"].includes(key)) {
-        return key;
-      }
-      const found = findUnknownDirective(node[key]);
-      if (found) {
-        return found;
+  } else if (isObject(node)) {
+    const keys = Object.keys(node);
+    const directives = keys.filter((key) => key.startsWith("$") && !key.startsWith("${"));
+    if (directives.length === 0) {
+      return checkTemplate(Object.values(node));
+    }
+
+    const directive = directives.find((key) => DIRECTIVES.includes(key));
+    if (!directive) {
+      return "directive inconnue '" + directives[0] + "'";
+    }
+
+    const value = node[directive];
+    let allowedKeys = [directive];
+    let templates = [];
+    let valid = true;
+    switch (directive) {
+      case "$for":
+        allowedKeys = [directive, "$as"];
+        valid = isPath(value) && node.$as !== undefined;
+        templates = [node.$as];
+        break;
+      case "$if":
+        allowedKeys = [directive, "$then", "$else"];
+        valid = isPath(value) && node.$then !== undefined;
+        templates = [node.$then, node.$else];
+        break;
+      case "$divide":
+      case "$multiply":
+        valid = Array.isArray(value) && value.length === 2;
+        templates = value;
+        break;
+      case "$concat":
+      case "$merge":
+        valid = Array.isArray(value);
+        templates = value;
+        break;
+      case "$lookup":
+        valid = isObject(value) && value.value !== undefined && isObject(value.table) &&
+          Object.keys(value).every((key) => ["value", "table", "default"].includes(key));
+        if (valid) {
+          templates = [value.value, ...Object.values(value.table), value.default];
+        }
+        break;
+      case "$fromEntries":
+      case "$join": {
+        const fields = directive === "$fromEntries" ? ["from", "key", "value"] : ["from", "as", "separator"];
+        valid = isObject(value) && isPath(value.from) && Object.keys(value).every((key) => fields.includes(key));
+        if (valid && directive === "$fromEntries") {
+          valid = value.key !== undefined && value.value !== undefined;
+          templates = [value.key, value.value];
+        } else if (valid) {
+          valid = value.as !== undefined && (value.separator === undefined || typeof value.separator === "string");
+          templates = [value.as];
+        }
+        break;
       }
     }
+
+    if (!valid || keys.some((key) => !allowedKeys.includes(key))) {
+      return "structure invalide pour la directive '" + directive + "'";
+    }
+    return checkTemplate(templates);
   }
   return null;
 }
@@ -218,9 +283,9 @@ function checkMapping(mapping) {
       return "'" + operation + ".response.format' doit valoir " + SUPPORTED_RESPONSE_FORMATS[operation].join(" ou ");
     }
 
-    const unknown = findUnknownDirective([conf.path, conf.query, conf.body]);
-    if (unknown) {
-      return "directive inconnue '" + unknown + "' dans l'opération '" + operation + "'";
+    const templateError = checkTemplate([conf.path, conf.query, conf.body, conf.headers]);
+    if (templateError) {
+      return templateError + " dans l'opération '" + operation + "'";
     }
 
   }

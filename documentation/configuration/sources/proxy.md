@@ -42,9 +42,11 @@ Un objet par opération (`route`, `isochrone`) :
 - `{"$for": "liste", "$as": template}` : itération (`item`, `index`)
 - `{"$if": "variable", "$then": t, "$else": t}`
 - `{"$divide": [a, b]}`, `{"$multiply": [a, b]}`
-- `{"$lookup": {"value": "${x}", "table": {...}, "default": v}}`
-- `{"$fromEntries": {"from": "liste", "key": "${item}", "value": v}}`
+- `{"$lookup": {"value": "${x}", "table": {...}, "default": v}}` : rend le template associé à la clé trouvée, ou le template `default` (optionnel).
+- `{"$fromEntries": {"from": "liste", "key": "${item}", "value": v}}` : omet les entrées dont la clé ou la valeur rendue est indéfinie, sans écraser les valeurs précédentes dans un `$merge`.
 - `{"$concat": [t1, t2, ...]}` : concaténation (utile pour construire `path`)
 - `{"$join": {"from": "liste", "separator": ";", "as": template}}` : jointure des éléments d'une liste
+
+Les templates de `path`, `query`, `body` et `headers` sont validés au chargement, y compris les templates imbriqués. Un objet directive ne doit contenir que les champs de cette directive. Les chemins (`$for`, `$if`, `from`) sont des chaînes non vides ; `$as`, `$then`, `key`, `value` et `as` sont obligatoires pour leurs directives respectives. `$divide` et `$multiply` attendent exactement deux opérandes ; `$concat` et `$merge` attendent un tableau ; la table de `$lookup` est un objet. Le séparateur de `$join`, s'il est fourni, est une chaîne.
 
 Mappings fournis : `valhalla-proxy.mapping` (route et isochrone) et `osrm-proxy.mapping` (route seulement, OSRM n'a pas d'isochrone), avec les sources d'exemple `proxy.source` et `osrm-proxy.source`.
