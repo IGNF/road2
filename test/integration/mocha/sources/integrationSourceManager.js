@@ -129,6 +129,21 @@ describe('Test de la classe SourceManager', function() {
 
   });
 
+  describe('Test de la fonction checkSourceProxy()', function() {
+
+    it('checkSourceProxy() rejette une entrée de coût nulle', function() {
+      const proxyDescription = {
+        proxy: {
+          url: "http://proxy.test",
+          mapping: { route: { path: "/route", response: { format: "osrm" } } }
+        },
+        costs: [null]
+      };
+      assert.equal(sourceManager.checkSourceProxy(proxyDescription), false);
+    });
+
+  });
+
   describe('Test de la fonction loadSourceConfiguration()', function() {
 
     it('loadSourceConfiguration() avec une description correcte', function() {

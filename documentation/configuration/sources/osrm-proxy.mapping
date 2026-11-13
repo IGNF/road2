@@ -12,7 +12,8 @@
         "query": {
             "overview": "full",
             "geometries": "polyline6",
-            "steps": "true"
+            "steps": "true",
+            "exclude": { "$if": "constraints", "$then": "${constraints}" }
         },
         "response": {
             "format": "osrm",

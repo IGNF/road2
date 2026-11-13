@@ -3,7 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const sinon = require('sinon');
 const proxySource = require('../../../../src/js/sources/proxySource');
+const responseWriter = require('../../../../src/js/sources/proxyResponseWriter');
 const RouteRequest = require('../../../../src/js/requests/routeRequest');
+const Point = require('../../../../src/js/geometry/point');
 const logManager = require('../logManager');
 const mapping = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../documentation/configuration/sources/valhalla-proxy.mapping')));
 
@@ -65,7 +67,7 @@ describe('Test de la classe proxySource', function() {
     assert.equal(options.json.costing, "auto");
     assert.equal(options.json.date_time, undefined);
     assert.deepStrictEqual(options.json.costing_options.auto, { walking_speed: 4, exclude_tolls: true });
-    assert.deepStrictEqual(options.https, { rejectUnauthorized: true });
+    assert.deepStrictEqual(source._httpQuery._options.https, { rejectUnauthorized: true });
   });
 
   it('computeRequest() passe la source en red si le service est injoignable', async function() {
@@ -107,6 +109,66 @@ describe('Test de la classe proxySource', function() {
 
     await assert.rejects(source.computeRequest(request), (error) => error.status === 502);
     assert.equal(source.state, "green");
+  });
+
+  it('computeRequest() retourne 404 pour les erreurs OSRM sans itinéraire', async function() {
+    const start = { getCoordinatesIn() { return [8.73, 41.92]; } };
+    const end = { getCoordinatesIn() { return [8.76, 41.95]; } };
+    const request = new RouteRequest("res", start, end, "car", "fastest");
+    const upstreamError = new Error("Not Found");
+    upstreamError.response = { statusCode: 404, body: { code: "NoRoute" } };
+    source._httpQuery.post = sinon.stub().rejects(upstreamError);
+
+    await assert.rejects(source.computeRequest(request), (error) => error.status === 404);
+    assert.equal(source.state, "green");
+  });
+
+  it('computeRequest() rejette une erreur pour les problèmes de connexion', async function() {
+    const start = { getCoordinatesIn() { return [8.73, 41.92]; } };
+    const end = { getCoordinatesIn() { return [8.76, 41.95]; } };
+    const request = new RouteRequest("res", start, end, "car", "fastest");
+    source._httpQuery.post = sinon.stub().rejects(new Error("ECONNREFUSED"));
+
+    await assert.rejects(source.computeRequest(request), (error) => error instanceof Error && error.message === "Internal PROXY error");
+  });
+
+  it('writeRouteResponse() preserve les métadonnées OSRM et reprojette leurs coordonnées', function() {
+    const request = new RouteRequest("res", new Point(0, 0, "EPSG:3857"), new Point(0, 0, "EPSG:3857"), "car", "fastest");
+    const response = {
+      waypoints: [
+        { hint: "start-hint", distance: 1, name: "start", location: [8.73, 41.92] },
+        { hint: "end-hint", distance: 2, name: "end", location: [8.76, 41.95] }
+      ],
+      routes: [{
+        geometry: "??",
+        distance: 1,
+        duration: 1,
+        legs: [{
+          summary: "road",
+          distance: 1,
+          duration: 1,
+          steps: [{
+            geometry: "??",
+            name: "road",
+            distance: 1,
+            duration: 1,
+            mode: "driving",
+            maneuver: { type: "turn", bearing_before: 10, bearing_after: 20, location: [8.74, 41.93] },
+            intersections: [{ location: [8.74, 41.93], bearings: [10, 20] }]
+          }]
+        }]
+      }]
+    };
+
+    const result = responseWriter.writeRouteResponse(request, response, "EPSG:4326", 5);
+    const expectedLocation = new Point(8.74, 41.93, "EPSG:4326");
+    expectedLocation.transform("EPSG:3857");
+
+    assert.equal(result.engineExtras.code, "Ok");
+    assert.equal(result.engineExtras.waypoints[0].hint, "start-hint");
+    assert.equal(result.engineExtras.routes[0].legs[0].summary, "road");
+    assert.deepStrictEqual(result.engineExtras.routes[0].legs[0].steps[0].maneuver.location, [expectedLocation.x, expectedLocation.y]);
+    assert.deepStrictEqual(result.engineExtras.routes[0].legs[0].steps[0].intersections[0].location, [expectedLocation.x, expectedLocation.y]);
   });
 
 });

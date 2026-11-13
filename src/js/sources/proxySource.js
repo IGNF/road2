@@ -164,11 +164,15 @@ module.exports = class proxySource extends Source {
       if (error && error.response) {
         // Le service a répondu : il est joignable mais n'a pas pu traiter la requête
         this.state = "green";
+        const body = error.response.body;
+        if (body && (body.code === "NoRoute" || body.code === "NoSegment")) {
+          return Promise.reject(errorManager.createError(" No path found ", 404));
+        }
         return Promise.reject(errorManager.createError(" Upstream proxy service error ", 502));
       }
 
       this.state = "red";
-      return Promise.reject("Internal PROXY error");
+      return Promise.reject(errorManager.createError("Internal PROXY error"));
 
     });
 

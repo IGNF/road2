@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const proxyMapper = require('../../../../src/js/sources/proxyMapper');
 
 describe('Test de proxyMapper', function() {
@@ -67,6 +69,12 @@ describe('Test de proxyMapper', function() {
     it('$merge', function() {
       const result = proxyMapper.render({ $merge: [{ walking_speed: 4 }, { $fromEntries: { from: "constraints", key: "${item}", value: true } }] }, context);
       assert.deepStrictEqual(result, { walking_speed: 4, toll: true });
+    });
+
+    it('conditionne le paramètre exclude aux contraintes présentes', function() {
+      const mapping = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../documentation/configuration/sources/osrm-proxy.mapping')));
+      assert.deepStrictEqual(proxyMapper.render(mapping.route.query, context).exclude, ["toll"]);
+      assert.strictEqual(proxyMapper.render(mapping.route.query, { ...context, constraints: [] }).exclude, undefined);
     });
 
   });

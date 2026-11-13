@@ -11,6 +11,7 @@ const Step = require('../responses/step');
 const Distance = require('../geography/distance');
 const Duration = require('../time/duration');
 const errorManager = require('../utils/errorManager');
+const copyManager = require('../utils/copyManager');
 const turf = require('@turf/turf');
 
 /**
@@ -37,6 +38,15 @@ function writeRouteResponse(routeRequest, osrmResponse, projection, precision) {
 
   const askedProjection = routeRequest.start.projection;
   const waypoints = osrmResponse.waypoints;
+  const engineExtras = {
+    code: "Ok",
+    waypoints: waypoints.map((waypoint) => ({
+      hint: waypoint.hint,
+      distance: waypoint.distance,
+      name: waypoint.name
+    })),
+    routes: []
+  };
 
   const toPoint = (waypoint) => {
     const point = new Point(waypoint.location[0], waypoint.location[1], projection);
@@ -67,10 +77,12 @@ function writeRouteResponse(routeRequest, osrmResponse, projection, precision) {
     }
 
     const portions = [];
+    const nativeLegs = [];
 
     for (let j = 0; j < current.legs.length; j++) {
 
       const leg = current.legs[j];
+      nativeLegs[j] = { summary: leg.summary, steps: [] };
 
       portions[j] = new Portion(toPoint(waypoints[j]), toPoint(waypoints[j + 1]));
       portions[j].distance = new Distance(leg.distance, "meter");
@@ -107,6 +119,31 @@ function writeRouteResponse(routeRequest, osrmResponse, projection, precision) {
         if (legStep.maneuver.exit) {
           steps[k].instruction.exit = legStep.maneuver.exit;
         }
+
+        const nativeStep = { mode: legStep.mode, intersections: [], maneuver: {} };
+        for (const intersection of legStep.intersections || []) {
+          const nativeIntersection = copyManager.deepCopy(intersection);
+          const location = new Point(intersection.location[0], intersection.location[1], projection);
+          if (!location.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of intersection in proxy response. ");
+          }
+          nativeIntersection.location = [location.x, location.y];
+          nativeStep.intersections.push(nativeIntersection);
+        }
+
+        for (const bearing of ["bearing_before", "bearing_after"]) {
+          if (Object.prototype.hasOwnProperty.call(legStep.maneuver, bearing)) {
+            nativeStep.maneuver[bearing] = legStep.maneuver[bearing];
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(legStep.maneuver, "location")) {
+          const location = new Point(legStep.maneuver.location[0], legStep.maneuver.location[1], projection);
+          if (!location.transform(askedProjection)) {
+            throw errorManager.createError(" Error during reprojection of step location in proxy response. ");
+          }
+          nativeStep.maneuver.location = [location.x, location.y];
+        }
+        nativeLegs[j].steps[k] = nativeStep;
       }
 
       portions[j].steps = steps;
@@ -114,10 +151,12 @@ function writeRouteResponse(routeRequest, osrmResponse, projection, precision) {
     }
 
     routes[i].portions = portions;
+    engineExtras.routes[i] = { legs: nativeLegs };
 
   }
 
   routeResponse.routes = routes;
+  routeResponse.engineExtras = engineExtras;
 
   return routeResponse;
 

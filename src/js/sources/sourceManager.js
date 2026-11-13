@@ -803,7 +803,7 @@ module.exports = class sourceManager {
 
     for (let i = 0; i < sourceJsonObject.costs.length; i++) {
       const cost = sourceJsonObject.costs[i];
-      if (!cost.profile || !cost.optimization || !cost.costType) {
+      if (!cost || typeof cost !== "object" || Array.isArray(cost) || !cost.profile || !cost.optimization || !cost.costType) {
         LOGGER.error("Mauvaise configuration : 'source.costs[" + i + "]' doit contenir profile, optimization et costType");
         return false;
       }
