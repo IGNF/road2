@@ -24,7 +24,7 @@
     "cors": "2.8.5",
     "express": "5.2.1",
     "express-rate-limit": "^8.7.4",
-    "got": "14.6.6",
+    "got": "16.2.0",
     "helmet": "8.1.0",
     "https-proxy-agent": "7.0.6",
     "log4js": "6.9.1",
