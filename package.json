@@ -26,7 +26,7 @@
     "express-rate-limit": "^8.7.4",
     "got": "14.6.6",
     "helmet": "8.1.0",
-    "https-proxy-agent": "7.0.6",
+    "https-proxy-agent": "9.1.0",
     "log4js": "6.9.1",
     "nconf": "0.13.0",
     "pg": "8.16.3",
