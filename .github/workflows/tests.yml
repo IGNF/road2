@@ -29,8 +29,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install OpenSSL
-        run: sudo apt-get update && sudo apt-get install --yes openssl
+      - name: Install OpenSSL and OSRM runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes openssl libtbb12
+          sudo apt-get install --yes libtbbmalloc2t64 || sudo apt-get install --yes libtbbmalloc2
 
       - name: Run unit tests
         run: npm run utest
