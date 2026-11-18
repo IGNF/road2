@@ -7,8 +7,8 @@
   "scripts": {
     "start": "env NODE_ENV=prod node ./src/js/road2.js",
     "configCheck": "node ./src/js/road2.js --configCheck",
-    "utest": "mocha --recursive './test/unit/mocha/**/*.js'",
-    "itest": "mocha --recursive './test/integration/mocha/**/*.js'",
+    "utest": "mocha --recursive test/unit/mocha/**/*.js",
+    "itest": "mocha --recursive test/integration/mocha/**/*.js",
     "rtest": "HTTP_PROXY='' ./node_modules/cucumber/bin/cucumber-js ./test/functional/request/cucumber/features/req*.feature",
     "ctest": "./node_modules/cucumber/bin/cucumber-js ./test/functional/configuration/cucumber/features/conf*.feature",
     "lint": "eslint -c eslint.json ./src/",
@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@mapbox/polyline": "1.2.1",
+    "@project-osrm/osrm": "26.4.1",
     "@turf/turf": "7.3.0",
+    "@valhallajs/valhallajs": "3.7.0",
     "assert": "2.1.0",
     "cors": "2.8.5",
     "express": "5.2.1",
@@ -27,21 +29,38 @@
     "https-proxy-agent": "7.0.6",
     "log4js": "6.9.1",
     "nconf": "0.13.0",
-    "proj4": "2.20.2",
-    "swagger-ui-express": "5.0.1",
-    "@project-osrm/osrm": "26.4.1",
     "pg": "8.16.3",
-    "@valhallajs/valhallajs": "3.7.0"
+    "proj4": "2.20.2",
+    "swagger-ui-express": "5.0.1"
   },
   "devDependencies": {
-    "sinon": "^7.2.7",
-    "mock-fs": "^4.9.0",
-    "cucumber": "5.1.0",
     "axios": "^0.34.0",
-    "tunnel": "^0.0.6",
-    "esprima":"4.0.1"
+    "cucumber": "5.1.0",
+    "esprima": "4.0.1",
+    "mocha": "^11.7.2",
+    "mock-fs": "^4.9.0",
+    "sinon": "^7.2.7",
+    "tunnel": "^0.0.6"
   },
   "bundledDependencies": [
+    "cors",
+    "express",
+    "log4js",
+    "nconf",
+    "@project-osrm/osrm",
+    "@valhallajs/valhallajs",
+    "pg",
+    "@mapbox/polyline",
+    "@turf/turf",
+    "proj4",
+    "assert",
+    "helmet",
+    "got",
+    "http-proxy-agent",
+    "swagger-ui-express",
+    "express-rate-limit"
+  ],
+  "bundleDependencies": [
     "cors",
     "express",
     "log4js",
