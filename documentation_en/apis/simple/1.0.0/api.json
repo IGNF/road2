@@ -182,6 +182,14 @@
             "example": true
           },
           {
+            "name": "metadataOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/routeMetadataOnlyOption"
+            }
+          },
+          {
             "name": "getBbox",
             "in": "query",
             "description": "Présence de l'emprise de l'itinéraire dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
@@ -847,6 +855,9 @@
           "getSteps": {
             "type": "boolean"
           },
+          "metadataOnly": {
+            "$ref": "#/components/schemas/routeMetadataOnlyOption"
+          },
           "geometryFormat": {
             "type": "string",
             "enum": [
@@ -967,8 +978,44 @@
           }
         }
       },
+      "routeMetadataOnlyOption": {
+        "type": "boolean",
+        "default": false,
+        "description": "When true, only route-level metadata is returned: no geometry, portions (and thus no steps), or bbox, even when getSteps or getBbox is true. Route calculation is unchanged."
+      },
       "itineraire": {
         "type": "object",
+        "oneOf": [
+          {
+            "title": "Full route",
+            "required": ["geometry", "portions"]
+          },
+          {
+            "title": "Metadata only",
+            "properties": {
+              "geometry": false,
+              "portions": false,
+              "bbox": false
+            },
+            "required": ["resource", "resourceVersion", "start", "end", "profile", "optimization", "crs", "distance", "distanceUnit", "duration", "timeUnit", "constraints"],
+            "examples": [
+              {
+                "resource": "bdtopo-osrm",
+                "resourceVersion": "1",
+                "start": "2.33,48.88",
+                "end": "2.35,48.89",
+                "profile": "car",
+                "optimization": "fastest",
+                "crs": "EPSG:4326",
+                "distance": 2.4,
+                "distanceUnit": "kilometer",
+                "duration": 6,
+                "timeUnit": "minute",
+                "constraints": []
+              }
+            ]
+          }
+        ],
         "properties": {
           "start": {
             "$ref": "#/components/schemas/point"
@@ -977,7 +1024,7 @@
             "$ref": "#/components/schemas/point"
           },
           "geometry": {
-            "type": "string"
+            "type": ["object", "string"]
           },
           "duration": {
             "type": "number",
@@ -987,8 +1034,15 @@
             "type": "number",
             "format": "float"
           },
-          "bbox": {
+          "distanceUnit": {
             "type": "string"
+          },
+          "timeUnit": {
+            "type": "string"
+          },
+          "bbox": {
+            "type": "array",
+            "items": { "type": "number" }
           },
           "resource": {
             "type": "string"
@@ -1042,7 +1096,8 @@
                   "format": "float"
                 },
                 "bbox": {
-                  "type": "string"
+                  "type": "array",
+                  "items": { "type": "number" }
                 },
                 "steps": {
                   "type": "array",

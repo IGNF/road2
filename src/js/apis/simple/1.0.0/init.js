@@ -1,6 +1,7 @@
 'use strict';
 
 const log4js = require('log4js');
+const { METADATA_ONLY_PARAMETER } = require('./routeResponseOptions');
 
 var LOGGER = log4js.getLogger("INIT");
 
@@ -330,6 +331,16 @@ module.exports = {
       constraintsParameterDescription.style = "pipeDelimited";
       constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
       routeDescription.parameters.push(constraintsParameterDescription);
+
+      routeDescription.parameters.push({
+        name: METADATA_ONLY_PARAMETER,
+        in: "query",
+        description: "Ne renvoie que les métadonnées de l'itinéraire, sans géométrie, portions, étapes ni emprise.",
+        required: false,
+        default: "false",
+        schema: { type: "boolean" },
+        example: "true"
+      });
 
       // -- end route.parameters
 
