@@ -21,6 +21,30 @@ Feature: Road2
     Then the server should send a response with status 200
     And the response should contain "Road2 via l'API simple 1.0.0"
 
+  Scenario Outline: Métadonnées seules d'un itinéraire sur <engine>
+    Given an "GET" request on operation "route" in api "simple" "1.0.0"
+    And with default parameters for "route-<engine>"
+    And with query parameters:
+      | key          | value |
+      | metadataOnly | true  |
+    When I send the request
+    Then the server should send a response with status 200
+    And the response should contain an attribute "resourceVersion"
+    And the response should contain an attribute "crs"
+    And the response should contain an attribute "distance"
+    And the response should contain an attribute "distanceUnit"
+    And the response should contain an attribute "duration"
+    And the response should contain an attribute "timeUnit"
+    And the response should not contain an attribute "geometry"
+    And the response should not contain an attribute "portions"
+    And the response should not contain an attribute "bbox"
+
+  Examples:
+    | engine   |
+    | osrm     |
+    | pgr      |
+    | valhalla |
+
   Scenario: GetCapabilities sur l'API simple 1.0.0
     Given an "GET" request on operation "getcapabilities" in api "simple" "1.0.0"
     When I send the request 
