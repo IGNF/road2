@@ -1,6 +1,7 @@
 'use strict';
 
 const log4js = require('log4js');
+const { RETURN_GEOMETRY_PARAMETER } = require('./routeResponseOptions');
 
 var LOGGER = log4js.getLogger("INIT");
 
@@ -330,6 +331,16 @@ module.exports = {
       constraintsParameterDescription.style = "pipeDelimited";
       constraintsParameterDescription.example = "{'constraintType':'banned','key':'ways_type','operator':'=','value':'autoroute'}";
       routeDescription.parameters.push(constraintsParameterDescription);
+
+      routeDescription.parameters.push({
+        name: RETURN_GEOMETRY_PARAMETER,
+        in: "query",
+        description: "Avec false, ne renvoie que la ressource, sa version, le départ, l'arrivée, le profil, l'optimisation, les contraintes, la distance, la durée et leurs unités. Le calcul est inchangé.",
+        required: false,
+        default: "true",
+        schema: { type: "boolean" },
+        example: "false"
+      });
 
       // -- end route.parameters
 

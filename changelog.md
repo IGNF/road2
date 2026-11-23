@@ -2,6 +2,7 @@
 
 ## Unreleased
 ADDED:
+- Simple API route GET/POST parameter `returnGeometry` (default: `true`): when `false`, return only the resource and its version, start/end points, profile, optimization, constraints, distance, duration and their units, without changing route calculation.
 - `proxy` source and resource type: Road2 translates `route` and `isochrone` requests to a remote HTTP service (e.g. a Valhalla container) using a declarative mapping file (`source.proxy.url`, `source.proxy.mapping`). See `documentation/configuration/sources/proxy.source` and `valhalla-proxy.mapping`.
 
 ## 3.1.8

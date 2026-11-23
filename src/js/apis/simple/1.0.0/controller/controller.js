@@ -1015,11 +1015,12 @@ module.exports = {
   * @param {object} RouteRequest - Instance de la classe RouteRequest
   * @param {object} RouteResponse - Instance de la classe RouteResponse
   * @param {object} service - Instance de la classe Service
+  * @param {boolean} returnGeometry - Renvoyer la réponse complète avec la géométrie
   * @return {object} userResponse - Réponse envoyée à l'utilisateur
   *
   */
 
-  writeRouteResponse: function(routeRequest, routeResponse, service) {
+  writeRouteResponse: function(routeRequest, routeResponse, service, returnGeometry = true) {
 
     LOGGER.debug("writeRouteResponse()");
 
@@ -1046,11 +1047,15 @@ module.exports = {
     userResponse.optimization = routeResponse.optimization;
 
     // geometry
-    userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
-    LOGGER.debug("geometry: " + userResponse.geometry);
+    if (returnGeometry) {
+      userResponse.geometry = route.geometry.getGeometryWithFormat(routeRequest.geometryFormat);
+      LOGGER.debug("geometry: " + userResponse.geometry);
+    }
 
     // crs
-    userResponse.crs = route.geometry.projection;
+    if (returnGeometry) {
+      userResponse.crs = route.geometry.projection;
+    }
 
     // Units
     // distance
@@ -1060,7 +1065,7 @@ module.exports = {
     userResponse.timeUnit = routeRequest.timeUnit;
 
     // bbox
-    if (routeRequest.bbox) {
+    if (returnGeometry && routeRequest.bbox) {
       userResponse.bbox = Turf.bbox(route.geometry.getGeometryWithFormat("geojson"));
       LOGGER.debug("bbox:");
       LOGGER.debug(userResponse.bbox);
@@ -1096,6 +1101,10 @@ module.exports = {
       }
     } else {
       LOGGER.debug("no constraints asked by user");
+    }
+
+    if (!returnGeometry) {
+      return userResponse;
     }
 
     // On ne considère que le premier itinéraire renvoyé par routeResponse

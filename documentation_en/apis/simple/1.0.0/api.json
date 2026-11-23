@@ -182,6 +182,14 @@
             "example": true
           },
           {
+            "name": "returnGeometry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/routeReturnGeometryOption"
+            }
+          },
+          {
             "name": "getBbox",
             "in": "query",
             "description": "Présence de l'emprise de l'itinéraire dans la réponse. Les valeurs disponibles et la valeur par défaut utilisées sont présentes dans le GetCapabilities.",
@@ -847,6 +855,9 @@
           "getSteps": {
             "type": "boolean"
           },
+          "returnGeometry": {
+            "$ref": "#/components/schemas/routeReturnGeometryOption"
+          },
           "geometryFormat": {
             "type": "string",
             "enum": [
@@ -967,8 +978,44 @@
           }
         }
       },
+      "routeReturnGeometryOption": {
+        "type": "boolean",
+        "default": true,
+        "description": "When false, only resource, resourceVersion, start, end, profile, optimization, constraints, distanceUnit, timeUnit, distance and duration are returned, even when getSteps or getBbox is true. Other parameters are still validated and route calculation is unchanged."
+      },
       "itineraire": {
         "type": "object",
+        "oneOf": [
+          {
+            "title": "Full route",
+            "required": ["geometry", "portions"]
+          },
+          {
+            "title": "Metadata only",
+            "properties": {
+              "geometry": false,
+              "portions": false,
+              "bbox": false,
+              "crs": false
+            },
+            "required": ["resource", "resourceVersion", "start", "end", "profile", "optimization", "constraints", "distance", "distanceUnit", "duration", "timeUnit"],
+            "examples": [
+              {
+                "resource": "bdtopo-osrm",
+                "resourceVersion": "2026-11-20",
+                "start": "2.337325,48.84932",
+                "end": "2.367842,48.85278",
+                "profile": "car",
+                "optimization": "fastest",
+                "distance": 2.5685,
+                "distanceUnit": "kilometer",
+                "duration": 0.16141666666666668,
+                "timeUnit": "hour",
+                "constraints": []
+              }
+            ]
+          }
+        ],
         "properties": {
           "start": {
             "$ref": "#/components/schemas/point"
@@ -977,7 +1024,7 @@
             "$ref": "#/components/schemas/point"
           },
           "geometry": {
-            "type": "string"
+            "type": ["object", "string"]
           },
           "duration": {
             "type": "number",
@@ -987,8 +1034,15 @@
             "type": "number",
             "format": "float"
           },
-          "bbox": {
+          "distanceUnit": {
             "type": "string"
+          },
+          "timeUnit": {
+            "type": "string"
+          },
+          "bbox": {
+            "type": "array",
+            "items": { "type": "number" }
           },
           "resource": {
             "type": "string"
@@ -1042,7 +1096,8 @@
                   "format": "float"
                 },
                 "bbox": {
-                  "type": "string"
+                  "type": "array",
+                  "items": { "type": "number" }
                 },
                 "steps": {
                   "type": "array",
