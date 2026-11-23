@@ -4,7 +4,7 @@ const express = require('express');
 const sinon = require('sinon');
 const controller = require('../../../../src/js/apis/simple/1.0.0/controller/controller');
 const router = require('../../../../src/js/apis/simple/1.0.0');
-const { METADATA_ONLY_PARAMETER } = require('../../../../src/js/apis/simple/1.0.0/routeResponseOptions');
+const { RETURN_GEOMETRY_PARAMETER } = require('../../../../src/js/apis/simple/1.0.0/routeResponseOptions');
 const Distance = require('../../../../src/js/geography/distance');
 const Duration = require('../../../../src/js/time/duration');
 const Line = require('../../../../src/js/geometry/line');
@@ -91,20 +91,26 @@ describe('Simple API controller', function() {
           });
         }
 
-        assert.deepStrictEqual(controller.writeRouteResponse(routeRequest, response, service, true), {
+        assert.deepStrictEqual(controller.writeRouteResponse(routeRequest, response, service, false), {
           resource: 'test',
           resourceVersion: '1',
           start: '650000,6860000',
           end: '652000,6860000',
           profile: 'car',
           optimization: 'fastest',
-          crs: 'EPSG:2154',
           distance: 2,
           distanceUnit: 'kilometer',
           duration: 0.5,
           timeUnit: 'hour',
           constraints: routeRequest.constraints
         });
+      });
+
+      it('returns an empty constraints array when no constraints were requested', function() {
+        const response = controller.writeRouteResponse(
+          { ...routeRequest, constraints: [] }, makeRouteResponse(), service, false
+        );
+        assert.deepStrictEqual(response.constraints, []);
       });
 
       for (const method of ['GET', 'POST']) {
@@ -121,11 +127,11 @@ describe('Simple API controller', function() {
             const route = process.env.ROUTE_ROUTE || 'route';
             const url = `http://127.0.0.1:${server.address().port}/simple/1.0.0/${route}`;
             const send = (values = []) => method === 'GET'
-              ? fetch(`${url}?${new URLSearchParams(values.map(value => [METADATA_ONLY_PARAMETER, value]))}`)
+              ? fetch(`${url}?${new URLSearchParams(values.map(value => [RETURN_GEOMETRY_PARAMETER, value]))}`)
               : fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values.length ? { [METADATA_ONLY_PARAMETER]: values[0] } : {})
+                body: JSON.stringify(values.length ? { [RETURN_GEOMETRY_PARAMETER]: values[0] } : {})
               });
 
             const full = await send();
@@ -135,11 +141,11 @@ describe('Simple API controller', function() {
             assert.ok(fullBody.bbox);
             assert.strictEqual(fullBody.portions.length, 2);
             assert.ok(fullBody.portions[0].steps[0].geometry);
-            assert.deepStrictEqual(await (await send([false])).json(), fullBody);
+            assert.deepStrictEqual(await (await send([true])).json(), fullBody);
 
-            const metadata = await send([true]);
+            const metadata = await send([false]);
             assert.strictEqual(metadata.status, 200);
-            const { geometry, bbox, portions, ...expectedMetadata } = fullBody;
+            const { geometry, bbox, portions, crs, ...expectedMetadata } = fullBody;
             assert.deepStrictEqual(await metadata.json(), expectedMetadata);
             sinon.assert.alwaysCalledWithExactly(computeRequest, routeRequest);
 
@@ -149,7 +155,7 @@ describe('Simple API controller', function() {
             for (const values of invalidValues) {
               const invalid = await send(values);
               assert.strictEqual(invalid.status, 400);
-              assert.ok((await invalid.json()).error.message.includes(METADATA_ONLY_PARAMETER));
+              assert.ok((await invalid.json()).error.message.includes(RETURN_GEOMETRY_PARAMETER));
             }
             sinon.assert.callCount(computeRequest, 3);
           } finally {

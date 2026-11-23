@@ -182,11 +182,11 @@
             "example": true
           },
           {
-            "name": "metadataOnly",
+            "name": "returnGeometry",
             "in": "query",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/routeMetadataOnlyOption"
+              "$ref": "#/components/schemas/routeReturnGeometryOption"
             }
           },
           {
@@ -855,8 +855,8 @@
           "getSteps": {
             "type": "boolean"
           },
-          "metadataOnly": {
-            "$ref": "#/components/schemas/routeMetadataOnlyOption"
+          "returnGeometry": {
+            "$ref": "#/components/schemas/routeReturnGeometryOption"
           },
           "geometryFormat": {
             "type": "string",
@@ -978,10 +978,10 @@
           }
         }
       },
-      "routeMetadataOnlyOption": {
+      "routeReturnGeometryOption": {
         "type": "boolean",
-        "default": false,
-        "description": "When true, only route-level metadata is returned: no geometry, portions (and thus no steps), or bbox, even when getSteps or getBbox is true. Route calculation is unchanged."
+        "default": true,
+        "description": "When false, only resource, resourceVersion, start, end, profile, optimization, constraints, distanceUnit, timeUnit, distance and duration are returned, even when getSteps or getBbox is true. Other parameters are still validated and route calculation is unchanged."
       },
       "itineraire": {
         "type": "object",
@@ -995,22 +995,22 @@
             "properties": {
               "geometry": false,
               "portions": false,
-              "bbox": false
+              "bbox": false,
+              "crs": false
             },
-            "required": ["resource", "resourceVersion", "start", "end", "profile", "optimization", "crs", "distance", "distanceUnit", "duration", "timeUnit", "constraints"],
+            "required": ["resource", "resourceVersion", "start", "end", "profile", "optimization", "constraints", "distance", "distanceUnit", "duration", "timeUnit"],
             "examples": [
               {
                 "resource": "bdtopo-osrm",
-                "resourceVersion": "1",
-                "start": "2.33,48.88",
-                "end": "2.35,48.89",
+                "resourceVersion": "2026-11-20",
+                "start": "2.337325,48.84932",
+                "end": "2.367842,48.85278",
                 "profile": "car",
                 "optimization": "fastest",
-                "crs": "EPSG:4326",
-                "distance": 2.4,
+                "distance": 2.5685,
                 "distanceUnit": "kilometer",
-                "duration": 6,
-                "timeUnit": "minute",
+                "duration": 0.16141666666666668,
+                "timeUnit": "hour",
                 "constraints": []
               }
             ]

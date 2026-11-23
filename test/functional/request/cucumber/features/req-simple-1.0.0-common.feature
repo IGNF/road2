@@ -25,12 +25,13 @@ Feature: Road2
     Given an "GET" request on operation "route" in api "simple" "1.0.0"
     And with default parameters for "route-<engine>"
     And with query parameters:
-      | key          | value |
-      | metadataOnly | true  |
+      | key            | value |
+      | returnGeometry | false |
     When I send the request
     Then the server should send a response with status 200
     And the response should contain an attribute "resourceVersion"
-    And the response should contain an attribute "crs"
+    And the response should not contain an attribute "crs"
+    And the response should contain an attribute "constraints"
     And the response should contain an attribute "distance"
     And the response should contain an attribute "distanceUnit"
     And the response should contain an attribute "duration"

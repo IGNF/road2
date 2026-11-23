@@ -2,14 +2,14 @@
 
 const errorManager = require('../../../utils/errorManager');
 
-const METADATA_ONLY_PARAMETER = 'metadataOnly';
+const RETURN_GEOMETRY_PARAMETER = 'returnGeometry';
 
-function readMetadataOnly(parameters, method) {
-  if (!parameters || !Object.hasOwn(parameters, METADATA_ONLY_PARAMETER)) {
-    return false;
+function readReturnGeometry(parameters, method) {
+  if (!parameters || !Object.hasOwn(parameters, RETURN_GEOMETRY_PARAMETER)) {
+    return true;
   }
 
-  const value = parameters[METADATA_ONLY_PARAMETER];
+  const value = parameters[RETURN_GEOMETRY_PARAMETER];
   if (method === 'GET') {
     if (value === 'true' || value === 'false') {
       return value === 'true';
@@ -18,7 +18,7 @@ function readMetadataOnly(parameters, method) {
     return value;
   }
 
-  throw errorManager.createError(` Parameter '${METADATA_ONLY_PARAMETER}' is invalid: expected true or false. `, 400);
+  throw errorManager.createError(` Parameter '${RETURN_GEOMETRY_PARAMETER}' is invalid: expected true or false. `, 400);
 }
 
-module.exports = { METADATA_ONLY_PARAMETER, readMetadataOnly };
+module.exports = { RETURN_GEOMETRY_PARAMETER, readReturnGeometry };

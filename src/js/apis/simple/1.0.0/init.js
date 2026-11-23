@@ -1,7 +1,7 @@
 'use strict';
 
 const log4js = require('log4js');
-const { METADATA_ONLY_PARAMETER } = require('./routeResponseOptions');
+const { RETURN_GEOMETRY_PARAMETER } = require('./routeResponseOptions');
 
 var LOGGER = log4js.getLogger("INIT");
 
@@ -333,13 +333,13 @@ module.exports = {
       routeDescription.parameters.push(constraintsParameterDescription);
 
       routeDescription.parameters.push({
-        name: METADATA_ONLY_PARAMETER,
+        name: RETURN_GEOMETRY_PARAMETER,
         in: "query",
-        description: "Ne renvoie que les métadonnées de l'itinéraire, sans géométrie, portions, étapes ni emprise.",
+        description: "Avec false, ne renvoie que la ressource, sa version, le départ, l'arrivée, le profil, l'optimisation, les contraintes, la distance, la durée et leurs unités. Le calcul est inchangé.",
         required: false,
-        default: "false",
+        default: "true",
         schema: { type: "boolean" },
-        example: "true"
+        example: "false"
       });
 
       // -- end route.parameters

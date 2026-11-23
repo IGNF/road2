@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 const log4js = require('log4js');
 const controller = require('./controller/controller');
-const { readMetadataOnly } = require('./routeResponseOptions');
+const { readReturnGeometry } = require('./routeResponseOptions');
 const errorManager = require('../../../utils/errorManager');
 const swaggerUi = require('swagger-ui-express');
 const { rateLimit } = require('express-rate-limit');
@@ -141,13 +141,13 @@ router.route("/" + routeNameRoute)
 
       // Vérification des paramètres de la requête
       const routeRequest = controller.checkRouteParameters(parameters, service, "GET");
-      const metadataOnly = readMetadataOnly(parameters, "GET");
+      const returnGeometry = readReturnGeometry(parameters, "GET");
       LOGGER.debug(routeRequest);
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       LOGGER.debug(routeResponse);
       // Formattage de la réponse
-      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service, metadataOnly);
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service, returnGeometry);
       LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
@@ -179,13 +179,13 @@ router.route("/" + routeNameRoute)
 
       // Vérification des paramètres de la requête
       const routeRequest = controller.checkRouteParameters(parameters, service, "POST");
-      const metadataOnly = readMetadataOnly(parameters, "POST");
+      const returnGeometry = readReturnGeometry(parameters, "POST");
       LOGGER.debug(routeRequest);
       // Envoie au service et récupération de l'objet réponse
       const routeResponse = await service.computeRequest(routeRequest);
       LOGGER.debug(routeResponse);
       // Formattage de la réponse
-      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service, metadataOnly);
+      const userResponse = controller.writeRouteResponse(routeRequest, routeResponse, service, returnGeometry);
       LOGGER.debug(userResponse);
 
       res.set('content-type', 'application/json');
