@@ -34,7 +34,7 @@
     "swagger-ui-express": "5.0.1"
   },
   "devDependencies": {
-    "axios": "^0.34.0",
+    "axios": "^1.21.1",
     "cucumber": "5.1.0",
     "esprima": "4.0.1",
     "mocha": "^12.0.3",
