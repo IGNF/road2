@@ -22,7 +22,7 @@
     "@valhallajs/valhallajs": "3.9.2",
     "assert": "2.1.0",
     "cors": "2.8.5",
-    "express": "5.2.1",
+    "express": "5.3.0",
     "express-rate-limit": "^8.7.4",
     "got": "16.2.0",
     "helmet": "8.3.0",
