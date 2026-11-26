@@ -18,7 +18,7 @@
   "dependencies": {
     "@mapbox/polyline": "1.2.1",
     "@project-osrm/osrm": "26.4.1",
-    "@turf/turf": "7.3.0",
+    "@turf/turf": "7.4.0",
     "@valhallajs/valhallajs": "3.9.2",
     "assert": "2.1.0",
     "cors": "2.8.5",
